@@ -68,7 +68,42 @@ export async function loadAds() {
       document.head.appendChild(s);
     }
   }
+  notice();
   return CFG;
+}
+
+/**
+ * THE COOKIE NOTICE, and an honest account of what it is and is not.
+ *
+ * It appears ONLY when advertising is actually switched on, because
+ * until then there is nothing to consent to: PLAYPILE itself sets no
+ * cookies at all, and a banner asking permission for nothing is the kind
+ * of thing that trained everybody to click "accept" without reading.
+ *
+ * WHAT THIS IS NOT: a Consent Management Platform. Since 2024 Google
+ * requires a CERTIFIED CMP for traffic from the EEA and the UK, and a
+ * hand-rolled bar like this one does not qualify however it is worded.
+ * The free one is Google's own "Privacy & messaging" tool, switched on
+ * inside the AdSense account once it is approved - it drops its own
+ * script in and takes over from this. Until then this is a plain notice:
+ * it tells people what is happening and points at the cookie page, which
+ * is what the site owes them and what a reviewer looks for.
+ */
+function notice() {
+  if (!CFG || !CFG.enabled) return;
+  try { if (localStorage.getItem('pd.notice') === '1') return; } catch (e) {}
+  const bar = document.createElement('div');
+  bar.className = 'notice';
+  bar.innerHTML = '<span>PLAYPILE keeps your scores in this browser. '
+    + 'Adverts on this site may set cookies to count how often one is shown &mdash; '
+    + '<a href="/site/cookies.html">what that means</a>.</span>'
+    + '<button type="button">Got it</button>';
+  bar.querySelector('button').addEventListener('click', () => {
+    try { localStorage.setItem('pd.notice', '1'); } catch (e) {}
+    bar.remove();
+  });
+  const put = () => document.body && document.body.appendChild(bar);
+  if (document.body) put(); else addEventListener('DOMContentLoaded', put);
 }
 
 /**

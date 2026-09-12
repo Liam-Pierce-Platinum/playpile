@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Not found — PLAYPILE</title>
+<link rel="stylesheet" href="/site/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>🕹️</text></svg>">
+</head>
+<body>
+<header class="top"><div class="bar">
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <nav class="links"><a href="/">All games</a><a href="/site/about.html">About</a>
+    <a href="/site/advertise.html">Advertise</a></nav>
+</div></header>
+
+<main class="wrap" style="max-width:760px">
+  <section class="hero">
+    <h1>There is nothing here</h1>
+    <p>That page does not exist. It may have been a game that moved, or a link with a
+       typo in it. Everything that does exist is one click away.</p>
+    <p style="margin-top:18px"><a class="btn" href="/">All sixteen games</a></p>
+  </section>
+
+  <section class="about" style="margin-top:26px">
+    <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:0 0 10px">Try one of these</h2>
+    <div id="some"></div>
+  </section>
+</main>
+
+<footer class="foot"><div class="wrap"><div class="row">
+  <span>PLAYPILE</span><span class="sp"></span>
+  <a href="/">All games</a><a href="/site/about.html">About</a>
+  <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+</div></div></footer>
+
+<script type="module">
+// A DEAD END SHOULD STILL OFFER SOMETHING. A 404 that only apologises
+// sends the visitor back to the tab bar; six cards sends some of them
+// into a game, which is the whole point of a portal.
+import { GAMES } from '/site/catalogue.js';
+const six = GAMES.slice().sort(() => Math.random() - 0.5).slice(0, 6);
+document.getElementById('some').innerHTML = six.map((x) => `
+  <a class="mini" href="/play/${x.slug}">
+    <span class="th" style="background-image:url('/shots/${x.slug}.png')"></span>
+    <span><b>${x.title}</b><small>${x.tag}</small></span>
+  </a>`).join('');
+</script>
+</body>
+</html>

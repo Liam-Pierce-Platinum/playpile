@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kickback</title>
+<style>
+:root{ --ink:#12101a; --edge:#2a2438; --text:#d8d4e2; --dim:#7b7590; --hi:#d4b02c; }
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--ink);color:var(--text);
+  font:12px/1.6 ui-monospace,"Courier New",monospace}
+body{min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px}
+header{display:flex;align-items:baseline;gap:16px;width:100%;max-width:1440px;flex-wrap:wrap}
+h1{margin:0;font-size:17px;font-weight:700;letter-spacing:.34em;color:var(--hi)}
+header span{color:var(--dim);letter-spacing:.04em}
+header .rule{margin-left:auto;color:#c03a2e}
+.frame{position:relative;line-height:0;border:1px solid var(--edge);background:#000}
+canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges}
+#hud{position:absolute;left:0;top:0;pointer-events:none}
+.cols{display:flex;gap:34px;flex-wrap:wrap;width:100%;max-width:1440px;
+  border-top:1px solid var(--edge);padding-top:12px;color:var(--dim)}
+.cols h2{margin:0 0 5px;font-size:11px;letter-spacing:.16em;color:var(--hi);font-weight:700}
+.cols b{color:var(--text);font-weight:700}
+.note{max-width:1440px;width:100%;color:var(--dim)}
+.note strong{color:var(--text);font-weight:700}
+.note em{font-style:normal;color:#d4b02c}
+</style>
+</head>
+<body>
+<header>
+  <h1>KICKBACK</h1>
+  <span>six floors up, and the gun is the only way to move</span>
+  <span class="rule">click to aim &mdash; two shells at a time</span>
+</header>
+<div class="frame">
+  <canvas id="view"></canvas>
+</div>
+<div class="cols">
+  <div>
+    <h2>MOVING</h2>
+    <div><b>A D</b> walk &nbsp; <b>mouse</b> swing the gun &nbsp; <b>click</b> fire &nbsp; <b>R</b> reload</div>
+    <div>Walking is slow. The gun is how you actually get anywhere.</div>
+  </div>
+  <div>
+    <h2>THE GUN IS THE JUMP</h2>
+    <div>Shoot <b>down</b> and you go up. Shoot <b>up</b> in the air and you come down hard.</div>
+    <div>Shoot <b>into a wall</b> beside you and it throws you off it.</div>
+  </div>
+  <div>
+    <h2>CRATES</h2>
+    <div>One at the top of every stair. <b>1 2 3</b> to pick.</div>
+  </div>
+</div>
+<p class="note">
+  Walking is slow and the stairs are slow. <strong>The shotgun is how you actually get anywhere</strong>
+  &mdash; and you only have two shells before you have to break it open, so every barrel is
+  a choice between going somewhere and hitting somebody. <em>Gas drums go up when you shoot them.</em>
+  Columns stop bullets, but only if you get <em>behind</em> one rather than merely level with it.
+</p>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

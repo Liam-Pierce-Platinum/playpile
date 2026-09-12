@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exposure</title>
+<style>
+:root{
+  --ink:#06080c;
+  --edge:#1b232f;
+  --text:#e6ecf5;
+  --dim:#79839a;
+  --faint:#3c4657;
+  --warm:#ffcf8a;
+  --cold:#a8bdd6;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--ink);color:var(--text);
+  font:12px/1.55 "Courier New",ui-monospace,monospace}
+body{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;padding:16px}
+
+header{display:flex;align-items:baseline;gap:14px;width:100%;max-width:900px;flex-wrap:wrap}
+h1{margin:0;font-size:17px;font-weight:700;letter-spacing:.36em}
+header span{color:var(--dim);letter-spacing:.05em}
+header .rule{margin-left:auto;color:var(--cold);opacity:.85}
+
+/* the cabinet: a black bezel, because the game is mostly black and it
+   needs an edge to sit inside */
+.frame{padding:9px;background:#010204;border:1px solid var(--edge);
+  box-shadow:0 0 0 1px #090d13, 0 26px 60px -40px #000;line-height:0}
+canvas{display:block;image-rendering:pixelated;cursor:crosshair;background:#05070a}
+
+.keys{display:flex;gap:22px;flex-wrap:wrap;width:100%;max-width:900px;
+  border-top:1px solid var(--edge);padding-top:10px;color:var(--dim)}
+.keys b{color:var(--text);font-weight:700}
+.note{max-width:900px;width:100%;color:var(--dim)}
+.note i{font-style:normal;color:var(--warm)}
+.note em{font-style:normal;color:var(--cold)}
+.note strong{color:var(--text);font-weight:700}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>EXPOSURE</h1>
+  <span>240 &times; 160 &middot; d-pad and two buttons</span>
+  <span class="rule">the flash freezes &mdash; you are always shooting at where things were</span>
+</header>
+
+<div class="frame"><canvas id="screen"></canvas></div>
+
+<div class="keys">
+  <div><b>arrows</b> / <b>WASD</b> move &mdash; the gun points where you walked</div>
+  <div><b>shift</b> hold your aim and creep</div>
+  <div><b>Z</b> fire &nbsp; <b>X</b> match</div>
+  <div><b>mouse</b> aims too, if you want it</div>
+</div>
+
+<p class="note">
+  Firing takes a photograph: the room lights for an instant and that instant
+  <em>stays on screen, cold and frozen</em>, while everything real keeps moving in the dark.
+  It doesn't fade &mdash; it comes apart a shade at a time until there's nothing left.
+  A match is <i>live but dim</i> and costs you standing still. The <i>glow</i> is always on
+  and reaches about an arm's length, enough to know you've walked into a wall.
+  Every flash tells every crawler on the deck where you fired from.
+  <strong>Clear the deck, find the hatch. Each deck is a checkpoint.</strong>
+</p>
+
+<script src="game.js"></script>
+</body>
+</html>

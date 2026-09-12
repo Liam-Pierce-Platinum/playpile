@@ -1,0 +1,29 @@
+{
+  "_readme": "The only file you edit to turn advertising on. Nothing else on the site knows an ad network exists. See MONETISATION.md.",
+  "enabled": false,
+  "network": "adsense",
+  "adsense": {
+    "client": "",
+    "_client_example": "ca-pub-1234567890123456",
+    "slots": {
+      "home_leader": "",
+      "home_inline": "",
+      "play_leader": "",
+      "play_rail": "",
+      "play_tall": "",
+      "play_footer": "",
+      "interstitial": ""
+    }
+  },
+  "interstitial": {
+    "enabled": true,
+    "_note": "The panel shown while a game loads. It is the most valuable slot on a games site and the least annoying place to put one, because the player is already waiting.",
+    "seconds": 5,
+    "minGapMinutes": 3,
+    "_minGap": "Never show it twice inside this many minutes, however many games are opened."
+  },
+  "houseAds": {
+    "_note": "Shown in every slot that has no network id yet, instead of a dashed placeholder. They promote your own games, which is worth more than an empty box - and on a LIVE site a dashed box labelled advert reads as broken. Set false to go back to placeholders.",
+    "enabled": true
+  }
+}

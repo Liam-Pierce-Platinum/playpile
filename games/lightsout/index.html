@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lights Out</title>
+<style>
+:root{ --ink:#05060a; --edge:#171a22; --text:#c9c2ae; --dim:#6a6152; --warm:#ffe9a8; --blood:#a03028; }
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--ink);color:var(--text);
+  font:12px/1.55 "Courier New",ui-monospace,monospace}
+body{min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:12px;padding:16px}
+header{display:flex;align-items:baseline;gap:14px;width:100%;max-width:900px;flex-wrap:wrap}
+h1{margin:0;font-size:17px;font-weight:700;letter-spacing:.4em;color:var(--warm)}
+header span{color:var(--dim);letter-spacing:.05em}
+header .rule{margin-left:auto;color:var(--blood)}
+.frame{position:relative;padding:8px;background:#010103;border:1px solid var(--edge);line-height:0;
+  box-shadow:0 0 0 1px #0b0d12, 0 30px 70px -40px #000}
+/* THE BACKGROUND GOES ON THE GAME CANVAS ONLY.
+   `canvas { background }` hit BOTH canvases, and #hud is an opaque layer
+   sitting exactly on top of #screen - so the house was rendering
+   perfectly and then being painted over with near-black every frame.
+   Clearing the HUD's own pixels does nothing about the ELEMENT's
+   background, which is why the torch appeared to light nothing: the only
+   thing you could see was the HUD's own text. */
+#screen{display:block;image-rendering:pixelated;background:#05060a}
+#hud{display:block;image-rendering:pixelated;background:transparent;
+  position:absolute;left:8px;top:8px;pointer-events:none}
+.cols{display:flex;gap:26px;flex-wrap:wrap;width:100%;max-width:900px;
+  border-top:1px solid var(--edge);padding-top:11px;color:var(--dim)}
+.cols h2{margin:0 0 4px;font-size:11px;letter-spacing:.16em;color:var(--warm);font-weight:700}
+.cols b{color:var(--text);font-weight:700}
+.note{max-width:900px;width:100%;color:var(--dim)}
+.note strong{color:var(--text);font-weight:700}
+.note em{font-style:normal;color:var(--warm)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>LIGHTS OUT</h1>
+  <span>320 &times; 240 &middot; six switches</span>
+  <span class="rule">the beam is not a light, it is a leash</span>
+</header>
+
+<div class="frame">
+  <canvas id="screen"></canvas>
+  <canvas id="hud"></canvas>
+</div>
+
+<div class="cols">
+  <div>
+    <h2>LOOK</h2>
+    <div><b>mouse</b> turn (click the window first)</div>
+    <div><b>left / right</b> turn without the mouse</div>
+  </div>
+  <div>
+    <h2>ACT</h2>
+    <div><b>F</b> or <b>click</b> &mdash; torch on / off</div>
+    <div><b>WASD</b> run &mdash; only with the torch off</div>
+    <div><b>Q</b> or <b>right click</b> &mdash; throw a blanket</div>
+    <div><b>E</b> flip a switch &nbsp; <b>R</b> restart</div>
+  </div>
+</div>
+
+<p class="note">
+  <strong>Torch on and you cannot take a step</strong> &mdash; but anything your beam is
+  actually on stops dead where it stands. <strong>Torch off and you can run</strong>, and
+  everything in the house starts moving, and you cannot see any of it.
+  Every switch on the far side of a room has to be paid for in seconds of darkness.
+  The only other thing you can spend is a <em>blanket</em>: throw one over something and
+  it spends four seconds getting out from under it, lights on or off.
+  A room you have lit stays lit, and they will not walk into a lit room &mdash;
+  so the house does not get easier because you got better at it, it gets smaller.
+</p>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

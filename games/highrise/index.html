@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HIGHRISE</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { --ink:#e6e2d8; --dim:#8a8578; --acc:#c8412f; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; overflow:hidden; background:#07070a; }
+  body { color:var(--ink); font:13px/1.5 "Segoe UI", system-ui, sans-serif;
+         -webkit-font-smoothing:antialiased; cursor:none; }
+  /* THE MOUSE COMES BACK IN THE EDITOR. `cursor:none` is right for a
+     shooter with a crosshair painted in the middle of the screen and
+     completely wrong for a tool you click things with - you cannot aim a
+     pointer you cannot see. Editor.toggle() puts this class on. */
+  body.editing { cursor:crosshair; }
+  body.editing.looking { cursor:none; }
+  canvas { display:block; position:fixed; inset:0; }
+
+  #hud { position:fixed; inset:0; pointer-events:none; z-index:2; }
+  #cross { position:absolute; left:50%; top:50%; width:22px; height:22px;
+           transform:translate(-50%,-50%); }
+  #cross i { position:absolute; background:#f2ede2; box-shadow:0 0 2px #000; opacity:.85; }
+  #cross i:nth-child(1){ left:50%; top:0; width:1.5px; height:7px; margin-left:-.75px; }
+  #cross i:nth-child(2){ left:50%; bottom:0; width:1.5px; height:7px; margin-left:-.75px; }
+  #cross i:nth-child(3){ top:50%; left:0; height:1.5px; width:7px; margin-top:-.75px; }
+  #cross i:nth-child(4){ top:50%; right:0; height:1.5px; width:7px; margin-top:-.75px; }
+
+  #vitals { position:absolute; left:26px; bottom:22px; }
+  #hpbar { width:190px; height:7px; background:#1a1216; border:1px solid #000;
+           box-shadow:0 0 0 1px #2e2a24; }
+  #hpfill { height:100%; background:linear-gradient(90deg,#8e1f14,#d8452c); width:100%; }
+  /* STAMINA. Narrower and dimmer than health on purpose: it is a
+     resource you spend, not a thing that kills you, and a second bar the
+     same weight as the first splits your attention between them. */
+  #stambar { width:190px; height:4px; background:#12161a; border:1px solid #000;
+             box-shadow:0 0 0 1px #2e2a24; margin-top:3px; }
+  #stamfill { height:100%; background:linear-gradient(90deg,#3f7a86,#7fd4c8); width:100%;
+              transition:width .08s linear; }
+  #stambar.spent #stamfill { background:linear-gradient(90deg,#7a5a2a,#d8a44c); }
+  #stambar.no { animation:stamno .16s steps(2) 3; }
+  @keyframes stamno { 0%,100% { box-shadow:0 0 0 1px #2e2a24; }
+                      50% { box-shadow:0 0 0 2px #d8452c; } }
+  .lbl { font:10px ui-monospace,Consolas,monospace; letter-spacing:.22em;
+         color:var(--dim); text-transform:uppercase; margin-bottom:5px; }
+
+  /* BANDAGES, and the dodge window. The i-frames are the single most
+     important rule in the fight and an invisible rule is a rule nobody
+     learns - so the vitals bar goes white and says DODGE while nothing
+     can touch you. */
+  #meds { position:absolute; left:26px; bottom:44px; font:11px ui-monospace,Consolas,monospace;
+          letter-spacing:.16em; color:var(--dim); text-transform:uppercase; }
+  #meds b { color:#7de08a; font-size:14px; }
+  #meds.none b { color:#6a4a4a; }
+  #iframe { position:absolute; left:26px; bottom:22px; width:190px; height:7px;
+            border:1px solid #cfe6ff; box-shadow:0 0 10px #7fd0ff; opacity:0;
+            transition:opacity .09s; pointer-events:none; }
+  #iftext { position:absolute; left:224px; bottom:20px; font:700 10px ui-monospace,Consolas,monospace;
+            letter-spacing:.26em; color:#bfe4ff; opacity:0; transition:opacity .09s; }
+
+  #gun { position:absolute; right:28px; bottom:20px; text-align:right; }
+  #gunname { font:700 15px "Segoe UI",system-ui; letter-spacing:.14em; text-transform:uppercase; }
+  #ammo { font:700 34px/1 ui-monospace,Consolas,monospace; letter-spacing:.02em; }
+  #ammo small { font-size:15px; color:var(--dim); }
+  #floor { position:absolute; left:26px; top:20px; font:700 12px ui-monospace,Consolas,monospace;
+           letter-spacing:.22em; color:var(--dim); }
+  #floor b { color:var(--ink); font-size:20px; }
+  #kills { position:absolute; right:28px; top:20px; text-align:right;
+           font:11px ui-monospace,Consolas,monospace; letter-spacing:.16em; color:var(--dim); }
+  #kills b { color:var(--ink); }
+
+  #hurt { position:absolute; inset:0; box-shadow:inset 0 0 160px 30px rgba(150,10,0,.85);
+          opacity:0; transition:opacity .35s; }
+  /* THE WEAPON RACK.
+     Liam: "numbers don't swap through weapons or at least not visibly".
+     Eight slots, always all eight visible. Un-owned ones are drawn dark
+     so you can see what you are missing and what the number key WOULD
+     do - a rack you can only see the current entry of is a rack that
+     teaches you nothing. */
+  #slots { position:absolute; right:28px; bottom:74px; display:flex; gap:5px; }
+  .slot { width:62px; padding:5px 6px 4px; background:rgba(10,10,14,.55);
+          border:1px solid #23232b; text-align:left; opacity:.34;
+          transition:opacity .12s, border-color .12s, background .12s; }
+  .slot.has { opacity:.78; }
+  .slot.cur { opacity:1; border-color:var(--acc); background:rgba(60,16,10,.6); }
+  .slot b { display:block; font:700 10px ui-monospace,Consolas,monospace; color:var(--acc); }
+  .slot span { display:block; font:9px/1.25 ui-monospace,Consolas,monospace; color:var(--ink);
+               white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .slot i { display:block; font:9px ui-monospace,Consolas,monospace; color:var(--dim); font-style:normal; }
+
+  /* WHAT THAT BODY IS CARRYING, from across the room. */
+  #prompt { position:absolute; left:50%; top:58%; transform:translateX(-50%);
+            font:700 12px ui-monospace,Consolas,monospace; letter-spacing:.2em;
+            text-transform:uppercase; color:#f0d9a8; opacity:0;
+            transition:opacity .16s; text-shadow:0 1px 3px #000; white-space:nowrap; }
+  #prompt::before { content:'▸ take  '; color:var(--acc); }
+
+  /* BLOOD ON THE LENS - only when you were close enough to wear it. */
+  #fade { position:absolute; inset:0; background:#05050a; opacity:0; pointer-events:none; }
+  #lens { position:absolute; inset:0; opacity:0; background-size:cover;
+          mix-blend-mode:multiply; transition:opacity .25s; }
+
+  #log { position:absolute; left:26px; bottom:70px; font:11px ui-monospace,Consolas,monospace;
+         color:var(--dim); }
+  #log div { opacity:.9; }
+
+  #boot { position:fixed; inset:0; display:grid; place-items:center; z-index:5;
+          background:#07070a; text-align:center; cursor:pointer; }
+  #boot h1 { font:900 54px/1 "Segoe UI",system-ui; letter-spacing:.30em; margin:0 0 6px;
+             text-transform:uppercase; }
+  #boot .sub { color:var(--acc); letter-spacing:.34em; font-size:11px; text-transform:uppercase; }
+  #boot p { color:var(--dim); max-width:520px; margin:26px auto 0; }
+  #boot kbd { background:#16161c; border:1px solid #2c2c34; border-radius:3px;
+              padding:1px 5px; font:11px ui-monospace,Consolas,monospace; color:var(--ink); }
+  #dead { position:fixed; inset:0; display:none; place-items:center; z-index:4;
+          background:rgba(20,2,0,.72); text-align:center; }
+  #dead h2 { font:900 42px "Segoe UI",system-ui; letter-spacing:.24em; margin:0; }
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="hud">
+  <div id="cross"><i></i><i></i><i></i><i></i></div>
+  <div id="lens"></div>
+  <div id="fade"></div>
+  <div id="hurt"></div>
+  <div id="floor">FLOOR <b id="fnum">1</b></div>
+  <div id="kills">DOWN <b id="knum">0</b></div>
+  <div id="vitals">
+    <div class="lbl">vitals</div>
+    <div id="hpbar"><div id="hpfill"></div></div>
+    <div id="stambar"><div id="stamfill"></div></div>
+    <div id="iframe"></div><div id="iftext">dodging</div>
+    <div id="meds">bandages <b id="bnum">2</b> &middot; <kbd style="font:inherit">H</kbd></div>
+  </div>
+  <div id="gun">
+    <div id="gunname">—</div>
+    <div id="ammo">0<small>/0</small></div>
+  </div>
+  <div id="prompt"></div>
+  <div id="slots"></div>
+  <div id="log"></div>
+</div>
+
+<div id="boot">
+  <div>
+    <h1>Highrise</h1>
+    <div class="sub">one hundred floors &middot; go up</div>
+    <p>You are on the ground floor of a building full of people paid to keep you off the roof.
+       Take what they carry.</p>
+    <p style="margin-top:18px">
+      <kbd>W A S D</kbd> move &middot; <kbd>SHIFT</kbd> sprint &middot; <kbd>CTRL</kbd> crouch &middot;
+      <kbd>SPACE</kbd> slide<br>
+      <kbd>DOUBLE-TAP</kbd> a move key to dodge &mdash; nothing can hit you mid-dodge<br>
+      <kbd>H</kbd> bandage &middot; <kbd>Q</kbd> <kbd>E</kbd> lean &middot; <kbd>MOUSE</kbd> aim &middot; <kbd>CLICK</kbd> fire &middot;
+      <kbd>RIGHT-CLICK</kbd> / <kbd>F</kbd> strike<br>
+      <kbd>R</kbd> reload &middot; <kbd>1-8</kbd> / <kbd>WHEEL</kbd> weapons &middot; walk over a body to take what he had<br>
+      <kbd>1</kbd> is your fists &mdash; behind a man who has not seen you, they are enough
+    </p>
+    <p style="margin-top:26px;color:#c8412f;letter-spacing:.2em">CLICK TO PLAY</p>
+  </div>
+</div>
+<div id="dead"><div><h2>DOWN</h2><p style="color:#8a8578">click to start over</p></div></div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+/* =====================================================================
+   PLAYPILE :: style.css - ONE SHEET FOR THE WHOLE SITE
+   =====================================================================
+
+   The games are dark, so the site is dark: a bright portal round a black
+   game is a lamp pointed at the player. Everything below is on a four-
+   pixel rhythm, one accent colour, and no rounded corners over 10px -
+   the aim is "clean", which mostly means "not decorated".            */
+
+:root{
+  --ink:#07090d;          /* page */
+  --panel:#0d1117;        /* cards */
+  --panel-2:#121924;      /* card hover / inputs */
+  --edge:#1e2733;         /* hairlines */
+  --text:#e7ecf3;
+  --dim:#8b96a8;
+  --faint:#5a6577;
+  --accent:#ff9f43;       /* one colour, used sparingly */
+  --accent-2:#4dc9ff;
+  --good:#57d38c;
+  --pad:16px;
+  --w:1240px;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--ink);color:var(--text);
+  font:15px/1.6 var(--sans);
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+
+.wrap{max-width:var(--w);margin:0 auto;padding:0 var(--pad)}
+
+/* ---- masthead ----------------------------------------------------- */
+header.top{
+  position:sticky;top:0;z-index:40;
+  background:rgba(7,9,13,.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--edge);
+}
+header.top .bar{
+  max-width:var(--w);margin:0 auto;padding:12px var(--pad);
+  display:flex;align-items:center;gap:20px;
+}
+.logo{font:700 19px/1 var(--mono);letter-spacing:.34em;color:var(--text)}
+.logo b{color:var(--accent);font-weight:700}
+nav.links{display:flex;gap:18px;margin-left:auto;font-size:13px;color:var(--dim)}
+nav.links a:hover{color:var(--text)}
+nav.links a.on{color:var(--accent)}
+
+/* ---- hero --------------------------------------------------------- */
+.hero{padding:38px 0 22px;border-bottom:1px solid var(--edge)}
+.hero h1{
+  margin:0 0 8px;font:700 clamp(26px,4.4vw,44px)/1.1 var(--sans);
+  letter-spacing:-.02em;
+}
+.hero p{margin:0;color:var(--dim);max-width:62ch}
+.hero .count{font-family:var(--mono);color:var(--faint);font-size:12px;
+  letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px}
+
+/* ---- section headers ---------------------------------------------- */
+.sec{margin:34px 0 14px;display:flex;align-items:baseline;gap:14px}
+.sec h2{margin:0;font:600 17px/1 var(--sans);letter-spacing:.01em}
+.sec span{font:11px/1 var(--mono);color:var(--faint);letter-spacing:.18em;
+  text-transform:uppercase}
+.sec .rule{flex:1;height:1px;background:var(--edge)}
+
+/* ---- the grid ----------------------------------------------------- */
+.grid{
+  display:grid;gap:14px;
+  grid-template-columns:repeat(auto-fill,minmax(232px,1fr));
+}
+.grid.big{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+
+.card{
+  background:var(--panel);border:1px solid var(--edge);border-radius:10px;
+  overflow:hidden;display:flex;flex-direction:column;
+  transition:border-color .14s,transform .14s,background .14s;
+}
+.card:hover{border-color:#33465c;background:var(--panel-2);transform:translateY(-2px)}
+.card .shot{
+  aspect-ratio:16/10;background:#05070a center/cover no-repeat;
+  border-bottom:1px solid var(--edge);position:relative;
+}
+/* The initials are what is under the screenshot, and they are only ever
+   seen if the file is missing - the <img> removes itself on error. They
+   are a real element rather than a background so that a portrait game's
+   shot can be object-fit on its own. */
+.card .shot .fallback{
+  position:absolute;inset:0;display:grid;place-items:center;
+  font:700 22px/1 var(--mono);letter-spacing:.3em;color:#1e2a38;
+}
+.card .shot img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center 42%;
+}
+/* A TALL GAME IS NOT CROPPED. STACK, MERGE and HOOPS are portrait, and
+   filling a 16:10 card with the middle of a portrait board shows an
+   empty strip of it. Fitted whole, on the game's own background, the
+   card shows what the game is. */
+.card .shot img.tall{object-fit:contain;background:#080b11}
+.card .tag{
+  position:absolute;top:8px;left:8px;padding:3px 7px;border-radius:4px;
+  background:rgba(7,9,13,.82);border:1px solid var(--edge);
+  font:10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+}
+.card .body{padding:11px 13px 13px;display:flex;flex-direction:column;gap:5px;flex:1}
+.card h3{margin:0;font:700 14px/1.2 var(--mono);letter-spacing:.14em}
+.card p{margin:0;color:var(--dim);font-size:13px;flex:1}
+.card .foot{display:flex;align-items:center;gap:8px;margin-top:6px}
+.card .play{
+  font:11px/1 var(--mono);letter-spacing:.16em;color:var(--accent);
+}
+.card .note{margin-left:auto;font:10px/1 var(--mono);color:var(--faint);
+  letter-spacing:.12em;text-transform:uppercase}
+
+/* ---- game page ---------------------------------------------------- */
+.play-wrap{display:grid;gap:18px;grid-template-columns:minmax(0,1fr) 300px;
+  align-items:start;padding:18px 0 40px}
+@media (max-width:980px){.play-wrap{grid-template-columns:minmax(0,1fr)}}
+
+.stage{
+  background:#000;border:1px solid var(--edge);border-radius:10px;overflow:hidden;
+  position:relative;aspect-ratio:16/9;
+}
+.stage iframe{width:100%;height:100%;border:0;display:block;background:#000}
+.stage .curtain{
+  position:absolute;inset:0;display:grid;place-items:center;gap:14px;
+  background:radial-gradient(120% 90% at 50% 40%,#141c28,#05070a 70%);
+  text-align:center;padding:24px;
+}
+.stage .curtain h2{margin:0;font:700 clamp(22px,3vw,34px)/1 var(--mono);letter-spacing:.28em}
+.stage .curtain p{margin:0;color:var(--dim);max-width:52ch}
+.btn{
+  display:inline-block;padding:11px 26px;border-radius:7px;cursor:pointer;
+  background:var(--accent);color:#12141a;border:0;
+  font:700 13px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;
+}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--edge)}
+.btn.ghost:hover{border-color:#3a4d63;background:var(--panel-2)}
+
+.stagebar{
+  display:flex;align-items:center;gap:12px;padding:10px 2px 0;
+  font:11px/1 var(--mono);letter-spacing:.14em;color:var(--faint);
+  text-transform:uppercase;flex-wrap:wrap;
+}
+.stagebar .sp{flex:1}
+.stagebar button{background:none;border:0;color:var(--dim);cursor:pointer;
+  font:inherit;letter-spacing:.14em;text-transform:uppercase;padding:4px 6px}
+.stagebar button:hover{color:var(--accent)}
+
+.about{margin-top:22px}
+.about h1{margin:0 0 4px;font:700 26px/1.1 var(--mono);letter-spacing:.2em}
+.about .lede{color:var(--dim);margin:0 0 16px}
+.about p{color:var(--dim)}
+.keys{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  gap:6px;margin:14px 0 0;padding:0;list-style:none}
+.keys li{display:flex;gap:10px;align-items:baseline;background:var(--panel);
+  border:1px solid var(--edge);border-radius:6px;padding:7px 10px}
+.keys kbd{font:11px/1 var(--mono);letter-spacing:.08em;color:var(--accent-2);
+  background:#0a0f16;border:1px solid var(--edge);border-radius:4px;padding:4px 6px;
+  white-space:nowrap}
+.keys span{color:var(--dim);font-size:13px}
+.tip{margin-top:14px;padding:11px 13px;border-left:2px solid var(--accent);
+  background:var(--panel);color:var(--dim);font-size:13px;border-radius:0 6px 6px 0}
+
+.side{display:flex;flex-direction:column;gap:14px}
+.side .panel{background:var(--panel);border:1px solid var(--edge);border-radius:10px;
+  padding:13px}
+.side .panel h4{margin:0 0 10px;font:11px/1 var(--mono);letter-spacing:.2em;
+  text-transform:uppercase;color:var(--faint)}
+.side .mini{display:flex;gap:10px;align-items:center;padding:7px 0;
+  border-top:1px solid var(--edge)}
+.side .mini:first-of-type{border-top:0}
+.side .mini .th{width:56px;height:36px;border-radius:4px;background:#05070a center/cover;
+  border:1px solid var(--edge);flex:none}
+.side .mini b{font:11px/1.2 var(--mono);letter-spacing:.12em;display:block}
+.side .mini small{color:var(--faint);font-size:11px}
+
+/* ---- ad slots ------------------------------------------------------
+   A placeholder is a PLACEHOLDER: it says what it is, what size it is
+   and where its id goes. Nothing here ever pretends to be an advert. */
+.ad{display:flex;align-items:center;justify-content:center;margin:0 auto}
+.ad-ph{
+  width:100%;height:100%;display:grid;place-items:center;gap:4px;text-align:center;
+  border:1px dashed #2a3a4d;border-radius:8px;background:
+    repeating-linear-gradient(135deg,#0b1016 0 10px,#0d1319 10px 20px);
+  color:#46566b;font:10px/1.5 var(--mono);letter-spacing:.16em;text-transform:uppercase;
+  padding:8px;
+}
+.ad-ph b{color:#5d7189;font-size:11px;letter-spacing:.2em}
+.ad-ph i{font-style:normal;color:#38485c;font-size:9px;letter-spacing:.1em}
+.ad-leader{max-width:728px;height:90px;margin:18px auto}
+.ad-rail{width:300px;height:250px}
+.ad-tall{width:300px;height:600px}
+.ad-mobile{max-width:320px;height:50px;margin:14px auto}
+.ad-inline{max-width:728px;height:90px;margin:8px auto}
+@media (max-width:760px){
+  .ad-leader{max-width:320px;height:100px}
+  .ad-tall{height:250px}
+}
+
+/* the between-games interstitial: a real slot, shown while the game
+   loads, never over a game that is already running */
+.gate{
+  position:fixed;inset:0;z-index:60;display:none;place-items:center;
+  background:rgba(4,6,9,.93);backdrop-filter:blur(3px);padding:20px;
+}
+.gate.on{display:grid}
+.gate .box{background:var(--panel);border:1px solid var(--edge);border-radius:12px;
+  padding:18px;display:grid;gap:14px;justify-items:center;max-width:min(92vw,380px)}
+.gate .box h3{margin:0;font:11px/1 var(--mono);letter-spacing:.2em;color:var(--faint);
+  text-transform:uppercase}
+.gate .box .count{font:11px/1 var(--mono);color:var(--dim);letter-spacing:.14em}
+
+footer.foot{border-top:1px solid var(--edge);margin-top:40px;padding:22px 0 40px;
+  color:var(--faint);font-size:12px}
+footer.foot .row{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+footer.foot a:hover{color:var(--text)}
+footer.foot .sp{flex:1}

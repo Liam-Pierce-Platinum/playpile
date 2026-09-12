@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PLAYPILE — fifteen games, free, in your browser</title>
+<meta name="description" content="Fifteen browser games: shooters, puzzles and arcade. No sign-up, no download, plays on the phone.">
+<link rel="stylesheet" href="/site/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>🕹️</text></svg>">
+</head>
+<body>
+
+<header class="top">
+  <div class="bar">
+    <a class="logo" href="/">PLAY<b>PILE</b></a>
+    <nav class="links">
+      <a href="/" class="on">All games</a>
+      <a href="#big">Big</a>
+      <a href="#quick">Quick</a>
+      <a href="/site/about.html">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div class="count" id="count">— games</div>
+    <h1>Fifteen games. No sign-up, no download.</h1>
+    <p>Five big ones built over the last months, and ten quick ones for when you have
+       four minutes. Everything here runs in the browser and remembers your best score.</p>
+  </section>
+
+  <!-- the leaderboard everybody has, above the fold, out of the way -->
+  <div id="ad-home-leader"></div>
+
+  <div class="sec" id="big">
+    <h2>The big ones</h2><span>five</span><div class="rule"></div>
+  </div>
+  <div class="grid big" id="grid-big"></div>
+
+  <div id="ad-home-inline"></div>
+
+  <div class="sec" id="quick">
+    <h2>Quick games</h2><span>ten &middot; under five minutes</span><div class="rule"></div>
+  </div>
+  <div class="grid" id="grid-small"></div>
+
+</main>
+
+<footer class="foot"><div class="wrap"><div class="row">
+  <span>PLAYPILE</span>
+  <span>Fifteen games, all free.</span>
+  <span class="sp"></span>
+  <a href="/site/about.html">About</a>
+  <a href="/site/advertise.html">Advertise</a><a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+</div></div></footer>
+
+<script type="module">
+import { GAMES } from '/site/catalogue.js';
+import { loadAds, slot } from '/ads/ads.js';
+
+window.__PLAYPILE_GAMES = GAMES;
+document.getElementById('count').textContent = GAMES.length + ' games';
+
+// A card. The shot is a background image with the title behind it, so a
+// game whose screenshot has not been taken yet still looks deliberate
+// instead of showing a broken image.
+const card = (g) => `
+  <a class="card" href="/play/${g.slug}">
+    <div class="shot">
+      <div class="fallback">${g.title.slice(0, 2)}</div>
+      <img src="/shots/${g.slug}.png" alt="${g.title}" loading="lazy"
+           onerror="this.remove()"
+           onload="if(this.naturalHeight>this.naturalWidth)this.classList.add('tall')">
+      <div class="tag">${g.tag}</div>
+    </div>
+    <div class="body">
+      <h3>${g.title}</h3>
+      <p>${g.blurb}</p>
+      <div class="foot">
+        <span class="play">PLAY &rarr;</span>
+        ${g.heavy ? '<span class="note">big download</span>' : ''}
+      </div>
+    </div>
+  </a>`;
+
+// The fallback initials must sit BEHIND the screenshot, and a background
+// image on the same element does that for free - if the file is missing
+// the initials are what is left.
+document.getElementById('grid-big').innerHTML =
+  GAMES.filter((g) => g.big).map(card).join('');
+document.getElementById('grid-small').innerHTML =
+  GAMES.filter((g) => !g.big).map(card).join('');
+
+await loadAds();
+slot(document.getElementById('ad-home-leader'), 'home_leader');
+slot(document.getElementById('ad-home-inline'), 'home_inline');
+</script>
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dungeon Quest</title>
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js" } }
+</script>
+</head>
+<body>
+  <div id="stage"><canvas id="game"></canvas></div>
+
+  <div id="popups"></div>
+  <div id="enemy-bars"></div>
+  <div id="lockon-marker" hidden><span>◆</span></div>
+
+  <!-- ============ IN-GAME HUD ============ -->
+  <div id="hud" hidden>
+    <div class="hud-tl">
+      <div class="pxbox">
+        <div class="hud-class" id="hud-class" data-px="2" data-px-color="#f2c14e">KNIGHT</div>
+        <div class="bar hp"><i id="hp-fill"></i><b id="hp-text">100/100</b></div>
+        <div class="bar sp"><i id="sp-fill"></i><b>SPECIAL</b></div>
+        <div class="bar mana" id="mana-bar" hidden><i id="mana-fill"></i><b>MANA</b></div>
+        <div class="ammo" id="ammo-row" hidden>
+          <span class="ammo-ico"></span><span id="ammo-count">0/12</span>
+          <span class="dip" id="dip-tag" hidden></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hud-tr">
+      <div class="pxbox coinbox">
+        <span class="coin-icon"></span><span id="hud-coin">0</span>
+      </div>
+      <div class="pxbox stealthbox" id="stealth-box" hidden>
+        <span id="stealth-text">HIDDEN</span>
+      </div>
+    </div>
+
+    <div class="hud-bl">
+      <div class="pxbox potions">
+        <div class="slot" id="slot-good"><kbd>1</kbd><span class="pname">—</span><span class="pcount">0</span></div>
+        <div class="slot" id="slot-bad"><kbd>2</kbd><span class="pname">—</span><span class="pcount">0</span></div>
+      </div>
+    </div>
+
+    <div class="hud-br">
+      <div class="pxbox inv">
+        <div class="inv-head" data-px="1" data-px-color="#8d7f9e">SATCHEL</div>
+        <div class="inv-row" id="inv-row"></div>
+      </div>
+    </div>
+
+    <div id="area-banner"></div>
+    <div id="checkpoint-msg"></div>
+    <div id="gate-msg" hidden></div>
+    <div id="prompt" hidden></div>
+    <div id="group-lock" hidden></div>
+    <div id="boss-bar" hidden>
+      <div class="boss-name" data-px="2" data-px-color="#ff6a4a">GREEN DRAGON</div>
+      <div class="bar boss"><i id="boss-fill"></i></div>
+    </div>
+  </div>
+
+  <!-- ============ SIDEBAR ============ -->
+  <div id="sidebar" hidden>
+    <div class="sb-head" data-px="2" data-px-color="#16121f">CONTROLS</div>
+    <div class="sb-body">
+      <div class="krow"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span data-px="1">MOVE</span></div>
+      <div class="krow"><kbd>SHIFT</kbd><span data-px="1">RUN</span></div>
+      <div class="krow"><kbd>C</kbd><span data-px="1">CROUCH</span></div>
+      <div class="krow"><kbd>↑</kbd><span data-px="1">JUMP</span></div>
+      <div class="krow"><kbd>←</kbd><span data-px="1">ATTACK</span></div>
+      <div class="krow"><kbd>↓</kbd><span data-px="1">BLOCK</span></div>
+      <div class="krow"><kbd>→</kbd><span data-px="1">SPECIAL</span></div>
+      <div class="krow"><kbd>SPACE</kbd><span data-px="1">PICK UP</span></div>
+      <div class="krow"><kbd>1</kbd><kbd>2</kbd><span data-px="1">POTIONS</span></div>
+      <div class="krow"><kbd>3</kbd><span data-px="1">EAT</span></div>
+      <div class="krow"><kbd>E</kbd><span data-px="1">SATCHEL</span></div>
+      <div class="krow" id="map-row" hidden><kbd>E</kbd><span data-px="1">MAP &#8212; IN THE SATCHEL</span></div>
+      <div class="krow" id="q-row" hidden><kbd>Q</kbd><span data-px="1">LEVEL SELECT</span></div>
+      <div id="pad-rows" hidden>
+        <div class="sb-sep"></div>
+        <div class="krow"><span class="lbl" data-px="1" data-px-color="#7fd4ff">CONTROLLER</span></div>
+        <div class="krow"><kbd>STICK</kbd><span data-px="1">MOVE</span></div>
+        <div class="krow"><kbd>C&#8593;</kbd><span data-px="1">JUMP</span></div>
+        <div class="krow"><kbd>C&#8595;</kbd><span data-px="1">BLOCK</span></div>
+        <div class="krow"><kbd>C&#8592;</kbd><span data-px="1">ATTACK</span></div>
+        <div class="krow"><kbd>C&#8594;</kbd><span data-px="1">SPECIAL</span></div>
+        <div class="krow"><kbd class="pad-a">A</kbd><span data-px="1">PICK UP / TALK</span></div>
+        <div class="krow"><kbd class="pad-b">B</kbd><span data-px="1">SATCHEL</span></div>
+        <div class="krow"><kbd>D-PAD</kbd><span data-px="1">MENUS / CAMERA</span></div>
+        <div class="krow"><kbd>L</kbd><span data-px="1">SWITCH TARGET</span></div>
+        <div class="krow"><kbd>L</kbd><kbd>L</kbd><span data-px="1">FREE LOOK</span></div>
+        <div class="krow"><kbd>Z</kbd><span data-px="1">RUN</span></div>
+        <div class="krow"><kbd>R</kbd><span data-px="1">CROUCH</span></div>
+        <div class="krow"><kbd>START</kbd><span data-px="1">LEVEL SELECT</span></div>
+      </div>
+      <div id="ride-rows" hidden>
+        <div class="sb-sep"></div>
+        <div class="krow"><span class="lbl" data-px="1" data-px-color="#8fbf5a">ON THE DRAGON</span></div>
+        <div class="krow"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span data-px="1">FLY</span></div>
+        <div class="krow"><kbd>&#8593;</kbd><span data-px="1">UP</span></div>
+        <div class="krow"><kbd>&#8595;</kbd><span data-px="1">DOWN</span></div>
+        <div class="krow"><kbd>&#8592;</kbd><span data-px="1">TAIL</span></div>
+        <div class="krow"><kbd>&#8594;</kbd><span data-px="1">FLAME</span></div>
+        <div class="krow"><kbd>SPACE</kbd><span data-px="1">GET DOWN</span></div>
+      </div>
+      <div class="krow"><kbd>TAB</kbd><span data-px="1">SWITCH TARGET</span></div>
+      <div class="krow"><kbd>A A</kbd><kbd>D D</kbd><span data-px="1">DART ASIDE</span></div>
+      <div class="krow" id="dash-row"><kbd>W W</kbd><span data-px="1">DASH</span></div>
+      <div class="sb-sep"></div>
+      <div class="krow"><span class="lbl" data-px="1" data-px-color="#f2c14e">N64 FILTER</span></div>
+      <div class="btns" id="fx-btns">
+        <button data-fx="on" class="on">ON</button>
+        <button data-fx="off">OFF</button>
+      </div>
+      <div class="sb-sep"></div>
+      <button class="wide" id="btn-title">QUIT TO TITLE</button>
+      <div class="sb-sep"></div>
+      <div class="krow"><span class="lbl" data-px="1" data-px-color="#ff8a4a">DEV TOOLS</span></div>
+      <div class="btns dev">
+        <button id="dev-coin">+500 COIN</button>
+        <button id="dev-heal">HEAL</button>
+      </div>
+      <div class="btns dev">
+        <button id="dev-skip">SKIP AHEAD</button>
+        <button id="dev-arena">TO BOSS</button>
+      </div>
+      <div class="btns dev">
+        <button id="dev-clear">KILL ALL</button>
+        <button id="dev-next">NEXT LEVEL</button>
+      </div>
+      <button class="wide" id="btn-dragon-restart">RESTART AS THE DRAGON</button>
+      <button class="wide" id="dev-finish">FINISH GAME</button>
+      <button class="wide" id="dev-reset">RESET PROGRESS</button>
+      <div class="sb-foot"><kbd>H</kbd> hide</div>
+    </div>
+  </div>
+
+  <!-- ============ TITLE SCREEN ============ -->
+  <div id="title" class="screen">
+    <div class="title-art">
+      <div id="title-logo"></div>
+      <div id="title-sub"></div>
+    </div>
+
+    <div class="title-panel pxframe">
+      <div class="sect-head" data-px="2" data-px-color="#f2c14e">CHOOSE YOUR HERO</div>
+      <div class="class-picker" id="class-picker">
+        <button data-class="knight" class="on">KNIGHT</button>
+        <button data-class="wizard">WIZARD</button>
+        <button data-class="archer">ARCHER</button>
+      </div>
+      <div class="class-blurb" id="class-blurb"></div>
+      <div class="class-special" id="class-special"></div>
+
+      <div class="sect-head" data-px="2" data-px-color="#f2c14e">COLOURS</div>
+      <div class="swrow"><span data-px="1">MAIN</span><div class="swatches" id="sw-primary"></div></div>
+      <div class="swrow"><span data-px="1">ACCENT</span><div class="swatches" id="sw-secondary"></div></div>
+      <div class="swrow"><span data-px="1">TRIM</span><div class="swatches" id="sw-trim"></div></div>
+      <button class="wide ghost" id="btn-random">RANDOMISE</button>
+
+      <div class="start-row">
+        <button class="wide start" id="btn-start">ENTER THE VALLEY</button>
+        <div class="purse">PURSE <b id="title-coin">0</b></div>
+      </div>
+      <div class="title-keys">
+        <b>WASD</b> move · <b>←</b> attack · <b>↓</b> block · <b>→</b> special<br>
+        <b>↑</b> jump · <b>C</b> crouch · <b>SPACE</b> pick up
+      </div>
+      <button class="tiny" id="btn-wipe">erase save</button>
+    </div>
+  </div>
+
+  <!-- ============ CUTSCENE ============ -->
+  <div id="cutscene" hidden>
+    <div class="cs-bar top"></div>
+    <div id="cutscene-text"></div>
+    <div class="cs-bar bottom"></div>
+    <div id="cutscene-skip">ANY KEY &#8594; NEXT &#183; ESC &#8594; SKIP</div>
+  </div>
+
+  <!-- ============ TAVERN ============ -->
+  <div id="tavern" class="screen" hidden>
+    <div class="shop-panel pxframe">
+      <div class="shop-head">
+        <span data-px="2" data-px-color="#f2c14e" id="tavern-name">THE CROSSED AXES</span>
+        <span class="purse">PURSE <b id="tavern-coin">0</b></span>
+      </div>
+      <p class="shop-note">Rest to recover fully. Relics are sold once only.</p>
+      <button class="wide start" id="btn-rest">REST &#8212; 20 COIN</button>
+      <div class="sect-head" data-px="2" data-px-color="#f2c14e">RELICS FOR SALE</div>
+      <div class="upgrade-list" id="relic-list"></div>
+      <button class="wide ghost" id="btn-leave-tavern">BACK TO THE ROAD</button>
+    </div>
+  </div>
+
+  <!-- ============ THE MIRROR ============ -->
+  <div id="mirror" class="screen" hidden>
+    <div class="shop-panel pxframe">
+      <div class="shop-head">
+        <span data-px="2" data-px-color="#9fd4ff">THE MIRROR</span>
+        <span class="purse">PURSE <b id="mirror-coin">0</b></span>
+      </div>
+      <p class="shop-note">Ten coin a piece. What you are wearing costs nothing to put back on.</p>
+      <div class="upgrade-list" id="mirror-list"></div>
+      <button class="wide ghost" id="btn-leave-mirror">DONE</button>
+    </div>
+  </div>
+
+  <!-- ============ LEVEL SELECT ============ -->
+  <div id="levelsel" class="screen" hidden>
+    <div class="shop-panel pxframe">
+      <div class="shop-head">
+        <span data-px="2" data-px-color="#f2c14e">WHERE TO?</span>
+        <span class="purse">Q &#8212; CLOSE</span>
+      </div>
+      <p class="shop-note">Every road you have already walked.</p>
+      <div class="upgrade-list" id="levelsel-list"></div>
+      <button class="wide ghost" id="btn-leave-levelsel">STAY HERE</button>
+    </div>
+  </div>
+
+  <!-- ============ TRAVEL ============ -->
+  <div id="travel" hidden>
+    <div class="travel-inner">
+      <div class="travel-head" data-px="3" data-px-color="#e8dfc8">THE ROAD GOES ON</div>
+      <canvas id="travel-canvas" width="480" height="300"></canvas>
+      <div id="travel-caption"></div>
+      <div class="travel-skip">ANY KEY &#8212; SKIP</div>
+    </div>
+  </div>
+
+  <!-- ============ MAP ============ -->
+  <div id="map-screen" class="screen" hidden>
+    <div class="map-panel pxframe">
+      <div class="shop-head">
+        <span id="map-title"></span>
+        <span class="purse">E &#8212; BACK</span>
+      </div>
+      <canvas id="map-canvas" width="420" height="420"></canvas>
+      <div class="map-key">
+        <span><i style="background:#e8f0ff"></i>YOU</span>
+        <span><i style="background:#f2c14e"></i>SHRINE</span>
+        <span><i style="background:#c07a3c"></i>TAVERN</span>
+        <span><i style="background:#3f8ab0"></i>MERCHANT</span>
+        <span><i style="background:#d4af37"></i>CHEST</span>
+        <span><i style="background:#7a2f24"></i>THE DRAGON</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ HOW TO PLAY ============ -->
+  <div id="briefing" class="screen" hidden>
+    <div class="shop-panel pxframe">
+      <div class="shop-head">
+        <span data-px="2" data-px-color="#f2c14e" id="brief-name">THE KNIGHT</span>
+        <span class="purse" id="brief-device">KEYBOARD</span>
+      </div>
+      <p class="shop-note" id="brief-blurb">&nbsp;</p>
+      <div class="sect-head" data-px="2" data-px-color="#f2c14e">HOW YOU FIGHT</div>
+      <div id="brief-rows" class="brief-rows"></div>
+      <button class="wide start" id="btn-brief-go">GOT IT</button>
+    </div>
+  </div>
+
+  <!-- ============ SATCHEL ============ -->
+  <div id="satchel" class="screen" hidden>
+    <div class="shop-panel pxframe">
+      <div class="shop-head">
+        <span data-px="2" data-px-color="#f2c14e">SATCHEL</span>
+        <span class="purse">PURSE <b id="satchel-coin">0</b></span>
+      </div>
+      <p class="shop-note">Food heals over time. Relics are always working.</p>
+      <div class="sect-head" data-px="2" data-px-color="#f2c14e">PROVISIONS</div>
+      <div class="upgrade-list" id="satchel-food"></div>
+      <div class="sect-head" data-px="2" data-px-color="#f2c14e">PAPERS</div>
+      <div class="upgrade-list" id="satchel-map"></div>
+      <div class="sect-head" data-px="2" data-px-color="#f2c14e">RELICS CARRIED</div>
+      <div class="upgrade-list" id="satchel-relics"></div>
+      <button class="wide ghost" id="btn-leave-satchel">CLOSE &#8212; E</button>
+    </div>
+  </div>
+
+  <!-- ============ SHOP ============ -->
+  <div id="shop" class="screen" hidden>
+    <div class="shop-panel pxframe">
+      <div class="shop-head">
+        <span data-px="2" data-px-color="#f2c14e">THE VALLEY MERCHANT</span>
+        <span class="purse">PURSE <b id="shop-coin">0</b></span>
+      </div>
+      <p class="shop-note">Upgrades are permanent. They survive death.</p>
+      <div class="upgrade-list" id="upgrade-list"></div>
+      <button class="wide start" id="btn-leave-shop">BACK TO THE VALLEY</button>
+    </div>
+  </div>
+
+  <!-- ============ DEATH ============ -->
+  <div id="death" class="screen" hidden>
+    <div class="death-panel pxframe">
+      <div class="big-head" id="death-head" data-px="4" data-px-color="#ff6a4a">YOU FELL</div>
+      <p id="death-note">The valley keeps your bones. Your coin and upgrades remain.</p>
+      <button class="wide start" id="btn-respawn">LAST CHECKPOINT</button>
+      <button class="wide" id="btn-restart">RESTART THE LEVEL</button>
+      <button class="wide ghost" id="btn-death-title">QUIT TO TITLE</button>
+    </div>
+  </div>
+
+  <!-- ============ VICTORY ============ -->
+  <div id="victory" class="screen" hidden>
+    <div class="death-panel pxframe">
+      <div class="big-head" data-px="3" data-px-color="#f2c14e">THE GREEN DRAGON FALLS</div>
+      <p>The valley is yours. The Red Dragon waits in the mine shafts below —
+         that is level two.</p>
+      <button class="wide start" id="btn-victory-title">RETURN TO TITLE</button>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

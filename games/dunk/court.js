@@ -226,7 +226,38 @@ function buildCrowd(scene) {
   bodies.count = i; heads.count = i;
   bodies.castShadow = false; bodies.receiveShadow = false;
   scene.add(bodies); scene.add(heads);
-  return { bodies, heads, count: i };
+
+  // A CROWD THAT NEVER MOVES IS SCENERY. Keeping every seat's base matrix
+  // means they can be nudged each frame without rebuilding anything - a
+  // slow individual sway most of the time, and everybody on their feet
+  // when something goes in.
+  const base = [];
+  const m3 = new THREE.Matrix4();
+  for (let k = 0; k < i; k++) {
+    bodies.getMatrixAt(k, m3);
+    base.push({ x: m3.elements[12], y: m3.elements[13], z: m3.elements[14],
+                phase: Math.random() * Math.PI * 2 });
+  }
+  return {
+    bodies, heads, count: i, base,
+    step(t, cheer) {
+      const mm = new THREE.Matrix4(), mh = new THREE.Matrix4();
+      for (let k = 0; k < i; k++) {
+        const b = base[k];
+        const sway = Math.sin(t * 1.3 + b.phase) * len(0.03);
+        const up = cheer > 0 ? Math.max(0, Math.sin(t * 9 + b.phase)) * cheer * len(0.30) : 0;
+        bodies.getMatrixAt(k, mm);
+        mm.elements[12] = b.x + sway; mm.elements[13] = b.y + up; mm.elements[14] = b.z;
+        bodies.setMatrixAt(k, mm);
+        heads.getMatrixAt(k, mh);
+        mh.elements[12] = b.x + sway * 1.4; mh.elements[13] = b.y + len(0.44) + up;
+        mh.elements[14] = b.z;
+        heads.setMatrixAt(k, mh);
+      }
+      bodies.instanceMatrix.needsUpdate = true;
+      heads.instanceMatrix.needsUpdate = true;
+    },
+  };
 }
 
 /** one hoop: board, ring, net, stanchion */
@@ -355,10 +386,83 @@ export function stepNet(net, dt, ball, ballR) {
   net.geo.attributes.position.needsUpdate = true;
 }
 
+/**
+ * The thing hanging over the middle.
+ *
+ * Every arena has one and it is the object that makes a wide shot read as
+ * an ARENA rather than as a gym: it sits in the empty air above the
+ * court, which is otherwise the least interesting part of the picture,
+ * and it is the only thing in the building that is lit from inside.
+ *
+ * The four faces are canvases the match writes the score onto, so it is
+ * also useful - you can read the score from the far end without looking
+ * at the HUD.
+ */
+function buildJumbotron(scene) {
+  const g = new THREE.Group();
+  g.position.y = len(7.6);
+  scene.add(g);
+
+  const shell = new THREE.Mesh(
+    new THREE.BoxGeometry(len(4.2), len(2.2), len(4.2)),
+    new THREE.MeshStandardMaterial({ color: 0x11161e, roughness: 0.6, metalness: 0.4 }));
+  shell.castShadow = false;
+  g.add(shell);
+
+  // the cables it hangs on
+  const wire = new THREE.MeshBasicMaterial({ color: 0x0a0d12 });
+  for (const [x, z] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+    const w = new THREE.Mesh(new THREE.BoxGeometry(len(0.06), len(2.2), len(0.06)), wire);
+    w.position.set(x * len(1.7), len(2.2), z * len(1.7));
+    g.add(w);
+  }
+
+  const faces = [];
+  for (let i = 0; i < 4; i++) {
+    const c = document.createElement('canvas');
+    c.width = 256; c.height = 128;
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(len(3.9), len(1.9)),
+      new THREE.MeshBasicMaterial({ map: tex }));
+    const a = i * Math.PI / 2;
+    m.position.set(Math.sin(a) * len(2.12), 0, Math.cos(a) * len(2.12));
+    m.rotation.y = a;
+    g.add(m);
+    faces.push({ c, g: c.getContext('2d'), tex });
+  }
+
+  return {
+    group: g, faces,
+    /** the match calls this when the score changes */
+    set(home, away, homeName, awayName, clock) {
+      for (const f of faces) {
+        const x = f.g;
+        x.fillStyle = '#0a0e14'; x.fillRect(0, 0, 256, 128);
+        x.fillStyle = '#ff8a1f';
+        x.font = 'bold 54px system-ui, sans-serif';
+        x.textAlign = 'center'; x.textBaseline = 'middle';
+        x.fillText(home + '  ' + away, 128, 52);
+        x.fillStyle = '#7d8899';
+        x.font = 'bold 18px system-ui, sans-serif';
+        x.fillText(homeName + '   -   ' + awayName, 128, 96);
+        x.fillStyle = '#e7ecf3';
+        x.font = 'bold 20px system-ui, sans-serif';
+        x.fillText(clock, 128, 18);
+        f.tex.needsUpdate = true;
+      }
+    },
+  };
+}
+
 /** everything that is not a player or the ball */
 export function buildCourt(scene, trim) {
+  // A COURT IS VARNISHED, and varnish is the reason a basketball floor
+  // photographs the way it does: a long low sheen with the lights smeared
+  // down it. Low roughness plus the scene environment does it.
   const floorMat = new THREE.MeshStandardMaterial({
-    map: floorTexture(trim), roughness: 0.34, metalness: 0.02,
+    map: floorTexture(trim), roughness: 0.18, metalness: 0.0,
+    envMapIntensity: 0.9,
   });
   const floor = new THREE.Mesh(
     new THREE.BoxGeometry(COURT.halfLen * 2, len(0.2), COURT.halfWid * 2), floorMat);
@@ -408,6 +512,7 @@ export function buildCourt(scene, trim) {
 
   const crowd = buildCrowd(scene);
   const hoops = [buildHoop(scene, -1, trim), buildHoop(scene, 1, trim)];
+  const board = buildJumbotron(scene);
 
   // the roof, so the arena is a room: dark, with light rigs in it
   // THE ROOF IS PALE AND LOWER. Black at thirteen metres was invisible,
@@ -444,5 +549,39 @@ export function buildCourt(scene, trim) {
     scene.add(glow);
   }
 
-  return { floor, hoops, crowd };
+  // ---- COURTSIDE -----------------------------------------------------
+  // The strip between the sideline and the first row is empty in most
+  // games and full in every real arena. Benches, a scorer's table and a
+  // row of people sitting on the floor are what stop the court looking
+  // like it was cut out and pasted in front of a crowd.
+  const benchMat = new THREE.MeshStandardMaterial({ color: 0x1d2733, roughness: 0.7 });
+  const tableMat = new THREE.MeshStandardMaterial({ color: 0x2b3543, roughness: 0.5, metalness: 0.2 });
+  for (const s of [-1, 1]) {
+    // the scorer's table, along the near sideline
+    const tab = new THREE.Mesh(new THREE.BoxGeometry(len(6.0), len(0.9), len(0.7)), tableMat);
+    tab.position.set(0, len(0.45), s * (COURT.halfWid + len(1.1)));
+    tab.castShadow = true; tab.receiveShadow = true;
+    scene.add(tab);
+    const trim2 = new THREE.Mesh(new THREE.BoxGeometry(len(6.05), len(0.2), len(0.75)),
+      new THREE.MeshStandardMaterial({ color: 0xff8a1f, roughness: 0.6 }));
+    trim2.position.set(0, len(0.78), s * (COURT.halfWid + len(1.1)));
+    scene.add(trim2);
+    // two benches, one each side of it
+    for (const x of [-len(9), len(9)]) {
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(len(4.4), len(0.12), len(0.5)), benchMat);
+      seat.position.set(x, len(0.45), s * (COURT.halfWid + len(1.2)));
+      seat.castShadow = true; seat.receiveShadow = true;
+      scene.add(seat);
+      const backR = new THREE.Mesh(new THREE.BoxGeometry(len(4.4), len(0.55), len(0.1)), benchMat);
+      backR.position.set(x, len(0.72), s * (COURT.halfWid + len(1.42)));
+      scene.add(backR);
+      for (let i = 0; i < 5; i++) {
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(len(0.08), len(0.45), len(0.45)), benchMat);
+        leg.position.set(x - len(2.0) + i * len(1.0), len(0.22), s * (COURT.halfWid + len(1.2)));
+        scene.add(leg);
+      }
+    }
+  }
+
+  return { floor, hoops, crowd, board };
 }

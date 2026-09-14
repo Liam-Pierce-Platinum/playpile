@@ -50,6 +50,7 @@ import { TEAMS, teamById, topSpeed, turnRate, shotError, releaseWindow,
          mass } from './teams.js';
 import { buildCourt, stepNet, COURT } from './court.js';
 import { SCALE, len, launch } from './scale.js';
+import { PLAYS, playById, callPlay, at } from './plays.js';
 import { makePlayer, posePlayer, handPoint } from './player.js';
 
 const D = new Deck3D({ key: 'dunk', w: 960, h: 560, units: 26, bg: '#070b11',
@@ -98,6 +99,38 @@ for (const x of [-len(9), len(9)]) for (const z of [-len(5), len(5)]) {
   const l = new THREE.PointLight(0xfff3dc, len(34), len(38), 1.5);
   l.position.set(x, len(11.5), z);
   D.scene.add(l);
+}
+
+// ---- SOMETHING FOR THE SURFACES TO REFLECT --------------------------
+//
+// Every material in here is a MeshStandardMaterial, which means it does
+// physically-based specular - and with nothing in the scene to reflect,
+// the specular term is black and everything looks like painted card. One
+// small environment map is the single biggest visual change available:
+// the floor gets the long soft sheen a polished court has, the glass
+// backboard reads as glass, and the kit picks up a sheen along the folds.
+//
+// It is generated rather than loaded - a vertical gradient from the roof
+// lights down to the dark floor, which is what an arena actually looks
+// like to a reflective surface - so it costs no download.
+{
+  const c = document.createElement('canvas');
+  c.width = 16; c.height = 128;
+  const g = c.getContext('2d');
+  const grd = g.createLinearGradient(0, 0, 0, 128);
+  grd.addColorStop(0.00, '#ffffff');   // the light rigs
+  grd.addColorStop(0.16, '#c9d6e8');
+  grd.addColorStop(0.42, '#5a6474');   // the upper stands
+  grd.addColorStop(0.62, '#333b47');
+  grd.addColorStop(1.00, '#12161d');   // the floor
+  g.fillStyle = grd; g.fillRect(0, 0, 16, 128);
+  const tex = new THREE.CanvasTexture(c);
+  tex.mapping = THREE.EquirectangularReflectionMapping;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const pmrem = new THREE.PMREMGenerator(D.renderer);
+  D.scene.environment = pmrem.fromEquirectangular(tex).texture;
+  D.scene.environmentIntensity = 0.55;
+  tex.dispose(); pmrem.dispose();
 }
 
 court = buildCourt(D.scene, TEAMS[0].trim);
@@ -207,6 +240,9 @@ function startMatch(teamId, n) {
     camYaw: Math.PI / 2, camPitch: 0.30,
     camPosV: new THREE.Vector3(), aimDir: new THREE.Vector3(0, 0, 1),
     settled: false, mateT: null, thiefT: null, camDist: CAM_DIST,
+    // THE PLAY EACH SIDE IS RUNNING. One shared intention with a clock on
+    // it, rather than five men each deciding for themselves - see plays.js
+    call: [null, null],
     // (everything physical in here is in scaled metres - see scale.js)
     // the tools can hold the other nine still - see __dunk.freeze
     frozen: false,
@@ -218,6 +254,47 @@ function startMatch(teamId, n) {
 }
 
 const other = (s) => (s === 0 ? 1 : 0);
+
+/**
+ * Call a play and hand out the roles.
+ *
+ * The man with the ball is always the 'ball' role whatever his position -
+ * a play is about what the five of them do, not about who is nominally
+ * the point guard, and a centre who picks up a loose ball should not have
+ * to walk it back to a guard before anything can happen.
+ */
+function startPlay(side, carrier) {
+  const mine = play.players.filter((q) => q.side === side);
+  if (!mine.length) return;
+  const wrong = Math.random() < mistakeChance(carrier ? carrier.card : mine[0].card);
+  const id = callPlay(side, play.players, play.ball, wrong);
+  const P = playById(id);
+  const roles = P.roles(mine.length);
+
+  // the ball handler takes the ball role; the rest fill the others in
+  // order, biggest man first for the roles that want a big
+  const rest = mine.filter((q) => q !== carrier);
+  rest.sort((a, b) => (b.card.pos === 'C' ? 1 : 0) - (a.card.pos === 'C' ? 1 : 0));
+  const assign = new Map();
+  let k = 0;
+  if (carrier) assign.set(carrier, roles[0] || 'ball');
+  for (const q of rest) assign.set(q, roles[++k] || 'pop');
+
+  // which side of the floor it starts on, so the play mirrors naturally
+  const flip = carrier ? (carrier.z >= 0 ? 1 : -1) : 1;
+  play.call[side] = { id, t: 0, flip, beat: 0, assign, name: P.name };
+  for (const [q, role] of assign) { q.role = role; }
+}
+
+/** where this man should be, this instant, in the play he is running */
+function playSpot(p, call) {
+  const P = playById(call.id);
+  const rim = targetRim(p.side);
+  const dir = Math.sign(rim.x);
+  const i = p.index;
+  const sp = P.spot(p.role || 'pop', call.t, i);
+  return at(rim, dir, call.flip, sp.out, sp.side);
+}
 /** the ring a side is attacking */
 const targetRim = (side) => ({ x: side === 0 ? COURT.rimX : -COURT.rimX, y: COURT.rimY, z: 0 });
 
@@ -243,13 +320,18 @@ function loose(b, x, y, z, vx, vy, vz) {
 
 function giveBall(p) {
   const b = play.ball;
+  const turnover = play.possession !== p.side;
   b.carrier = p; b.cool = 0.12; b.pass = null; b.lastShot = null;
   for (const q of play.players) q.hasBall = false;
   p.hasBall = true;
-  if (play.possession !== p.side) {
+  if (turnover) {
     play.possession = p.side;
     play.shotClock = SHOT_CLOCK;
   }
+  // A NEW POSSESSION IS A NEW PLAY. It is called once, by the side that
+  // has the ball, and everybody on it gets their role from the same call -
+  // which is the entire difference between a team and five people.
+  if (turnover || !play.call[p.side]) startPlay(p.side, p);
 }
 
 /**
@@ -709,6 +791,36 @@ function npcTurn(p, dt) {
       && Math.hypot(q.x - p.x, q.z - p.z) < len(1.8)).length;
     const openMate = bestOpenMate(p);
 
+    // ---- IS THERE A BEAT DUE? ------------------------------------------
+    // The play says the ball should move at a particular moment, to a
+    // particular role. If that man is open, it goes - and that is what
+    // makes a pick and roll look like a pick and roll rather than like
+    // two men who happened to stand near each other.
+    const call = play.call[p.side];
+    if (call) {
+      const P = playById(call.id);
+      const beat = P.beats[call.beat];
+      if (beat && call.t >= beat.t) {
+        call.beat++;
+        if (beat.from === p.role) {
+          const target = play.players.find((q) => q.side === p.side && q.role === beat.to);
+          if (target) {
+            const cover = play.players.filter((e) => e.side !== p.side
+              && Math.hypot(e.x - target.x, e.z - target.z) < len(1.7)).length;
+            const lane = play.players.filter((e) => e.side !== p.side
+              && closestOnSegment(e, p, target).d < len(1.0)).length;
+            // he still has to be worth passing to. A play is a plan, not
+            // an instruction to throw it into a crowd.
+            if (cover + lane === 0 || Math.random() > mistakeChance(p.card)) {
+              pass(p, target);
+              p.plan = null;
+              return;
+            }
+          }
+        }
+      }
+    }
+
     if (p.think <= 0) {
       p.think = 0.22 + Math.random() * 0.3;
       const options = [];
@@ -755,14 +867,31 @@ function npcTurn(p, dt) {
       if (near && near.d < len(1.7)) goZ += (p.z > near.p.z ? len(2.4) : -len(2.4));
     }
   } else if (ourBall) {
-    const spots = spacing(p.side, play.n);
-    const spot = spots[p.index % spots.length];
-    goX = spot.x; goZ = spot.z;
-    if (carrier && play.players.some((q) => q.side !== p.side
-        && Math.hypot(q.x - carrier.x, q.z - carrier.z) < len(1.4))) {
-      // he is in trouble: come and help
-      goX = lerp(goX, carrier.x - Math.sign(rim.x) * len(2.4), 0.6);
-      goZ = lerp(goZ, carrier.z + (p.index % 2 ? len(2.6) : -len(2.6)), 0.6);
+    // ---- RUNNING THE PLAY --------------------------------------------
+    const call = play.call[p.side];
+    if (call) {
+      const spot = playSpot(p, call);
+      goX = spot.x; goZ = spot.z;
+      const P = playById(call.id);
+
+      // A SCREENER STANDS STILL. That is the entire skill of setting one,
+      // and because contact between players is real in this game, a
+      // defender genuinely cannot walk through him.
+      if (P.planted && P.planted(p.role, call.t)) {
+        const d = Math.hypot(goX - p.x, goZ - p.z);
+        if (d < len(0.9)) { goX = p.x; goZ = p.z; p.planted = true; }
+      } else p.planted = false;
+    } else {
+      const spots = spacing(p.side, play.n);
+      const spot = spots[p.index % spots.length];
+      goX = spot.x; goZ = spot.z;
+    }
+    // and if he is in real trouble, the nearest man comes back for it
+    // whatever the play says
+    if (carrier && play.players.filter((q) => q.side !== p.side
+        && Math.hypot(q.x - carrier.x, q.z - carrier.z) < len(1.3)).length >= 2) {
+      goX = lerp(goX, carrier.x - Math.sign(rim.x) * len(2.2), 0.5);
+      goZ = lerp(goZ, carrier.z + (p.index % 2 ? len(2.4) : -len(2.4)), 0.5);
     }
   } else if (carrier) {
     if (!p.mark || p.think <= 0) {
@@ -920,6 +1049,22 @@ function step(dt) {
   mouseLook(dt);
   updateCamera(dt);
 
+  // ---- THE PLAY CLOCK -------------------------------------------------
+  // A play is a sequence with timing in it, so something has to be
+  // counting. When it runs out the side simply calls another one - which
+  // is what a team does when the first option is not there.
+  for (let side = 0; side < 2; side++) {
+    const call = play.call[side];
+    if (!call) continue;
+    if (play.possession !== side) { play.call[side] = null; continue; }
+    call.t += dt;
+    if (call.t > playById(call.id).length) {
+      const c = play.players.find((q) => q.hasBall && q.side === side);
+      if (c) startPlay(side, c);
+      else play.call[side] = null;
+    }
+  }
+
   for (const p of play.players) {
     if (p.cool > 0) p.cool -= dt;
     if (p === play.me) humanTurn(p, dt);
@@ -1029,6 +1174,18 @@ function step(dt) {
   stepBall(dt);
 
   for (const h of court.hoops) stepNet(h.net, dt, play.ball, BALL_R);
+  // THE BUILDING IS ALIVE TOO: the crowd sways, and gets to its feet when
+  // something goes in. play.cheer is already set by basket() and dunk().
+  if (court.crowd.step) court.crowd.step(D.t, Math.min(1, play.cheer));
+  // the jumbotron only redraws when the score or the second changes -
+  // four canvas repaints a frame for a number that changes once a minute
+  // would be the most expensive thing in the game
+  const secs = Math.ceil(play.clock);
+  if (court.board && (play.__bs !== play.score[0] + ':' + play.score[1] + ':' + secs)) {
+    play.__bs = play.score[0] + ':' + play.score[1] + ':' + secs;
+    court.board.set(play.score[0], play.score[1], play.mine.short, play.theirs.short,
+      Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0'));
+  }
   for (const p of play.players) {
     posePlayer(p.model, dt, {
       x: p.x, y: p.y, z: p.z, yaw: p.yaw, speed: p.speed, air: p.air, vy: p.vy,
@@ -1196,6 +1353,16 @@ function drawHud() {
   D.hud(play.mine.short + '  ' + s[0] + '   —   ' + s[1] + '  ' + play.theirs.short,
         mm + ':' + String(ss).padStart(2, '0') + '    SHOT ' + Math.ceil(play.shotClock));
   if (play.msgT > 0) D.text(play.msg, D.W / 2, 82, 22, '#ffd166', 'center');
+  // WHAT THEY ARE RUNNING. Half the pleasure of watching a team is
+  // recognising the thing they are doing, and a name on screen teaches a
+  // player to read it in a way that watching never quite does.
+  const theirs = play.call[other(play.me.side)];
+  const ours = play.call[play.me.side];
+  const shown = ours || theirs;
+  if (shown) {
+    D.text((ours ? 'RUNNING  ' : 'THEY RUN  ') + shown.name,
+           D.W / 2, D.H - 142, 11, ours ? '#8fd98f' : '#ff9f9f', 'center');
+  }
 
   // ---- THE CROSSHAIR --------------------------------------------------
   // With the camera behind him the middle of the screen IS the aim, and
@@ -1380,6 +1547,10 @@ window.__dunk = {
     input: { down: !!D.mouse.down, latch: !!play.me.pressLatch,
              charging: !!play.me.charging, charge: +play.me.charge.toFixed(2) },
     onThief: play.thiefT ? play.thiefT.p.card.name : null,
+    plays: [0,1].map((i) => play.call[i] && ({ id: play.call[i].id, name: play.call[i].name,
+      t: +play.call[i].t.toFixed(2), beat: play.call[i].beat })),
+    roles: play.players.map((q) => q.role || null),
+    planted: play.players.map((q) => !!q.planted),
     court: { halfLen: +COURT.halfLen.toFixed(2), halfWid: +COURT.halfWid.toFixed(2),
              rimY: +COURT.rimY.toFixed(2), scale: SCALE },
   }) : ({ menu: true, buttons: (home.hot || []).map((h) => ({ x: h.x, y: h.y, w: h.w, h: h.h })) }),

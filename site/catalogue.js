@@ -213,6 +213,65 @@ export const GAMES = [
                ['SPACE', 'jump - at the ring with the ball, it is a dunk']],
     tips: 'The hand away from your man cannot be stolen. Swap hands as you go past him.',
   },
+
+  // ---- the classics ------------------------------------------------
+  {
+    slug: 'snake', title: 'SNAKE', how: 'local', tag: 'Classic',
+    blurb: 'Every fifth apple leaves a block where you ate it.',
+    about: `Plain Snake is solved - you learn to fold it into rows and then it is a
+    chore with a timer. So this one fights back: every fifth apple drops a wall block
+    on the square where you ate it, which means the tidy fold stops being safe and the
+    board at apple forty is one you built yourself out of forty decisions. The golden
+    apple is worth five and rots in seven seconds, and the route to it is never the
+    route you would otherwise take.`,
+    controls: [['Arrows / W A S D', 'turn'], ['Swipe', 'turn (mobile)'], ['P', 'pause']],
+    tips: 'Turns are buffered two deep, so left-then-up as one motion works at full speed.',
+  },
+  {
+    slug: 'lines', title: 'LINES', how: 'local', tag: 'Classic',
+    blurb: 'Seven shapes, ten columns, and a piece that lands still has half a second.',
+    about: `The falling-block game with the four details that decide whether it feels
+    right: a landed piece gets half a second in which it can still be slid or spun, the
+    next piece comes from a shuffled bag of all seven rather than a dice, a rotation
+    that would not fit is retried against the wall before being refused, and a ghost
+    shows where it will land. Four rows at once pays double if you did it last time too.`,
+    controls: [['← →', 'move'], ['↑ or X', 'spin'], ['Z', 'spin back'],
+               ['↓', 'soft drop'], ['Space', 'hard drop'], ['Shift / C', 'hold']],
+    tips: 'The bag means the longest you can ever wait for the long piece is twelve.',
+  },
+  {
+    slug: 'rally', title: 'RALLY', how: 'local', tag: 'Classic',
+    blurb: 'Two bats and a ball. Where it hits the bat is where it goes.',
+    about: `The oldest one there is, with the rule most copies get wrong left in: the
+    ball leaves at an angle set by WHERE on the bat it struck, so the middle sends it
+    straight back and the end sends it away. Move as you make contact and you cut it
+    sideways. The ball speeds up through a rally, and the computer has a reaction delay
+    and an aim error rather than being perfect, so it can be wrong-footed.`,
+    controls: [['W S or Mouse', 'move'], ['↑ ↓', 'player two'], ['P', 'pause']],
+    tips: 'The end of the bat is a weapon. Take the ball early and wide to pull him out of position.',
+  },
+  {
+    slug: 'invasion', title: 'INVASION', how: 'local', tag: 'Classic',
+    blurb: 'Five rows of them, and they march faster the fewer are left.',
+    about: `The 1978 one. The whole arc of it is an accident of the original hardware
+    that turned out to be the design: with fewer aliens on screen the machine redrew
+    faster, so it starts as a shooting gallery and ends as a panic without any
+    difficulty curve existing. One shot at a time, so a miss costs you the wait. The
+    bunkers erode block by block - and your own shots eat them from underneath.`,
+    controls: [['← → or Mouse', 'move'], ['Space / Click', 'fire'], ['P', 'pause']],
+    tips: 'The saucer is worth up to 300. It is also the only time your shot is not defending you.',
+  },
+  {
+    slug: 'crossing', title: 'CROSSING', how: 'local', tag: 'Classic',
+    blurb: 'On the road, touching anything kills you. On the river, touching nothing does.',
+    about: `Two halves that look the same and play as opposites, which is the whole
+    joke: you spend the bottom half avoiding everything that moves and the top half
+    desperate to land on it. The river carries you along with the log, so the far bank
+    is about where you WILL be rather than where you are, and the turtles dive. Five
+    holes to fill, and the clock is worth points if you are quick.`,
+    controls: [['Arrows / W A S D', 'hop'], ['Swipe', 'hop (mobile)'], ['P', 'pause']],
+    tips: 'A diving turtle will not hold you. Watch one go under before you commit to the row.',
+  },
 ];
 
 export const bySlug = (s) => GAMES.find((g) => g.slug === s);

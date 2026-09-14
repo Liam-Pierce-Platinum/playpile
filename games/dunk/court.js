@@ -194,7 +194,11 @@ function buildCrowd(scene) {
     const m2 = m.clone();
     m2.setPosition(x, y + len(0.44), z);
     heads.setMatrixAt(i, m2);
-    col.setHSL(Math.random(), 0.35, 0.28 + Math.random() * 0.22);
+    // A CROWD IS NOT A GRADIENT. Real ones are mostly dark and drab with
+    // a scattering of bright coats through them, and it is the scattering
+    // the eye reads as "lots of separate people" rather than as texture.
+    const loud = Math.random() < 0.18;
+    col.setHSL(Math.random(), loud ? 0.62 : 0.22, loud ? 0.52 : 0.24 + Math.random() * 0.18);
     bodies.setColorAt(i, col);
     col.setHSL(0.07 + Math.random() * 0.05, 0.4, 0.35 + Math.random() * 0.3);
     heads.setColorAt(i, col);
@@ -392,13 +396,13 @@ export function buildCourt(scene, trim) {
   }
   // and a dark back wall behind the top row
   for (const s of [-1, 1]) {
-    const back = new THREE.Mesh(new THREE.BoxGeometry(COURT.halfLen * 2 + len(22), len(9), len(0.6)),
-      new THREE.MeshStandardMaterial({ color: 0x0f1520, roughness: 1 }));
-    back.position.set(0, len(4.5), s * (COURT.halfWid + len(9.6)));
+    const back = new THREE.Mesh(new THREE.BoxGeometry(COURT.halfLen * 2 + len(22), len(9.5), len(0.6)),
+      new THREE.MeshStandardMaterial({ color: 0x232b38, roughness: 1 }));
+    back.position.set(0, len(4.75), s * (COURT.halfWid + len(9.6)));
     scene.add(back);
-    const backEnd = new THREE.Mesh(new THREE.BoxGeometry(len(0.6), len(9), COURT.halfWid * 2 + len(20)),
-      new THREE.MeshStandardMaterial({ color: 0x0f1520, roughness: 1 }));
-    backEnd.position.set(s * (COURT.halfLen + len(9.6)), len(4.5), 0);
+    const backEnd = new THREE.Mesh(new THREE.BoxGeometry(len(0.6), len(9.5), COURT.halfWid * 2 + len(20)),
+      new THREE.MeshStandardMaterial({ color: 0x232b38, roughness: 1 }));
+    backEnd.position.set(s * (COURT.halfLen + len(9.6)), len(4.75), 0);
     scene.add(backEnd);
   }
 
@@ -406,16 +410,38 @@ export function buildCourt(scene, trim) {
   const hoops = [buildHoop(scene, -1, trim), buildHoop(scene, 1, trim)];
 
   // the roof, so the arena is a room: dark, with light rigs in it
+  // THE ROOF IS PALE AND LOWER. Black at thirteen metres was invisible,
+  // which is worse than ugly - it read as no ceiling at all. A grey deck
+  // at nine and a half catches the key light, gives the hall a lid, and
+  // puts a horizon behind the top row of seats.
   const roof = new THREE.Mesh(
     new THREE.BoxGeometry(COURT.halfLen * 2 + len(24), len(0.4), COURT.halfWid * 2 + len(24)),
-    new THREE.MeshStandardMaterial({ color: 0x0c1118, roughness: 1 }));
-  roof.position.y = len(13);
+    new THREE.MeshStandardMaterial({ color: 0x39414d, roughness: 0.95 }));
+  roof.position.y = len(9.5);
   scene.add(roof);
-  for (const x of [-len(8), 0, len(8)]) for (const z of [-len(4), len(4)]) {
-    const rig = new THREE.Mesh(new THREE.BoxGeometry(len(3.4), len(0.3), len(1.2)),
-      new THREE.MeshBasicMaterial({ color: 0xfff6df }));
-    rig.position.set(x, len(12.6), z);
+
+  // roof trusses, because a flat lid is a lid and a trussed one is a building
+  const trussMat = new THREE.MeshStandardMaterial({ color: 0x2b323c, roughness: 0.9 });
+  for (let i = -3; i <= 3; i++) {
+    const t = new THREE.Mesh(
+      new THREE.BoxGeometry(COURT.halfLen * 2 + len(20), len(0.34), len(0.34)), trussMat);
+    t.position.set(0, len(9.1), i * len(3.4));
+    scene.add(t);
+  }
+
+  // THE LIGHT RIGS ARE THE BRIGHTEST THING IN THE PICTURE and they should
+  // look like it: a white panel with a soft glow plate under it.
+  for (const x of [-len(9), -len(3), len(3), len(9)]) for (const z of [-len(4.5), len(4.5)]) {
+    const rig = new THREE.Mesh(new THREE.BoxGeometry(len(3.0), len(0.26), len(1.1)),
+      new THREE.MeshBasicMaterial({ color: 0xfffaf0 }));
+    rig.position.set(x, len(8.85), z);
     scene.add(rig);
+    const glow = new THREE.Mesh(new THREE.PlaneGeometry(len(4.4), len(2.2)),
+      new THREE.MeshBasicMaterial({ color: 0xfff1d0, transparent: true, opacity: 0.16,
+                                    depthWrite: false }));
+    glow.rotation.x = Math.PI / 2;
+    glow.position.set(x, len(8.6), z);
+    scene.add(glow);
   }
 
   return { floor, hoops, crowd };

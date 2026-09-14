@@ -171,6 +171,37 @@ export class Deck3D {
       this.cv.style.height = Math.floor(this.H * s) + 'px';
     };
     addEventListener('resize', fit); fit();
+    document.addEventListener('fullscreenchange', () => setTimeout(fit, 60));
+
+    // ---- R RESTARTS, F FILLS THE SCREEN -----------------------------
+    //
+    // Liam: *"add in resets to the games, full screen, larger screens for
+    // everything"*.
+    //
+    // Both live in the cabinet rather than in each game, so all eleven
+    // behave the same way and a new game gets them for nothing.
+    //
+    // RESET reloads, which lands back on the game's own home screen. That
+    // is a real reset - every scrap of run state goes - and the
+    // leaderboard survives it, because that lives in localStorage rather
+    // than in the page. A per-game "restart this run" can override it by
+    // setting D.onReset.
+    //
+    // NOT WHILE SOMEBODY IS TYPING THEIR INITIALS. The home screen asks
+    // for three letters after a qualifying run, and R is a letter: without
+    // this guard, reaching for your own initials would reload the page and
+    // throw away the score you had just set.
+    addEventListener('keydown', (e) => {
+      if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+      const typing = window.__home && window.__home.mode === 'entry';
+      if (typing) return;
+      if (e.code === 'KeyR') {
+        e.preventDefault();
+        if (this.onReset) this.onReset(); else location.reload();
+      }
+      if (e.code === 'KeyF') { e.preventDefault(); this.fullscreen(); }
+    });
+
     // every key is released when focus goes - see the long note in deck.js
     const letGo = () => { this.keys.clear(); };
     addEventListener('blur', () => { this.paused = true; letGo(); });
@@ -203,6 +234,26 @@ export class Deck3D {
   }
 
 
+
+
+  /**
+   * Fill the screen.
+   *
+   * The element that goes fullscreen is the canvas's PARENT, not the
+   * canvas: the 3D cabinet keeps its HUD on a second canvas stacked on
+   * top, and taking only the game canvas fullscreen would leave the score
+   * and the buttons behind in the page. fit() then runs off the new
+   * window size and everything scales up together.
+   *
+   * Inside an iframe this needs allowfullscreen on the frame, which the
+   * site's play page sets.
+   */
+  fullscreen() {
+    const el = this.cv.parentNode && this.cv.parentNode.requestFullscreen
+      ? this.cv.parentNode : this.cv;
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+  }
 
   /** put the camera on a point on the play plane, from the side */
   lookAt(x, y) {

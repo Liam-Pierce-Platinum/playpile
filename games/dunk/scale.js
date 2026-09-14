@@ -36,7 +36,13 @@
 //           the game ever feels slow again; it is the only one, and
 //           turning it does not make anybody the wrong size.
 export const SCALE = 0.78;
-export const QUICK = 1.25;
+// SLOWER. Liam: *"they should be slower"*. At 1.25 the players moved a
+// quarter faster than real ones and the whole match read as frantic -
+// you arrived everywhere before you had decided to go there, which is
+// the opposite of how basketball feels. At 0.92 a player crosses the
+// floor in about 3.4 seconds, a shade slower than life, and the game
+// gets the weight that makes a crossover or a closeout mean something.
+export const QUICK = 0.92;
 
 /** a length in real metres -> a length in this game */
 export const len = (v) => v * SCALE;

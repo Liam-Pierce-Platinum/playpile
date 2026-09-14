@@ -19,7 +19,13 @@
   --accent-2:#4dc9ff;
   --good:#57d38c;
   --pad:16px;
-  --w:1240px;
+  /* THE PAGE WAS THE THING MAKING THE GAMES SMALL.
+     At a fixed 1240 the stage got 1240 - 300 for the rail - the gaps, so
+     every game played in about 890 by 500 however big the monitor was.
+     On a 3440-wide screen that is a postage stamp. It now takes 94% of
+     the viewport up to 2100, so a wide monitor gets a wide game and a
+     laptop is unchanged. */
+  --w:min(2100px, 94vw);
   --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
   --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 }
@@ -122,10 +128,23 @@ nav.links a.on{color:var(--accent)}
 .play-wrap{display:grid;gap:18px;grid-template-columns:minmax(0,1fr) 300px;
   align-items:start;padding:18px 0 40px}
 @media (max-width:980px){.play-wrap{grid-template-columns:minmax(0,1fr)}}
+/* on a really wide monitor the rail can afford to be wider too */
+@media (min-width:1700px){.play-wrap{grid-template-columns:minmax(0,1fr) 340px}}
 
 .stage{
   background:#000;border:1px solid var(--edge);border-radius:10px;overflow:hidden;
   position:relative;aspect-ratio:16/9;
+  /* AND IT IS ALLOWED TO BE TALL. Eleven of these games are not 16:9 -
+     MERGE is 420x640, STACK is 460x720 - and the cabinet letterboxes them
+     inside whatever it is given. Capping the height at the viewport stops
+     a portrait game pushing the page controls off the bottom of a laptop
+     screen, and the min-height stops it collapsing on a short window. */
+  max-height:calc(100vh - 190px);
+  min-height:420px;
+}
+/* fullscreen: the frame fills the screen, nothing else shows */
+.stage:fullscreen, .stage:-webkit-full-screen{
+  max-height:none;border:0;border-radius:0;aspect-ratio:auto;width:100vw;height:100vh;
 }
 .stage iframe{width:100%;height:100%;border:0;display:block;background:#000}
 .stage .curtain{
@@ -150,6 +169,8 @@ nav.links a.on{color:var(--accent)}
   text-transform:uppercase;flex-wrap:wrap;
 }
 .stagebar .sp{flex:1}
+.stagebar kbd{font:600 10px/1 var(--mono);border:1px solid var(--edge);
+  border-radius:3px;padding:2px 4px;margin-left:5px;opacity:.75}
 .stagebar button{background:none;border:0;color:var(--dim);cursor:pointer;
   font:inherit;letter-spacing:.14em;text-transform:uppercase;padding:4px 6px}
 .stagebar button:hover{color:var(--accent)}

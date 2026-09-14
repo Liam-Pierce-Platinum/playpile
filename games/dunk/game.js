@@ -77,11 +77,20 @@ const panelHits = [];
 // what bright rooms look like without it: the crowd went to pastel mush
 // and the jerseys went white. ACES rolls the highlights off instead.
 D.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-D.renderer.toneMappingExposure = 0.95;
+D.renderer.toneMappingExposure = 1.05;
 
 D.setShadowArea(len(16), len(80));
-D.key.intensity = 2.0;
-D.scene.add(new THREE.HemisphereLight(0xdfe8ff, 0x2a3038, 0.55));
+D.key.intensity = 2.2;
+// A SPORTS HALL IS NOT A VOID WITH A FLOOR IN IT.
+//
+// Everything above the top row of seats was pure black, so the arena read
+// as a lit disc floating in space. Real halls have light bouncing off a
+// pale ceiling and spilling down the far walls, and the cheapest honest
+// way to get that is a hemisphere light with a sky colour that is
+// actually visible plus a faint ambient floor - so the roof structure and
+// the backs of the stands are dim rather than absent.
+D.scene.add(new THREE.HemisphereLight(0xc8d8f0, 0x3a3f48, 1.05));
+D.scene.add(new THREE.AmbientLight(0x2a3442, 0.55));
 for (const x of [-len(9), len(9)]) for (const z of [-len(5), len(5)]) {
   // the house lights, so the floor has highlights running down it rather
   // than one flat wash
@@ -1041,7 +1050,11 @@ function stepBall(dt) {
     // dribbles, which is what makes the hand visible - and the hand is
     // what defence is about
     const h = handPoint(b.carrier.model, b.carrier.hand, new THREE.Vector3());
-    const low = Math.max(0, Math.sin(b.carrier.model.dribble || 0));
+    // THE BALL FOLLOWS THE SAME PHASE THE HAND DOES. posePlayer works
+    // out a skewed dribble phase - fast push down, slow ride back up -
+    // and writes it to dribblePhase. Using a plain sine here instead put
+    // the ball at the floor while the hand was still on its way down.
+    const low = b.carrier.model.dribblePhase || 0;
     b.x = h.x; b.z = h.z;
     b.y = b.carrier.air ? h.y : lerp(h.y, BALL_R + len(0.02), low * 0.85);
     b.vx = b.carrier.vx; b.vz = b.carrier.vz;

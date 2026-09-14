@@ -43,14 +43,25 @@ import * as THREE from '../vendor/three.module.js';
 
 /* the render size. Not a fixed 320x240 any more - it follows the window,
    capped so a 4K screen does not ask for a 4K shadow-mapped scene. */
-export const RES = { w: 1152, h: 720 };
+// Liam: *"full screen, larger screens for everything... better graphics
+// for lights out"*.
+//
+// 1152x720 was chosen when this was a PS1 pastiche and a soft image was
+// the point. It is a realistic game now, and on a wide monitor it was
+// being blown up from something smaller than the window - so the whole
+// thing looked soft for no reason. 1600x1000 is a real resolution and
+// costs little, because what is expensive in here is the torch shadow
+// rather than the pixel count.
+export const RES = { w: 1600, h: 1000 };
 
 export function makeRenderer(canvas) {
   const r = new THREE.WebGLRenderer({
     canvas, antialias: true, powerPreference: 'high-performance',
     preserveDrawingBuffer: true,
   });
-  r.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
+  // On a high-dpi screen this is the difference between crisp edges and
+  // a slightly gauzy image; 2 is the point past which nobody can tell.
+  r.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
   r.setSize(RES.w, RES.h, false);
   r.shadowMap.enabled = true;
   r.shadowMap.type = THREE.PCFSoftShadowMap;

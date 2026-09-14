@@ -534,7 +534,35 @@ function frame(now) {
       + Math.sin(P.t * 11.3) * 0.018
       + Math.sin(P.t * 2.7) * 0.03
       - (Math.random() < 0.004 ? 0.22 : 0);
-    torch.intensity = P.power * f;
+    // A TORCH PRESSED AGAINST A WALL IS A WHITE SCREEN.
+    //
+    // This is the same fault Liam reported as *"you can't see anything
+    // when the thing is on"*, in its last hiding place: the intensity was
+    // fixed, so at arm's length from plaster the near surface clipped to
+    // pure white and the whole picture went with it. Walking into a wall
+    // - which you do constantly in the dark - blanked the game.
+    //
+    // Real eyes stop down. This does the same, using the grid the
+    // collision already uses rather than a raycast: step along the beam
+    // looking for the first solid tile, and pull the torch back as that
+    // gets close. Past a metre and a half nothing changes at all.
+    const bx = -Math.sin(P.yaw), bz = -Math.cos(P.yaw);
+    let wall = 3.4;
+    for (let d = 0.35; d <= 3.4; d += 0.18) {
+      if (house.solid(P.x + bx * d, P.z + bz * d)) { wall = d; break; }
+    }
+    // The curve matters more than the idea. A linear pull-back still
+    // clipped: at arm's length a torch is enormously brighter than at two
+    // metres, so the correction has to fall away much faster than the
+    // distance does. Squared-ish, with a floor so you can still see the
+    // wall you are standing against.
+    // MEASURED, NOT GUESSED. The debug probe said the wall being blown
+    // out was 1.6 metres away, not point blank - so a correction that
+    // only acted inside 1.4m never fired at all. A torch this bright
+    // clips anything inside about three metres, which in a house is most
+    // of what you ever point it at.
+    const stopDown = Math.max(0.10, Math.min(1, Math.pow(Math.min(1, wall / 3.2), 1.6)));
+    torch.intensity = P.power * f * stopDown;
     spill.intensity = 1.6 * f;
   } else {
     spill.intensity = 0;
@@ -553,8 +581,15 @@ function frame(now) {
    half-pixel is a smear. At 1152x720 with filtering the opposite is
    true: whole multiples waste most of the window. */
 function fit() {
-  const k = Math.min((Math.min(innerWidth, 1600) - 40) / RES.w,
-                     (innerHeight - 200) / RES.h);
+  // IT USED TO CAP AT 1600 WIDE and reserve 200px of page for the
+  // chrome, so on a 3440 monitor two thirds of the screen was margin.
+  // In fullscreen it takes the lot; otherwise it leaves room for the
+  // header and the key list and nothing more.
+  const full = !!document.fullscreenElement;
+  const marginX = full ? 0 : 40;
+  const marginY = full ? 0 : 150;
+  const k = Math.min((innerWidth - marginX) / RES.w,
+                     (innerHeight - marginY) / RES.h);
   const w = Math.max(320, Math.floor(RES.w * k));
   const h = Math.max(200, Math.floor(RES.h * k));
   for (const el of [canvas, hud]) {
@@ -563,6 +598,11 @@ function fit() {
   }
 }
 addEventListener('resize', fit);
+// Going fullscreen changes the window size without reliably firing a
+// resize first, so it gets its own listener - otherwise the site's
+// Fullscreen button gives you a big black page with a small game in the
+// corner of it.
+document.addEventListener('fullscreenchange', () => setTimeout(fit, 60));
 fit();
 requestAnimationFrame(frame);
 

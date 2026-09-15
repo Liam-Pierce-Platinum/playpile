@@ -146,11 +146,23 @@ export function slot(el, name) {
   if (cfg.enabled && cfg.adsense && cfg.adsense.client && id) {
     const ins = document.createElement('ins');
     ins.className = 'adsbygoogle';
-    ins.style.display = 'inline-block';
-    ins.style.width = sz.w + 'px';
-    ins.style.height = sz.h + 'px';
     ins.setAttribute('data-ad-client', cfg.adsense.client);
     ins.setAttribute('data-ad-slot', id);
+    if (cfg.adsense.format === 'auto') {
+      // A RESPONSIVE unit, exactly as AdSense hands out the code: block,
+      // format auto, full width on phones. It sizes itself to the slot's
+      // box, which keeps the fixed height here so the page still does not
+      // move when it fills. width:100% because the slot is a flex box and
+      // a block with no width inside one collapses to nothing.
+      ins.style.display = 'block';
+      ins.style.width = '100%';
+      ins.setAttribute('data-ad-format', 'auto');
+      ins.setAttribute('data-full-width-responsive', 'true');
+    } else {
+      ins.style.display = 'inline-block';
+      ins.style.width = sz.w + 'px';
+      ins.style.height = sz.h + 'px';
+    }
     el.innerHTML = '';
     el.appendChild(ins);
     try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}

@@ -5,19 +5,23 @@
   "adsense": {
     "client": "ca-pub-3389918233377914",
     "_client_example": "ca-pub-1234567890123456",
+    "format": "auto",
+    "_format": "auto = responsive units (display:block, data-ad-format auto, full-width-responsive). Anything else = fixed-size units at each slot's own size.",
     "slots": {
-      "home_leader": "",
-      "home_inline": "",
-      "play_leader": "",
-      "play_rail": "",
-      "play_tall": "",
-      "play_footer": "",
+      "_unit": "1775985163 is display unit '1' from the AdSense account (responsive). One unit may be used in several places on a site.",
+      "home_leader": "1775985163",
+      "home_inline": "1775985163",
+      "play_leader": "1775985163",
+      "play_rail": "1775985163",
+      "play_tall": "1775985163",
+      "play_footer": "1775985163",
       "interstitial": ""
     }
   },
   "interstitial": {
     "enabled": true,
     "_note": "The panel shown while a game loads. It is the most valuable slot on a games site and the least annoying place to put one, because the player is already waiting.",
+    "_adsense": "Left empty on purpose: a normal AdSense display unit inside a panel that covers the page breaks their placement policy. It keeps showing a house ad. Loading-screen ads need AdSense for Games (H5 Games Ads), which is a separate application.",
     "seconds": 5,
     "minGapMinutes": 3,
     "_minGap": "Never show it twice inside this many minutes, however many games are opened."

@@ -44,16 +44,27 @@
 // being played, anything that moves, anything that makes noise, and any
 // unit inside the game frame. Those are the four that get a games site
 // dropped by an ad network, and they are also why people leave.
+//
+// FLUID OR FIXED. A responsive unit picks its own height - usually 280px
+// on a desktop - so it can only go where the page is free to grow: the
+// home page, between rows, under a description. Anywhere a unit sits
+// ABOVE or BESIDE a game it is fixed at the slot's exact size instead
+// (AdSense allows a responsive unit to be pinned by CSS), because a
+// 280px ad arriving above the game frame shoves the game down the page
+// under the player's hands. The first live deploy put fluid units in 90px
+// boxes and they spilled 190px over the cards below.
 let CFG = null;
 const SIZES = {
-  home_leader:  { w: 728, h: 90,  cls: 'ad-leader', label: 'leaderboard' },
-  home_inline:  { w: 728, h: 90,  cls: 'ad-inline', label: 'in-feed' },
+  home_leader:  { w: 728, h: 90,  cls: 'ad-fluid',  label: 'leaderboard', fluid: true },
+  home_inline:  { w: 728, h: 90,  cls: 'ad-fluid',  label: 'in-feed',     fluid: true },
+  home_row1:    { w: 728, h: 90,  cls: 'ad-fluid ad-row', label: 'between rows', fluid: true },
+  home_row2:    { w: 728, h: 90,  cls: 'ad-fluid ad-row', label: 'between rows', fluid: true },
   play_leader:  { w: 728, h: 90,  cls: 'ad-leader', label: 'leaderboard' },
   play_rail:    { w: 300, h: 250, cls: 'ad-rail',   label: 'rectangle' },
   play_tall:    { w: 300, h: 600, cls: 'ad-tall',   label: 'half page' },
   play_sky:     { w: 160, h: 600, cls: 'ad-sky',    label: 'skyscraper' },
   home_rail:    { w: 300, h: 600, cls: 'ad-tall',   label: 'half page' },
-  play_footer:  { w: 728, h: 90,  cls: 'ad-inline', label: 'leaderboard' },
+  play_footer:  { w: 728, h: 90,  cls: 'ad-fluid',  label: 'leaderboard', fluid: true },
   interstitial: { w: 300, h: 250, cls: 'ad-rail',   label: 'rectangle' },
   endcard:      { w: 300, h: 250, cls: 'ad-rail',   label: 'rectangle' },
 };
@@ -136,7 +147,7 @@ function notice() {
 export function slot(el, name) {
   if (!el) return;
   const sz = SIZES[name] || SIZES.play_rail;
-  el.classList.add('ad', sz.cls);
+  el.classList.add('ad', ...sz.cls.split(' '));
   el.setAttribute('data-slot', name);
 
   const cfg = CFG || { enabled: false };
@@ -148,24 +159,24 @@ export function slot(el, name) {
     ins.className = 'adsbygoogle';
     ins.setAttribute('data-ad-client', cfg.adsense.client);
     ins.setAttribute('data-ad-slot', id);
-    if (cfg.adsense.format === 'auto') {
+    if (cfg.adsense.format === 'auto' && sz.fluid) {
       // A RESPONSIVE unit, exactly as AdSense hands out the code: block,
-      // format auto, full width on phones. It sizes itself to the slot's
-      // box, which keeps the fixed height here so the page still does not
-      // move when it fills. width:100% because the slot is a flex box and
-      // a block with no width inside one collapses to nothing.
+      // format auto, full width on phones. width:100% because a block
+      // with no width inside a flex box collapses to nothing.
       ins.style.display = 'block';
       ins.style.width = '100%';
       ins.setAttribute('data-ad-format', 'auto');
       ins.setAttribute('data-full-width-responsive', 'true');
     } else {
+      // pinned to the slot's own box - see FLUID OR FIXED above
       ins.style.display = 'inline-block';
-      ins.style.width = sz.w + 'px';
-      ins.style.height = sz.h + 'px';
+      ins.style.width = '100%';
+      ins.style.height = '100%';
     }
     el.innerHTML = '';
     el.appendChild(ins);
     try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+    whenUnfilled(el, ins, sz, cfg);
     return;
   }
 
@@ -176,6 +187,32 @@ export function slot(el, name) {
     + '<span>' + sz.label + ' &middot; ' + sz.w + '&times;' + sz.h + '</span>'
     + '<i>ads/ads.json &rarr; slots.' + name + '</i>'
     + '</div>';
+}
+
+/**
+ * WHEN GOOGLE HAS NOTHING TO SHOW, show one of Liam's games instead.
+ *
+ * AdSense marks a unit it could not fill with data-ad-status="unfilled"
+ * and leaves an empty box - which is every unit on a site still under
+ * review, and some of them for ever after. Google's own guidance is to
+ * hide an unfilled unit, so it is hidden and a house card goes in the
+ * same place. The ins stays in the page, untouched, as Google asks.
+ */
+function whenUnfilled(el, ins, sz, cfg) {
+  if (!(cfg.houseAds && cfg.houseAds.enabled)) return;
+  const check = () => {
+    if (ins.getAttribute('data-ad-status') !== 'unfilled') return false;
+    ins.style.display = 'none';
+    const box = document.createElement('div');
+    box.className = 'ad-house';
+    el.appendChild(box);
+    house(box, sz);
+    el.classList.add('ad-unfilled');
+    return true;
+  };
+  if (check()) return;
+  const mo = new MutationObserver(() => { if (check()) mo.disconnect(); });
+  mo.observe(ins, { attributes: true, attributeFilter: ['data-ad-status'] });
 }
 
 /**

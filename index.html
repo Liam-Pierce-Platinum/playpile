@@ -40,6 +40,8 @@
   <!-- the leaderboard everybody has, above the fold, out of the way -->
   <div id="ad-home-leader"></div>
 
+  <div class="home-cols">
+  <div>
   <div class="sec" id="big">
     <h2>The big ones</h2><span>five</span><div class="rule"></div>
   </div>
@@ -51,6 +53,11 @@
     <h2>Quick games</h2><span>ten &middot; under five minutes</span><div class="rule"></div>
   </div>
   <div class="grid" id="grid-small"></div>
+  </div>
+
+  <!-- down the right-hand side on wide screens, sticky -->
+  <aside class="home-rail"><div id="ad-home-rail"></div></aside>
+  </div>
 
 </main>
 
@@ -99,9 +106,26 @@ document.getElementById('grid-big').innerHTML =
 document.getElementById('grid-small').innerHTML =
   GAMES.filter((g) => !g.big).map(card).join('');
 
+// ADVERTS BETWEEN ROWS. Each is given an explicit grid-row and a full row
+// of columns, and CSS grid's auto-placement flows the cards around it - so
+// it always lands after two whole rows, then after four more, however many
+// columns the screen has. Inserting it after the Nth card instead would
+// break a row in half on every width but one.
+const small = document.getElementById('grid-small');
+for (const [row, name] of [[3, 'home_row1'], [8, 'home_row2']]) {
+  const d = document.createElement('div');
+  d.style.gridRow = String(row);
+  d.dataset.adRow = name;
+  small.appendChild(d);
+}
+
 await loadAds();
 slot(document.getElementById('ad-home-leader'), 'home_leader');
 slot(document.getElementById('ad-home-inline'), 'home_inline');
+for (const d of small.querySelectorAll('[data-ad-row]')) slot(d, d.dataset.adRow);
+// only on a screen wide enough to show the rail, or it would request an
+// advert nobody can see
+if (matchMedia('(min-width:1400px)').matches) slot(document.getElementById('ad-home-rail'), 'home_rail');
 </script>
 </body>
 </html>

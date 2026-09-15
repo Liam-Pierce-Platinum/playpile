@@ -225,6 +225,24 @@ nav.links a.on{color:var(--accent)}
   .ad-leader{max-width:320px;height:100px}
   .ad-tall{height:250px}
 }
+/* A responsive unit chooses its own height, so its box must be free to
+   grow - a fixed 90px box is what let the first live units spill over
+   the cards below. min-height keeps a sensible hole while it loads. */
+.ad-fluid{display:block;width:100%;max-width:970px;min-height:100px;height:auto;margin:22px auto}
+.ad-fluid .ad-ph{min-height:100px}
+/* between rows of cards: a full row of the grid, placed by grid-row in
+   index.html so it lands after whole rows whatever the column count */
+.grid .ad-row{grid-column:1/-1;margin:6px auto}
+.ad-house{width:100%;height:100%;min-height:inherit;display:flex}
+.ad-house > .ad-ph{flex:1}
+
+/* the home page's side rail, only where there is width to spare for it */
+.home-cols{display:block}
+.home-rail{display:none}
+@media (min-width:1400px){
+  .home-cols{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
+  .home-rail{display:block;position:sticky;top:78px;margin-top:34px}
+}
 
 /* the between-games interstitial: a real slot, shown while the game
    loads, never over a game that is already running */

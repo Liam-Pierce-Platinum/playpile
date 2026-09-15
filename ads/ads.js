@@ -24,11 +24,21 @@
 //                         shelf divider rather than an interruption.
 //   play_leader   728x90  above the game, where the eye already is.
 //   play_rail     300x250 beside the game. The rectangle is the best
-//                         paying unit on the web and this is the only
-//                         place on a game page it fits without crowding.
-//   play_tall     300x600 under the rail on tall screens.
+//                         paying unit on the web, and BEING BESIDE THE
+//                         GAME is why: it is the only unit that stays in
+//                         view for a whole session. It is sticky for
+//                         exactly that reason.
+//   play_tall     300x600 under the rail, also sticky.
+//   play_sky      160x600 a skyscraper down the LEFT of the game, and it
+//                         only exists above 1500px - on anything narrower
+//                         it would be taking width off the game itself,
+//                         which is the trade that loses you the player.
+//   home_rail     300x600 down the side of the deck, above 1400px.
 //   play_footer   728x90  under the description, for the people reading.
 //   interstitial  300x250 in the panel that covers the loading game.
+//   endcard       300x250 after a score goes on the leaderboard. The one
+//                         moment a player is FINISHED rather than
+//                         interrupted, which is why it is allowed.
 //
 // WHAT IS DELIBERATELY NOT HERE: anything over the game while it is
 // being played, anything that moves, anything that makes noise, and any
@@ -41,8 +51,11 @@ const SIZES = {
   play_leader:  { w: 728, h: 90,  cls: 'ad-leader', label: 'leaderboard' },
   play_rail:    { w: 300, h: 250, cls: 'ad-rail',   label: 'rectangle' },
   play_tall:    { w: 300, h: 600, cls: 'ad-tall',   label: 'half page' },
+  play_sky:     { w: 160, h: 600, cls: 'ad-sky',    label: 'skyscraper' },
+  home_rail:    { w: 300, h: 600, cls: 'ad-tall',   label: 'half page' },
   play_footer:  { w: 728, h: 90,  cls: 'ad-inline', label: 'leaderboard' },
   interstitial: { w: 300, h: 250, cls: 'ad-rail',   label: 'rectangle' },
+  endcard:      { w: 300, h: 250, cls: 'ad-rail',   label: 'rectangle' },
 };
 
 export async function loadAds() {
@@ -54,11 +67,18 @@ export async function loadAds() {
     CFG = { enabled: false, interstitial: { enabled: false } };
   }
   if (CFG.enabled && CFG.network === 'adsense' && CFG.adsense && CFG.adsense.client) {
-    // ONE script tag for the whole page, added once, only when it is
-    // actually going to be used. An ad script on a page with no ad units
-    // is a third-party request that costs the player a load and earns
-    // nothing.
-    if (!document.getElementById('adsense-lib')) {
+    // ONE script tag for the whole page.
+    //
+    // Since verification, every page carries Google's own snippet pasted
+    // into its <head> - that is what they check for, and it has to be in
+    // the HTML rather than injected by this file, which only runs on the
+    // pages that have slots. So the test is for the SCRIPT SRC, not for
+    // an id this file chose: loading adsbygoogle.js twice on one page is
+    // a policy violation, and it would have happened on every page here
+    // the moment the tag went in.
+    const already = [...document.scripts].some(
+      (x) => (x.src || '').includes('pagead2.googlesyndication.com'));
+    if (!already) {
       const s = document.createElement('script');
       s.id = 'adsense-lib';
       s.async = true;

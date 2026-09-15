@@ -1,9 +1,9 @@
 {
   "_readme": "The only file you edit to turn advertising on. Nothing else on the site knows an ad network exists. See MONETISATION.md.",
-  "enabled": false,
+  "enabled": true,
   "network": "adsense",
   "adsense": {
-    "client": "",
+    "client": "ca-pub-3389918233377914",
     "_client_example": "ca-pub-1234567890123456",
     "slots": {
       "home_leader": "",

@@ -6,6 +6,12 @@
 <title>About — PLAYPILE</title>
 <link rel="stylesheet" href="/site/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>🕹️</text></svg>">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
 </head>
 <body>
 <header class="top"><div class="bar">
@@ -48,5 +54,12 @@
   <span>PLAYPILE</span><span class="sp"></span>
   <a href="/">All games</a><a href="/site/advertise.html">Advertise</a><a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
 </div></div></footer>
+
+<!-- no ad slots on this page, but it does load the ad script, so it owes
+     the visitor the same cookie notice as everywhere else -->
+<script type="module">
+  import { loadAds } from '/ads/ads.js';
+  loadAds();
+</script>
 </body>
 </html>

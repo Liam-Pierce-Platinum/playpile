@@ -266,7 +266,10 @@ export const PARKS = [
   // is a spine in the middle because that is what a contest course has.
   {
     id: 'arena',
-    name: 'RED BULL ARENA',
+    // Named for nobody real. It was RED BULL ARENA until the game went on
+    // playpile.net, and a live trademark on a page carrying advertising is
+    // somebody else's problem to hand you.
+    name: 'THE BIG TOP',
     sub: 'a contest course under the lights. big transition, a spine and a hip.',
     blurb: 'contest park. quarters, a spine, a hip and a long rail, indoors.',
     theme: 'arena',

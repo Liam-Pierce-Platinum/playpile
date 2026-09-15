@@ -313,15 +313,17 @@ export const GAMES = [
     tips: 'The saucer is worth up to 300. It is also the only time your shot is not defending you.',
   },
   {
-    slug: 'crossing', title: 'CROSSING', how: 'local', tag: 'Classic',
-    blurb: 'On the road, touching anything kills you. On the river, touching nothing does.',
-    about: `Two halves that look the same and play as opposites, which is the whole
-    joke: you spend the bottom half avoiding everything that moves and the top half
-    desperate to land on it. The river carries you along with the log, so the far bank
-    is about where you WILL be rather than where you are, and the turtles dive. Five
-    holes to fill, and the clock is worth points if you are quick.`,
+    slug: 'crossing', title: 'CROSSING', how: 'local', tag: 'Endless',
+    blurb: 'It never ends, and the bottom of the screen is rising. How far did you get?',
+    about: `Road and river, generated forever as they come into view, and they play as
+    opposites - on the road touching anything kills you, on the river touching NOTHING
+    does. The river carries you along with the log, so the far bank is about where you
+    WILL be rather than where you are, and the turtles dive. What makes it a game is
+    the camera: it creeps up from the bottom of the screen, faster the further you get,
+    and the edge is lethal. You are never allowed to wait for a gap, only to pick one.
+    One life, and your score is the row you reached.`,
     controls: [['Arrows / W A S D', 'hop'], ['Swipe', 'hop (mobile)'], ['P', 'pause']],
-    tips: 'A diving turtle will not hold you. Watch one go under before you commit to the row.',
+    tips: 'A diving turtle will not hold you - but you cannot wait for it either. Take the gap you have.',
   },
 ];
 

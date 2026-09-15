@@ -77,6 +77,57 @@ export const GAMES = [
                ['1 2 3', 'potion · throw · eat'], ['E / M / Tab', 'satchel · map · target']],
     tips: 'The dragon tells you which way to move: an orange tail sweep is jumped, green breath is dodged sideways.',
   },
+  {
+    slug: 'apex', title: 'APEX', how: 'mounted', port: 8201, url: '/',
+    web: 'apex/',
+    tag: 'Racing', big: true,
+    blurb: 'Five real Formula 1 circuits, a manual eight-speed box, and grip that grows with speed.',
+    about: `Monza, Silverstone, Suzuka, Spa and Monaco, each laid out from its real
+    corner sequence and solved until the lap closes to under a metre and measures the
+    published distance. The car makes its own grip out of air - about its own weight
+    again in downforce by 200 km/h - so it corners harder the faster it is going, and
+    the body heaves, pitches and rolls on four real springs rather than on a formula.
+    The gearbox is manual, with the shift lights across the top going green, amber,
+    red, purple like the real ones.`,
+    controls: [['W S', 'throttle · brake'], ['A D', 'steer'],
+               ['Shift / Ctrl', 'up a gear · down a gear'], ['Space', 'DRS'],
+               ['C', 'clutch'], ['V', 'camera'], ['R', 'back on track'], ['Esc', 'circuit list']],
+    tips: 'Short-shift out of the slow corners. The wings do nothing at 60 km/h, so first and second are all tyre.',
+  },
+  {
+    slug: 'night-shift', title: 'NIGHT SHIFT', how: 'mounted', port: 8130, url: '/',
+    web: 'night-shift/',
+    tag: 'Crime', big: true,
+    blurb: 'Do the job, and do not get caught. They have to kill you to stop you.',
+    about: `A top-down city at night, and a police force that does not look for YOU -
+    it looks for a description, built one line at a time out of what you left at the
+    scene: vehicle, clothing, face, prints, build. The screen before the job is the
+    one that matters, because a ski mask denies them your face and gloves deny them
+    your prints, and face or prints means identified, which means your name, your
+    address and your bank card. Drive, get out, go in, take a different car.`,
+    controls: [['W A S D', 'drive · walk'], ['F', 'get out · go in · take a car'],
+               ['Shift', 'sprint'], ['Mouse', 'aim'], ['Click', 'fire'],
+               ['R', 'reload'], ['M', 'mask'], ['Esc', 'pause']],
+    tips: 'Change the car and the clothes between jobs. What they cannot describe, they cannot look for.',
+  },
+  {
+    slug: 'grind-city', title: 'GRIND CITY', how: 'mounted', port: 8126, url: '/',
+    web: 'grind-city/',
+    tag: 'Sport', big: true,
+    blurb: 'A 2D pixel skater where the mouse IS the board, not a pointer.',
+    about: `Your hand is your weight on the deck. Slide to a tip and flick sideways and
+    it flips; push down in the middle and it spins flat; push down over a tip and it
+    goes end over end. Because a slow slide only moves your foot and only a real snap
+    counts as a flick, you get to choose the trick before you commit to it - and past
+    about a sixth of a turn the rotation completes itself, so there is no catch to time
+    and you never wipe out for doing nothing. Free skating scores; money comes out of
+    competitions only.`,
+    controls: [['Mouse / arrows', 'your weight on the deck'],
+               ['A D', 'push · brake · spin in the air'],
+               ['Hold down', 'pump in a transition · manual over a tip'],
+               ['R', 'bail and reset'], ['Esc', 'pause']],
+    tips: 'TRICK SHEETS on the main screen plays every gesture back at you with the real board attached.',
+  },
 
   // ---- the ten written for the deck --------------------------------
   {

@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PLAYPILE</title>
+<link rel="stylesheet" href="/site/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>🕹️</text></svg>">
+</head>
+<body>
+
+<header class="top">
+  <div class="bar">
+    <a class="logo" href="/">PLAY<b>PILE</b></a>
+    <nav class="links">
+      <a href="/">All games</a>
+      <a href="/site/about.html">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="ad-play-leader"></div>
+
+  <div class="play-wrap">
+    <div>
+      <!-- THE GAME DOES NOT LOAD UNTIL IT IS ASKED FOR.
+           Five of these are heavy - one is an 83 MB Unity build - and a
+           page that starts downloading a game the moment it opens is a
+           page that costs the player 83 MB for a click they might not
+           make. The iframe has no src until START. -->
+      <div class="stage" id="stage">
+        <iframe id="frame" title="game" allow="autoplay; fullscreen; gamepad; pointer-lock"
+                allowfullscreen hidden></iframe>
+        <div class="curtain" id="curtain">
+          <h2 id="ttl">GAME</h2>
+          <p id="lede"></p>
+          <button class="btn" id="start">Play</button>
+          <p id="warn" style="color:#8b96a8;font-size:12px"></p>
+        </div>
+      </div>
+      <div class="stagebar">
+        <span id="how"></span>
+        <span class="sp"></span>
+        <button id="full">Fullscreen <kbd>F</kbd></button>
+        <button id="reload">Restart <kbd>R</kbd></button>
+        <a href="/"><button>All games</button></a>
+      </div>
+
+      <section class="about">
+        <h1 id="h1">GAME</h1>
+        <p class="lede" id="blurb"></p>
+        <p id="about"></p>
+        <ul class="keys" id="keys"></ul>
+        <div class="tip" id="tip"></div>
+      </section>
+
+      <div id="ad-play-footer"></div>
+    </div>
+
+    <aside class="side">
+      <div id="ad-play-rail"></div>
+      <div class="panel">
+        <h4>More games</h4>
+        <div id="more"></div>
+      </div>
+      <div id="ad-play-tall"></div>
+    </aside>
+  </div>
+</main>
+
+<!-- the loading interstitial -->
+<div class="gate" id="gate">
+  <div class="box">
+    <h3>Advertisement</h3>
+    <div data-ad></div>
+    <div class="count">your game starts in 5</div>
+    <button class="btn ghost">Skip</button>
+  </div>
+</div>
+
+<footer class="foot"><div class="wrap"><div class="row">
+  <span>PLAYPILE</span><span class="sp"></span>
+  <a href="/site/about.html">About</a>
+  <a href="/site/advertise.html">Advertise</a><a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+</div></div></footer>
+
+<script type="module">
+import { GAMES, bySlug } from '/site/catalogue.js';
+import { loadAds, slot, interstitial } from '/ads/ads.js';
+
+window.__PLAYPILE_GAMES = GAMES;
+const slug = location.pathname.split('/').filter(Boolean).pop();
+const g = bySlug(slug);
+if (!g) { location.replace('/'); }
+
+document.title = g.title + ' — PLAYPILE';
+ttl.textContent = g.title;
+h1.textContent = g.title;
+lede.textContent = g.blurb;
+blurb.textContent = g.blurb;
+about.textContent = g.about.replace(/\s+/g, ' ').trim();
+tip.textContent = g.tips;
+keys.innerHTML = g.controls.map(([k, w]) => `<li><kbd>${k}</kbd><span>${w}</span></li>`).join('');
+
+// ---- where does this game actually come from? -----------------------
+//
+// ON THE WEB, NOWHERE BUT HERE. Every game is a folder under /games/,
+// the five big ones included, which is why they now ask for their own
+// files by relative path rather than off the web root.
+//
+// ON THIS MACHINE they are still five separate servers on five ports,
+// because that is where they are developed and nothing about that should
+// have to change to suit a website. A port that is not answering shows
+// the browser's own error page inside the frame, which reads as the site
+// being broken - so that case asks first and says so plainly.
+//
+// WHICH OF THE TWO is decided at BUILD time rather than by sniffing the
+// hostname: tools/deploy.mjs stamps this flag into the copy it writes.
+// That way tools/webcheck.mjs can serve the built site from localhost
+// and still be testing the real thing.
+const WEB = !!window.__PLAYPILE_WEB;
+let src = null, note = '';
+if (g.how === 'mounted' && WEB && g.web) {
+  src = '/games/' + g.web;
+  note = 'runs here';
+} else if (g.how === 'local') {
+  src = '/games/' + g.slug + '/';
+  note = 'runs here';
+} else if (g.how === 'unity') {
+  src = '/games/' + g.slug + '/build/index.html';
+  note = 'unity webgl · 83 mb first load';
+  warn.textContent = 'First load is a big download. It is cached after that.';
+} else {
+  src = 'http://localhost:' + g.port + (g.url || '/');
+  note = 'localhost:' + g.port;
+  try {
+    const list = await (await fetch('/api/mounted')).json();
+    const m = list.find((x) => x.slug === g.slug);
+    if (!m || m.state !== 'up') {
+      warn.innerHTML = 'This one runs from its own folder and is not up. '
+        + 'Start PLAYPILE with <code>node server.js</code> and it boots with the site.';
+    }
+  } catch (e) {}
+}
+how.textContent = note;
+
+start.addEventListener('click', async () => {
+  start.disabled = true;
+  await interstitial();          // the ad slot that pays, while it loads
+  frame.src = src;
+  frame.hidden = false;
+  curtain.style.display = 'none';
+  setTimeout(() => { try { frame.focus(); } catch (e) {} }, 400);
+});
+full.addEventListener('click', () => {
+  const el = document.getElementById('stage');
+  if (document.fullscreenElement) document.exitFullscreen();
+  else el.requestFullscreen && el.requestFullscreen();
+});
+reload.addEventListener('click', () => { if (frame.src) frame.src = frame.src; });
+
+// ---- more games, which is the other half of monetising a portal -----
+// Somebody who finishes a game and closes the tab is worth one page
+// view. The rail is four games chosen from the ones this player is not
+// currently on, biased to the quick ones because those get clicked.
+const others = GAMES.filter((x) => x.slug !== g.slug)
+  .sort(() => Math.random() - 0.5)
+  .sort((a, b) => (a.big === b.big) ? 0 : (a.big ? 1 : -1))
+  .slice(0, 5);
+more.innerHTML = others.map((x) => `
+  <a class="mini" href="/play/${x.slug}">
+    <span class="th" style="background-image:url('/shots/${x.slug}.png')"></span>
+    <span><b>${x.title}</b><small>${x.tag}</small></span>
+  </a>`).join('');
+
+await loadAds();
+slot(document.getElementById('ad-play-leader'), 'play_leader');
+slot(document.getElementById('ad-play-rail'), 'play_rail');
+slot(document.getElementById('ad-play-tall'), 'play_tall');
+slot(document.getElementById('ad-play-footer'), 'play_footer');
+</script>
+</body>
+</html>

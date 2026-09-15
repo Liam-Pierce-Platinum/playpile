@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>HIGHWAY</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>&#128663;</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<!-- ==================== HUD ==================== -->
+<div id="prep" hidden>
+  <div class="prep-box">
+    <h1>BEFORE THE JOB</h1>
+    <p class="prep-sub">Everything you buy here is a line they will never have.
+       Everything you skip is a line they will.</p>
+    <div class="prep-cash">FUNDS <b id="prep-cash">0</b></div>
+    <div id="prep-list"></div>
+    <button id="btn-go" class="prep-go">GO TO WORK</button>
+  </div>
+</div>
+
+<div id="shop" hidden>
+  <div class="prep-box">
+    <h1 id="shop-name">BODEGA</h1>
+    <p class="prep-sub" id="shop-sub">Cash leaves nothing behind. A card tells them the shop, the minute, and which way you left.</p>
+    <div class="prep-cash">CASH <b id="shop-cash">0</b></div>
+    <div id="shop-list"></div>
+    <button id="btn-shop-close" class="prep-go">LEAVE</button>
+  </div>
+</div>
+
+<div id="hud" hidden>
+  <div class="hud-top">
+    <div class="speedo">
+      <svg viewBox="0 0 120 120" class="dial">
+        <circle cx="60" cy="60" r="52" class="dial-bg"/>
+        <path id="dial-arc" class="dial-arc" d=""/>
+        <path id="dial-red" class="dial-red" d=""/>
+      </svg>
+      <div class="speed-num"><span id="speed">0</span><em>km/h</em></div>
+      <div class="gear" id="gear">1</div>
+    </div>
+
+    <div class="score-stack" style="top:auto;bottom:1.2rem">
+      <div class="score-big" hidden><span id="score">0</span></div>
+      <div class="combo-wrap" hidden>
+        <div class="combo">x<span id="combo">1.0</span></div>
+        <div class="combo-bar"><i id="combo-bar"></i></div>
+      </div>
+      <div class="run-stats">
+        <span><b id="dist">0.00</b> km</span>
+        <span><b id="near" hidden>0</b></span>
+      </div>
+    </div>
+
+    <div class="right-stack">
+      <div class="heat" id="heat-wrap" hidden>
+        <span class="heat-label">HEAT</span>
+        <i class="heat-pip"></i><i class="heat-pip"></i><i class="heat-pip"></i>
+        <i class="heat-pip"></i><i class="heat-pip"></i>
+      </div>
+      <div class="dmg" id="dmg-wrap">
+        <span>DAMAGE</span><div class="dmg-bar"><i id="dmg-bar"></i></div>
+      </div>
+      <div class="bust" id="bust-wrap" hidden>
+        <span>BUSTED IN</span><div class="bust-bar"><i id="bust-bar"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="event" id="event" hidden></div>
+  <div class="banner" id="banner" hidden></div>
+  <div class="toasts" id="toasts"></div>
+  <div class="offroad" id="offroad" hidden>OFF ROAD</div>
+  <button id="btn-use" class="btn-use" hidden>USE</button>
+  <div class="prompt" id="prompt" hidden></div>
+  <div class="vitals" id="vitals">
+    <div class="hp"><span>HEALTH</span><div class="hp-bar"><i id="hp-bar"></i></div></div>
+    <div class="ammo"><b id="ammo">12</b><small id="mags">/ 48</small><em id="reload" hidden>RELOADING</em></div>
+  </div>
+  <button id="btn-fire" class="btn-fire" hidden>FIRE</button>
+  <div class="board" id="board">
+    <div class="board-h">WHAT THEY HAVE</div>
+    <ul id="board-list"></ul>
+    <div class="board-id" id="board-id" hidden>IDENTIFIED</div>
+  </div>
+  <div class="inv" id="inv">
+    <div class="inv-h">CARRYING</div>
+    <ul id="inv-list"></ul>
+  </div>
+  <div class="needs" id="needs">
+    <span>FOOD<i><b id="n-food"></b></i></span>
+    <span>WATER<i><b id="n-water"></b></i></span>
+    <span>ENERGY<i><b id="n-energy"></b></i></span>
+  </div>
+  <div class="sweep" id="sweep" hidden><span>THEY ARE SEARCHING THE BUILDING</span><i><b id="sweep-b"></b></i></div>
+  <div class="clock" id="clock"><span>TIME FREE</span><b id="clock-t">0:00</b><i id="clock-where">MANHATTAN</i></div>
+  <div class="seen" id="seen" hidden>SEEN</div>
+  <div class="stam" id="stam" hidden><i id="stam-bar"></i></div>
+  <div class="blockwarn" id="blockwarn" hidden><span>ROADBLOCK</span><b id="blockdist">0</b><small>m</small></div>
+  <button class="pause-btn" id="btn-pause" aria-label="Pause">II</button>
+</div>
+
+<!-- ==================== TOUCH ==================== -->
+<div id="touch" hidden>
+  <div class="wheel-zone" id="wheel-zone">
+    <div class="wheel" id="wheel">
+      <svg viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="88" class="w-rim"/>
+        <circle cx="100" cy="100" r="70" class="w-inner"/>
+        <path class="w-spoke" d="M100 100 L100 24 M100 100 L34 138 M100 100 L166 138"/>
+        <circle cx="100" cy="100" r="26" class="w-hub"/>
+        <path class="w-mark" d="M100 12 l-9 16 h18 z"/>
+      </svg>
+    </div>
+  </div>
+  <div class="pedals">
+    <button class="pedal brake" id="pedal-brake"><span>BRAKE</span></button>
+    <button class="pedal gas" id="pedal-gas"><span>GAS</span></button>
+  </div>
+</div>
+
+<!-- ==================== TITLE ==================== -->
+<div id="title" class="screen">
+  <div class="title-bg"></div>
+  <div class="title-inner">
+    <h1 class="logo"><span class="logo-en">HIGH<em>WAY</em></span></h1>
+    <p class="tagline">Go fast &middot; Thread the traffic &middot; Lose the police</p>
+    <div class="title-btns">
+      <button class="big" id="btn-play">DRIVE</button>
+      <button class="ghost" id="btn-title-garage">GARAGE</button>
+      <button class="ghost small" id="btn-wipe">Reset save</button>
+    </div>
+    <p class="hint" id="title-hint"></p>
+  </div>
+</div>
+
+<!-- ==================== GARAGE ==================== -->
+<div id="garage" class="screen" hidden>
+  <div class="garage-head">
+    <button class="back" id="btn-garage-back">&larr;</button>
+    <h2>GARAGE</h2>
+    <div class="garage-cash">¥<span id="g-cash">0</span></div>
+  </div>
+  <div class="garage-body">
+    <div class="g-left">
+      <canvas id="g-preview" width="520" height="360"></canvas>
+      <div class="g-name" id="g-name"></div>
+      <div class="g-stats" id="g-stats"></div>
+      <div class="g-actions" id="g-actions"></div>
+    </div>
+    <div class="g-right">
+      <div class="g-tabs">
+        <button class="g-tab on" data-tab="cars">CARS</button>
+        <button class="g-tab" data-tab="tune">TUNE</button>
+        <button class="g-tab" data-tab="body">BODY</button>
+        <button class="g-tab" data-tab="paint">PAINT</button>
+      </div>
+      <div class="g-pane" id="pane-cars"></div>
+      <div class="g-pane" id="pane-tune" hidden></div>
+      <div class="g-pane" id="pane-body" hidden></div>
+      <div class="g-pane" id="pane-paint" hidden></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAUSE ==================== -->
+<div id="pause" class="screen dim" hidden>
+  <div class="panel">
+    <h2>PAUSED</h2>
+    <button class="big" id="btn-resume">RESUME</button>
+    <button class="ghost" id="btn-pause-quit">QUIT TO TITLE</button>
+    <div class="help" id="help"></div>
+  </div>
+</div>
+
+<!-- ==================== RESULTS ==================== -->
+<div id="results" class="screen dim" hidden>
+  <div class="panel wide">
+    <h2 id="res-title">WRECKED</h2>
+    <div id="res-lines"></div>
+    <button class="big" id="btn-again">RUN AGAIN</button>
+    <button class="ghost" id="btn-res-garage">GARAGE</button>
+    <button class="ghost small" id="btn-res-title">TITLE</button>
+  </div>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

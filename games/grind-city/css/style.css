@@ -1,0 +1,373 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; background: #17131c; overflow: hidden;
+  font-family: ui-monospace, "Consolas", monospace; color: #f4e3c6; }
+#stage { position: relative; width: 100vw; height: 100vh;
+  display: flex; align-items: center; justify-content: center; }
+canvas#screen { image-rendering: pixelated; image-rendering: crisp-edges;
+  display: block; background: #000; }
+
+.overlay { position: absolute; inset: 0; display: flex; align-items: center;
+  justify-content: center; background: rgba(23,19,28,.88); backdrop-filter: blur(2px); z-index: 5;
+  padding: 14px; overflow: auto; }
+.overlay.hidden { display: none; }
+
+.plate { background: #2a2131; border: 3px solid #6b4f3a; box-shadow: 0 0 0 3px #1b1520, 0 12px 0 rgba(0,0,0,.35);
+  padding: 20px 24px; max-width: 940px; width: 100%; }
+.plate.wide { max-width: 1080px; }
+.plate.small { max-width: 420px; text-align: center; }
+
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.wallet { display: flex; align-items: center; gap: 12px; }
+.cashval { font-size: 20px; color: #9ce85b; letter-spacing: 2px; text-shadow: 2px 2px 0 #1b1520; }
+.shopbtn { font-family: inherit; font-size: 13px; letter-spacing: 2px; padding: 8px 16px;
+  background: #6b4f3a; color: #ffe9c0; border: 2px solid #8c6a4c; cursor: pointer; }
+.shopbtn.small { font-size: 10px; padding: 5px 9px; letter-spacing: 1px; }
+.shopbtn:hover { background: #8c6a4c; }
+
+h1 { font-size: 38px; letter-spacing: 5px; color: #ffcf70; text-shadow: 3px 3px 0 #7a3f2b; }
+h1 span { color: #7fd4e8; }
+h2 { font-size: 24px; letter-spacing: 3px; color: #ffcf70; }
+h3 { font-size: 12px; letter-spacing: 2px; color: #7fd4e8; margin-bottom: 6px; text-transform: uppercase; }
+.tag { color: #b9a48c; font-size: 13px; margin: 6px 0 14px; }
+.hint { text-align: center; color: #8d7a67; font-size: 12px; margin-top: 12px; }
+.lbl { font-size: 9.5px; letter-spacing: 1.5px; color: #8d7a67; display: block; margin-bottom: 5px; }
+
+/* --- main screen ------------------------------------------------------- */
+.homerow { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px; }
+.rider { background: #201a27; border: 2px solid #4a3a53; padding: 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.rider canvas { image-rendering: pixelated; display: block; }
+.rider span { font-size: 10px; letter-spacing: 1px; color: #8d7a67; text-align: center; }
+
+.parks { display: flex; gap: 10px; flex: 1; align-items: flex-start; flex-wrap: wrap; }
+.park { flex: 1 1 150px; background: #201a27; border: 2px solid #4a3a53; padding: 9px;
+  cursor: pointer; transition: transform .08s, border-color .08s; }
+.park:hover { border-color: #ffcf70; transform: translateY(-3px); }
+.park.endless { border-color: #7a5a8c; }
+.park.endless:hover { border-color: #c78ce8; }
+.park canvas { width: 100%; image-rendering: pixelated; display: block; margin-bottom: 7px; border: 1px solid #120f16; }
+.park b { display: block; font-size: 12px; color: #f4e3c6; letter-spacing: 1px; }
+.park small { display: block; color: #8d7a67; font-size: 10.5px; margin-top: 3px; line-height: 1.4; }
+.park em { display: block; color: #9ce85b; font-size: 10.5px; margin-top: 5px; font-style: normal; }
+
+.howto { display: flex; gap: 24px; }
+.howto .col { flex: 1; }
+.howto ul { list-style: none; }
+.howto li { font-size: 11.5px; line-height: 1.55; color: #c3b09a; margin-bottom: 5px; padding-left: 9px;
+  border-left: 2px solid #4a3a53; }
+.howto b { color: #ffcf70; }
+
+/* --- shop: the character is the main display, gear is the sidebar ------- */
+.shoprow { display: flex; gap: 16px; align-items: flex-start; margin-top: 14px; }
+
+.stage-you { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.youbox { background: #201a27; border: 2px solid #4a3a53; padding: 8px; }
+.youbox canvas { image-rendering: pixelated; display: block; }
+.boardbox { background: #201a27; border: 2px solid #4a3a53; padding: 8px; text-align: center; }
+.boardbox canvas { image-rendering: pixelated; display: block; }
+.note { font-size: 11px; letter-spacing: 1px; color: #7fd4e8; min-height: 16px; text-align: center; }
+.note.flash { color: #9ce85b; }
+
+.printer { background: #201a27; border: 2px solid #7a5a8c; padding: 8px; text-align: center; }
+.printer.hidden { display: none; }
+.pgrid { display: grid; gap: 1px; background: #120f16; border: 1px solid #120f16; }
+.pcell { width: 17px; height: 17px; border: 0; padding: 0; cursor: crosshair;
+  background: transparent; box-shadow: inset 0 0 0 1px rgba(255,255,255,.05); }
+.pcell:hover { box-shadow: inset 0 0 0 2px #ffcf70; }
+.prow { display: flex; align-items: center; gap: 8px; margin-top: 7px; justify-content: center; }
+.ppal { display: flex; gap: 2px; flex-wrap: wrap; max-width: 210px; }
+.pcol { width: 17px; height: 17px; border: 2px solid #2a2131; cursor: pointer; padding: 0; }
+.pcol.on { border-color: #ffcf70; }
+
+.sidebar { width: 340px; flex: 0 0 340px; }
+.tabs { display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
+.tab { font-family: inherit; font-size: 10px; letter-spacing: 1px; padding: 6px 8px;
+  background: #201a27; color: #8d7a67; border: 2px solid #4a3a53; cursor: pointer; }
+.tab:hover { color: #f4e3c6; }
+.tab.on { background: #6b4f3a; color: #ffe9c0; border-color: #ffcf70; }
+
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  max-height: 52vh; overflow-y: auto; padding-right: 4px; }
+.gear { background: #201a27; border: 2px solid #4a3a53; padding: 8px; cursor: pointer;
+  transition: border-color .08s, transform .08s; }
+.gear:hover { border-color: #ffcf70; transform: translateY(-2px); }
+.gear.owned { border-color: #55705f; }
+.gear.worn { border-color: #9ce85b; background: #232a24; }
+.gear b { display: block; font-size: 11px; letter-spacing: 1px; color: #f4e3c6; }
+.gear small { display: block; font-size: 10px; color: #8d7a67; margin-top: 2px; line-height: 1.3; }
+.gear em { display: block; font-size: 10.5px; color: #ffcf70; margin-top: 5px; font-style: normal; letter-spacing: 1px; }
+.gear em.poor { color: #ff5b5b; }
+.swatch { display: flex; height: 13px; margin-bottom: 6px; border: 1px solid #120f16; }
+.swatch i { flex: 1; }
+
+/* --- pause ------------------------------------------------------------- */
+.slider { display: flex; align-items: center; gap: 10px; justify-content: center;
+  font-size: 12px; color: #b9a48c; margin-bottom: 12px; }
+input[type=range] { accent-color: #ffcf70; }
+.btns { display: flex; gap: 10px; justify-content: center; margin-top: 8px; flex-wrap: wrap; }
+button { font-family: inherit; font-size: 13px; letter-spacing: 2px; padding: 9px 16px;
+  background: #6b4f3a; color: #ffe9c0; border: 2px solid #8c6a4c; cursor: pointer; }
+button:hover { background: #8c6a4c; }
+
+/* --- competitions ------------------------------------------------------ */
+.shopbtn.hot { background: #8c4a3a; border-color: #c9704c; }
+.shopbtn.hot:hover { background: #c9704c; }
+.kinds { display: flex; gap: 14px; margin-bottom: 14px; flex-wrap: wrap; }
+.kinds span { flex: 1 1 200px; font-size: 10.5px; color: #8d7a67; line-height: 1.5;
+  border-left: 2px solid #4a3a53; padding-left: 8px; }
+.kinds b { display: block; color: #7fd4e8; letter-spacing: 1px; }
+.complist { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px; max-height: 56vh; overflow-y: auto; padding-right: 4px; }
+.comp { background: #201a27; border: 2px solid #4a3a53; padding: 10px; cursor: pointer;
+  transition: border-color .08s, transform .08s; }
+.comp:hover { border-color: #ffcf70; transform: translateY(-2px); }
+.comp .kind { display: inline-block; font-size: 9px; letter-spacing: 1.5px; padding: 2px 5px;
+  background: #3a2f45; color: #b9a48c; margin-bottom: 6px; }
+.comp.jam .kind { background: #3d3357; color: #b3a0e0; }
+.comp.spots .kind { background: #3d4433; color: #b6cf8f; }
+.comp.line .kind { background: #4a3630; color: #e0a78f; }
+.comp b { display: block; font-size: 13px; color: #f4e3c6; letter-spacing: 1px; }
+.comp small { display: block; font-size: 10.5px; color: #8d7a67; margin-top: 3px; line-height: 1.4; }
+.comp em { display: block; font-size: 11px; color: #9ce85b; margin-top: 6px; font-style: normal; }
+
+/* --- trick sheets ------------------------------------------------------ */
+.sheets { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 10px; max-height: 60vh; overflow-y: auto; padding-right: 4px; }
+.sheet { display: flex; gap: 10px; background: #201a27; border: 2px solid #4a3a53; padding: 8px;
+  align-items: flex-start; }
+.sheet canvas { image-rendering: pixelated; display: block; flex: 0 0 auto; }
+.sheettext b { display: block; font-size: 12px; color: #ffcf70; letter-spacing: 1px; }
+.sheettext small { display: block; font-size: 10.5px; color: #c3b09a; margin-top: 4px; line-height: 1.45; }
+
+/* --- results ----------------------------------------------------------- */
+#result-body table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+#result-body td { padding: 5px 6px; font-size: 12px; color: #b9a48c; border-bottom: 1px solid #3a2f45; }
+#result-body td:last-child { text-align: right; color: #f4e3c6; }
+#result-body tr.you td { color: #9ce85b; }
+#result-body .payout { font-size: 13px; letter-spacing: 1px; color: #ffcf70; margin-top: 8px; }
+/* --- the workshop: colour chips, slots, and the wipe button --------------- */
+.chips { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin: 6px 0 2px; }
+.chips.hidden, .pgrid.hidden { display: none; }
+.chip { display: flex; align-items: center; gap: 5px; padding: 3px 7px; cursor: pointer;
+  background: #2a2131; border: 2px solid #4a3a53; color: #b8a68f;
+  font: inherit; font-size: 9.5px; letter-spacing: 1px; }
+.chip i { width: 12px; height: 12px; display: block; border: 1px solid #120f16; }
+.chip.on { border-color: #ffcf70; color: #f4e3c6; }
+.pcol.dead { opacity: 0.25; cursor: default; }
+.prow.btns { flex-wrap: wrap; }
+.shopbtn.small:disabled { opacity: 0.4; cursor: default; }
+.shopbtn.poor { color: #ff5b5b; }
+.shopbtn.danger { background: #3a2028; border-color: #6b3742; color: #d89a9a; }
+.shopbtn.danger:hover { background: #6b3742; color: #ffe0e0; }
+.gear.mine { border-color: #7a5a8c; }
+.gear.mine.worn { border-color: #9ce85b; }
+
+/* trying something on before you have paid for it */
+.gear.trying { border-color: #ffcf70; background: #2c2418; }
+.gear.trying em { color: #ffcf70; }
+.boardbox button { margin-top: 6px; }
+
+/* the wheel-face grid is small and square; the deck and grip grids are wide */
+.pgrid { max-width: 240px; margin: 0 auto; }
+.pgrid.wide { max-width: 100%; }
+
+/* the deck grid is now 26 wide, so the cells need to be allowed to get small */
+.pgrid .pcell { min-width: 0; min-height: 9px; }
+.pgrid.wide { max-width: 100%; }
+
+/* the rider preview doubles as a turntable once you click it */
+.youbox { outline: none; cursor: pointer; }
+.youbox.turning { box-shadow: 0 0 0 2px #ffcf70; }
+.youbox.turning .lbl { color: #ffcf70; }
+.youbox .lbl { display: block; margin-top: 4px; }
+
+/* ==========================================================================
+   THE PIXEL PASS
+   --------------------------------------------------------------------------
+   The game renders into a 384x216 buffer and blows it up with whole-pixel
+   scaling; the menus around it were smooth-edged text on blurred glass, which
+   is a different piece of software sitting on top of the first one.
+   Everything below drags the UI back onto the same grid:
+
+     - text is drawn WITHOUT anti-aliasing, so a letter is made of pixels
+     - every size is a whole number, so a glyph never lands on a half pixel
+     - no blur, no rounded corners, no soft shadows, no easing
+     - panels and buttons get a hard two-tone bevel -- light up and left, dark
+       down and right -- which is how a raised thing was drawn before there
+       were enough colours to shade one
+     - corners are NOTCHED rather than square, the way a sprite border is
+   ========================================================================== */
+
+* {
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  text-rendering: geometricPrecision;
+}
+img, canvas { image-rendering: pixelated; }
+
+/* the glass behind a menu becomes a flat dither instead of a blur */
+.overlay {
+  backdrop-filter: none;
+  background:
+    repeating-linear-gradient(0deg, rgba(23,19,28,.94) 0 2px, rgba(17,14,21,.94) 2px 4px);
+}
+
+/* --- panels ------------------------------------------------------------- */
+.plate {
+  border: 0;
+  box-shadow:
+    0 -4px 0 0 #8c6a4c, 0 4px 0 0 #3a2a1e,
+    -4px 0 0 0 #8c6a4c, 4px 0 0 0 #3a2a1e,
+    0 0 0 8px #1b1520;
+  clip-path: polygon(
+    4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px),
+    calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+  background:
+    repeating-linear-gradient(0deg, #2a2131 0 3px, #271e2d 3px 6px);
+}
+
+/* --- buttons: raised, then pressed -------------------------------------- */
+.shopbtn, #results button, #pause button {
+  border: 0;
+  border-radius: 0;
+  box-shadow: inset 2px 2px 0 0 #b08a63, inset -2px -2px 0 0 #3a2a1e, 0 0 0 2px #1b1520;
+  text-shadow: 1px 1px 0 #2a1c12;
+  transition: none;
+}
+.shopbtn:hover, #results button:hover, #pause button:hover { background: #8c6a4c; }
+.shopbtn:active, #results button:active, #pause button:active {
+  box-shadow: inset -2px -2px 0 0 #b08a63, inset 2px 2px 0 0 #3a2a1e, 0 0 0 2px #1b1520;
+  transform: translate(1px, 1px);
+}
+.shopbtn.danger { box-shadow: inset 2px 2px 0 0 #a05a68, inset -2px -2px 0 0 #33161d, 0 0 0 2px #1b1520; }
+.shopbtn.hot { box-shadow: inset 2px 2px 0 0 #e09a72, inset -2px -2px 0 0 #4d2418, 0 0 0 2px #1b1520; }
+
+/* --- cards: the same bevel, one step quieter ---------------------------- */
+.gear, .park, .comp, .rider, .youbox, .boardbox, .printer, .sheet {
+  border: 0;
+  border-radius: 0;
+  box-shadow: inset 2px 2px 0 0 #5f4d6b, inset -2px -2px 0 0 #171320, 0 0 0 2px #120f16;
+  transition: none;
+}
+.park:hover, .gear:hover, .comp:hover {
+  transform: none;
+  box-shadow: inset 2px 2px 0 0 #ffcf70, inset -2px -2px 0 0 #6b4f21, 0 0 0 2px #120f16;
+}
+.gear.worn { box-shadow: inset 2px 2px 0 0 #9ce85b, inset -2px -2px 0 0 #3c5f22, 0 0 0 2px #120f16; }
+.gear.trying { box-shadow: inset 2px 2px 0 0 #ffcf70, inset -2px -2px 0 0 #6b4f21, 0 0 0 2px #120f16; }
+.youbox.turning { box-shadow: inset 2px 2px 0 0 #ffcf70, inset -2px -2px 0 0 #6b4f21, 0 0 0 2px #120f16; }
+
+/* --- whole-pixel type --------------------------------------------------- */
+h1 { font-size: 40px; text-shadow: 4px 4px 0 #7a3f2b; }
+h2 { font-size: 24px; text-shadow: 2px 2px 0 #7a3f2b; }
+h3 { font-size: 12px; }
+.tag, .hint { font-size: 12px; }
+.lbl { font-size: 10px; }
+.park small, .park em, .gear small, .gear em, .comp small, .comp em { font-size: 10px; }
+.howto li { font-size: 12px; line-height: 1.5; }
+.cashval { text-shadow: 2px 2px 0 #1b1520; }
+
+/* --- the printer grid --------------------------------------------------- */
+.pcell { border: 0; box-shadow: inset 0 0 0 1px #191420; border-radius: 0; }
+.pcol { border-radius: 0; box-shadow: inset 0 0 0 2px #2a2131; }
+.pcol.on { box-shadow: inset 0 0 0 2px #ffcf70; }
+.pgrid.bucket .pcell { cursor: cell; }
+.chip { border: 0; border-radius: 0; box-shadow: inset 1px 1px 0 0 #6b5a78, inset -1px -1px 0 0 #1d1826; }
+.chip.on { box-shadow: inset 1px 1px 0 0 #ffcf70, inset -1px -1px 0 0 #6b4f21; }
+
+/* a scanline wash over the whole thing, at the same pitch as the panels */
+#stage::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 20;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,.10) 0 1px, transparent 1px 3px);
+}
+
+/* --- the settings screen ------------------------------------------------ */
+.setrow { display: flex; gap: 26px; margin-top: 14px; }
+.setrow .col { flex: 1; }
+.setrow h3 { margin-top: 14px; }
+.setrow h3:first-child { margin-top: 0; }
+.slider { display: flex; align-items: center; gap: 10px; font-size: 11px;
+  letter-spacing: 1px; color: #c3b09a; margin-bottom: 8px; }
+.slider input[type=range] { flex: 1; accent-color: #ffcf70; }
+.keys { list-style: none; margin-bottom: 4px; }
+.keys li { font-size: 11px; line-height: 1.5; color: #c3b09a; margin-bottom: 4px;
+  padding-left: 9px; border-left: 2px solid #4a3a53; }
+.keys b { color: #ffcf70; }
+.note { display: block; font-size: 10px; letter-spacing: 1px; color: #9ce85b; margin-top: 8px; }
+body.noscan #stage::after { display: none; }
+
+/* --- the brush nib ------------------------------------------------------- */
+.nibs { display: flex; gap: 4px; align-items: center; margin-right: 6px; }
+.nib { background: #2a2131; border: 0; border-radius: 0; cursor: pointer; padding: 0;
+  width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+  box-shadow: inset 1px 1px 0 0 #5f4d6b, inset -1px -1px 0 0 #171320; }
+.nib i { display: block; background: #b8a68f; }
+.nib.on { box-shadow: inset 1px 1px 0 0 #ffcf70, inset -1px -1px 0 0 #6b4f21; }
+.nib.on i { background: #ffcf70; }
+.nibs.hidden { display: none; }
+.pgrid .pcell { min-height: 7px; }
+
+/* --- being able to reach the top of a tall panel ------------------------- */
+/*
+ * A flex container that centres its child CLIPS that child when the child is
+ * taller than the container: the overflow goes off BOTH ends, and the top half
+ * lands outside the scrollable area where no amount of scrolling can reach it.
+ * The panels have been growing -- seventeen park cards, the settings screen, a
+ * forty-by-sixteen printer grid -- so the home screen and the shop had their
+ * titles stranded above the scroll.
+ *
+ * `margin: auto` on the child centres it exactly the same way when there IS
+ * room, and pushes nothing out of reach when there is not.
+ */
+.overlay { align-items: flex-start; justify-content: flex-start; }
+.overlay > .plate { margin: auto; }
+
+/* --- the touch pad -------------------------------------------------------
+ *
+ * About two thirds of CrazyGames' traffic is a phone, and this game was
+ * mouse-only. The drag itself IS the board (see src/ui/touch.js); these
+ * are the four things a finger on glass cannot express - push, grab,
+ * carry, bail - plus a pause, since there is no ESC on a phone.
+ *
+ * The pads sit in the two bottom corners under the thumbs and never in
+ * the middle, because the middle of the screen is the board. They are
+ * `pointer-events: none` on the row and `auto` on the button so the gaps
+ * between them stay board surface: a thumb that lands an inch wide of
+ * PUSH should still be able to flick.
+ *
+ * `display: none` unless <body> has .touch, so a desktop build carries
+ * the CSS and never shows it.
+ */
+#touchpad { display: none; }
+body.touch #touchpad { display: block; position: fixed; inset: 0; z-index: 40;
+  pointer-events: none; touch-action: none; }
+#touchpad.hidden { display: none; }
+.tp-row { position: absolute; bottom: 14px; display: flex; gap: 10px;
+  pointer-events: none; }
+.tp-l { left: 14px; }
+.tp-r { right: 14px; flex-direction: row-reverse; }
+.tp-p { top: 12px; right: 14px; bottom: auto; }
+.tp-btn { pointer-events: auto; -webkit-user-select: none; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  min-width: 62px; height: 62px; padding: 0 10px;
+  display: flex; align-items: center; justify-content: center;
+  font: 700 13px/1 ui-monospace, monospace; letter-spacing: 1px;
+  color: #ffcf70; background: rgba(30, 24, 38, 0.62);
+  box-shadow: inset 2px 2px 0 0 #5f4d6b, inset -2px -2px 0 0 #171320; }
+.tp-btn:active { color: #fff; background: rgba(96, 74, 122, 0.8);
+  box-shadow: inset 2px 2px 0 0 #171320, inset -2px -2px 0 0 #5f4d6b; }
+#tp-left, #tp-right { font-size: 22px; }
+#tp-carry, #tp-bail { min-width: 54px; height: 44px; font-size: 10px; }
+#tp-pause { min-width: 44px; height: 44px; font-size: 20px; }
+/* on a phone the browser's own gestures fight the board: no bounce, no
+ * pinch-zoom, no text selection, no long-press callout */
+body.touch { overscroll-behavior: none; -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none; }
+body.touch #screen { touch-action: none; }
+
+/* --- portrait, on a phone ------------------------------------------------ */
+#rotate { display: none; }
+body.touch #rotate { position: fixed; inset: 0; z-index: 60;
+  align-items: center; justify-content: center; background: #171320; }
+@media (orientation: portrait) { body.touch #rotate { display: flex; } }
+@media (orientation: landscape) { body.touch #rotate { display: none; } }

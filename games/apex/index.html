@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APEX</title>
+<style>
+  :root {
+    --ink: #e8edf4;
+    --dim: #8b96a6;
+    --hot: #e03a2f;
+    --go:  #35d07f;
+    --panel: rgba(10,13,19,0.72);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #05070b; overflow: hidden;
+    font-family: 'Segoe UI', system-ui, sans-serif; color: var(--ink); }
+  canvas { display: block; }
+  #hud { position: fixed; inset: 0; pointer-events: none; }
+
+  /* ---- bottom left: the important numbers ---- */
+  #dash { position: absolute; left: 26px; bottom: 24px;
+    display: flex; align-items: flex-end; gap: 20px; }
+  #gear { font-size: 92px; line-height: 0.8; font-weight: 700; letter-spacing: -4px;
+    text-shadow: 0 3px 20px rgba(0,0,0,.8); min-width: 74px; text-align: center; }
+  #speedbox { padding-bottom: 6px; }
+  #speed { font-size: 46px; font-weight: 600; line-height: 0.9;
+    text-shadow: 0 3px 16px rgba(0,0,0,.8); font-variant-numeric: tabular-nums; }
+  #speed span { font-size: 15px; color: var(--dim); font-weight: 400; margin-left: 5px; }
+
+  /* ---- the rev bar and shift lights ---- */
+  #revwrap { position: absolute; left: 50%; top: 22px; transform: translateX(-50%);
+    width: 620px; max-width: 70vw; }
+  #lights { display: flex; gap: 7px; justify-content: center; margin-bottom: 9px; }
+  #lights i { width: 22px; height: 10px; border-radius: 2px; background: #1d222b;
+    border: 1px solid #2b3240; transition: background .04s; }
+  #revbar { height: 13px; background: rgba(10,13,19,0.66); border: 1px solid #2b3240;
+    border-radius: 3px; overflow: hidden; }
+  #revfill { height: 100%; width: 0%; background: linear-gradient(90deg,#2f7de0,#35d07f 62%,#e6c03a 84%,var(--hot)); }
+
+  /* ---- timing, top right ---- */
+  #timing { position: absolute; right: 26px; top: 22px; text-align: right;
+    background: var(--panel); border: 1px solid #232a35; border-radius: 8px;
+    padding: 13px 17px; min-width: 208px; }
+  #timing .row { display: flex; justify-content: space-between; gap: 22px;
+    font-size: 14px; margin: 4px 0; }
+  #timing .row b { font-variant-numeric: tabular-nums; font-weight: 600; }
+  #timing .k { color: var(--dim); }
+  #lap { font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums;
+    letter-spacing: -1px; margin-bottom: 4px; }
+  .best { color: var(--go); }
+  #delta { font-size: 15px; font-variant-numeric: tabular-nums; }
+
+  /* ---- corner name + circuit, top left ---- */
+  #where { position: absolute; left: 26px; top: 22px; background: var(--panel);
+    border: 1px solid #232a35; border-radius: 8px; padding: 11px 15px; }
+  #circuit { font-size: 17px; font-weight: 700; letter-spacing: .4px; }
+  #country { font-size: 12px; color: var(--dim); margin-top: 1px; }
+  #corner { font-size: 13px; color: var(--hot); margin-top: 7px; min-height: 17px;
+    font-weight: 600; letter-spacing: .3px; }
+
+  /* ---- DRS + off-track flag ---- */
+  #flags { position: absolute; left: 50%; top: 86px; transform: translateX(-50%);
+    display: flex; gap: 10px; }
+  .flag { padding: 5px 13px; border-radius: 4px; font-size: 13px; font-weight: 700;
+    letter-spacing: 1.4px; opacity: 0; transition: opacity .12s; }
+  #drs { background: var(--go); color: #06231a; }
+  #off { background: #e6c03a; color: #2a2000; }
+  .on { opacity: 1 !important; }
+
+  /* ---- minimap ---- */
+  #map { position: absolute; right: 26px; bottom: 24px; width: 210px; height: 210px;
+    background: var(--panel); border: 1px solid #232a35; border-radius: 8px; }
+
+  /* ---- help ---- */
+  #help { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%);
+    font-size: 12px; color: var(--dim); background: var(--panel); padding: 7px 15px;
+    border-radius: 20px; border: 1px solid #232a35; white-space: nowrap; }
+  #help b { color: var(--ink); font-weight: 600; }
+
+  /* ---- the circuit picker ---- */
+  #menu { position: fixed; inset: 0; background: rgba(4,6,10,.93);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 26px; z-index: 10; }
+  #menu h1 { margin: 0; font-size: 74px; letter-spacing: 14px; font-weight: 200; }
+  #menu h1 b { font-weight: 700; color: var(--hot); }
+  #menu p { margin: -18px 0 6px; color: var(--dim); font-size: 13px; letter-spacing: 3.4px; }
+  #picks { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; max-width: 900px; }
+  .pick { pointer-events: auto; cursor: pointer; background: #0d1219; border: 1px solid #253040;
+    border-radius: 10px; padding: 16px 22px; min-width: 172px; text-align: left;
+    transition: border-color .12s, transform .12s; }
+  .pick:hover { border-color: var(--hot); transform: translateY(-3px); }
+  .pick .n { font-size: 19px; font-weight: 700; }
+  .pick .c { font-size: 12px; color: var(--dim); margin-top: 3px; }
+  .pick .d { font-size: 12px; color: #5f6a7a; margin-top: 9px; font-variant-numeric: tabular-nums; }
+  #loading { position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+    background: #05070b; z-index: 20; font-size: 15px; letter-spacing: 3px; color: var(--dim); }
+</style>
+</head>
+<body>
+<div id="hud">
+  <div id="where">
+    <div id="circuit">-</div>
+    <div id="country">-</div>
+    <div id="corner"></div>
+  </div>
+
+  <div id="revwrap">
+    <div id="lights"></div>
+    <div id="revbar"><div id="revfill"></div></div>
+  </div>
+
+  <div id="flags">
+    <div class="flag" id="drs">DRS</div>
+    <div class="flag" id="off">OFF TRACK</div>
+  </div>
+
+  <div id="timing">
+    <div id="lap">--:--.---</div>
+    <div id="delta">&nbsp;</div>
+    <div class="row"><span class="k">LAST</span><b id="last">--:--.---</b></div>
+    <div class="row"><span class="k">BEST</span><b id="best">--:--.---</b></div>
+    <div class="row"><span class="k">LAPS</span><b id="laps">0</b></div>
+  </div>
+
+  <div id="dash">
+    <div id="gear">N</div>
+    <div id="speedbox"><div id="speed">0<span>KM/H</span></div></div>
+  </div>
+
+  <canvas id="map" width="420" height="420"></canvas>
+
+  <div id="help">
+    <b>W</b>/<b>S</b> throttle, brake &nbsp;·&nbsp; <b>A</b>/<b>D</b> steer &nbsp;·&nbsp;
+    <b>Shift</b>/<b>Ctrl</b> gears &nbsp;·&nbsp; <b>Space</b> DRS &nbsp;·&nbsp;
+    <b>C</b> clutch &nbsp;·&nbsp; <b>V</b> camera &nbsp;·&nbsp; <b>R</b> reset &nbsp;·&nbsp; <b>Esc</b> circuits
+  </div>
+</div>
+
+<div id="menu">
+  <p>FORMULA ONE</p>
+  <h1>A<b>P</b>EX</h1>
+  <div id="picks"></div>
+</div>
+<div id="loading">BUILDING CIRCUIT</div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

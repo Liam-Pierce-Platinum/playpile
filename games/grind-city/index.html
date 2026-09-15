@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Grind City</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="stage">
+  <canvas id="screen"></canvas>
+
+  <!-- ============================ MAIN SCREEN ============================ -->
+  <div id="title" class="overlay">
+    <div class="plate">
+      <div class="topbar">
+        <h1>GRIND<span>CITY</span></h1>
+        <div class="wallet">
+          <span class="cashval">$0</span>
+          <button id="btn-settings" class="shopbtn">SETTINGS</button>
+          <button id="btn-tricks" class="shopbtn">TRICK SHEETS</button>
+          <button id="btn-comps" class="shopbtn hot">COMPS</button>
+          <button id="btn-shop" class="shopbtn">SHOP</button>
+        </div>
+      </div>
+      <p class="tag">your mouse is the board. free skating scores &mdash; but the money is in the comps.</p>
+
+      <div class="homerow">
+        <div class="rider">
+          <canvas id="home-preview"></canvas>
+          <span>YOUR SETUP</span>
+        </div>
+        <div id="parks" class="parks"></div>
+      </div>
+
+      <div class="howto">
+        <div class="col">
+          <h3>the deck &mdash; mouse, or the arrow keys</h3>
+          <ul>
+            <li><b>slide your weight to a tip, then flick sideways</b> &mdash; it <b>flips</b>, and which way depends on which end you are over. Slow slides only move your foot.</li>
+            <li><b>push down in the middle</b> &mdash; it <b>spins</b> flat. Over a tip instead, it goes end over end.</li>
+            <li><b>push down hard over a rail</b> &mdash; <b>stomp</b> onto it and grind</li>
+            <li><b>push down on the ground, then back up</b> &mdash; <b>ollie</b></li>
+            <li><b>stop, or come back to the centre</b> &mdash; it settles under your feet and you land. Past a sixth of a turn, letting go <b>completes</b> the rotation.</li>
+          </ul>
+          <p class="hint" style="text-align:left;margin-top:6px">stuck? the <b>TRICK SHEETS</b> button plays every gesture back at you.</p>
+        </div>
+        <div class="col">
+          <h3>the skater</h3>
+          <ul>
+            <li><b>A / D</b> push left and right, or brake</li>
+            <li><b>A / D in the air</b> spin your body for 180s and 360s</li>
+            <li><b>hold down in a transition</b> to pump for speed</li>
+            <li><b>hold down out over a tip</b> to manual</li>
+            <li><b>SPACE</b> pick the board up, or step back onto it</li>
+            <li><b>on foot</b> &mdash; A/D or LEFT/RIGHT walk, UP hops, DOWN crouches. you can walk up anything.</li>
+            <li><b>your LEGS run out</b> &mdash; about six pops back to back, then roll to get them back. buy better legs in the shop.</li>
+            <li><b>S in the air</b> hold the board out belly-up, so you can actually see the graphic you paid for</li>
+            <li><b>1 - 0 in the air</b> hold a GRAB &mdash; indy, method, superman, christ air. the longer you hold it the more it pays, and it pays CASH.</li>
+            <li><b>ESC</b> pause &nbsp;&middot;&nbsp; <b>R</b> bail out and reset</li>
+          </ul>
+        </div>
+      </div>
+      <p class="hint">click a park to free skate, or take a COMP for cash</p>
+    </div>
+  </div>
+
+  <!-- ============================ SHOP SCREEN ============================ -->
+  <div id="shop" class="overlay hidden">
+    <div class="plate wide">
+      <div class="topbar">
+        <h2>THE SHOP</h2>
+        <div class="wallet">
+          <span class="cashval">$0</span>
+          <button id="shop-reset" class="shopbtn danger">RESET PROGRESS</button>
+          <button id="shop-back" class="shopbtn">BACK</button>
+        </div>
+      </div>
+
+      <div class="shoprow">
+        <!-- main display: you -->
+        <div class="stage-you">
+          <div class="youbox">
+            <canvas id="shop-rider"></canvas>
+            <span id="turn-hint" class="lbl">CLICK TO TURN THEM ROUND</span>
+          </div>
+          <div class="boardbox">
+            <span id="board-label" class="lbl">BOTTOM OF THE BOARD</span>
+            <canvas id="shop-board"></canvas>
+            <button id="board-view" class="shopbtn small">SHOW THE WHEELS</button>
+          </div>
+          <div id="printer" class="printer hidden">
+            <span id="print-label" class="lbl">THE PRINTER</span>
+            <div id="print-grid" class="pgrid"></div>
+            <div id="print-chips" class="chips hidden"></div>
+            <div class="prow">
+              <div id="print-palette" class="ppal"></div>
+            </div>
+            <div class="prow btns">
+              <div id="print-nib" class="nibs"></div>
+              <button id="print-fill" class="shopbtn small">BUCKET</button>
+              <button id="print-clear" class="shopbtn small">CLEAR</button>
+            </div>
+          </div>
+          <span id="shop-note" class="note">tap to try it on, tap again to buy</span>
+        </div>
+
+        <!-- sidebar: the gear -->
+        <div class="sidebar">
+          <div id="shop-tabs" class="tabs"></div>
+          <div id="shop-grid" class="grid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ COMPS ============================ -->
+  <div id="comps" class="overlay hidden">
+    <div class="plate wide">
+      <div class="topbar">
+        <h2>COMPETITIONS</h2>
+        <div class="wallet">
+          <span class="cashval">$0</span>
+          <button id="comps-back" class="shopbtn">BACK</button>
+        </div>
+      </div>
+      <p class="tag">the only place money comes from. place top three to get paid.</p>
+      <div class="kinds">
+        <span><b>FREE FOR ALL</b> out-score the others before the clock runs out</span>
+        <span><b>TRICK PERFORM</b> land the named trick at each marked spot</span>
+        <span><b>LINE</b> the same tricks IN ORDER, one go at each. miss one and you lose points and the line moves on without it. the faster you ride it, the more every trick pays.</span>
+      </div>
+      <div id="comp-list" class="complist"></div>
+    </div>
+  </div>
+
+  <!-- ========================= TRICK SHEETS ========================= -->
+  <div id="tricks" class="overlay hidden">
+    <div class="plate wide">
+      <div class="topbar">
+        <h2>TRICK SHEETS</h2>
+        <div class="wallet">
+          <button id="tricks-back" class="shopbtn">BACK</button>
+        </div>
+      </div>
+      <p class="tag">every clip is the real board being driven by the gesture beside it. the dot is your hand.</p>
+      <div id="sheet-list" class="sheets"></div>
+    </div>
+  </div>
+
+  <!-- =========================== RESULTS =========================== -->
+  <div id="results" class="overlay hidden">
+    <div class="plate small">
+      <div id="result-body"></div>
+      <div class="btns">
+        <button id="results-again">RUN IT AGAIN</button>
+        <button id="results-ok">MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- pause -->
+  <div id="pause" class="overlay hidden">
+    <div class="plate small">
+      <h2>PAUSED</h2>
+      <div class="btns">
+        <button id="resume">RESUME</button>
+        <button id="pause-settings">SETTINGS</button>
+        <button id="pause-comps">COMPS</button>
+        <button id="pause-shop">SHOP</button>
+        <button id="quit">MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ SETTINGS ============================ -->
+  <div id="settings" class="overlay hidden">
+    <div class="plate">
+      <div class="topbar">
+        <h2>SETTINGS</h2>
+        <div class="wallet">
+          <button id="settings-back" class="shopbtn">BACK</button>
+        </div>
+      </div>
+
+      <div class="setrow">
+        <div class="col">
+          <h3>the board</h3>
+          <label class="slider">mouse sensitivity
+            <input id="sens" type="range" min="20" max="300" value="100">
+            <span id="sensval">1.00</span>
+          </label>
+          <label class="slider">invert pressure
+            <input id="invert" type="checkbox">
+          </label>
+          <label class="slider">arrow key strength
+            <input id="padstr" type="range" min="40" max="200" value="100">
+            <span id="padstrval">1.00</span>
+          </label>
+
+          <h3>the picture</h3>
+          <label class="slider">scanlines
+            <input id="scanlines" type="checkbox" checked>
+          </label>
+          <label class="slider">camera lead
+            <input id="camlead" type="range" min="0" max="200" value="100">
+            <span id="camleadval">1.00</span>
+          </label>
+        </div>
+
+        <div class="col">
+          <h3>controls</h3>
+          <ul class="keys">
+            <li><b>mouse</b> the board &mdash; slide to set your foot, flick to flip</li>
+            <li><b>arrows</b> the same thing, on the keyboard</li>
+            <li><b>A / D</b> push, brake, and spin your body in the air</li>
+            <li><b>SPACE</b> pick the board up, or step back on</li>
+            <li><b>on foot</b> A/D or LEFT/RIGHT walk, UP hops, DOWN crouches</li>
+            <li><b>your LEGS run out</b> &mdash; about six pops back to back, then roll to get them back. buy better legs in the shop.</li>
+            <li><b>S in the air</b> hold the board out belly-up, so you can actually see the graphic you paid for</li>
+            <li><b>1 - 0 in the air</b> hold a GRAB &mdash; indy, method, superman, christ air. the longer you hold it the more it pays, and it pays CASH.</li>
+            <li><b>ESC</b> pause &nbsp;&middot;&nbsp; <b>R</b> bail out and reset</li>
+          </ul>
+
+          <h3>your save</h3>
+          <p class="tag">cash, gear, printed designs, best runs and comp places.</p>
+          <button id="settings-reset" class="shopbtn danger">RESET PROGRESS</button>
+          <span id="settings-note" class="note"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PORTRAIT, ON A PHONE. The park is a side-on strip a hundred and
+       fifty metres long; there is no version of it that reads in a tall
+       window. Every skate game ever made is landscape. -->
+  <div id="rotate"><div class="plate small"><h2>TURN YOUR PHONE</h2><p class="tag">grind city is played sideways</p></div></div>
+
+  <!-- click-to-lock curtain -->
+  <div id="lock" class="overlay hidden">
+    <div class="plate small"><h2>CLICK TO SKATE</h2><p class="tag">the mouse gets captured &mdash; ESC to let it go</p></div>
+  </div>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

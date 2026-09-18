@@ -224,13 +224,21 @@ export const GAMES = [
   },
   {
     slug: 'hoops', title: 'HOOPS', how: 'local', tag: 'Sport',
-    blurb: 'Drag anywhere and let go. The hoop moves, and the streak is the score.',
-    about: `A side-on court in solids, with a low-poly shooter who dips into his knees as you
-    pull and puts the ball up out of his hands, a net simulated as twelve strands of beads
-    that the ball pushes through, and a crowd who get on their feet when one goes in. The
-    drag starts anywhere and the dotted line is the real flight.`,
-    controls: [['Drag anywhere', 'aim and power'], ['Release', 'shoot']],
-    tips: 'Swishes stack the multiplier. A rim-in resets it to one.',
+    blurb: 'Streetball on a half court, the proper game on a full one, or ten balls on the spot.',
+    about: `Three games on one side-on court. HALF COURT is streetball: one ring, both teams
+    attacking it, ones and twos, first to eleven and win by two, and a team that wins the ball
+    has to take it back behind the check line before it can score. FULL COURT is the real thing:
+    two rings, twos and threes, two minutes on the clock, and the camera runs with the ball to
+    whichever end it is at. STAND STILL is the old game - one spot, ten balls, a moving hoop and
+    a streak. Pick how many a side. The players are low-poly bodies who dip into their knees as
+    you pull and release the ball out of their hands, the net is twelve strands of beads the ball
+    pushes through, and the crowd get on their feet when one goes in.`,
+    controls: [['A D', 'back and forward, the way you are attacking'],
+               ['W S', 'away from the camera and towards it'],
+               ['Drag', 'aim and power - let go in the green band for a clean look'],
+               ['Click', 'pass to a team-mate, or swat at the ball'],
+               ['Shift', 'guard'], ['Space', 'jump - rebound, block or dunk']],
+    tips: 'The green band on the power ring is the shot that drops through the middle from where you stand.',
   },
   {
     slug: 'spike', title: 'SPIKE', how: 'local', tag: 'Sport',
@@ -244,26 +252,11 @@ export const GAMES = [
                ['Up arrow', 'player two jumps']],
     tips: 'Jump INTO the ball, not under it. Press 2 on the title screen for two players.',
   },
-  {
-    slug: 'dunk', title: 'DUNK', how: 'local', tag: 'Sport',
-    blurb: 'Three a side, three minutes, and the camera is over your shoulder.',
-    about: `Six low-poly players in painted kit on a hardwood floor, in front of a crowd
-    on tiers. The camera sits behind your man and the mouse looks: the crosshair in the
-    middle of the screen is the aim, and what is under it decides what a click does -
-    a team-mate and it is a pass, anything else and it starts a shot you charge by
-    holding and release in the green band. Point at the man with the ball and click to
-    reach in, but only the hand NEARER you can be swiped, so Q and E - which put the
-    ball in your left or right hand - are a crossover. Everybody has stats that mean
-    something: speed, shooting, handle, steal, block, and an IQ that every decision the
-    other five make is rolled against, so they take the wrong option, pass into
-    coverage and shoot from too far. They bump, too: run into somebody and you both
-    come off it, and a hard shoulder into the carrier can knock the ball loose.`,
-    controls: [['W A S D', 'move, relative to the camera'], ['Mouse', 'look - click once to capture it'],
-               ['Click', 'on a team-mate: pass · elsewhere: hold to charge, release to shoot'],
-               ['Click', 'without the ball: reach in'], ['Q  E', 'ball to the left or right hand'],
-               ['SPACE', 'jump - at the ring with the ball, it is a dunk']],
-    tips: 'The hand away from your man cannot be stolen. Swap hands as you go past him.',
-  },
+  // DUNK WAS HERE. Liam: "delete dunk". It was a three-a-side game with
+  // the camera over your shoulder, and HOOPS now does the same job from
+  // the side with the same body, the same shot and both courts - so there
+  // were two basketball games on the pile and only one of them was being
+  // worked on. Its folder, its card and its test went with this entry.
 
   // ---- the classics ------------------------------------------------
   {

@@ -30,6 +30,8 @@
 import { Deck3D, THREE, mat, box, sphere, cyl, paint, clamp, rnd, lerp, pick } from '../_deck/deck3d.js';
 import { Board } from '../_deck/board.js';
 import { Home } from '../_deck/home.js';
+import { person } from './kit.js';
+import { HalfCourt, FLOOR as HALF_FLOOR } from './half.js';
 
 const D = new Deck3D({ key: 'hoops', w: 520, h: 680, units: 15, bg: '#101826',
                        tilt: 0.13, scale: 2 });
@@ -41,6 +43,47 @@ const RIM_R = 0.72;
 const SPOT = { x: -5.0, y: FLOOR };
 
 let ball, hoop, drag, score, mult, ballsLeft, over, started, wind, msg, msgT, trail, spin, shooter, cheer;
+
+// ---------------------------------------------------------------------
+// THREE GAMES IN ONE. Liam: "make hoops have the stand still mdoe but the
+// main game mode should be like dunk", and then "make it so there can also
+// be full court".
+//
+// STAND STILL is the game this file has always been: one spot, ten balls,
+// a moving hoop and a streak. HALF COURT and FULL COURT are the main ones
+// now - a real game against a team, both of them built in half.js, drawn
+// with the same camera, the same bodies and the same shot. DUNK, which the
+// quote above refers to, has since been deleted; half.js says why.
+// ---------------------------------------------------------------------
+let mode = 'half';                  // 'half' | 'still'
+let court = 'half';                 // which court the match game is on: 'half' | 'full'
+let half = null;                    // the court game, made on first use
+let teamSize = 3;                   // how many a side
+
+// ONE CAMERA FOR BOTH COURTS. Liam: *"same camera angle for half court and
+// stuff to"*. So the half-width, the tilt and the height are the SAME
+// NUMBERS in both rows below, deliberately written out twice rather than
+// shared, because the whole point is that they match and the next person to
+// change one should see the other sitting beside it. The only thing that
+// differs is the x, and on a full court even that is not a number - thirty
+// metres of floor will not fit in a frame that shows a person at a size you
+// can read, so the camera TRACKS, and half.camX() says where to.
+const CAM = {
+  still: { hw: D.units / 2, tilt: 0.13, x: 0, y: 0.6 },
+  half:  { hw: 10, tilt: 0.30, x: -1.6, y: HALF_FLOOR + 3.4 },
+  full:  { hw: 10, tilt: 0.30, x: 0, y: HALF_FLOOR + 3.4 },
+};
+
+/** point the camera at whichever game is being played */
+function useCam(which) {
+  const c = CAM[which];
+  const hh = c.hw * (D.H / D.W);
+  D.cam.left = -c.hw; D.cam.right = c.hw;
+  D.cam.top = hh; D.cam.bottom = -hh;
+  D.cam.updateProjectionMatrix();
+  D.tilt = c.tilt;
+  D.lookAt(c.x, c.y);
+}
 
 const root = new THREE.Group();
 D.scene.add(root);
@@ -197,67 +240,9 @@ function stepNet(dt) {
   netGeo.attributes.position.needsUpdate = true;
 }
 
-// ---------------------------------------------------------------------
-// a low-poly person, at any scale
-// ---------------------------------------------------------------------
-function person(scale, shirtCol, skinCol) {
-  const g = new THREE.Group();
-  const shirt = mat(shirtCol);
-  const shorts = mat(new THREE.Color(shirtCol).offsetHSL(0, 0, -0.18));
-  const skin = mat(skinCol);
-
-  const hips = new THREE.Group(); g.add(hips);
-  const torso = box(0.62 * scale * 2, 0.9 * scale * 2, 0.34 * scale * 2, shirt);
-  torso.position.y = 0.45 * scale * 2;
-  hips.add(torso);
-  const head = box(0.34 * scale * 2, 0.36 * scale * 2, 0.34 * scale * 2, skin);
-  head.position.y = 1.10 * scale * 2;
-  hips.add(head);
-  const hair = box(0.36 * scale * 2, 0.10 * scale * 2, 0.36 * scale * 2,
-    mat(new THREE.Color(0x2a1d16)));
-  hair.position.y = 1.27 * scale * 2;
-  hips.add(hair);
-
-  const arms = [];
-  for (const s of [-1, 1]) {
-    const pivot = new THREE.Group();
-    pivot.position.set(s * 0.40 * scale * 2, 0.86 * scale * 2, 0);
-    const upper = box(0.18 * scale * 2, 0.62 * scale * 2, 0.18 * scale * 2, skin);
-    upper.position.y = -0.31 * scale * 2;
-    pivot.add(upper);
-    const fore = new THREE.Group();
-    fore.position.y = -0.62 * scale * 2;
-    const lower = box(0.16 * scale * 2, 0.56 * scale * 2, 0.16 * scale * 2, skin);
-    lower.position.y = -0.28 * scale * 2;
-    fore.add(lower);
-    pivot.add(fore);
-    hips.add(pivot);
-    arms.push({ pivot, fore });
-  }
-
-  const legs = [];
-  for (const s of [-1, 1]) {
-    const pivot = new THREE.Group();
-    pivot.position.set(s * 0.18 * scale * 2, 0, 0);
-    const thigh = box(0.24 * scale * 2, 0.6 * scale * 2, 0.24 * scale * 2, shorts);
-    thigh.position.y = -0.3 * scale * 2;
-    pivot.add(thigh);
-    const knee = new THREE.Group();
-    knee.position.y = -0.6 * scale * 2;
-    const shin = box(0.20 * scale * 2, 0.6 * scale * 2, 0.20 * scale * 2, skin);
-    shin.position.y = -0.3 * scale * 2;
-    knee.add(shin);
-    const shoe = box(0.24 * scale * 2, 0.14 * scale * 2, 0.4 * scale * 2, mat('#1d2430'));
-    shoe.position.set(0, -0.62 * scale * 2, 0.08 * scale * 2);
-    knee.add(shoe);
-    pivot.add(knee);
-    hips.add(pivot);
-    legs.push({ pivot, knee });
-  }
-  hips.position.y = 1.22 * scale * 2;
-  return { g, hips, arms, legs, scale };
-}
-
+// The person builder moved to kit.js when the half court arrived: both
+// modes are made of the same body, and the crowd in both is that body at
+// a third of the size.
 // the shooter, at the free-throw line
 shooter = person(0.5, new THREE.Color('#e2584a'), new THREE.Color('#e8b98c'));
 shooter.g.position.set(SPOT.x, FLOOR, 0.6);
@@ -326,7 +311,14 @@ function flightStep(p, dt) {
 }
 
 function step(dt) {
-  if (!started) { pose(0); place(); home.step(dt); return; }
+  if (!started) {
+    if (half) half.stop();
+    root.visible = true;
+    useCam('still');
+    pose(0); place(); home.step(dt);
+    return;
+  }
+  if (mode === 'half') return stepHalf(dt);
   if (over) {
     place(); poseCrowd(dt);
     D.card('FULL TIME', ['score ' + score, 'record ' + board.best], 'click for the home screen');
@@ -413,6 +405,102 @@ function step(dt) {
   poseCrowd(dt);
   place();
   drawHud();
+}
+
+// ---------------------------------------------------------------------
+// THE HALF COURT
+// ---------------------------------------------------------------------
+function stepHalf(dt) {
+  if (!half) return;
+  // WHERE THE CAMERA LOOKS, EVERY FRAME. On a half court camX hands back
+  // the same fixed spot every time and this costs nothing; on a full court
+  // it is the tracking shot. Either way it goes through the same lookAt, at
+  // the same tilt and the same height, which is what makes the two modes
+  // look like one game.
+  const c = CAM[court];
+  D.lookAt(half.camX(c.hw * 2), c.y);
+  if (half.over) {
+    half.step(0);
+    drawHalfHud();
+    const s = half.score;
+    const draw = s[0] === s[1];
+    D.card(draw ? 'A DRAW' : (s[0] > s[1] ? 'YOU WIN' : 'THEY WIN'),
+           ['home ' + s[0] + '   away ' + s[1],
+            teamSize + ' v ' + teamSize + '   ·   ' + (court === 'half' ? 'half court' : 'full court')],
+           'click for the home screen');
+    if (D.tapped()) { half.stop(); started = false; home.finish(s[0] * 10 + (s[0] > s[1] ? 50 : 0)); }
+    return;
+  }
+  half.step(dt);
+  drawHalfHud();
+}
+
+function drawHalfHud() {
+  const h = half.hud();
+  D.hud('HOME ' + h.home + '   AWAY ' + h.away, h.ball + '   BEST ' + board.best);
+  // THE TWO CLOCKS, one above the other, because they mean opposite
+  // things: the game clock is how long is left of the match and the shot
+  // clock is how long is left of this possession. Only a full court has
+  // the first one - a half court is played to eleven, not to a horn.
+  if (h.game != null) {
+    const m = Math.floor(h.game / 60), s = Math.floor(h.game % 60);
+    D.text(m + ':' + String(s).padStart(2, '0'), D.W / 2, 50, 22,
+           h.game <= 15 ? '#ff6b8b' : '#e7ecf3', 'center');
+    D.text(String(h.clock), D.W / 2, 70, 13, h.clock <= 5 ? '#ff6b8b' : '#4dc9ff', 'center');
+  } else {
+    D.text(String(h.clock), D.W / 2, 52, 16, h.clock <= 5 ? '#ff6b8b' : '#4dc9ff', 'center');
+  }
+  if (h.check) D.text('TAKE IT BACK', D.W / 2, 88, 12, '#d8ac4a', 'center');
+  if (h.msg) D.text(h.msg, D.W / 2, 110, 20, '#ffd166', 'center');
+
+  // THE POWER RING, with the band that would drop it through the middle.
+  // Same ring the stand-still game draws; the band is the half court's
+  // one addition, because here the range changes every time you move.
+  //
+  // TWO THINGS ABOUT IT CHANGED WHEN THE AIMING WAS FIXED.
+  //
+  // It is drawn where the HAND went down, in screen pixels, rather than at
+  // the patch of floor that was under the hand at the time - on a full
+  // court the camera travels, and the ring used to slide away across the
+  // screen while you were still pulling on it.
+  //
+  // And the green band is now the band the shot actually uses, which
+  // half.js works out in idealBand(). It used to be a fixed 0.07 either
+  // side while the shot forgave a fraction of the ideal speed, which at
+  // every range measured was narrower - so the ring was painting a promise
+  // the shot had no intention of keeping. See idealBand() for the numbers.
+  if (h.drag && h.drag.power !== undefined) {
+    const p = { x: h.drag.sx, y: h.drag.sy };
+    const g = D.g;
+    g.strokeStyle = 'rgba(231,236,243,.35)'; g.lineWidth = 2;
+    g.beginPath(); g.arc(p.x, p.y, 26, 0, 7); g.stroke();
+    if (h.ideal != null) {
+      const w = h.band != null ? h.band : 0.07;
+      const a0 = -Math.PI / 2 + (h.ideal - w) * 6.283;
+      const a1 = -Math.PI / 2 + (h.ideal + w) * 6.283;
+      g.strokeStyle = 'rgba(74,226,138,.85)'; g.lineWidth = 7;
+      g.beginPath(); g.arc(p.x, p.y, 26, a0, a1); g.stroke();
+    }
+    g.strokeStyle = h.drag.power > 0.85 ? '#ff6b8b' : '#ff9f43'; g.lineWidth = 4;
+    g.beginPath(); g.arc(p.x, p.y, 26, -Math.PI / 2, -Math.PI / 2 + h.drag.power * 6.283); g.stroke();
+  } else {
+    const you = h.you;
+    const hint = half.ball.holder === you
+      ? 'drag to shoot  ·  click a team-mate to pass'
+      : 'click the man with the ball to swat  ·  SHIFT to guard';
+    D.text(hint, D.W / 2, D.H - 26, 11, '#8b96a8', 'center');
+  }
+}
+
+/** start a match on either court; `which` is 'half' or 'full' */
+function startHalf(which = 'half') {
+  if (!half) half = new HalfCourt(D, { size: teamSize, onEnd: () => {} });
+  court = which === 'full' ? 'full' : 'half';
+  root.visible = false;
+  useCam(court);
+  half.start(teamSize, court);
+  mode = 'half';
+  started = true;
 }
 
 function finish() {
@@ -538,17 +626,119 @@ function drawHud() {
 const board = new Board('hoops', { unit: 'SCORE' });
 const home = new Home(D, {
   title: 'HOOPS',
-  lines: ['drag anywhere on the screen and let go',
-          'nothing but net stacks the multiplier, a rim-in resets it',
-          'the hoop starts moving on the fifth ball'],
+  lines: ['A and D run up and down the floor, W and S go away and towards you',
+          'drag to shoot, click a team-mate to pass, click the ball to swat',
+          'SHIFT guards him  ·  half court is first to eleven, full court is two minutes'],
   board,
-  buttons: [{ label: 'SHOOT', sub: 'ten balls', fn: () => { started = true; reset(); } }],
-  hint: 'DRAG and RELEASE · P pause',
+  buttons: [
+    { label: 'HALF COURT', sub: 'one ring, ones and twos, first to 11', fn: () => startHalf('half') },
+    { label: 'FULL COURT', sub: 'two rings, twos and threes, two minutes', fn: () => startHalf('full') },
+    { label: 'STAND STILL', sub: 'ten balls, keep the streak alive',
+      fn: () => { mode = 'still'; root.visible = true; useCam('still'); started = true; reset(); } },
+  ],
+  // HOW MANY A SIDE. Liam: "the player can choose how many people play".
+  panel: {
+    h: 50,
+    draw: (DD, x, y, w) => {
+      DD.text('HOW MANY A SIDE', x, y + 12, 11, '#8b96a8');
+      const g = DD.g;
+      for (let i = 1; i <= 5; i++) {
+        const bw = 34, bx = x + (i - 1) * (bw + 6), by = y + 20;
+        const on = teamSize === i;
+        g.fillStyle = on ? '#ffb15e' : 'rgba(255,159,67,.14)';
+        g.fillRect(bx, by, bw, 26);
+        g.strokeStyle = on ? '#ffd9a8' : 'rgba(255,159,67,.45)';
+        g.lineWidth = 2; g.strokeRect(bx + 1, by + 1, bw - 2, 24);
+        DD.text(i + 'v' + i, bx + 5, by + 18, 12, on ? '#2a1a10' : '#ffd9a8');
+      }
+      void w;
+      return 50;
+    },
+    click: (DD, x, y) => {
+      for (let i = 1; i <= 5; i++) {
+        const bw = 34, bx = x + (i - 1) * (bw + 6), by = y + 20;
+        if (DD.mouse.x > bx && DD.mouse.x < bx + bw && DD.mouse.y > by && DD.mouse.y < by + 26) teamSize = i;
+      }
+    },
+  },
+  hint: 'WASD move · DRAG shoot · CLICK pass or swat · SHIFT guard · SPACE jump · P pause',
 });
+
+// ---------------------------------------------------------------------
+// A HANDLE FOR THE TEST HARNESS (tools/hoops.mjs).
+//
+// Everything here drives the game the way a player does - it sets a team
+// size, starts a match, hands the ball to a side, shoots, passes, swats -
+// so a check that passes here is a check on the real thing and not on a
+// second copy of the rules written in the test.
+// ---------------------------------------------------------------------
+window.__hoops = {
+  setSize: (n) => { teamSize = clamp(n | 0, 1, 5); return teamSize; },
+  startHalf,
+  startFull: () => startHalf('full'),
+  camX: () => (half ? +half.camX(CAM[court].hw * 2).toFixed(2) : null),
+  you: () => (half ? { ...half.you } : null),
+  freeze: (on) => { if (half) half.frozen = !!on; },
+  giveBall: (team) => half && half.debugGive(team),
+  standOn: (gap) => half && half.debugStandOnCarrier(gap),
+  standAt: (x, z) => half && half.debugStandAt(x, z),
+  testShoot: (power, angle) => half && half.debugShoot(power, angle),
+  // where the last shot crossed the ring's height: see half.js #ball
+  cross: () => (half && half.cross ? {
+    long: +half.cross.long.toFixed(3),
+    side: +half.cross.side.toFixed(3),
+    miss: +half.cross.miss.toFixed(3),
+  } : null),
+  // what the drag has made of the gesture so far, and what the green band
+  // on the power ring is telling the player to release at
+  drag: () => (half && half.drag
+    ? { power: +half.drag.power.toFixed(3), angle: +half.drag.angle.toFixed(3),
+        sx: half.drag.sx, sy: half.drag.sy,
+        ideal: half.idealPower(), band: half.idealBand() }
+    : null),
+  ideal: (a) => {
+    if (!half || !half.ball.holder) return null;
+    return half.idealPowerFor(half.ball.holder, a == null ? 0.8 : a);
+  },
+  // the half-width of the green band on the power ring, as the ring draws it
+  band: () => (half ? half.idealBand() : null),
+  testPass: () => half && half.debugPass(),
+  testSwat: () => half && half.debugSwat(),
+  testGuard: () => half && half.debugGuard(),
+  probe: () => {
+    if (!half) return null;
+    const b = half.ball;
+    return { bx: +b.x.toFixed(2), by: +b.y.toFixed(2), bz: +b.z.toFixed(2),
+             vx: +b.vx.toFixed(2), vy: +b.vy.toFixed(2), vz: +b.vz.toFixed(2),
+             rimX: half.COURT.hoopX, rimY: +half.COURT.rimY.toFixed(2), rimZ: half.COURT.hoopZ,
+             live: !!b.live, holder: !!b.holder };
+  },
+  state: () => {
+    if (!half || mode !== 'half') return { mode, players: 0 };
+    const h = half.hud(), b = half.ball;
+    return {
+      mode, court: h.mode, players: half.players.length, size: teamSize,
+      home: h.home, away: h.away, msg: h.msg, game: h.game == null ? null : +h.game.toFixed(1),
+      over: !!half.over,
+      holder: b.holder ? (b.holder.you ? 'you' : b.holder.team + ':' + b.holder.idx) : null,
+      holderTeam: b.holder ? b.holder.team : null,
+      ballY: +b.y.toFixed(2), live: !!b.live,
+      tally: half.tally, check: h.check,
+    };
+  },
+};
 
 reset(); started = false;
 
 if (D.shot) {
+  // THE CARD IS THE MAIN GAME. It used to be the stand-still mode, which is
+  // now the third one on the home screen - a picture of one man on a spot
+  // sells the game it used to be. Three a side on the half court, a few
+  // seconds in so everyone has run somewhere, and the shot below is left
+  // set up underneath in case the match cannot start for any reason.
+  teamSize = 3;
+  startHalf('half');
+  for (let i = 0; i < 150; i++) stepHalf(1 / 60);
   started = true; score = 640; mult = 3; ballsLeft = 6;
   hoop = { x: 3.4, y: 1.2, dir: 1, speed: 1.4 };
   ball = { x: 3.4, y: 1.0, vx: 1, vy: -6, live: true, scored: true, touched: false, held: false };

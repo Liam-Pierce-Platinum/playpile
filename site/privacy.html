@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Privacy — PLAYPILE</title>
 <link rel="stylesheet" href="/site/style.css">
+<link rel="stylesheet" href="/site/account.css">
+<script type="module" src="/site/account.js"></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>🕹️</text></svg>">
 <!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
      this is the tag Google looks for when it verifies the site, so it
@@ -17,14 +19,17 @@
 <header class="top"><div class="bar">
   <a class="logo" href="/">PLAY<b>PILE</b></a>
   <nav class="links"><a href="/">All games</a><a href="/site/about.html">About</a>
-    <a href="/site/advertise.html">Advertise</a></nav>
+    <a href="/site/advertise.html">Advertise</a></nav><div id="accountSlot"></div>
 </div></header>
 
 <main class="wrap" style="max-width:760px">
   <section class="hero">
     <h1>Privacy</h1>
-    <p>The short version: PLAYPILE has no accounts, no logins and no database. Your
-       scores are saved in your own browser and never leave your machine.</p>
+    <p>The short version: your scores are saved in your own browser. You can also make
+       a <b>profile</b> (still only on your device), or <b>sign up</b> so that your progress
+       follows you to another browser &mdash; and if you do, the only thing we hold is your
+       email address and that saved progress. No tracking, no analytics, no selling anything
+       to anybody.</p>
   </section>
 
   <section class="about" style="margin-top:26px">
@@ -34,7 +39,30 @@
        not sent anywhere, we cannot read it, and clearing your browsing data deletes
        it. It is why your scores do not follow you to another browser or another
        device.</p>
-    <p>There is no sign-up, so we hold no email address, no name and no password.</p>
+    <p>Playing as a guest, that is the whole story: nothing you do leaves your machine.</p>
+
+    <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Profiles, save codes and accounts</h2>
+    <p>The <b>Sign in</b> button at the top of the page offers up to three things, depending
+       on what the site has switched on:</p>
+    <p><b>A profile</b> lets several people share one browser. Each profile keeps its own copy
+       of those same local-storage keys. It never leaves the device and needs no email address.</p>
+    <p><b>A save code</b> is your progress written out as a long line of text you can copy. Paste
+       it into the panel on another device and it loads there. We never see it &mdash; copying
+       and pasting it is entirely between you and your own clipboard.</p>
+    <p><b>An account</b>, where the site offers one, is an email address and a password, and it
+       exists so your progress can follow you between devices. The email address, a player
+       name if you set one, and the saved progress itself are stored for you by
+       <b>Google Firebase</b> (Authentication and Firestore), because PLAYPILE is a static
+       site with no server of its own. We can see your email address and your saved game
+       progress; we cannot see your password, which Google holds and we never receive. Nothing
+       is shared with anyone else and none of it is used for advertising.</p>
+    <p>The saved progress is exactly what the games already keep on your device: high scores,
+       the three letters you type in beside them, coins, unlocked clothes and settings. No
+       location, no contacts, no device fingerprinting, nothing about what else you do online.</p>
+    <p><b>Deleting it.</b> Sign out and clear your browser data and the device copy is gone. To
+       have an account and its saved progress deleted from the server, email the address at the
+       bottom of this page and it will be removed &mdash; there is no form to fill in and no
+       waiting period beyond how long it takes to read the message.</p>
 
     <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Advertising</h2>
     <p>PLAYPILE carries advertising, and that is the one part of the site that
@@ -53,13 +81,15 @@
     <p>None. There is no analytics script on this site.</p>
 
     <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Children</h2>
-    <p>PLAYPILE is not directed at children under 13 and does not knowingly collect
-       anything from them.</p>
+    <p>PLAYPILE is not directed at children under 13 and does not knowingly collect anything
+       from them. If an account turns out to belong to a child under 13, email the address
+       below and it will be deleted. A child can play every game on the site without an
+       account, and nothing on the site asks for one.</p>
 
     <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Getting in touch</h2>
     <p>If you want anything on this page explained or removed, email <a href="mailto:liamlikescows@gmail.com">liamlikescows@gmail.com</a>.</p>
 
-    <div class="tip">Last updated 12 September 2026. If this page ever stops matching what the site actually does, the site is wrong, not the page &mdash; tell us and it gets fixed.</div>
+    <div class="tip">Last updated 18 September 2026. If this page ever stops matching what the site actually does, the site is wrong, not the page &mdash; tell us and it gets fixed.</div>
   </section>
 </main>
 

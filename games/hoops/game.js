@@ -30,7 +30,104 @@
 import { Deck3D, THREE, mat, box, sphere, cyl, paint, clamp, rnd, lerp, pick } from '../_deck/deck3d.js';
 import { Board } from '../_deck/board.js';
 import { Home } from '../_deck/home.js';
-import { person } from './kit.js';
+import { person, HIP_Y } from './kit.js';
+import { playerOutfit, wardrobePanel, coins as coinsNow } from './wardrobe.js';
+import { Net, packInput } from './net.js';
+let panelTab = 'match';
+let venueKind = (() => { try { return localStorage.getItem('pd.hoops.venue') || 'street'; } catch (e) { return 'street'; } })();
+let panelHot = [];
+
+// =====================================================================
+// ONLINE. Liam: "add online multiplay through the site".
+//
+// PLAYPILE has no server, so a match is peer to peer: one player hosts and
+// the others join with a four-letter room code (net.js explains the whole
+// arrangement). Everything here is the front of it - the code on the
+// screen, the four letters you type, and pumping the wire once a frame.
+// =====================================================================
+const online = {
+  net: null, role: null, code: '', status: '', kind: '',
+  entry: '', typing: false, sendT: 0, stateT: 0, seat: 0,
+};
+
+function onlineStatus(text, kind) { online.status = text; online.kind = kind; }
+
+async function hostOnline() {
+  online.net = new Net({
+    onStatus: onlineStatus,
+    onInput: (slot, d) => { if (half) half.netInput(slot, d); },
+    onJoin: () => { if (half) half.say('A PLAYER JOINED', 1.6); },
+    onLeave: () => { if (half) half.say('A PLAYER LEFT', 1.6); },
+  });
+  online.role = 'host';
+  onlineStatus('opening a room...', 'waiting');
+  try {
+    online.code = await online.net.host(3);
+    startHalf('half');
+    half.setNet(online.net, 'host', 0);
+    half.say('ROOM ' + online.code, 3);
+  } catch (e) {
+    online.role = null;
+  }
+}
+
+async function joinOnline(code) {
+  online.net = new Net({
+    onStatus: onlineStatus,
+    onState: (snap) => { if (half) half.netApply(snap); },
+  });
+  online.role = 'guest';
+  onlineStatus('connecting to ' + code + '...', 'waiting');
+  try {
+    const seat = await online.net.join(code);
+    online.seat = seat;
+    online.code = code;
+    startHalf('half');
+    half.setNet(online.net, 'guest', seat);
+    half.say('YOU ARE IN', 2);
+  } catch (e) {
+    online.role = null;
+    online.net = null;
+  }
+}
+
+/** the wire, pumped once a frame: state out if hosting, hands out if not */
+function pumpNet(dt) {
+  if (!online.net || !half) return;
+  if (online.role === 'host') {
+    online.stateT -= dt;
+    if (online.stateT <= 0) {
+      online.stateT = 1 / 20;
+      online.net.sendState(half.netSnapshot(performance.now()));
+    }
+  } else if (online.role === 'guest') {
+    online.sendT -= dt;
+    if (online.sendT <= 0) {
+      online.sendT = 1 / 30;
+      online.net.sendInput(packInput(half.you, half.netTakeInput()));
+    }
+  }
+}
+
+function leaveOnline() {
+  if (online.net) online.net.close();
+  online.net = null; online.role = null; online.status = ''; online.code = '';
+}
+
+// TYPING A ROOM CODE. The home screen is a canvas, so there is no text box
+// to put a cursor in: while the join prompt is up this listener collects
+// letters, Enter connects and Escape gives up.
+addEventListener('keydown', (e) => {
+  if (!online.typing) return;
+  if (e.key === 'Escape') { online.typing = false; online.entry = ''; return; }
+  if (e.key === 'Enter') {
+    if (online.entry.length >= 4) { const c = online.entry; online.typing = false; online.entry = ''; joinOnline(c); }
+    return;
+  }
+  if (e.key === 'Backspace') { online.entry = online.entry.slice(0, -1); return; }
+  const ch = e.key.toUpperCase();
+  if (/^[A-Z0-9]$/.test(ch) && online.entry.length < 4) online.entry += ch;
+});
 import { HalfCourt, FLOOR as HALF_FLOOR } from './half.js';
 
 const D = new Deck3D({ key: 'hoops', w: 520, h: 680, units: 15, bg: '#101826',
@@ -244,7 +341,7 @@ function stepNet(dt) {
 // modes are made of the same body, and the crowd in both is that body at
 // a third of the size.
 // the shooter, at the free-throw line
-shooter = person(0.5, new THREE.Color('#e2584a'), new THREE.Color('#e8b98c'));
+shooter = person(0.5, null, null, playerOutfit());
 shooter.g.position.set(SPOT.x, FLOOR, 0.6);
 shooter.g.rotation.y = -0.5;
 root.add(shooter.g);
@@ -411,6 +508,7 @@ function step(dt) {
 // THE HALF COURT
 // ---------------------------------------------------------------------
 function stepHalf(dt) {
+  pumpNet(dt);
   if (!half) return;
   // WHERE THE CAMERA LOOKS, EVERY FRAME. On a half court camX hands back
   // the same fixed spot every time and this costs nothing; on a full court
@@ -438,6 +536,24 @@ function stepHalf(dt) {
 function drawHalfHud() {
   const h = half.hud();
   D.hud('HOME ' + h.home + '   AWAY ' + h.away, h.ball + '   BEST ' + board.best);
+  // ---- THE STAMINA BAR -------------------------------------------------
+  // Bottom left, under your feet rather than up with the score, because it
+  // is about YOU and you look at it while you are deciding whether you can
+  // afford another jump. It goes amber under a third and red under a sixth.
+  {
+    const bw = 128, bh = 9, bx = 14, by = D.H - 30;
+    const g = D.g;
+    g.fillStyle = 'rgba(8,12,18,0.75)';
+    g.fillRect(bx - 2, by - 2, bw + 4, bh + 4);
+    const f = clamp(h.stam, 0, 1);
+    g.fillStyle = f < 0.17 ? '#ff5a5a' : f < 0.34 ? '#ffb15e' : '#35d07f';
+    g.fillRect(bx, by, bw * f, bh);
+    g.strokeStyle = 'rgba(255,255,255,.22)'; g.lineWidth = 1;
+    g.strokeRect(bx + 0.5, by + 0.5, bw - 1, bh - 1);
+    D.text('LEGS', bx, by - 5, 9, '#8b96a8');
+    if (online.role) D.text(online.role === 'host' ? 'ONLINE · ROOM ' + online.code : 'ONLINE', bx, by + 22, 9, '#35d07f');
+    D.text('✦ ' + coinsNow(), bx + bw, by - 5, 10, '#ffd166', 'right');
+  }
   // THE TWO CLOCKS, one above the other, because they mean opposite
   // things: the game clock is how long is left of the match and the shot
   // clock is how long is left of this possession. Only a full court has
@@ -495,6 +611,7 @@ function drawHalfHud() {
 /** start a match on either court; `which` is 'half' or 'full' */
 function startHalf(which = 'half') {
   if (!half) half = new HalfCourt(D, { size: teamSize, onEnd: () => {} });
+  half.venueKind = venueKind;
   court = which === 'full' ? 'full' : 'half';
   root.visible = false;
   useCam(court);
@@ -527,7 +644,7 @@ function pose(dt) {
   const ext = rel < 1 ? Math.sin(rel * Math.PI) : 0;
 
   const dip = load * 0.55 - ext * 0.2;
-  s.hips.position.y = 1.22 - dip * 0.5;
+  s.hips.position.y = HIP_Y - dip * 0.5;
   for (const leg of s.legs) {
     leg.pivot.rotation.x = dip * 0.9;
     leg.knee.rotation.x = -dip * 1.8;
@@ -635,30 +752,98 @@ const home = new Home(D, {
     { label: 'FULL COURT', sub: 'two rings, twos and threes, two minutes', fn: () => startHalf('full') },
     { label: 'STAND STILL', sub: 'ten balls, keep the streak alive',
       fn: () => { mode = 'still'; root.visible = true; useCam('still'); started = true; reset(); } },
+    { label: 'PLAY ONLINE', sub: 'host a room, or join a friend with a code',
+      fn: () => { panelTab = 'online'; } },
   ],
   // HOW MANY A SIDE. Liam: "the player can choose how many people play".
+  // THE PANEL HAS TWO TABS. Everything - the team size, ten rows of kit
+  // and the stamina shelf - does not fit under the buttons on a phone, and
+  // a panel that runs off the bottom of the screen is a shop you cannot
+  // buy from. So: MATCH is how many a side, KIT is the wardrobe.
   panel: {
-    h: 50,
+    h: 190,
     draw: (DD, x, y, w) => {
-      DD.text('HOW MANY A SIDE', x, y + 12, 11, '#8b96a8');
       const g = DD.g;
-      for (let i = 1; i <= 5; i++) {
-        const bw = 34, bx = x + (i - 1) * (bw + 6), by = y + 20;
-        const on = teamSize === i;
+      const tabs = [['match', 'MATCH'], ['kit', 'KIT & SHOP'], ['online', 'ONLINE']];
+      panelHot = [];
+      tabs.forEach(([id, label], i) => {
+        const bw = 74, bx = x + i * (bw + 6), by = y;
+        const on = panelTab === id;
         g.fillStyle = on ? '#ffb15e' : 'rgba(255,159,67,.14)';
-        g.fillRect(bx, by, bw, 26);
-        g.strokeStyle = on ? '#ffd9a8' : 'rgba(255,159,67,.45)';
-        g.lineWidth = 2; g.strokeRect(bx + 1, by + 1, bw - 2, 24);
-        DD.text(i + 'v' + i, bx + 5, by + 18, 12, on ? '#2a1a10' : '#ffd9a8');
+        g.fillRect(bx, by, bw, 20);
+        DD.text(label, bx + 8, by + 14, 11, on ? '#2a1a10' : '#ffd9a8');
+        panelHot.push({ x: bx, y: by, w: bw, h: 20, tab: id });
+      });
+      if (panelTab === 'match') {
+        DD.text('HOW MANY A SIDE', x, y + 42, 11, '#8b96a8');
+        for (let i = 1; i <= 5; i++) {
+          const bw = 34, bx = x + (i - 1) * (bw + 6), by = y + 50;
+          const on = teamSize === i;
+          g.fillStyle = on ? '#ffb15e' : 'rgba(255,159,67,.14)';
+          g.fillRect(bx, by, bw, 26);
+          g.strokeStyle = on ? '#ffd9a8' : 'rgba(255,159,67,.45)';
+          g.lineWidth = 2; g.strokeRect(bx + 1, by + 1, bw - 2, 24);
+          DD.text(i + 'v' + i, bx + 5, by + 18, 12, on ? '#2a1a10' : '#ffd9a8');
+          panelHot.push({ x: bx, y: by, w: bw, h: 26, size: i });
+        }
+        // WHERE YOU PLAY. Liam asked for street ball, so that is the default:
+        // the blacktop with the fence round it, or the arena with the bowl.
+        DD.text('WHERE', x, y + 96, 11, '#8b96a8');
+        [['street', 'STREET COURT'], ['arena', 'ARENA']].forEach(([id, label], i) => {
+          const bw = 110, bx = x + i * (bw + 8), by = y + 104;
+          const on = venueKind === id;
+          g.fillStyle = on ? '#ffb15e' : 'rgba(255,159,67,.14)';
+          g.fillRect(bx, by, bw, 24);
+          DD.text(label, bx + 8, by + 16, 11, on ? '#2a1a10' : '#ffd9a8');
+          panelHot.push({ x: bx, y: by, w: bw, h: 24, venue: id });
+        });
+        return 136;
       }
-      void w;
-      return 50;
+      if (panelTab === 'online') {
+        const oy = y + 30;
+        DD.text('PLAY SOMEBODY', x, oy + 10, 11, '#8b96a8');
+        const btn = (label, bx, by, bw2, on) => {
+          g.fillStyle = on ? '#ffb15e' : 'rgba(255,159,67,.16)';
+          g.fillRect(bx, by, bw2, 24);
+          DD.text(label, bx + 8, by + 16, 11, on ? '#2a1a10' : '#ffd9a8');
+          panelHot.push({ x: bx, y: by, w: bw2, h: 24, online: label });
+        };
+        btn('HOST A ROOM', x, oy + 18, 108, online.role === 'host');
+        btn(online.typing ? 'TYPE: ' + (online.entry || '____') : 'JOIN A ROOM', x + 116, oy + 18, 120, online.role === 'guest');
+        if (online.role) btn('LEAVE', x + 244, oy + 18, 60, false);
+        if (online.code && online.role === 'host') {
+          DD.text('ROOM CODE', x, oy + 62, 10, '#8b96a8');
+          DD.text(online.code, x + 78, oy + 66, 22, '#ffd166');
+          DD.text('tell a friend to press JOIN and type it', x, oy + 84, 9, '#5a6577');
+        } else if (online.typing) {
+          DD.text('type four letters, ENTER to connect, ESC to stop', x, oy + 62, 9, '#5a6577');
+        } else {
+          DD.text('one of you hosts and reads out the code.', x, oy + 60, 9, '#5a6577');
+          DD.text('the host\'s browser runs the match, so keep it open.', x, oy + 74, 9, '#5a6577');
+        }
+        if (online.status) {
+          DD.text(online.status, x, oy + 104, 10,
+                  online.kind === 'error' ? '#ff6b8b' : online.kind === 'live' ? '#35d07f' : '#ffd166');
+        }
+        return 150;
+      }
+      return 26 + wardrobePanel.draw(DD, x, y + 26, w);
     },
     click: (DD, x, y) => {
-      for (let i = 1; i <= 5; i++) {
-        const bw = 34, bx = x + (i - 1) * (bw + 6), by = y + 20;
-        if (DD.mouse.x > bx && DD.mouse.x < bx + bw && DD.mouse.y > by && DD.mouse.y < by + 26) teamSize = i;
+      for (const h of panelHot) {
+        if (DD.mouse.x < h.x || DD.mouse.x > h.x + h.w || DD.mouse.y < h.y || DD.mouse.y > h.y + h.h) continue;
+        if (h.tab) { panelTab = h.tab; DD.beep(560, 0.05, 'triangle', 0.05); return; }
+        if (h.size) { teamSize = h.size; return; }
+        if (h.venue) { venueKind = h.venue; try { localStorage.setItem('pd.hoops.venue', h.venue); } catch (e) { /* fine */ } DD.beep(600, 0.05, 'triangle', 0.05); return; }
+        if (h.online) {
+          if (h.online === 'HOST A ROOM') hostOnline();
+          else if (h.online === 'LEAVE') leaveOnline();
+          else { online.typing = true; online.entry = ''; }
+          DD.beep(600, 0.06, 'triangle', 0.05);
+          return;
+        }
       }
+      if (panelTab === 'kit') wardrobePanel.click(DD, x, y + 26, 0);
     },
   },
   hint: 'WASD move · DRAG shoot · CLICK pass or swat · SHIFT guard · SPACE jump · P pause',
@@ -674,6 +859,48 @@ const home = new Home(D, {
 // ---------------------------------------------------------------------
 window.__hoops = {
   setSize: (n) => { teamSize = clamp(n | 0, 1, 5); return teamSize; },
+  // the online lobby, for tools/online.mjs
+  hostOnline: async () => { await hostOnline(); return online.code; },
+  joinOnline: async (c) => { await joinOnline(c); return online.seat; },
+  onlineInfo: () => ({ role: online.role, code: online.code, status: online.status, kind: online.kind,
+    seat: online.seat, live: !!(online.net && online.net.live),
+    seats: half && half.netSeats ? half.netSeats.length : 0,
+    ball: half ? [+half.ball.x.toFixed(2), +half.ball.z.toFixed(2)] : null,
+    score: half ? half.score.slice() : null,
+    mine: half && half.you ? [+half.you.x.toFixed(2), +half.you.z.toFixed(2)] : null }),
+  leaveOnline: () => leaveOnline(),
+  /** where the man on a given online seat is, on this machine */
+  seatPos: (i) => { const p = half && half.netSeats && half.netSeats[i]; return p ? [+p.x.toFixed(2), +p.z.toFixed(2)] : null; },
+  /** drop one man onto another from a height: the foul, for tools/rules.mjs */
+  dropOnto: () => {
+    if (!half) return null;
+    const a = half.players[0], b = half.players.find((q) => q.team !== a.team);
+    half.phase = 'live';
+    half.needCheck = false;
+    b.x = a.x + 0.3; b.z = a.z; b.y = 0; b.vy = 0; b.vx = 0; b.vz = 0;
+    a.y = 1.2; a.vy = -6.5; a.vx = 0; a.vz = 0;
+    for (let i = 0; i < 20; i++) half.step(1 / 60);
+    const f = half.freeThrow;
+    return { fouled: !!f, shooter: f ? (f.shooter === b ? 'the man on the floor' : 'somebody else') : null,
+      fouls: half.fouls || {}, msg: half.hud().msg };
+  },
+  /** run the match on without drawing it, for the counting tool */
+  simSteps: (n) => { if (half) for (let i = 0; i < n; i++) half.step(1 / 60); },
+  /** one line about the match for tools/hoopsim.mjs: what is on the floor now */
+  matchProbe: () => {
+    if (!half) return null;
+    const b = half.ball, h = half.hud();
+    const sh = b.shot && b.live ? b.from : null;
+    const r = sh ? half.rim(sh.team) : null;
+    return {
+      shotUp: !!(b.shot && b.live),
+      shotFrom: sh && r ? Math.hypot(sh.x - r.x, sh.z - r.z) : 0,
+      score: h.home + h.away, msg: h.msg, stam: h.stam, coins: h.coins,
+      freeThrow: !!half.freeThrow, fouls: half.fouls || {},
+      botStam: Math.min(...half.players.filter((q) => !q.you).map((q) => q.stam)),
+      tally: half.tally,
+    };
+  },
   startHalf,
   startFull: () => startHalf('full'),
   camX: () => (half ? +half.camX(CAM[court].hw * 2).toFixed(2) : null),

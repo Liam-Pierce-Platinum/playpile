@@ -3,9 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PLAYPILE — 23 games, free, in your browser</title>
-<meta name="description" content="21 browser games: shooters, puzzles and arcade. No sign-up, no download, plays on the phone.">
+<title>PLAYPILE — 23 free games in your browser</title>
+<meta name="description" content="23 browser games: shooters, racers, puzzles, classics and quick arcade games. No sign-up, no download, plays on the phone.">
 <link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<script type="module" src="/site/account.js"></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>🕹️</text></svg>">
 <!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
      this is the tag Google looks for when it verifies the site, so it
@@ -15,117 +18,244 @@
      crossorigin="anonymous"></script>
 </head>
 <body>
+<a class="skip" href="#main">Skip to the games</a>
 
-<header class="top">
-  <div class="bar">
-    <a class="logo" href="/">PLAY<b>PILE</b></a>
-    <nav class="links">
-      <a href="/" class="on">All games</a>
-      <a href="#big">Big</a>
-      <a href="#quick">Quick</a>
-      <a href="/site/about.html">About</a>
-    </nav>
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games, e.g. puzzle, 2 player, racing" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
   </div>
-</header>
+</div></header>
 
-<main class="wrap">
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
 
-  <section class="hero">
-    <div class="count" id="count">— games</div>
-    <h1>23 games. No sign-up, no download.</h1>
-    <p>Five big ones built over the last months, and sixteen quick ones for when you have
-       four minutes. Everything here runs in the browser and remembers your best score.</p>
-  </section>
+  <main id="main">
+    <!-- the hero, built from the catalogue -->
+    <section class="hero" id="hero"></section>
 
-  <!-- the leaderboard everybody has, above the fold, out of the way -->
-  <div id="ad-home-leader"></div>
+    <!-- THE AD SLOTS LIVE OUTSIDE THE ROWS ON PURPOSE.
+         Searching and filtering rewrite the row containers; if an advert
+         sat inside one, every keystroke would destroy and recreate a
+         live AdSense unit, which is both a policy problem and a page
+         that jumps about. The slots below are written once and never
+         touched again. -->
+    <div id="ad-home-leader"></div>
 
-  <div class="home-cols">
-  <div>
-  <div class="sec" id="big">
-    <h2>The big ones</h2><span>five</span><div class="rule"></div>
-  </div>
-  <div class="grid big" id="grid-big"></div>
+    <div class="cols">
+      <div>
+        <div id="rowsA"></div>
+        <div id="ad-home-inline"></div>
+        <div id="rowsB"></div>
+        <div id="ad-home-row1"></div>
+        <div id="rowsC"></div>
+        <div id="ad-home-row2"></div>
+        <div id="rowsD"></div>
+      </div>
+      <aside class="homerail"><div id="ad-home-rail"></div></aside>
+    </div>
 
-  <div id="ad-home-inline"></div>
-
-  <div class="sec" id="quick">
-    <h2>Quick games</h2><span>ten &middot; under five minutes</span><div class="rule"></div>
-  </div>
-  <div class="grid" id="grid-small"></div>
-  </div>
-
-  <!-- down the right-hand side on wide screens, sticky -->
-  <aside class="home-rail"><div id="ad-home-rail"></div></aside>
-  </div>
-
-</main>
-
-<footer class="foot"><div class="wrap"><div class="row">
-  <span>PLAYPILE</span>
-  <span>23 games, all free.</span>
-  <span class="sp"></span>
-  <a href="/site/about.html">About</a>
-  <a href="/site/advertise.html">Advertise</a><a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
-</div></div></footer>
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">23 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/#c=Arcade">Arcade</a><a href="/#c=Classic">Classic</a>
+          <a href="/#c=Puzzle">Puzzle</a><a href="/#c=Sport">Sport</a>
+          <a href="/#c=Action">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
 
 <script type="module">
-import { GAMES } from '/site/catalogue.js';
+import { GAMES, mountShell, categories, catOf, search, recent, card, tile, row }
+  from '/site/shell.js';
 import { loadAds, slot } from '/ads/ads.js';
 
-window.__PLAYPILE_GAMES = GAMES;
-document.getElementById('count').textContent = GAMES.length + ' games';
+const $ = (id) => document.getElementById(id);
+const A = $('rowsA'), B = $('rowsB'), C = $('rowsC'), D = $('rowsD');
+const q = $('q');
 
-// A card. The shot is a background image with the title behind it, so a
-// game whose screenshot has not been taken yet still looks deliberate
-// instead of showing a broken image.
-const card = (g) => `
-  <a class="card" href="/play/${g.slug}">
-    <div class="shot">
-      <div class="fallback">${g.title.slice(0, 2)}</div>
-      <img src="/shots/${g.slug}.png" alt="${g.title}" loading="lazy"
-           onerror="this.remove()"
-           onload="if(this.naturalHeight>this.naturalWidth)this.classList.add('tall')">
-      <div class="tag">${g.tag}</div>
-    </div>
-    <div class="body">
-      <h3>${g.title}</h3>
-      <p>${g.blurb}</p>
-      <div class="foot">
-        <span class="play">PLAY &rarr;</span>
-        ${g.heavy ? '<span class="note">big download</span>' : ''}
-      </div>
-    </div>
-  </a>`;
+// ---------------------------------------------------------------------
+// THE HERO
+// ---------------------------------------------------------------------
+// One big game with its blurb and a PLAY button, four more beside it.
+// It rotates through the big games by the day, so the front page is not
+// the same picture every time somebody comes back, and it is stable
+// within a day so a link somebody sends still shows what they saw.
+const bigs = GAMES.filter((g) => g.big);
+const day = Math.floor(Date.now() / 86400000);
+const feature = bigs[day % bigs.length];
+const beside = bigs.filter((g) => g !== feature).slice(0, 4);
+$('hero').innerHTML =
+  '<a class="hero-main" href="/play/' + feature.slug + '">'
+  + '<img src="/shots/' + feature.slug + '.png" alt="" onerror="this.remove()">'
+  + '<span class="veil"></span>'
+  + '<span class="copy">'
+  + '<span class="kicker">Featured &middot; ' + catOf(feature) + '</span>'
+  + '<h2>' + feature.title + '</h2>'
+  + '<p>' + feature.blurb + '</p>'
+  + '<span class="go">Play free &rarr;</span>'
+  + '</span></a>'
+  + '<div class="hero-side">' + beside.map(tile).join('') + '</div>';
 
-// The fallback initials must sit BEHIND the screenshot, and a background
-// image on the same element does that for free - if the file is missing
-// the initials are what is left.
-document.getElementById('grid-big').innerHTML =
-  GAMES.filter((g) => g.big).map(card).join('');
-document.getElementById('grid-small').innerHTML =
-  GAMES.filter((g) => !g.big).map(card).join('');
+// ---------------------------------------------------------------------
+// THE FRONT PAGE: rows, the way a portal reads
+// ---------------------------------------------------------------------
+const cats = categories();
+const byCat = (n) => GAMES.filter((g) => catOf(g) === n);
+const fresh = GAMES.filter((g) => (g.tags || []).includes('new'));
 
-// ADVERTS BETWEEN ROWS. Each is given an explicit grid-row and a full row
-// of columns, and CSS grid's auto-placement flows the cards around it - so
-// it always lands after two whole rows, then after four more, however many
-// columns the screen has. Inserting it after the Nth card instead would
-// break a row in half on every width but one.
-const small = document.getElementById('grid-small');
-for (const [row, name] of [[3, 'home_row1'], [8, 'home_row2']]) {
-  const d = document.createElement('div');
-  d.style.gridRow = String(row);
-  d.dataset.adRow = name;
-  small.appendChild(d);
+function front() {
+  A.innerHTML =
+    row('Recently played', recent(), { seeAll: '/#r=recent' })
+    + row('Popular now', bigs, { seeAll: '/#r=popular', wide: true });
+  B.innerHTML =
+    row('New on PLAYPILE', fresh, { seeAll: '/#r=new' })
+    + row('Quick games &middot; under five minutes', GAMES.filter((g) => !g.big),
+          { seeAll: '/#r=quick' });
+  // a row per category that has enough games to fill one
+  C.innerHTML = cats.filter((c) => c.count >= 3)
+    .map((c) => row(c.name + ' games', byCat(c.name),
+                    { seeAll: '/#c=' + encodeURIComponent(c.name) })).join('');
+  D.innerHTML = row('All ' + GAMES.length + ' games', GAMES, {});
+  document.title = 'PLAYPILE — ' + GAMES.length + ' free games in your browser';
+  adsync();
 }
 
+// one grid, one heading - what a category link or a search lands on
+function only(heading, list) {
+  A.innerHTML = '<section class="row"><div class="rowhead"><h2>' + heading + '</h2>'
+    + '<span class="n">' + list.length + '</span>'
+    + '<a class="seeall" href="/">&lsaquo; All games</a></div>'
+    + (list.length
+        ? '<div class="strip">' + list.map(card).join('') + '</div>'
+        : '<div class="empty"><b>Nothing matched that</b>'
+          + 'Try a category on the left, or one of: puzzle, racing, 2 player, retro, mobile.</div>')
+    + '</section>';
+  B.innerHTML = C.innerHTML = '';
+  // one row of something to play, so a narrow result is never a dead end
+  D.innerHTML = list.length === GAMES.length ? '' : row('Popular now', bigs, { seeAll: '/#r=popular' });
+  adsync();
+}
+
+// AN ADVERT NEEDS CONTENT AROUND IT. The four home slots are written
+// once and never rebuilt - rebuilding a live AdSense unit on every
+// keystroke is both a policy problem and a page that jumps - but on a
+// filtered view the rows between them are empty, and three ad boxes
+// stacked on each other with nothing in between is exactly what an ad
+// network refuses a site for. So a slot with no row after it is HIDDEN,
+// not removed: the element and its id stay exactly where they were.
+const ROWADS = [['ad-home-inline', B], ['ad-home-row1', C], ['ad-home-row2', D]];
+const filled = new Set();
+let adsReady = false;
+function adsync() {
+  for (const [id, el] of ROWADS) $(id).style.display = el.innerHTML.trim() ? '' : 'none';
+  if (!adsReady) return;
+  // AND FILL A SLOT ONLY ONCE IT IS ON SCREEN. Pushing an AdSense unit
+  // into a display:none box throws "no slot size for availableWidth=0"
+  // out of Google's own script, asynchronously, where no try/catch of
+  // ours can reach it - which is what landing straight on /#c=Arcade
+  // used to do. A slot that is hidden is simply not requested yet; it
+  // gets its unit the moment a view puts rows back around it.
+  for (const [id, name] of [['ad-home-inline', 'home_inline'],
+                            ['ad-home-row1', 'home_row1'],
+                            ['ad-home-row2', 'home_row2']]) {
+    if ($(id).style.display !== 'none' && !filled.has(id)) { filled.add(id); slot($(id), name); }
+  }
+}
+
+// ---------------------------------------------------------------------
+// ROUTING - a hash, because a static host has no server to ask
+// ---------------------------------------------------------------------
+const VIEWS = {
+  popular: () => ['The big ones', bigs],
+  quick:   () => ['Quick games', GAMES.filter((g) => !g.big)],
+  new:     () => ['New on PLAYPILE', fresh],
+  recent:  () => ['Recently played', recent()],
+  all:     () => ['All ' + GAMES.length + ' games', GAMES],
+};
+
+function route() {
+  const h = new URLSearchParams(location.hash.replace(/^#/, ''));
+  const c = h.get('c'), term = h.get('q'), r = h.get('r');
+  document.getElementById('hero').style.display = (c || term || r) ? 'none' : '';
+
+  if (term !== null) {
+    q.value = term;
+    const hits = search(term);
+    only(term.trim() ? 'Results for &ldquo;' + term + '&rdquo;' : 'All games', hits);
+  } else if (c) {
+    q.value = '';
+    document.title = c + ' games — PLAYPILE';
+    only(c + ' games', byCat(c));
+  } else if (r && VIEWS[r]) {
+    q.value = '';
+    const [heading, list] = VIEWS[r]();
+    only(heading, list);
+  } else {
+    q.value = '';
+    front();
+  }
+  // light up the right thing in the rail
+  document.querySelectorAll('#sidenav .navlink').forEach((a) => {
+    a.classList.toggle('on', a.getAttribute('href') === (location.pathname + location.hash)
+      || (!location.hash && a.getAttribute('href') === '/'));
+  });
+  scrollTo({ top: 0 });
+}
+
+mountShell({
+  active: 'home',
+  onSearch: (v) => {
+    const t = v.trim();
+    // replaceState, not a new entry: typing eight letters should not put
+    // eight pages in the back button
+    history.replaceState(null, '', t ? '#q=' + encodeURIComponent(t) : location.pathname);
+    document.getElementById('hero').style.display = t ? 'none' : '';
+    if (t) only('Results for &ldquo;' + t + '&rdquo;', search(t)); else front();
+  },
+});
+route();
+addEventListener('hashchange', route);
+
+// ---------------------------------------------------------------------
+// ADVERTS - every slot that existed before, in the same place
+// ---------------------------------------------------------------------
 await loadAds();
-slot(document.getElementById('ad-home-leader'), 'home_leader');
-slot(document.getElementById('ad-home-inline'), 'home_inline');
-for (const d of small.querySelectorAll('[data-ad-row]')) slot(d, d.dataset.adRow);
-// only on a screen wide enough to show the rail, or it would request an
+slot($('ad-home-leader'), 'home_leader');
+// only where the rail is actually on screen, or it would request an
 // advert nobody can see
-if (matchMedia('(min-width:1400px)').matches) slot(document.getElementById('ad-home-rail'), 'home_rail');
+if (matchMedia('(min-width:1500px)').matches) slot($('ad-home-rail'), 'home_rail');
+// home_inline, home_row1 and home_row2 - each filled by adsync() as soon
+// as its view puts rows around it
+adsReady = true;
+adsync();
 </script>
 </body>
 </html>

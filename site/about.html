@@ -4,7 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>About — PLAYPILE</title>
+<meta name="description" content="What PLAYPILE is, who made it, and the rules it keeps about advertising.">
 <link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<script type="module" src="/site/account.js"></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>🕹️</text></svg>">
 <!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
      this is the tag Google looks for when it verifies the site, so it
@@ -14,52 +18,100 @@
      crossorigin="anonymous"></script>
 </head>
 <body>
+<a class="skip" href="#main">Skip to the content</a>
+
 <header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
   <a class="logo" href="/">PLAY<b>PILE</b></a>
-  <nav class="links"><a href="/">All games</a><a href="/site/about.html" class="on">About</a>
-    <a href="/site/advertise.html">Advertise</a></nav>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
 </div></header>
 
-<main class="wrap" style="max-width:760px">
-  <section class="hero">
-    <h1>About</h1>
-    <p>Sixteen browser games in one place. Nothing to install, no account, and every
-       game keeps your best score in your own browser.</p>
-  </section>
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
 
-  <section class="about" style="margin-top:26px">
-    <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:0 0 8px">The five big ones</h2>
-    <p>HIGHRISE, KICKBACK, LIGHTS OUT, EXPOSURE and DUNGEON QUEST are full projects, each
-       built over weeks. HIGHRISE is a thirty-one storey tower you climb floor by floor;
-       DUNGEON QUEST is an N64-style crawler with four levels, three classes and a black
-       dragon at the end of it.</p>
+  <main id="main">
+    <div class="prose">
+      <section class="hero">
+        <h1>About PLAYPILE</h1>
+        <p id="lede">Browser games in one place. Nothing to install, no account needed,
+           and every game keeps your best score in your own browser.</p>
+      </section>
 
-    <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:22px 0 8px">The ten quick ones</h2>
-    <p>Written to be finished in one sitting: a stacker, a breakout, an asteroids, a
-       runner, a merge puzzle, a pipe puzzle, a minesweeper, a reaction duel, a hoops
-       game and a volleyball. They all run on the same small engine, so they behave the
-       same way on a phone as on a desktop, and all of them work with one finger.</p>
+      <h2>The big ones</h2>
+      <p>HIGHRISE, KICKBACK, LIGHTS OUT, EXPOSURE, DUNGEON QUEST, APEX, NIGHT SHIFT and
+         GRIND CITY are full projects, each built over weeks. HIGHRISE is a thirty-one
+         storey tower you climb floor by floor; DUNGEON QUEST is an N64-style crawler with
+         four levels, three classes and a black dragon at the end of it; APEX is five real
+         Formula&nbsp;1 circuits with a manual gearbox.</p>
 
-    <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:22px 0 8px">Adverts</h2>
-    <p>There are advertising slots on this site, and there are rules about them: none
-       over a game that is being played, none that move, none that make a noise, and
-       none inside the game itself. The only one you will meet mid-flow is a short panel
-       while a game loads, and it is skippable.</p>
+      <h2>The quick ones</h2>
+      <p>Written to be finished in one sitting: a stacker, a breakout, an asteroids, a
+         runner, a merge puzzle, a pipe puzzle, a minesweeper, a reaction duel, a hoops
+         game, a volleyball, and the classics. They all run on the same small engine, so
+         they behave the same way on a phone as on a desktop, and all of them work with
+         one finger.</p>
 
-    <div class="tip">Every game runs in your browser. Nothing installs, nothing needs an account, and your best scores are kept on your own machine.</div>
-  </section>
-</main>
+      <h2>Adverts</h2>
+      <p>There are advertising slots on this site, and there are rules about them: none
+         over a game that is being played, none that move, none that make a noise, and
+         none inside the game itself. The only one you will meet mid-flow is a short panel
+         while a game loads, and it is skippable.</p>
 
-<footer class="foot"><div class="wrap"><div class="row">
-  <span>PLAYPILE</span><span class="sp"></span>
-  <a href="/">All games</a><a href="/site/advertise.html">Advertise</a><a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
-</div></div></footer>
+      <div class="tip">Every game runs in your browser. Nothing installs, nothing needs
+        an account, and your best scores are kept on your own machine.</div>
 
-<!-- no ad slots on this page, but it does load the ad script, so it owes
-     the visitor the same cookie notice as everywhere else -->
+      <div id="picks"></div>
+    </div>
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">23 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/#c=Arcade">Arcade</a><a href="/#c=Classic">Classic</a>
+          <a href="/#c=Puzzle">Puzzle</a><a href="/#c=Sport">Sport</a>
+          <a href="/#c=Action">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
 <script type="module">
-  import { loadAds } from '/ads/ads.js';
-  loadAds();
+import { GAMES, mountShell, row } from '/site/shell.js';
+import { loadAds } from '/ads/ads.js';
+mountShell({ active: 'about' });
+document.getElementById('lede').textContent =
+  GAMES.length + ' browser games in one place. Nothing to install, no account needed, '
+  + 'and every game keeps your best score in your own browser.';
+document.getElementById('picks').innerHTML =
+  row('Start with one of these', GAMES.filter((g) => g.big).slice(0, 6), { seeAll: '/' });
+// no ad slots on this page, but it does load the ad script, so it owes
+// the visitor the same cookie notice as everywhere else
+loadAds();
 </script>
 </body>
 </html>

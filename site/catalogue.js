@@ -17,6 +17,7 @@ export const GAMES = [
     slug: 'highrise', title: 'HIGHRISE', how: 'mounted', port: 8141, url: '/?play',
     web: 'highrise/?play',
     tag: 'Shooter', big: true,
+    cat: 'Shooter', tags: ['fps', 'guns', '3d', 'tower', 'singleplayer', 'first person'],
     blurb: 'Thirty-one storeys of a 2000s Manhattan tower, and you go up all of them.',
     about: `One building, not thirty-one levels: every floor exists at its real
     height in the same world at the same time, so you climb actual stairs and can
@@ -31,6 +32,7 @@ export const GAMES = [
     slug: 'kickback', title: 'KICKBACK', how: 'mounted', port: 8157, url: '/',
     web: 'kickback/',
     tag: 'Action', big: true,
+    cat: 'Action', tags: ['shotgun', 'platformer', 'physics', '2d', 'guns'],
     blurb: 'A sawed-off with two shells in it, and the shells are your legs.',
     about: `Six floors of an unfinished tower over the harbour with downtown across
     the water. Fire it at the floor and it throws you; fire it at a man and it is a
@@ -43,6 +45,7 @@ export const GAMES = [
     slug: 'lightsout', title: 'LIGHTS OUT', how: 'mounted', port: 8154, url: '/',
     web: 'lightsout/',
     tag: 'Horror', big: true,
+    cat: 'Horror', tags: ['dark', 'torch', '3d', 'survival', 'scary', 'first person'],
     blurb: 'A dark house, a torch, six switches, and something nine feet tall.',
     about: `You are standing in a dark house holding a torch. There are six light
     switches, and the house does not want you to reach them. The torch throws real
@@ -56,6 +59,7 @@ export const GAMES = [
     slug: 'exposure', title: 'EXPOSURE', how: 'mounted', port: 8151, url: '/',
     web: 'exposure/',
     tag: 'Horror', big: true,
+    cat: 'Horror', tags: ['dark', 'shooting', 'atmospheric', '2d', 'scary'],
     blurb: 'The deck is pitch black. Your muzzle flash is the only light, and it freezes.',
     about: `Firing lights the room for an instant, and that instant STAYS on the
     screen - cold, grainy and still - while everything in the actual room keeps
@@ -67,6 +71,7 @@ export const GAMES = [
     slug: 'dungeon-quest', title: 'DUNGEON QUEST', how: 'mounted', port: 8124, url: '/',
     web: 'dungeon-quest/',
     tag: 'Adventure', big: true,
+    cat: 'Adventure', tags: ['rpg', 'dungeon', 'retro', '3d', 'dragon', 'n64'],
     blurb: 'An N64 dungeon crawler: four levels, three classes, and a black dragon at the end.',
     about: `A forest between the cliffs, a mine shaft, a frozen mountain that actually
     climbs, and a ledge on a black cliff - then the dragon that took the kingdom. Knight,
@@ -81,6 +86,7 @@ export const GAMES = [
     slug: 'apex', title: 'APEX', how: 'mounted', port: 8201, url: '/',
     web: 'apex/',
     tag: 'Racing', big: true,
+    cat: 'Driving', tags: ['new', 'racing', 'f1', 'cars', 'simulation', '3d', 'track'],
     blurb: 'Five real Formula 1 circuits, a manual eight-speed box, and grip that grows with speed.',
     about: `Monza, Silverstone, Suzuka, Spa and Monaco, each laid out from its real
     corner sequence and solved until the lap closes to under a metre and measures the
@@ -98,6 +104,7 @@ export const GAMES = [
     slug: 'night-shift', title: 'NIGHT SHIFT', how: 'mounted', port: 8130, url: '/',
     web: 'night-shift/',
     tag: 'Crime', big: true,
+    cat: 'Action', tags: ['new', 'crime', 'driving', 'stealth', 'top down', 'cars', 'open world'],
     blurb: 'Do the job, and do not get caught. They have to kill you to stop you.',
     about: `A top-down city at night, and a police force that does not look for YOU -
     it looks for a description, built one line at a time out of what you left at the
@@ -114,6 +121,7 @@ export const GAMES = [
     slug: 'grind-city', title: 'GRIND CITY', how: 'mounted', port: 8126, url: '/',
     web: 'grind-city/',
     tag: 'Sport', big: true,
+    cat: 'Sport', tags: ['new', 'skateboard', 'pixel', 'tricks', '2d', 'street'],
     blurb: 'A 2D pixel skater where the mouse IS the board, not a pointer.',
     about: `Your hand is your weight on the deck. Slide to a tip and flick sideways and
     it flips; push down in the middle and it spins flat; push down over a tip and it
@@ -132,6 +140,7 @@ export const GAMES = [
   // ---- the ten written for the deck --------------------------------
   {
     slug: 'stack', title: 'STACK', how: 'local', tag: 'Skill',
+    cat: 'Arcade', tags: ['one button', 'tower', 'skill', 'mobile', 'timing'],
     blurb: 'Drop each slab on the one below. What hangs over gets sliced off and falls.',
     about: `One button, seen from the side in real solids: each slab is a lit block with a
     shaded edge, so you can see the overhang before you drop, and the piece that gets cut
@@ -142,6 +151,7 @@ export const GAMES = [
   },
   {
     slug: 'bricks', title: 'BRICKS', how: 'local', tag: 'Arcade',
+    cat: 'Arcade', tags: ['breakout', 'paddle', 'retro', 'mobile', 'ball'],
     blurb: 'Breakout, with a paddle that is exactly as wide as your last mistake.',
     about: `Ten columns, a row of steel that moves down the wall every level, and five
     drops worth leaving the ball for. The paddle shrinks the longer a wall takes and
@@ -153,6 +163,7 @@ export const GAMES = [
   },
   {
     slug: 'drifter', title: 'DRIFTER', how: 'local', tag: 'Arcade',
+    cat: 'Arcade', tags: ['asteroids', 'space', 'shooting', 'retro', 'ship'],
     blurb: 'Rocks, a small ship, and bullets that cost the fuel you steer with.',
     about: `Asteroids with one rule changed: the gun and the engine come out of the same
     tank. Shooting a rock is easy; shooting everything is how you end up drifting into
@@ -164,6 +175,7 @@ export const GAMES = [
   },
   {
     slug: 'hopper', title: 'HOPPER', how: 'local', tag: 'Endless',
+    cat: 'Arcade', tags: ['endless', 'runner', 'pixel', 'one button', 'mobile', 'jumping'],
     blurb: 'One button, one long night on the rooftops, and a jump as high as you hold it.',
     about: `An endless runner in pixel art, back on the rooftops at night: lit windows,
     neon, water towers and aerials going past in three depths. The jump is analogue -
@@ -175,6 +187,7 @@ export const GAMES = [
   },
   {
     slug: 'merge', title: 'MERGE', how: 'local', tag: 'Puzzle',
+    cat: 'Puzzle', tags: ['merge', 'physics', 'fruit', 'mobile', 'relaxing', 'match'],
     blurb: 'Drop the fruit in, match two, get a bigger one. A thousand stages of it.',
     about: `Real rolling physics in a glass jar. Two of the same touch and become the next
     one up - a thousand stages of it. Past the eleventh the sizes start again and the
@@ -185,6 +198,7 @@ export const GAMES = [
   },
   {
     slug: 'pipeworks', title: 'PIPEWORKS', how: 'local', tag: 'Puzzle',
+    cat: 'Puzzle', tags: ['pipes', 'water', 'logic', 'levels', 'tiles'],
     blurb: 'Six rooms of pipe by hand, then it generates them for ever.',
     about: `The cellar, the waterworks, the boiler, the roof, the foundry and the deep -
     each with its own room and one new idea: pipes bolted down that cannot be turned, and
@@ -195,6 +209,7 @@ export const GAMES = [
   },
   {
     slug: 'sweep', title: 'SWEEP', how: 'local', tag: 'Puzzle',
+    cat: 'Puzzle', tags: ['minesweeper', 'logic', 'mines', 'timed', 'board'],
     blurb: 'Minesweeper on a clock, at whatever size and difficulty you can stand.',
     about: `Four board sizes and four difficulties, from an 11% board with room to think
     to a 26% one past the density where logic alone gets you home. Boards come one after
@@ -205,6 +220,7 @@ export const GAMES = [
   },
   {
     slug: 'quickdraw', title: 'QUICKDRAW', how: 'local', tag: 'Reaction',
+    cat: 'Shooter', tags: ['reaction', 'western', 'duel', '2 player', 'aim'],
     blurb: 'Hand on the holster. One shot each, then hands down, until one of you drops.',
     about: `Keep the pointer on your holster through the wait. Leaving early is a re-do
     rather than a death - but three of them in one fight and you stand through the next
@@ -224,24 +240,36 @@ export const GAMES = [
   },
   {
     slug: 'hoops', title: 'HOOPS', how: 'local', tag: 'Sport',
-    blurb: 'Streetball on a half court, the proper game on a full one, or ten balls on the spot.',
+    cat: 'Sport', tags: ['new', 'basketball', 'multiplayer', 'online', '2 player', 'ball'],
+    blurb: 'Streetball on the blacktop or a full game in the arena - alone, or online with a friend.',
     about: `Three games on one side-on court. HALF COURT is streetball: one ring, both teams
-    attacking it, ones and twos, first to eleven and win by two, and a team that wins the ball
-    has to take it back behind the check line before it can score. FULL COURT is the real thing:
-    two rings, twos and threes, two minutes on the clock, and the camera runs with the ball to
-    whichever end it is at. STAND STILL is the old game - one spot, ten balls, a moving hoop and
-    a streak. Pick how many a side. The players are low-poly bodies who dip into their knees as
-    you pull and release the ball out of their hands, the net is twelve strands of beads the ball
-    pushes through, and the crowd get on their feet when one goes in.`,
+    attacking it, first to eleven and win by two, and a team that wins the ball has to take it
+    back behind the check line. FULL COURT is the real thing: two rings, twos and threes, two
+    minutes on the clock, and the camera runs with the ball. STAND STILL is the old game - one
+    spot, ten balls, a moving hoop and a streak.
+
+    The other players actually play basketball: they pick a man and stay with him, deny the pass,
+    sag off and help in the lane, and run plays - pick and roll, give and go, a back-door cut -
+    and they miss, especially from distance and especially tired. Everything you do costs
+    STAMINA: sprinting, guarding, jumping, swiping at the ball and shooting, so a tired player is
+    slower, jumps lower and shoots worse.
+
+    Play it on the BLACKTOP, with a chain-link fence, a city block and people hanging over the
+    railings, or in an ARENA with a full bowl, a scoreboard and banners. Baskets, steals and
+    blocks pay COINS, and coins buy jersey designs, street tees, baggy jeans, shoes, hair and
+    caps - or a bigger stamina tank. And you can PLAY ONLINE: one of you hosts a room, the
+    other types the four-letter code, and you are in the same match.`,
     controls: [['A D', 'back and forward, the way you are attacking'],
                ['W S', 'away from the camera and towards it'],
-               ['Drag', 'aim and power - let go in the green band for a clean look'],
-               ['Click', 'pass to a team-mate, or swat at the ball'],
+               ['Drag', 'aim and shoot - let go in the green band for a clean look'],
+               ['Hold Q + drag', 'pass where you point'],
+               ['Click', 'pass to a team-mate, or swipe at the ball'],
                ['Shift', 'guard'], ['Space', 'jump - rebound, block or dunk']],
-    tips: 'The green band on the power ring is the shot that drops through the middle from where you stand.',
+    tips: 'Time a jump into the flight of a shot and you can take it out of the air.',
   },
   {
     slug: 'spike', title: 'SPIKE', how: 'local', tag: 'Sport',
+    cat: 'Sport', tags: ['volleyball', 'physics', '2 player', 'ball', 'jelly'],
     blurb: 'Two jelly slimes, one ball, one net, first to eleven. Bring a friend.',
     about: `Volleyball with the rules taken out: no touch limit, no positions, just a ball that
     must not land on your side. The slimes are jelly - a spring for the squash and four
@@ -261,6 +289,7 @@ export const GAMES = [
   // ---- the classics ------------------------------------------------
   {
     slug: 'snake', title: 'SNAKE', how: 'local', tag: 'Classic',
+    cat: 'Classic', tags: ['snake', 'retro', 'arcade', 'mobile', '80s'],
     blurb: 'Every fifth apple leaves a block where you ate it.',
     about: `Plain Snake is solved - you learn to fold it into rows and then it is a
     chore with a timer. So this one fights back: every fifth apple drops a wall block
@@ -273,6 +302,7 @@ export const GAMES = [
   },
   {
     slug: 'lines', title: 'LINES', how: 'local', tag: 'Classic',
+    cat: 'Classic', tags: ['blocks', 'falling', 'retro', 'puzzle', '80s'],
     blurb: 'Seven shapes, ten columns, and a piece that lands still has half a second.',
     about: `The falling-block game with the four details that decide whether it feels
     right: a landed piece gets half a second in which it can still be slid or spun, the
@@ -285,6 +315,7 @@ export const GAMES = [
   },
   {
     slug: 'rally', title: 'RALLY', how: 'local', tag: 'Classic',
+    cat: 'Classic', tags: ['pong', 'bat and ball', 'retro', '2 player', '70s'],
     blurb: 'Two bats and a ball. Where it hits the bat is where it goes.',
     about: `The oldest one there is, with the rule most copies get wrong left in: the
     ball leaves at an angle set by WHERE on the bat it struck, so the middle sends it
@@ -296,6 +327,7 @@ export const GAMES = [
   },
   {
     slug: 'invasion', title: 'INVASION', how: 'local', tag: 'Classic',
+    cat: 'Classic', tags: ['space', 'shooting', 'retro', 'aliens', '70s'],
     blurb: 'Five rows of them, and they march faster the fewer are left.',
     about: `The 1978 one. The whole arc of it is an accident of the original hardware
     that turned out to be the design: with fewer aliens on screen the machine redrew
@@ -307,6 +339,7 @@ export const GAMES = [
   },
   {
     slug: 'crossing', title: 'CROSSING', how: 'local', tag: 'Endless',
+    cat: 'Arcade', tags: ['new', 'endless', 'hopping', 'traffic', 'mobile', 'one life'],
     blurb: 'It never ends, and the bottom of the screen is rising. How far did you get?',
     about: `Road and river, generated forever as they come into view, and they play as
     opposites - on the road touching anything kills you, on the river touching NOTHING

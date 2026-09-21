@@ -1,0 +1,3 @@
+{
+  "_readme": "NO CLOUD ACCOUNT IS CONFIGURED, and this file is deliberately empty of an apiKey and a projectId so that site/account.js keeps its honest 'profiles only' fallback exactly as it does with no file at all. It exists for one reason: account.js fetches this path on every page, and when the answer was a 404 its body was never read, so the request stayed open for ever and every Playwright tool on this site (tools/pages.mjs, ready.mjs, webcheck.mjs) waited for a 'networkidle' that never arrived. A real response that gets parsed closes the request. To switch cloud accounts ON, fill this in from ACCOUNTS.md step 7; the proper fix on the other side is to drain or cancel a not-ok response body in loadCloudConfig()."
+}

@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Not found — PLAYPILE</title>
 <link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<script type="module" src="/site/account.js"></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>🕹️</text></svg>">
 <!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
      this is the tag Google looks for when it verifies the site, so it
@@ -14,50 +17,79 @@
      crossorigin="anonymous"></script>
 </head>
 <body>
+<a class="skip" href="#main">Skip to the games</a>
+
 <header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
   <a class="logo" href="/">PLAY<b>PILE</b></a>
-  <nav class="links"><a href="/">All games</a><a href="/site/about.html">About</a>
-    <a href="/site/advertise.html">Advertise</a></nav>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
 </div></header>
 
-<main class="wrap" style="max-width:760px">
-  <section class="hero">
-    <h1>There is nothing here</h1>
-    <p>That page does not exist. It may have been a game that moved, or a link with a
-       typo in it. Everything that does exist is one click away.</p>
-    <p style="margin-top:18px"><a class="btn" href="/">All 23 games</a></p>
-  </section>
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
 
-  <section class="about" style="margin-top:26px">
-    <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:0 0 10px">Try one of these</h2>
-    <div id="some"></div>
-  </section>
-</main>
+  <main id="main">
+    <div class="prose" style="max-width:none">
+      <section class="hero">
+        <h1>There is nothing here</h1>
+        <p>That page does not exist. It may have been a game that moved, or a link with
+           a typo in it. Everything that does exist is one click away.</p>
+        <p style="margin-top:18px"><a class="btn" href="/" id="allbtn">All games</a></p>
+      </section>
+    </div>
 
-<footer class="foot"><div class="wrap"><div class="row">
-  <span>PLAYPILE</span><span class="sp"></span>
-  <a href="/">All games</a><a href="/site/about.html">About</a>
-  <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
-</div></div></footer>
+    <!-- A DEAD END SHOULD STILL OFFER SOMETHING. A 404 that only
+         apologises sends the visitor back to the tab bar; a shelf of
+         games sends some of them into one, which is the whole point. -->
+    <div id="picks"></div>
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">23 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/#c=Arcade">Arcade</a><a href="/#c=Classic">Classic</a>
+          <a href="/#c=Puzzle">Puzzle</a><a href="/#c=Sport">Sport</a>
+          <a href="/#c=Action">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
 
 <script type="module">
-// A DEAD END SHOULD STILL OFFER SOMETHING. A 404 that only apologises
-// sends the visitor back to the tab bar; six cards sends some of them
-// into a game, which is the whole point of a portal.
-import { GAMES } from '/site/catalogue.js';
-const six = GAMES.slice().sort(() => Math.random() - 0.5).slice(0, 6);
-document.getElementById('some').innerHTML = six.map((x) => `
-  <a class="mini" href="/play/${x.slug}">
-    <span class="th" style="background-image:url('/shots/${x.slug}.png')"></span>
-    <span><b>${x.title}</b><small>${x.tag}</small></span>
-  </a>`).join('');
-</script>
-
-<!-- no ad slots on this page, but it does load the ad script, so it owes
-     the visitor the same cookie notice as everywhere else -->
-<script type="module">
-  import { loadAds } from '/ads/ads.js';
-  loadAds();
+import { GAMES, mountShell, row } from '/site/shell.js';
+import { loadAds } from '/ads/ads.js';
+mountShell({});
+document.getElementById('allbtn').textContent = 'All ' + GAMES.length + ' games';
+document.getElementById('picks').innerHTML =
+  row('Try one of these', GAMES.slice().sort(() => Math.random() - 0.5).slice(0, 12), { seeAll: '/' });
+// no ad slots on this page, but it does load the ad script, so it owes
+// the visitor the same cookie notice as everywhere else
+loadAds();
 </script>
 </body>
 </html>

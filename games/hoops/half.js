@@ -41,6 +41,12 @@
 //             middle of the rim from where you are standing. Let go in
 //             the band for a clean look; outside it the ball is long or
 //             short by however far outside you were.
+//   HOLD Q    and DRAG: a PASS, thrown where the hand points and as hard
+//             as it was pulled. Liam: "make it if you hold Q and drag that
+//             makes it a pass". A team-mate in that direction takes it
+//             (led, so he runs onto it); nobody there and the ball goes
+//             that way anyway, which is how a ball ends up out of play.
+//             TAPPING Q on its own still finds the best man for you.
 //   CLICK     on a team-mate: PASS. On the man with the ball, when you
 //             have not got it: SWAT at the ball.
 //   SHIFT     GUARD. Arms up, feet moving: it slows the man you are in
@@ -68,7 +74,10 @@
 // `this.C` rather than a constant, so the two are one set of rules with
 // two shapes of floor.
 import { THREE, mat, box, paint, clamp, rnd, lerp, pick } from '../_deck/deck3d.js';
-import { person, ballTexture, boardTexture, makeNet, kitColours } from './kit.js';
+import { person, ballTexture, boardTexture, makeNet, kitColours, randomOutfit, HIP_Y } from './kit.js';
+import { playerOutfit, staminaMax, addCoins } from './wardrobe.js';
+import { packState, applyState } from './net.js';
+import { buildVenue, VENUES } from './venue.js';
 
 // ---------------------------------------------------------------------
 // the court, in world units. One unit is about 0.79 m - the scale the
@@ -218,70 +227,22 @@ export class HalfCourt {
    */
   #build(C) {
     if (this.world) { this.root.remove(this.world); this.world = null; }
+    if (this.venue && this.venue.dispose) { try { this.venue.dispose(); } catch (e) { /* going away anyway */ } this.venue = null; }
     const R = new THREE.Group();
     this.root.add(R);
     this.world = R;
-    const w = C.x1 - C.x0, d = C.z1 - C.z0;
-
-    const floor = new THREE.Mesh(new THREE.BoxGeometry(w + 3, 0.8, d + 3),
-      new THREE.MeshLambertMaterial({ map: boardTexture(10, 5) }));
-    floor.position.set((C.x0 + C.x1) / 2, FLOOR - 0.4, 0);
-    floor.receiveShadow = true;
-    R.add(floor);
-
-    // ---- the lines -------------------------------------------------
-    // Painted as thin boxes lying on the boards: the baseline, the key,
-    // the arc and the half-way line you check the ball behind.
-    const paintLine = (x, z, lw, ld, col = '#e8e2d2') => {
-      const m = box(lw, 0.02, ld, mat(col));
-      m.position.set(x, FLOOR + 0.02, z);
-      R.add(m);
-      return m;
-    };
-    // the half-way line - on a half court it is the line you take the
-    // ball back behind, on a full one it is half way
-    paintLine(C.check, 0, 0.16, d, C.id === 'half' ? '#d8ac4a' : '#e8e2d2');
-    // ...and per ring: a baseline, a key and an arc
-    for (const rim of C.rims) {
-      const base = rim.board + rim.face * 0.6;
-      paintLine(base, 0, 0.12, d);
-      const keyW = 6.1, keyD = 4.8;
-      paintLine(base - rim.face * keyW / 2, -keyD / 2, keyW, 0.12);
-      paintLine(base - rim.face * keyW / 2, keyD / 2, keyW, 0.12);
-      paintLine(base - rim.face * keyW, 0, 0.12, keyD);
-      for (let i = 0; i <= 26; i++) {
-        const a = -Math.PI / 2 + (i / 26) * Math.PI;
-        const x = rim.x - rim.face * Math.sin(a) * C.arc;
-        const z = rim.z + Math.cos(a) * C.arc;
-        if (x < C.x0 + 0.4 || x > C.x1 - 0.4 || Math.abs(z) > d / 2 - 0.1) continue;
-        const t = box(0.34, 0.02, 0.34, mat('#e8e2d2'));
-        t.position.set(x, FLOOR + 0.02, z);
-        R.add(t);
-      }
-    }
-
-    // ---- the stands, behind and above ------------------------------
-    const back = new THREE.Mesh(new THREE.BoxGeometry(w + 8, 26, 1), mat('#16202f'));
-    back.position.set(0, FLOOR + 12, C.z0 - 3.2);
-    back.receiveShadow = true;
-    R.add(back);
+    // ---- WHERE WE ARE PLAYING ------------------------------------------
+    // Liam: "make more detailed background and stuff and street ball". The
+    // floor, the paint, the stands, the crowd and everything behind them
+    // are a VENUE (venue.js): a polished arena, or a blacktop court in a
+    // city block with a chain-link fence round it. Everything in here that
+    // is not the venue is the game: the rings, the nets and the ball.
+    const kind = VENUES.includes(this.venueKind) ? this.venueKind : 'arena';
+    this.venue = buildVenue(kind, C, { seed: kind === 'street' ? 5 : 7 });
+    R.add(this.venue.group);
+    // the crowd belongs to the venue now; this list stays so that the old
+    // #poseCrowd has nothing to do rather than something to crash on
     this.crowd = [];
-    for (let row = 0; row < 3; row++) {
-      const y = FLOOR + 0.6 + row * 1.05, z = C.z0 - 1.0 - row * 0.55;
-      const tier = new THREE.Mesh(new THREE.BoxGeometry(w + 6, 1.05, 0.6),
-        mat(row % 2 ? '#1b2738' : '#202e42'));
-      tier.position.set(0, y, z);
-      R.add(tier);
-      for (let i = 0; i < 9; i++) {
-        const c = kitColours(rnd(0, 1), i);
-        const p = person(0.30, c.shirt, c.skin);
-        p.g.position.set(C.x0 + 1 + i * 2.2 + (row % 2 ? 1.1 : 0), y + 0.52, z);
-        p.seat = p.g.position.y;
-        p.phase = rnd(0, 6.283);
-        R.add(p.g);
-        this.crowd.push(p);
-      }
-    }
 
     // ---- the rings ---------------------------------------------------
     this.nets = [];
@@ -349,7 +310,8 @@ export class HalfCourt {
   start(size, mode) {
     if (size) this.size = clamp(size, 1, 5);
     this.C = COURTS[mode] || COURTS.half;
-    if (this.builtFor !== this.C.id) { this.#build(this.C); this.builtFor = this.C.id; }
+    const want = this.C.id + ':' + (this.venueKind || 'arena');
+    if (this.builtFor !== want) { this.#build(this.C); this.builtFor = want; }
     this.root.visible = true;
     // tear down any previous roster
     for (const p of this.players || []) { this.root.remove(p.body.g); this.root.remove(p.blob); }
@@ -357,7 +319,16 @@ export class HalfCourt {
     for (let t = 0; t < 2; t++) {
       for (let i = 0; i < this.size; i++) {
         const c = kitColours(TEAM[t].hue, i);
-        const body = person(0.5, c.shirt, c.skin);
+        // YOU WEAR WHAT YOU PICKED. Everyone else wears the team's kit -
+        // a jersey in the team colour on an arena floor, a street tee and
+        // jeans on the blacktop, because a team in matching vests on a
+        // park court is not what a park court looks like.
+        const you = t === 0 && i === 0;
+        const kind = this.venueKind === 'street' ? 'street' : 'jersey';
+        const fit = you ? { ...playerOutfit(), kind, shirt: '#' + new THREE.Color(c.shirt).getHexString() }
+                        : { ...randomOutfit(kind, c.shirt), number: 4 + i * 3 + t };
+        const body = person(0.5, c.shirt, c.skin, fit);
+        if (you) { /* your tank is whatever you have paid for */ }
         this.root.add(body.g);
         const p = {
           team: t, idx: i, you: t === 0 && i === 0,
@@ -366,12 +337,22 @@ export class HalfCourt {
           face: 1,                         // +1 looking towards the ring
           jump: 0, land: 0,
           guard: false, stance: 0,
+          // STAMINA. Liam: "make a stamina bar and swatting and jumping and
+          // shooting and stuff uses up stamina". It is spent by the things
+          // that cost a burst of effort and by running flat out, it comes
+          // back when you are standing still or walking, and when it is
+          // low you are slower, you do not get as high, and your shot
+          // wanders. Yours can be made bigger in the shop; everybody
+          // else's is one tank.
+          stam: 1, stamMax: 1,
           shotT: 1, passT: 1, swatT: 1,
           cool: 0, mark: null,
           // what this one is like, so a team is not five identical players
           speed: rnd(0.88, 1.12), aim: rnd(0.72, 1.0), iq: rnd(0.45, 0.95),
           reach: rnd(0.9, 1.15),
         };
+        if (p.you) p.stamMax = staminaMax();
+        p.stam = p.stamMax;
         this.players.push(p);
       }
     }
@@ -394,6 +375,59 @@ export class HalfCourt {
   }
 
   stop() { this.root.visible = false; }
+
+  // =====================================================================
+  // ONLINE. Liam: "add online multiplay through the site".
+  // =====================================================================
+  //
+  // The host's browser is the referee: it runs every rule in this file and
+  // sends out where everything ended up. A guest runs none of them - it
+  // draws what it is told, and sends its hands back. That is the only
+  // arrangement that cannot disagree with itself, and on a peer-to-peer
+  // connection between two browsers there is nobody else to ask.
+  //
+  // WHICH MAN YOU ARE: the host is the first player on the home side, and
+  // guests are handed out alternating sides, so two people online is one
+  // against one and four is two a side. Everyone else on the floor is a
+  // bot, refereed by the host like everything else.
+  setNet(net, role, slot = 0) {
+    this.net = net;
+    this.netRole = role;
+    this.netSlot = slot;
+    const order = [];
+    for (let i = 0; i < this.size; i++) { order.push([0, i]); order.push([1, i]); }
+    this.netSeats = order.map(([t, i]) => this.players.find((p) => p.team === t && p.idx === i)).filter(Boolean);
+    // the man each connection is driving; everyone else stays a bot
+    for (const p of this.players) p.remote = false;
+    this.netSeats.forEach((p, k) => { if (k > 0) p.remote = true; });
+    this.you.you = false;
+    this.you = this.netSeats[slot] || this.netSeats[0];
+    this.you.you = true;
+    this.you.remote = false;
+    this.you.stamMax = staminaMax();
+  }
+
+  /** a guest's hands, arriving from the wire */
+  netInput(slot, d) {
+    const p = this.netSeats && this.netSeats[slot];
+    if (!p || !d || !d.i) return;
+    p.netWant = [d.i[0], d.i[1]];
+    p.guard = !!(d.i[2] & 1);
+    if ((d.i[2] & 2) && p.y <= 0.001 && p.land <= 0 && this.#spend(p, 0.14)) { p.vy = 10.2 + 2.2 * this.#legs(p); p.land = 0.25; }
+    if (d.i[2] & 4) {
+      const c = this.ball.holder;
+      if (c && c.team !== p.team && this.#dist(p, c) < 3.4 * p.reach) this.#swat(p, c);
+      else if (this.ball.live && this.#ballDist(p) < 2.4) this.#grabLoose(p);
+    }
+    if (d.s && this.ball.holder === p) this.#shoot(p, d.s[0], d.s[1]);
+    if (d.p && this.ball.holder === p) this.#aimedPass(p, { power: d.p[0], angle: d.p[1] });
+  }
+
+  /** what the host sends out, twenty times a second */
+  netSnapshot(t) { return packState(this, t); }
+
+  /** what a guest does with it */
+  netApply(snap) { applyState(this, snap); }
 
   /**
    * EVERYBODY BACK TO THEIR SPOTS.
@@ -461,13 +495,118 @@ export class HalfCourt {
 
   #give(p) {
     const b = this.ball;
+    const was = this.possession;
     b.holder = p;
     b.live = false; b.scored = false; b.touched = false;
     b.vx = b.vy = b.vz = 0;
-    if (p) this.possession = p.team;
+    if (p) {
+      this.possession = p.team;
+      // A NEW POSSESSION IS A NEW PLAY, and the defence picks up its men
+      if (was !== p.team || !this.play || this.play.team !== p.team) this.#callPlay(p.team);
+      else if (this.play) this.play.carrier = p;
+    }
+  }
+
+  // =====================================================================
+  // BASKETBALL, NOT FIVE MEN CHASING A BALL
+  // =====================================================================
+  //
+  // Liam: "make the NPCs in hoops do actually basketball strategies with
+  // one on one guarding and plays and stuff".
+  //
+  // Two halves to it, and they are the two halves of the real game:
+  //
+  //   THE OFFENCE CALLS A PLAY at the start of every possession and the
+  //   whole team knows its job in it - who screens, who cuts, who stands
+  //   in the corner and waits. A play has PHASES with a clock, and it ends
+  //   when the shot goes up, the ball is lost or it runs out of time, and
+  //   then another is called. #callPlay picks one for the personnel it has.
+  //
+  //   THE DEFENCE PICKS ITS MAN ONCE and stays with him - it used to
+  //   re-choose every frame at random, which is not man-to-man, it is five
+  //   people lunging at whoever is nearest. Off that come the things man
+  //   defence is actually made of: DENY a man one pass away, SAG towards
+  //   the ball when your man is two passes away, HELP when the carrier
+  //   beats his man, and deal with a SCREEN by fighting over it or
+  //   switching (which is what makes the pick and roll worth running).
+  //
+  // The plays. They are all real ones and all simple ones:
+  //
+  //   ISO        clear a side and let the best handler go at his man
+  //   PICK       a screen on the ball: the screener steps in front of the
+  //              carrier's man, the carrier goes round him, the screener
+  //              then ROLLS to the ring or POPS back out for the pass
+  //   GIVE&GO    pass to a wing, cut hard to the ring, take it back
+  //   BACKDOOR   a wing whose man is overplaying him cuts in behind
+  //   MOTION     swing it round the arc until something opens up
+  //
+  // Every choice still goes through the bot's own IQ, so the bad ones set
+  // late screens, cut at the wrong moment and pass into traffic.
+  #callPlay(team) {
+    const mates = this.players.filter((p) => p.team === team);
+    const carrier = this.ball.holder && this.ball.holder.team === team ? this.ball.holder : mates[0];
+    const others = mates.filter((p) => p !== carrier);
+    const iq = carrier ? carrier.iq : 0.7;
+    let kinds = ['motion', 'iso'];
+    if (others.length >= 1) kinds = kinds.concat(['pick', 'pick', 'giveGo', 'backdoor']);
+    // a poor point guard runs less; a good one has a play on nearly every trip
+    const kind = Math.random() < 0.25 + (1 - iq) * 0.35 ? pick(['motion', 'iso']) : pick(kinds);
+    const helper = others.length ? others.reduce((a, b) => (this.#dist(carrier, a) < this.#dist(carrier, b) ? a : b)) : null;
+    this.play = {
+      team, kind, carrier, t: 0, phase: 'set',
+      screener: kind === 'pick' ? helper : null,
+      cutter: kind === 'giveGo' || kind === 'backdoor' ? (others.length ? pick(others) : null) : null,
+      target: null, screenSet: 0, used: false,
+    };
+    this.#assignMarks(1 - team);
+  }
+
+  /** man-to-man: one defender each, picked once and kept */
+  #assignMarks(team) {
+    const def = this.players.filter((p) => p.team === team);
+    const opp = this.players.filter((p) => p.team !== team);
+    const taken = new Set();
+    // the carrier gets the nearest defender; after that it is nearest-first
+    const carrier = this.ball.holder && this.ball.holder.team !== team ? this.ball.holder : null;
+    if (carrier && def.length) {
+      const d = def.reduce((a, b) => (this.#dist(a, carrier) < this.#dist(b, carrier) ? a : b));
+      d.mark = carrier; taken.add(carrier); taken.add(d);
+    }
+    for (const d of def) {
+      if (taken.has(d)) continue;
+      let best = null, bd = 1e9;
+      for (const q of opp) {
+        if (taken.has(q)) continue;
+        const dd = this.#dist(d, q);
+        if (dd < bd) { bd = dd; best = q; }
+      }
+      d.mark = best || opp[0] || null;
+      if (best) taken.add(best);
+      taken.add(d);
+    }
+  }
+
+  /** the two defenders swap men - what a switch on a screen actually is */
+  #switchMarks(a, b) {
+    if (!a || !b) return;
+    const m = a.mark; a.mark = b.mark; b.mark = m;
+    a.switched = 0.6; b.switched = 0.6;
+  }
+
+  /** is this man on the same side of the floor as the ball? */
+  #ballSide(p) {
+    const b = this.ball, bz = b.holder ? b.holder.z : b.z;
+    return Math.sign(p.z || 0.001) === Math.sign(bz || 0.001) || Math.abs(bz) < 1.2;
   }
 
   say(s, t = 1.6) { this.msg = s; this.msgT = t; }
+
+  /** coins in your pocket, for the shop on the home screen */
+  #earn(n, why) {
+    this.coins = (this.coins || 0) + n;
+    addCoins(n);
+    if (why === 'block' || why === 'steal') this.say('+' + n + ' \u2726', 0.9);
+  }
 
   // -------------------------------------------------------------------
   // the frame
@@ -488,6 +627,20 @@ export class HalfCourt {
       this.#ball(dt);
       for (const p of this.players) this.#pose(p, dt);
       this.#poseCrowd(dt);
+    this.#stepVenue(dt);
+      this.#stepVenue(dt);
+      this.#place();
+      if (this.msgT > 0) this.msgT -= dt;
+      return;
+    }
+    if (this.netRole === 'guest') {
+      // no rules run here. The snapshots have already moved everybody;
+      // this is the body animation, the crowd and the camera, nothing else.
+      this.#input(dt);
+      for (const p of this.players) this.#pose(p, dt);
+      this.#poseCrowd(dt);
+    this.#stepVenue(dt);
+      this.#stepVenue(dt);
       this.#place();
       if (this.msgT > 0) this.msgT -= dt;
       return;
@@ -495,12 +648,23 @@ export class HalfCourt {
     this.#input(dt);
     // FROZEN, for the movement test: everybody but you stands still, so
     // "which way did W send him" is not answered by somebody barging past.
+    if (this.play) {
+      this.play.t += dt;
+      // a play that has not produced anything in eight seconds is over;
+      // so is one whose carrier has lost the ball
+      const b = this.ball;
+      if (this.play.t > 8 || (b.holder && b.holder.team !== this.play.team)) this.#callPlay(this.possession);
+      else if (b.holder && b.holder.team === this.play.team) this.play.carrier = b.holder;
+    }
+    this.#stepFreeThrow(dt);
     if (!this.frozen) for (const p of this.players) this.#think(p, dt);
     for (const p of this.players) { if (!this.frozen || p.you) this.#move(p, dt); }
+    for (const p of this.players) this.#stamina(p, dt);
     this.#ball(dt);
     this.#clock(dt);
     for (const p of this.players) this.#pose(p, dt);
     this.#poseCrowd(dt);
+    this.#stepVenue(dt);
     this.#place();
     if (this.msgT > 0) this.msgT -= dt;
     if (this.cheer > 0) this.cheer -= dt;
@@ -541,6 +705,42 @@ export class HalfCourt {
    */
   #drive(p) { return this.rim(p.team).face; }
 
+  /**
+   * TRAVELLING. Liam: "aiming the ball while moving is considered travel".
+   *
+   * You may run with it and you may shoot out of a jump - what you may not
+   * do is stand up a shot while your feet are still carrying you along.
+   * So the moment a pull begins, the man has GATHERED the ball, and from
+   * then on his feet have to be still: a fifth of a second of running with
+   * the ball gathered is a whistle and the other side get it.
+   *
+   * It is the same rule for the bots, which is why #carry plants their
+   * feet before they release - see the gather there.
+   */
+  #travelWatch(p, dt, gathered) {
+    if (!gathered || this.ball.holder !== p || p.y > 0.05) { p.gatherT = 0; return false; }
+    const speed = Math.hypot(p.vx, p.vz);
+    p.gatherT = speed > 1.8 ? (p.gatherT || 0) + dt : 0;
+    if (p.gatherT < 0.2) return false;
+    p.gatherT = 0;
+    this.#whistle('TRAVEL', p);
+    return true;
+  }
+
+  /** a turnover the referee calls: the other side get it, behind the line */
+  #whistle(what, p) {
+    const other = this.players.find((q) => q.team !== p.team
+      && this.#dist(q, p) === Math.min(...this.players.filter((r) => r.team !== p.team).map((r) => this.#dist(r, p))));
+    this.say(p.you ? 'YOU: ' + what : what, 1.5);
+    this.D.beep(180, 0.16, 'square', 0.05);
+    this.drag = null;
+    this.arcLine.visible = false;
+    if (other) this.#give(other);
+    this.needCheck = this.C.id === 'half';
+    this.shotClock = this.C.clock;
+    if (this.tally) this.tally.travels = (this.tally.travels || 0) + 1;
+  }
+
   #input(dt) {
     const D = this.D, you = this.you;
     if (!you || you.down) return;
@@ -560,15 +760,29 @@ export class HalfCourt {
     // ball is nothing, and SPACE with nobody to swat is a jump, because a
     // game where the jump key sometimes does nothing feels broken.
     const qNow = D.held('q', 'Q');
-    if (qNow && !this.qHeld && this.ball.holder === you) this.#passBest(you);
+    // A TAP of Q is still the automatic pass, but only if it was a tap:
+    // held down, it is the start of an aimed one and must not throw the
+    // ball the instant the key goes down.
+    if (qNow && !this.qHeld) { this.qDown = 0; this.qFired = false; }
+    if (qNow) this.qDown = (this.qDown || 0) + dt;
+    if (!qNow && this.qHeld && !this.qFired && (this.qDown || 0) < 0.35 && this.ball.holder === you) this.#passBest(you);
+    // letting go of Q mid-drag throws it too - the hand is already pointing
+    if (!qNow && this.qHeld && this.drag && this.drag.pass && this.ball.holder === you) {
+      this.#aimedPass(you, this.drag);
+      this.drag = null; this.qFired = true;
+      this.arcLine.visible = false;
+    }
     this.qHeld = qNow;
 
     const spaceNow = D.held(' ', 'Space');
     if (spaceNow && !this.spaceHeld) {
       const c = this.ball.holder;
-      const canSwat = c && c.team !== you.team && this.#dist(you, c) < 2.6 * you.reach;
+      const canSwat = c && c.team !== you.team && this.#dist(you, c) < 3.4 * you.reach;
+      if (this.netRole === 'guest') { this.netOut = this.netOut || {}; if (canSwat) this.netOut.swat = true; else this.netOut.jump = true; }
       if (canSwat) this.#swat(you, c);
-      else if (you.y <= 0.001 && you.land <= 0) { you.vy = 11.5; you.land = 0.25; }
+      else if (you.y <= 0.001 && you.land <= 0 && this.#spend(you, 0.14)) {
+        you.vy = 10.2 + 2.2 * this.#legs(you); you.land = 0.25;
+      }
     }
     this.spaceHeld = spaceNow;
 
@@ -596,9 +810,11 @@ export class HalfCourt {
     // Pixels cannot do that. The hand moved 116 pixels up and to the
     // right, and that is the whole of what the gesture meant.
     if (D.mouse.down && !this.drag) {
-      this.drag = { sx: D.mouse.x, sy: D.mouse.y, t: 0, power: 0, angle: 0 };
+      this.drag = { sx: D.mouse.x, sy: D.mouse.y, t: 0, power: 0, angle: 0, pass: qNow && hasBall };
       this.dragHit = this.#pickPlayer(D.mouse.x, D.mouse.y);
     }
+    // grabbing Q part way through a pull turns that pull into a pass
+    if (this.drag && hasBall && qNow) this.drag.pass = true;
     if (D.mouse.down && this.drag) {
       this.drag.t += dt;
       // screen y counts DOWNWARDS, so it is flipped here and nowhere else:
@@ -607,7 +823,10 @@ export class HalfCourt {
       const len = Math.hypot(dx, dy);
       this.drag.power = clamp(len / DRAG_FULL, 0, 1);
       this.drag.angle = Math.atan2(dy, dx);
-      if (hasBall && this.drag.power > 0.06) this.#preview(you, this.drag);
+      // aiming counts as gathering it: from here his feet must be still
+      if (hasBall && !this.drag.pass && this.drag.power > 0.05 && this.#travelWatch(you, dt, true)) return;
+      if (hasBall && this.drag.pass) this.#passPreview(you, this.drag);
+      else if (hasBall && this.drag.power > 0.06) this.#preview(you, this.drag);
       else this.arcLine.visible = false;
     }
     if (!D.mouse.down && this.drag) {
@@ -615,14 +834,24 @@ export class HalfCourt {
       this.drag = null;
       this.arcLine.visible = false;
       if (hasBall) {
-        // a click on a team-mate is a pass; a pull is a shot
-        if (d.power <= 0.12 && hit && hit.team === you.team && hit !== you) this.#pass(you, hit);
-        else if (d.power > 0.12) this.#shoot(you, d.power, d.angle);
+        // Q + a pull is an aimed pass; a click on a team-mate is a pass to
+        // him; anything else that is a real pull is a shot
+        if (this.netRole === 'guest') {
+          this.netOut = this.netOut || {};
+          if (d.pass) this.netOut.pass = [d.power, d.angle];
+          else if (d.power > 0.12) this.netOut.shot = [d.power, d.angle];
+        }
+        if (d.pass) this.#aimedPass(you, d);
+        else if (d.power <= 0.12 && hit && hit.team === you.team && hit !== you) this.#pass(you, hit);
+        else if (d.power > 0.12) {
+          if (this.freeThrow && this.freeThrow.shooter === you) this.freeThrow.taken = true;
+          this.#shoot(you, d.power, d.angle);
+        }
       } else {
         // no ball: a click at the man who has it is a swipe at it
         const c = this.ball.holder;
-        if (c && c.team !== you.team && this.#dist(you, c) < 2.6 * you.reach) this.#swat(you, c);
-        else if (this.ball.live && this.#ballDist(you) < 2.2) this.#grabLoose(you);
+        if (c && c.team !== you.team && this.#dist(you, c) < 3.4 * you.reach) this.#swat(you, c);
+        else if (this.ball.live && this.#ballDist(you) < 2.4) this.#grabLoose(you);
       }
     }
   }
@@ -666,6 +895,7 @@ export class HalfCourt {
    * second and the shot never happens at all, which is exactly right.
    */
   #shoot(p, power, angle) {
+    if (p.you) this.#spend(p, 0.06);
     p.shotT = 0;
     p.wind = 0.15;
     p.shotAsk = { power, angle };
@@ -714,7 +944,25 @@ export class HalfCourt {
     // between. `off` is now read as a distance rather than a speed - the
     // block below says why - so this number means what it looks like: how
     // far off line, at worst, in half a ring's width.
-    const miss = (1 - clean) * 0.5 + contest * 0.38 * (1 - p.aim * 0.5);
+    // HOW FAR OFF LINE. Distance is in here now: the same release from
+    // eleven metres and from twenty cannot be the same shot, and a heave
+    // from the far end has to be a lottery or the bots simply score with
+    // them. Tired legs push it off line too.
+    const far = clamp((L - this.C.arc) / Math.max(4, this.C.arc), 0, 1.6);
+    // AND IT IS THE RELEASE THAT CARRIES THE DISTANCE, not the distance on
+    // its own. Charging every long shot a flat penalty punished a PERFECT
+    // release from the arc as hard as a sloppy one - measured, a clean
+    // eleven-metre shot missed the ring entirely - and that is not what a
+    // long shot is. It is that a long shot magnifies whatever you did
+    // wrong: the same sloppy release that is a rebound from six metres is
+    // an air ball from twelve, which is exactly what makes the bots' heaves
+    // hopeless without making the player's good ones unfair.
+    // A HAND IN YOUR FACE COSTS MORE FROM DISTANCE. One flat contest
+    // penalty made a contested lay-up as hard as a contested three - the
+    // bots shot 28% from under the ring once the defence was tightened,
+    // which is not basketball. Close in, you can shoot over him.
+    const miss = (1 - clean) * 0.5 + contest * (0.20 + far * 0.30) * (1 - p.aim * 0.5)
+               + far * (1 - clean * 0.85) * 0.5 + (1 - this.#legs(p)) * 0.22;
     const off = rnd(-1, 1) * miss;
     const ux = dx / L, uz = dz / L;
     // the lateral miss is across the line to the ring. `off` is random, so
@@ -853,6 +1101,82 @@ export class HalfCourt {
     return best;
   }
 
+  /**
+   * A PASS THROWN WHERE THE HAND POINTED.
+   *
+   * The drag is a gesture on the screen, so it has to be turned into a
+   * direction on the floor: the camera looks along -z and across +x, so
+   * the hand's x is the floor's x and the hand's y (up the screen) is the
+   * floor going AWAY from the camera. That is the same mapping the shot
+   * uses, and it is why a pull up and to the right sends it long and away.
+   *
+   * Then it looks for a team-mate in that direction - inside a cone that
+   * widens with distance, because a flick towards a man twenty units away
+   * cannot be aimed to the degree - and passes to him, led so he runs onto
+   * it. With nobody there the ball is thrown at the floor point the drag
+   * asked for, which can absolutely be out of play. That is the cost of
+   * aiming it yourself.
+   */
+  #aimedPass(p, d) {
+    const power = clamp(d.power, 0.12, 1);
+    const dirX = Math.cos(d.angle), dirZ = -Math.sin(d.angle);
+    let best = null, bs = -1;
+    for (const q of this.players) {
+      if (q.team !== p.team || q === p) continue;
+      const dx = q.x - p.x, dz = q.z - p.z;
+      const L = Math.hypot(dx, dz) || 0.01;
+      const dot = (dx / L) * dirX + (dz / L) * dirZ;
+      // the cone: about 30 degrees close in, opening to 55 far away
+      const need = lerp(0.86, 0.57, clamp(L / 18, 0, 1));
+      if (dot < need) continue;
+      const sc = dot * 1.4 - L * 0.012 + (1 - this.#contest(q)) * 0.5;
+      if (sc > bs) { bs = sc; best = q; }
+    }
+    if (best) { this.#pass(p, best); return best; }
+    // nobody that way: throw it there anyway
+    const reach = 6 + power * 22;
+    this.#throwTo(p, p.x + dirX * reach, p.z + dirZ * reach);
+    return null;
+  }
+
+  /** the ball let go towards a point on the floor, with nobody named */
+  #throwTo(p, tx, tz) {
+    const b = this.ball, rel = this.#release(p);
+    const dx = tx - rel.x, dz = tz - rel.z;
+    const L = Math.hypot(dx, dz) || 0.01;
+    const t = clamp(L / 15, 0.18, 0.7);
+    const speed = clamp(L / t, 8, 26);
+    b.x = rel.x; b.y = rel.y; b.z = rel.z;
+    b.vx = dx / L * speed; b.vz = dz / L * speed;
+    b.vy = (FLOOR + 2.1 - rel.y) / t - 0.5 * G * t;
+    b.live = true; b.holder = null; b.shot = false; b.scored = false;
+    b.from = p; b.to = null; b.passT = 0;
+    b.grace = 0.2; b.noOwner = p; b.air = 0;
+    p.passT = 0;
+    if (this.tally) this.tally.passes++;
+    this.D.beep(200, 0.05, 'square', 0.04);
+  }
+
+  /** the dotted line a pass would take, while Q is held */
+  #passPreview(p, d) {
+    const rel = this.#release(p);
+    const power = clamp(d.power, 0.12, 1);
+    const dirX = Math.cos(d.angle), dirZ = -Math.sin(d.angle);
+    const reach = 6 + power * 22;
+    // the same fixed buffer the shot's arc line uses: 34 points, written
+    // in place. Swapping the attribute for a new one each frame is how you
+    // make a garbage collector run in the middle of a game.
+    for (let i = 0; i < 34; i++) {
+      const f = i / 33;
+      this.arcPts[i * 3] = rel.x + dirX * reach * f;
+      this.arcPts[i * 3 + 1] = lerp(rel.y, FLOOR + 1.4, f * f);
+      this.arcPts[i * 3 + 2] = rel.z + dirZ * reach * f;
+    }
+    this.arcGeo.attributes.position.needsUpdate = true;
+    this.arcLine.computeLineDistances();
+    this.arcLine.visible = true;
+  }
+
   #pass(p, to) {
     const b = this.ball;
     const rel = this.#release(p);
@@ -877,10 +1201,112 @@ export class HalfCourt {
     this.D.beep(220, 0.05, 'square', 0.04);
   }
 
+  /**
+   * CAN HE AFFORD IT? Every burst of effort goes through here, so there is
+   * one place that knows what a jump or a swipe costs and one place that
+   * refuses when the tank is empty. A refusal is audible on your own car -
+   * a game that silently ignores the button reads as broken.
+   */
+  #spend(p, cost) {
+    if (p.stam < cost) {
+      if (p.you) this.D.beep(120, 0.07, 'sine', 0.03);
+      return false;
+    }
+    p.stam -= cost;
+    return true;
+  }
+
+  /** running costs, standing pays it back */
+  #stamina(p, dt) {
+    const speed = Math.hypot(p.vx, p.vz);
+    const drain = Math.max(0, speed - 3.4) * 0.030 + (p.guard ? 0.07 : 0);
+    const regen = speed < 1.2 ? 0.22 : speed < 3.4 ? 0.15 : 0.08;
+    p.stam = clamp(p.stam + (regen - drain) * dt, 0, p.stamMax);
+  }
+
+  /** 0 dead on his feet, 1 fresh */
+  #legs(p) { return clamp(p.stam / (p.stamMax || 1), 0, 1); }
+
+  /**
+   * WHAT YOUR HANDS DID THIS FRAME, for a guest to send to the host. The
+   * one-shot things (a jump, a swipe, a shot, a pass) are collected as
+   * they happen and handed over once, or a single press would be sent
+   * thirty times and the man would jump until his legs gave out.
+   */
+  netTakeInput() {
+    const out = this.netOut || { jump: false, swat: false, shot: null, pass: null };
+    this.netOut = { jump: false, swat: false, shot: null, pass: null };
+    return out;
+  }
+
+  /**
+   * A FOUL, and the free throw that comes of it.
+   *
+   * The man who was landed on shoots one, alone, from the line. Everybody
+   * else stands out of the way and the clock waits. If it goes in it is a
+   * point and the other side take it out; if it misses the ball is live
+   * and it is a rebound like any other, which is why nobody goes home.
+   */
+  #foul(by, on) {
+    this.fouls = this.fouls || {};
+    this.fouls[by.team] = (this.fouls[by.team] || 0) + 1;
+    if (this.tally) this.tally.fouls = (this.tally.fouls || 0) + 1;
+    this.say(by.you ? 'YOUR FOUL - FREE THROW' : (on.you ? 'FOUL - YOUR FREE THROW' : 'FOUL'), 1.8);
+    this.D.beep(150, 0.2, 'square', 0.05);
+    const r = this.rim(on.team);
+    this.freeThrow = { shooter: on, by, t: 0, taken: false };
+    this.phase = 'live';
+    this.needCheck = false;
+    this.#give(on);
+    // the line: five and a half units out from the ring, on the middle
+    on.x = r.x - r.face * 5.5; on.z = r.z;
+    on.vx = 0; on.vz = 0; on.y = 0; on.vy = 0;
+    on.cool = 0.4;
+    // everybody else clears the key, attackers on one side, defence the other
+    let k = 0;
+    for (const q of this.players) {
+      if (q === on) continue;
+      const side = q.team === on.team ? 1 : -1;
+      q.x = r.x - r.face * (2.6 + (k % 3) * 1.5);
+      q.z = r.z + side * (1.9 + (k % 2) * 0.9);
+      q.vx = 0; q.vz = 0; q.y = 0; q.vy = 0;
+      q.cool = 0.5;
+      k++;
+    }
+    this.shotClock = this.C.clock;
+  }
+
+  /** the free throw itself, watched until it is over */
+  #stepFreeThrow(dt) {
+    const f = this.freeThrow;
+    if (!f) return;
+    f.t += dt;
+    const b = this.ball;
+    if (!f.taken) {
+      // hold everybody still while he lines it up
+      for (const q of this.players) { q.wantX = 0; q.wantZ = 0; }
+      if (b.holder !== f.shooter) { this.freeThrow = null; return; }
+      if (!f.shooter.you && f.t > 1.1) {
+        // a bot takes it, and a free throw is the one shot nobody contests,
+        // so it goes in far more often than anything else he tries
+        const a = clamp(0.72 + rnd(-0.04, 0.06), 0.5, 1.2);
+        const ideal = this.idealPowerFor(f.shooter, a) ?? 0.9;
+        this.#shoot(f.shooter, ideal * (1 + rnd(-1, 1) * 0.02 * (1.3 - f.shooter.aim)), a);
+        f.taken = true;
+      }
+      if (f.shooter.you && b.shot) f.taken = true;
+      if (f.t > 9) { this.freeThrow = null; }       // he never took it; play on
+      return;
+    }
+    // once it has been taken the game is live again as soon as it lands
+    if (!b.shot || b.holder || f.t > 7) this.freeThrow = null;
+  }
+
   /** a swipe at the ball in somebody's hands */
   #swat(p, c) {
     if (p.cool > 0) return;
-    p.cool = 0.55; p.swatT = 0;
+    if (!this.#spend(p, 0.12)) return;
+    p.cool = 0.38; p.swatT = 0;
     const d = this.#dist(p, c);
     // easier from in front and when he is not protecting it; his handle
     // and your reach decide the rest
@@ -890,7 +1316,12 @@ export class HalfCourt {
     // to the second pass - and a possession that never survives long
     // enough to end in a shot is not a basketball game. A quarter is still
     // plenty often enough that guarding the ball feels worth doing.
-    const chance = clamp((0.36 * front * p.reach - d * 0.06) * (1.25 - c.aim * 0.5), 0.05, 0.65);
+    // A SWIPE THAT NEVER COMES OFF IS NOT A DEFENCE, IT IS AN ANIMATION.
+    // A quarter of them was measured as about right when the only thing
+    // guarding cost you was position; now it also costs stamina, so it can
+    // afford to work more often - and Liam asked for the defence to be
+    // easier outright. Tired arms are worse arms, which is the trade.
+    const chance = clamp((0.50 * front * p.reach - d * 0.05) * (1.25 - c.aim * 0.5) * (0.65 + 0.35 * this.#legs(p)), 0.06, 0.78);
     if (Math.random() < chance) {
       const b = this.ball;
       b.holder = null; b.live = true; b.shot = false; b.from = p;
@@ -899,6 +1330,7 @@ export class HalfCourt {
       const a = Math.atan2(p.z - c.z, p.x - c.x) + rnd(-0.6, 0.6);
       b.vx = Math.cos(a) * 6; b.vz = Math.sin(a) * 6; b.vy = 3;
       if (this.tally) this.tally.steals++;
+      if (p.you) this.#earn(3, 'steal');
       this.say(p.you ? 'YOU KNOCKED IT LOOSE' : 'STRIPPED');
       this.D.beep(520, 0.07, 'square', 0.06);
     } else {
@@ -944,6 +1376,15 @@ export class HalfCourt {
    */
   #think(p, dt) {
     if (p.you) return;
+    // SOMEBODY ELSE IS DRIVING THIS ONE. His keys arrived over the wire;
+    // everything after that - the collisions, the ball, the rules - is the
+    // same code that runs for a bot, which is what keeps an online match
+    // and a local one the same game.
+    if (p.remote) {
+      p.wantX = p.netWant ? p.netWant[0] : 0;
+      p.wantZ = p.netWant ? p.netWant[1] : 0;
+      return;
+    }
     p.cool = Math.max(0, p.cool - dt);
     const b = this.ball;
     const mine = this.possession === p.team;
@@ -992,10 +1433,14 @@ export class HalfCourt {
     const range = toRim < 3.6 ? 1.9
                 : toRim < 6 ? 1.25
                 : toRim < this.C.arc ? 0.9
-                : toRim < this.C.arc + 2.5 ? 0.72
-                : 0.2;
+                : toRim < this.C.arc + 2.5 ? 0.74
+                : 0.08;
+    // AND NOBODY HEAVES IT FROM HIS OWN END. A shot from further out than
+    // a few strides past the arc is not a shot, it is a throw - the only
+    // reason to take one is that the clock is about to go off.
+    if (toRim > this.C.arc + 5 && this.shotClock > 3.5) { p.cool = Math.max(p.cool, 0.2); }
     const want = (1 - contest * 0.85) * (0.55 + p.aim * 0.45) * range + (this.shotClock < 7 ? 0.5 : 0);
-    if (!this.needCheck && p.cool <= 0 && want > 0.62
+    if (!this.needCheck && p.cool <= 0 && !(toRim > this.C.arc + 5 && this.shotClock > 3.5) && want > 0.62
         && Math.random() < dt * (3.2 * p.iq + (this.shotClock < 5 ? 3 : 0))) {
       // THE ARC HE AIMS WITH MUST BE THE ARC HE SHOOTS WITH.
       //
@@ -1008,20 +1453,42 @@ export class HalfCourt {
       // is the only way to be sure the two agree.
       const a = clamp(0.62 + rnd(-0.1, 0.16), 0.45, 1.2);
       const ideal = this.idealPowerFor(p, a) ?? 0.9;
-      // a bad decision-maker also releases badly
-      this.#shoot(p, ideal * (1 + rnd(-1, 1) * 0.06 * (1.2 - p.iq)), a);
+      // A BOT'S HANDS ARE NOT A CALCULATOR. It used to release within a few
+      // per cent of the perfect speed wherever it stood, which is why a
+      // long shot from one of them dropped as often as a lay-up. The error
+      // now grows with the distance, with a hand in his face and with how
+      // tired he is, and a poor shooter carries more of all three.
+      const far = clamp(toRim / this.C.arc, 0, 2.2);
+      const shake = (0.035 + far * 0.055 + contest * 0.05) * (1.35 - p.aim) * (1.25 - 0.25 * this.#legs(p));
+      this.#spend(p, 0.05 + far * 0.03);
+      // THE GATHER. Travelling is called on anybody, so a bot stops running
+      // before it puts one up - it plants its feet for a moment, and the
+      // shot goes up out of that. A poor one is late stopping and gets
+      // whistled for it, which is exactly what happens to people.
+      if (Math.hypot(p.vx, p.vz) > 2.6 && p.y <= 0.05) {
+        p.wantX = 0; p.wantZ = 0;
+        p.gatherT = (p.gatherT || 0) + dt;
+        if (p.gatherT > 0.55 * (1.7 - p.iq)) { this.#whistle('TRAVEL', p); return; }
+        return;
+      }
+      p.gatherT = 0;
+      this.#shoot(p, ideal * (1 + rnd(-1, 1) * shake), a);
       p.cool = 0.9;
       return;
     }
 
     // a pass to whoever is most open, if he is under pressure
     if (p.cool <= 0 && (contest > 0.62 || Math.random() < dt * 0.35)) {
+      const play = this.play && this.play.team === p.team ? this.play : null;
       let best = null, bs = -1;
       for (const q of this.players) {
         if (q.team !== p.team || q === p) continue;
         const open = 1 - this.#contest(q);
         const closer = (this.#dist2(q.x, q.z, r.x, r.z) < toRim) ? 0.25 : 0;
-        const s = open + closer + rnd(0, 0.3) * (1.2 - p.iq);
+        // THE MAN THE PLAY FREED IS THE MAN YOU ARE LOOKING FOR: the roller
+        // off the screen, the cutter going backdoor, the man who gave it up
+        const inPlay = play && (q === play.cutter || (play.used && q === play.screener)) ? 0.55 : 0;
+        const s = open + closer + inPlay + rnd(0, 0.3) * (1.2 - p.iq);
         if (s > bs) { bs = s; best = q; }
       }
       // a low-IQ passer throws it anyway; a good one waits
@@ -1044,68 +1511,215 @@ export class HalfCourt {
     // further out is a lay-up he can actually make, and it is also out of
     // the middle of everybody else's arms.
     if (this.needCheck && behindArc) this.needCheck = false;
-    const tx = this.needCheck ? this.#takeBackX(p.team) : r.x - r.face * 2.8;
-    const tz = this.needCheck ? p.z : r.z + Math.sign(p.z || 1) * 0.9;
+    let tx = this.needCheck ? this.#takeBackX(p.team) : r.x - r.face * 2.8;
+    let tz = this.needCheck ? p.z : r.z + Math.sign(p.z || 1) * 0.9;
+
+    // ---- THE PLAY, from the ball-handler's end -------------------------
+    const play = this.play && this.play.team === p.team ? this.play : null;
+    if (play && !this.needCheck) {
+      if (play.kind === 'pick' && play.screener && play.screener !== p) {
+        const sc = play.screener;
+        const set = this.#dist(p, sc) < 3.2 && Math.hypot(sc.vx, sc.vz) < 1.6;
+        if (set) {
+          // GO SHOULDER TO SHOULDER PAST HIM. The whole point of a screen
+          // is that you run your man into it, so the line is past the
+          // screener on the side he is not covering, then at the ring.
+          play.used = true;
+          const side = Math.sign(sc.z - p.z) || 1;
+          tx = sc.x + this.#drive(p) * 1.2;
+          tz = sc.z + side * 1.1;
+        } else if (play.t < 3) {
+          // wait for it: hold your dribble rather than running away from it
+          tx = p.x; tz = p.z;
+        }
+      } else if (play.kind === 'giveGo' && play.cutter && !play.used && p.cool <= 0 && play.t > 0.5) {
+        // give it up and go: the pass, then the man who threw it cuts
+        if (this.#contest(play.cutter) < 0.72) {
+          this.#pass(p, play.cutter);
+          play.used = true; play.phase = 'cut'; play.cutter = p; play.t = 0;
+          p.cool = 0.5;
+          return;
+        }
+      } else if (play.kind === 'iso') {
+        // clear out and go at him: straight at the ring, wide of the pack
+        tz = r.z + Math.sign(p.z || 1) * 1.6;
+      }
+    }
     this.#seek(p, tx, tz, contest > 0.75 ? 0.7 : 1);
   }
 
   #offBall(p, dt) {
-    // spread out, and cut when your lane is empty
     const b = this.ball;
+    const r = this.rim(p.team);
+    const play = this.play && this.play.team === p.team ? this.play : null;
+    const carrier = b.holder;
+
+    // ---- your job in the play ------------------------------------------
+    if (play && carrier && carrier.team === p.team) {
+      if (play.kind === 'pick' && play.screener === p) {
+        const d = carrier.mark || this.#markerOf(carrier);
+        if (!play.used) {
+          // SET IT AND STAND STILL. A screen that is still moving is not a
+          // screen, it is a man walking past - so once he is in place his
+          // feet stop, which is also what lets the carrier time his run.
+          const tx = d ? d.x + Math.sign(carrier.x - d.x) * -0.2 : carrier.x - this.#drive(p) * 1.4;
+          const tz = d ? d.z + Math.sign(carrier.z - d.z) * -0.6 : carrier.z + 1.2;
+          if (this.#dist2(p.x, p.z, tx, tz) < 0.9) { p.wantX = 0; p.wantZ = 0; p.guard = false; }
+          else this.#seek(p, tx, tz, 1);
+          return;
+        }
+        // ROLL or POP: a big man rolls to the ring, a shooter steps out
+        if (p.aim > 0.88) this.#seek(p, r.x - r.face * (this.C.arc + 0.6), p.z + Math.sign(p.z || 1) * 0.6, 0.9);
+        else this.#seek(p, r.x - r.face * 2.2, r.z + Math.sign(p.z || 1) * 0.7, 1);
+        return;
+      }
+      if (play.kind === 'giveGo' && play.cutter === p && play.phase === 'cut' && play.t < 2.2) {
+        // he gave it up: straight down the middle, looking for it back
+        this.#seek(p, r.x - r.face * 2.0, r.z * 0.3, 1);
+        return;
+      }
+      if (play.kind === 'backdoor' && play.cutter === p) {
+        const d = this.#markerOf(p);
+        // wait until his man is leaning on him, then go the other way
+        const overplayed = d && this.#dist(p, d) < 2.6 && (d.x - p.x) * this.#drive(p) > -0.4;
+        if (overplayed || play.t > 3.2) { play.used = true; this.#seek(p, r.x - r.face * 2.0, r.z + p.z * 0.25, 1); return; }
+      }
+    }
+
+    // ---- otherwise: spacing, and a cut when the lane is empty ------------
     const spot = this.#spot(p);
     if (!p.cutT || p.cutT <= 0) {
-      if (Math.random() < dt * 0.35 * p.iq && this.#contest(p) < 0.3) p.cutT = 1.4;
+      if (Math.random() < dt * 0.3 * p.iq && this.#contest(p) < 0.3 && this.#ballSide(p) === false) p.cutT = 1.3;
       else p.cutT = 0;
     } else p.cutT -= dt;
-    if (p.cutT > 0) { const r = this.rim(p.team); this.#seek(p, r.x - r.face * 2.4, p.z * 0.4, 1); }
+    if (p.cutT > 0) this.#seek(p, r.x - r.face * 2.4, p.z * 0.4, 1);
     else this.#seek(p, spot.x, spot.z, 0.8);
-    void b;
+  }
+
+  /** whoever is guarding this man */
+  #markerOf(p) {
+    for (const q of this.players) if (q.team !== p.team && q.mark === p) return q;
+    return null;
   }
 
   #defend(p, dt) {
     const b = this.ball;
-    // pick a man: the carrier gets the nearest defender, the rest match up
-    if (!p.mark || p.mark.team === p.team || Math.random() < dt * 0.6) {
-      const opp = this.players.filter((q) => q.team !== p.team);
-      const carrier = b.holder && b.holder.team !== p.team ? b.holder : null;
-      const takenBy = new Map();
-      for (const q of this.players) if (q.team === p.team && q.mark) takenBy.set(q.mark, q);
-      let best = null, bd = 1e9;
-      for (const q of opp) {
-        if (takenBy.has(q) && takenBy.get(q) !== p) continue;
-        const d = this.#dist(p, q) - (q === carrier ? 3 : 0);
-        if (d < bd) { bd = d; best = q; }
-      }
-      p.mark = best || carrier || opp[0];
-    }
+    p.switched = Math.max(0, (p.switched || 0) - dt);
+    p.screened = Math.max(0, (p.screened || 0) - dt);
+    // he keeps the man he was given. Only a man who has lost his - or who
+    // has ended up on somebody already covered - picks again.
+    const mineTaken = p.mark && this.players.some((q) => q !== p && q.team === p.team && q.mark === p.mark);
+    if (!p.mark || p.mark.team === p.team || (mineTaken && !p.switched)) this.#assignMarks(p.team);
     const m = p.mark;
     if (!m) return;
-    // stand between him and the ring, a stride off
+    const carrier = b.holder;
+    const onBall = carrier === m;
+
+    // ---- A SCREEN: fight over it or switch -------------------------------
+    // Anybody standing still, on his side, between him and the man he is
+    // guarding, is a screen. A good defender fights over the top of it and
+    // loses half a step; a poor one gets stuck; either way the two of them
+    // can decide to swap men instead, which is what a switch is.
+    if (!p.screened) {
+      for (const q of this.players) {
+        if (q.team === p.team || q === m) continue;
+        if (Math.hypot(q.vx, q.vz) > 1.8) continue;
+        const toM = Math.hypot(m.x - p.x, m.z - p.z);
+        const toQ = Math.hypot(q.x - p.x, q.z - p.z);
+        if (toQ > 2.0 || toM > 5) continue;
+        // is he in the way? the angle between the two directions is small
+        const dot = ((m.x - p.x) * (q.x - p.x) + (m.z - p.z) * (q.z - p.z)) / (toM * toQ || 1);
+        if (dot < 0.5) continue;
+        const mate = this.#markerOf(q);
+        if (mate && (p.iq < 0.6 || Math.random() < 0.45)) { this.#switchMarks(p, mate); this.say('SWITCH', 0.7); }
+        else p.screened = 0.55 * (1.4 - p.iq);
+        break;
+      }
+    }
+    if (p.screened > 0) { p.wantX *= 0.25; p.wantZ *= 0.25; p.guard = false; return; }
+
+    // ---- where to stand ---------------------------------------------------
     const r = this.rim(m.team);        // the ring HE is attacking
     const dx = r.x - m.x, dz = r.z - m.z;
     const L = Math.hypot(dx, dz) || 1;
-    const gap = b.holder === m ? 1.5 : 2.2;
-    this.#seek(p, m.x + dx / L * gap, m.z + dz / L * gap, b.holder === m ? 1 : 0.8);
-    p.guard = b.holder === m && this.#dist(p, m) < 3.4;
+    // ON THE BALL: right up on him, between him and the ring.
+    // ONE PASS AWAY: DENY - stand in the passing lane, ball side of him.
+    // TWO PASSES AWAY: SAG towards the ball, ready to help in the lane.
+    let tx, tz;
+    const ballAt = carrier ? { x: carrier.x, z: carrier.z } : { x: b.x, z: b.z };
+    const passLen = Math.hypot(ballAt.x - m.x, ballAt.z - m.z);
+    if (onBall) {
+      // RIGHT UP ON HIM. A stride and a half off the ball is a man watching
+      // somebody else play; it is under a stride now, and the closeout is
+      // run at full speed rather than at four fifths of it.
+      tx = m.x + dx / L * 1.35; tz = m.z + dz / L * 1.35;
+    } else if (passLen < 7.5) {
+      // deny: in the passing lane, on his shoulder, not behind him
+      const ux = (ballAt.x - m.x) / (passLen || 1), uz = (ballAt.z - m.z) / (passLen || 1);
+      tx = m.x + ux * 1.35 + dx / L * 0.45;
+      tz = m.z + uz * 1.35 + dz / L * 0.45;
+    } else {
+      // sag: hang back towards the lane between your man and the ring
+      tx = m.x + dx / L * 2.6 + (ballAt.x - m.x) * 0.12;
+      tz = m.z + dz / L * 2.6 + (ballAt.z - m.z) * 0.12;
+    }
+
+    // ---- HELP: the carrier has beaten his man and is going to the ring ----
+    // The nearest man off the ball steps across into the lane. He is giving
+    // up his own man to do it, which is the trade help defence always is.
+    if (!onBall && carrier && carrier.team !== p.team) {
+      const cr = this.rim(carrier.team);
+      const beaten = this.#contest(carrier) < 0.35 && this.#dist2(carrier.x, carrier.z, cr.x, cr.z) < 5.5;
+      if (beaten) {
+        const helpers = this.players.filter((q) => q.team === p.team && q.mark !== carrier);
+        const closest = helpers.reduce((a, q) => (this.#dist(q, carrier) < this.#dist(a, carrier) ? q : a), helpers[0]);
+        if (closest === p) {
+          tx = (carrier.x + cr.x) / 2; tz = (carrier.z + cr.z) / 2;
+        }
+      }
+    }
+
+    this.#seek(p, tx, tz, onBall ? 1.06 : 0.9);
+    p.guard = onBall && this.#dist(p, m) < 3.4;
     // and go for the ball now and then - not constantly; see #swat
-    if (b.holder === m && p.cool <= 0 && this.#dist(p, m) < 2.4 && Math.random() < dt * 0.45 * p.iq) {
+    if (b.holder === m && p.cool <= 0 && this.#dist(p, m) < 2.9 && Math.random() < dt * 0.42 * p.iq) {
       this.#swat(p, m);
     }
-    // contest a shot in the air
-    if (b.live && b.shot && p.y <= 0 && this.#dist2(p.x, p.z, b.x, b.z) < 2.2 && b.y < FLOOR + 4) {
-      p.vy = 10.5;
+    // CONTEST IT, AND GO FOR THE BLOCK. A defender who is close enough
+    // when a shot goes up jumps at the flight of it rather than at the
+    // shooter, which is what turns a contest into a block - and he will
+    // take the foul if he times it badly, the same as you.
+    if (b.live && b.shot && p.y <= 0 && p.land <= 0 && this.#dist2(p.x, p.z, b.x, b.z) < 2.2
+        && b.y < FLOOR + 4.6 && this.#legs(p) > 0.45 && this.#spend(p, 0.12)) {
+      p.vy = 10.2 + 2.4 * this.#legs(p);
+      p.land = 0.25;
     }
+    // and a man beaten to the middle gets back in front rather than trailing
+    if (onBall && this.#dist(p, m) > 2.4) { p.wantX *= 1.25; p.wantZ *= 1.25; }
   }
 
-  /** where an off-ball player should stand: spread round the arc */
+  /**
+   * WHERE TO STAND WHEN YOU HAVE NOT GOT IT. Not five men spread evenly
+   * round a semicircle - the spots a team actually uses: the two corners,
+   * the two wings and the top of the key, handed out by shirt number so
+   * they do not all want the same one, and pulled a stride wider when the
+   * ball is on your side so the lane stays open for the drive.
+   */
   #spot(p) {
-    const r = this.rim(p.team);
-    const n = this.size;
-    const k = n === 1 ? 0 : (p.idx / (n - 1)) - 0.5;
-    const a = k * 1.5;
+    const r = this.rim(p.team), C = this.C;
+    const SPOTS = [
+      { a: 0.00, d: 1.02 },      // the top
+      { a: 0.78, d: 0.98 },      // wings
+      { a: -0.78, d: 0.98 },
+      { a: 1.32, d: 1.06 },      // corners
+      { a: -1.32, d: 1.06 },
+    ];
+    const sp = SPOTS[p.idx % SPOTS.length];
+    const wide = this.#ballSide(p) ? 1.08 : 1.0;
+    const rad = (C.arc + 0.9) * sp.d * wide;
     return {
-      x: r.x - r.face * Math.cos(a) * (this.C.arc + 0.8),
-      z: r.z + Math.sin(a) * (this.C.arc + 0.8) * 0.45,
+      x: r.x - r.face * Math.cos(sp.a) * rad,
+      z: clamp(r.z + Math.sin(sp.a) * rad * 0.52, C.z0 + 0.8, C.z1 - 0.8),
     };
   }
 
@@ -1123,7 +1737,8 @@ export class HalfCourt {
     // going nowhere, whatever the keys or the bot say - which is also what
     // stops a bot walking out of his own jump shot.
     if (p.wind > 0) { p.wantX = 0; p.wantZ = 0; }
-    const SPD = 7.4 * p.speed * (p.guard ? 0.72 : 1) * (this.ball.holder === p ? 0.94 : 1);
+    const tired = 0.66 + 0.34 * this.#legs(p);
+    const SPD = 7.4 * p.speed * tired * (p.guard ? 0.72 : 1) * (this.ball.holder === p ? 0.94 : 1);
     const ax = (p.wantX || 0) * SPD, az = (p.wantZ || 0) * SPD;
     // heavy legs: you accelerate into a run and slide out of one
     const k = p.y > 0 ? 3.0 : 13;
@@ -1153,6 +1768,7 @@ export class HalfCourt {
       if (p.y <= 0) { p.y = 0; p.vy = 0; p.land = 0.18; }
     }
     if (p.land > 0) p.land -= dt;
+    if (p.foulT > 0) p.foulT -= dt;
 
     p.x = clamp(p.x, this.C.x0 + 0.4, this.C.x1 - 0.4);
     p.z = clamp(p.z, this.C.z0 + 0.4, this.C.z1 - 0.4);
@@ -1166,6 +1782,20 @@ export class HalfCourt {
         const push = (1.05 - d) / 2;
         p.x += dx / d * push; p.z += dz / d * push;
         q.x -= dx / d * push; q.z -= dz / d * push;
+        // LANDING ON SOMEBODY IS A FOUL. Liam: "jumping on top of some one
+        // is a foul and earns a free throw". A man in the air coming DOWN
+        // into a man who is on the floor has jumped into him - which is
+        // exactly the contact the rule exists for, and it is the one a
+        // player can actually commit on purpose by timing a block badly.
+        // ...but only when he really has come down ON him: deep overlap,
+        // dropping fast, and not twice for the same jump. Every contest
+        // jump landing beside a shooter was a whistle before that - two
+        // dozen free throws in ten minutes, measured.
+        if (p.y > 0.35 && p.vy < -3 && q.y < 0.2 && d < 0.72 && (p.foulT || 0) <= 0
+            && this.phase === 'live' && !this.freeThrow) {
+          p.foulT = 2.5;
+          this.#foul(p, q);
+        }
       }
     }
     // HOW LONG EACH ACTION TAKES TO PLAY. These were all a third of a
@@ -1370,7 +2000,17 @@ export class HalfCourt {
         // the man who let go of it has to wait until it has gone
         // somewhere - off the rim, off the floor, or simply away
         if (p === b.noOwner && b.ownerLock > 0) continue;
-        const reach = 1.35 + (p.y > 0.2 ? 0.7 : 0) + (b.to === p ? 0.5 : 0);
+        // JUMP IN FRONT OF IT. Liam: "jump in front of the ball when its
+        // shot to grab it out of the air". A man in the air is reaching
+        // with everything he has, and that is the whole point of timing a
+        // jump - so being off the floor is worth a metre and a quarter of
+        // reach rather than two thirds of one.
+        // THE LONG ARM IN THE AIR IS YOURS, not everybody's. Liam asked for
+        // the defence to be easier to PLAY; handing the same reach to ten
+        // bots made every shot in the game a block - twenty of them in ten
+        // minutes, measured, and nobody could score.
+        const air = p.y > 0.15 ? (p.you ? 1.25 : 0.38) * Math.min(1, p.y / 1.2 + 0.45) : 0;
+        const reach = 1.45 + air + (b.to === p ? 0.5 : 0);
         // A BALL ON THE FLOOR IS STILL A BALL.
         //
         // The height test used to be a window a metre and a half either
@@ -1409,10 +2049,15 @@ export class HalfCourt {
             // including the ones the defence took, announced itself as an
             // OFFENSIVE BOARD.
             const was = this.possession;
+            const airborne = b.shot && p.y > 0.15 && b.y > FLOOR + 2.6;
             this.#give(p);
             if (b.shot) {
               this.needCheck = this.C.id === 'half' && p.team !== was;
-              this.say(p.team === was ? 'OFFENSIVE BOARD' : 'REBOUND', 1.0);
+              if (airborne && p.team !== was) {
+                this.say(p.you ? 'YOU BLOCKED IT' : 'BLOCKED', 1.2);
+                this.D.beep(660, 0.09, 'square', 0.06);
+                if (p.you) this.#earn(5, 'block');
+              } else this.say(p.team === was ? 'OFFENSIVE BOARD' : 'REBOUND', 1.0);
             }
             b.shot = false;
             return;
@@ -1439,6 +2084,10 @@ export class HalfCourt {
     // THREES. Same shot, same line on the floor, different book.
     const pts = this.C.id === 'half' ? (b.three ? 2 : 1) : (b.three ? 3 : 2);
     this.score[team] += pts;
+    this.justScored = true;
+    if (this.venue && this.venue.cheer) { try { this.venue.cheer(pts); } catch (e) { /* ditto */ } }
+    // YOUR points pay, and only yours: a team-mate's basket is not your wage
+    if (this.ball.from && this.ball.from.you && team === 0) this.#earn(pts * 2, 'score');
     if (this.tally) this.tally.makes++;
     this.cheer = swish ? 2.2 : 1.4;
     this.say((swish ? 'SWISH' : 'GOOD') + '  +' + pts + '  ·  ' + TEAM[team].name, 1.5);
@@ -1457,6 +2106,7 @@ export class HalfCourt {
   /** the whistle: the same ending however the game got there */
   #end() {
     this.over = true;
+    if (this.score[0] > this.score[1]) this.#earn(15, 'win');
     this.onEnd({ score: this.score.slice(), won: this.score[0] > this.score[1] });
   }
 
@@ -1660,7 +2310,7 @@ export class HalfCourt {
     // tenths sideways. So the run cycle and the chest pass are said about
     // X, where they read, and a lift overhead about Z - because that one is
     // up, and up is up from every angle.
-    s.hips.position.y = 1.22 + R.hip;
+    s.hips.position.y = HIP_Y + R.hip;
     s.chest.rotation.x = R.lean;
     for (let i = 0; i < 2; i++) {
       const sg = i ? -1 : 1;
@@ -1686,6 +2336,22 @@ export class HalfCourt {
     const h = clamp(1 - p.y / 6, 0.4, 1);
     p.blob.scale.setScalar(h);
     p.blob.material.opacity = 0.3 * h;
+  }
+
+  /** the venue's own animation: flags, traffic, a crowd getting to its feet */
+  #stepVenue(dt) {
+    // the venue's own scoreboard, showing THIS match
+    if (this.venue && this.venue.setScore) {
+      const g = this.C.id === 'full' ? Math.max(0, this.gameClock) : 0;
+      const clock = this.C.id === 'full'
+        ? Math.floor(g / 60) + ':' + String(Math.floor(g % 60)).padStart(2, '0')
+        : 'TO 11';
+      this.venue.setScore(this.score[0], this.score[1], clock, Math.max(0, Math.ceil(this.shotClock)));
+    }
+    if (this.venue && this.venue.step) {
+      try { this.venue.step(dt, { ball: this.ball, scored: this.justScored }); } catch (e) { /* scenery never stops a game */ }
+    }
+    this.justScored = false;
   }
 
   #poseCrowd(dt) {
@@ -1998,6 +2664,8 @@ export class HalfCourt {
     return {
       mode: this.C.id,
       home: this.score[0], away: this.score[1],
+      stam: this.you ? this.#legs(this.you) : 1,
+      coins: this.coins || 0,
       clock: Math.max(0, Math.ceil(this.shotClock)),
       // the two minutes, as minutes and seconds; null on a half court,
       // where the game ends on a score rather than on a clock

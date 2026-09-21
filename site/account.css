@@ -1,0 +1,107 @@
+/* =====================================================================
+   PLAYPILE :: site/account.css - the sign-in button and its panel
+   =====================================================================
+   Deliberately self-contained: it owns nothing outside `.acc-*`, so the
+   rest of the site's stylesheet can be rewritten underneath it without
+   the account UI falling over. Colours are the site's own dark palette.
+   ===================================================================== */
+
+.acc-button {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 36px; padding: 0 14px;
+  background: #1b2433; color: #e7ecf3;
+  border: 1px solid #2b3648; border-radius: 999px;
+  font: 600 13px/1 system-ui, sans-serif; letter-spacing: .3px;
+  cursor: pointer; white-space: nowrap;
+  transition: background .12s, border-color .12s;
+}
+.acc-button:hover { background: #222d3f; border-color: #3a4761; }
+.acc-dot { width: 9px; height: 9px; border-radius: 50%; background: #55617a; flex: none; }
+.acc-name { max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+
+.acc-shade {
+  position: fixed; inset: 0; background: rgba(4, 7, 12, .72);
+  backdrop-filter: blur(3px);
+  opacity: 0; pointer-events: none; transition: opacity .16s; z-index: 900;
+}
+.acc-shade.on { opacity: 1; pointer-events: auto; }
+
+.acc-panel {
+  position: fixed; z-index: 901;
+  left: 50%; top: 50%; transform: translate(-50%, -48%) scale(.98);
+  width: min(420px, calc(100vw - 32px));
+  max-height: min(82vh, 720px); overflow: auto;
+  background: #10161f; color: #e7ecf3;
+  border: 1px solid #263145; border-radius: 16px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .6);
+  padding: 18px 20px 20px;
+  opacity: 0; pointer-events: none; transition: opacity .16s, transform .16s;
+  font: 400 14px/1.5 system-ui, sans-serif;
+}
+.acc-panel.on { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+.acc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.acc-head h2 { margin: 0; font: 800 18px/1 system-ui, sans-serif; letter-spacing: .4px; }
+.acc-x {
+  background: none; border: 0; color: #8b96a8; font-size: 24px; line-height: 1;
+  cursor: pointer; padding: 0 4px;
+}
+.acc-x:hover { color: #e7ecf3; }
+
+.acc-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+.acc-tab {
+  flex: 1; padding: 9px 10px; cursor: pointer;
+  background: rgba(255, 255, 255, .05); color: #9fb0c4;
+  border: 1px solid transparent; border-radius: 9px;
+  font: 600 13px/1 system-ui, sans-serif;
+}
+.acc-tab.on { background: #ff8a3d; color: #1a1005; border-color: #ff8a3d; }
+
+.acc-form { display: flex; flex-direction: column; gap: 10px; }
+.acc-field { display: flex; flex-direction: column; gap: 4px; }
+.acc-field input {
+  background: #0a0f17; color: #e7ecf3;
+  border: 1px solid #2b3648; border-radius: 9px;
+  padding: 10px 12px; font: 400 14px system-ui, sans-serif;
+}
+.acc-field input:focus { outline: none; border-color: #ff8a3d; }
+.acc-label { color: #8b96a8; font: 600 11px/1.4 system-ui, sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+
+.acc-btn {
+  padding: 11px 16px; cursor: pointer;
+  background: #ff8a3d; color: #1a1005; border: 0; border-radius: 9px;
+  font: 700 13px/1 system-ui, sans-serif; letter-spacing: .4px;
+}
+.acc-btn:hover { filter: brightness(1.07); }
+.acc-btn.ghost { background: transparent; color: #cdd7e4; border: 1px solid #2b3648; }
+.acc-btn.small { padding: 8px 12px; font-size: 12px; }
+.acc-buttons { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+
+.acc-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.acc-small { color: #8b96a8; font-size: 12.5px; line-height: 1.55; margin: 6px 0 2px; }
+
+.acc-list { margin-top: 14px; }
+.acc-chip {
+  display: inline-block; margin: 6px 6px 0 0; padding: 7px 12px; cursor: pointer;
+  background: rgba(255, 255, 255, .05); color: #cdd7e4;
+  border: 1px solid #2b3648; border-radius: 999px;
+  font: 600 12px/1 system-ui, sans-serif;
+}
+.acc-chip:hover { border-color: #ff8a3d; color: #fff; }
+
+.acc-code { margin-top: 16px; border-top: 1px solid #1d2635; padding-top: 12px; }
+.acc-code textarea {
+  width: 100%; margin-top: 6px; resize: vertical;
+  background: #0a0f17; color: #9fb0c4;
+  border: 1px solid #2b3648; border-radius: 9px;
+  padding: 8px 10px; font: 400 11px/1.4 ui-monospace, Consolas, monospace;
+  word-break: break-all;
+}
+
+.acc-note { min-height: 18px; margin-top: 12px; font: 600 12px/1.4 system-ui, sans-serif; color: #8b96a8; }
+.acc-note.good { color: #35d07f; }
+.acc-note.bad { color: #ff6b8b; }
+
+@media (max-width: 480px) {
+  .acc-name { display: none; }
+  .acc-button { padding: 0 10px; }
+}

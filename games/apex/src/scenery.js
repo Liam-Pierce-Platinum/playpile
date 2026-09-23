@@ -64,6 +64,9 @@ export function rng(seed) {
   return () => (s = (Math.imul(s, 1103515245) + 12345) & 0x7fffffff) / 0x7fffffff;
 }
 
+/** an offset that is either a number or a function of (sample, side) */
+const at = (v, i, side) => (typeof v === 'function' ? v(i, side) : v);
+
 const smoothstep = (a, b, x) => {
   const t = Math.max(0, Math.min(1, (x - a) / (b - a)));
   return t * t * (3 - 2 * t);
@@ -175,17 +178,19 @@ export function makeGround(bbox, distTo, opts = {}) {
   // Four greens picked by height and by a second noise field, so the land
   // is patchy instead of one flat colour - which is most of what stops a
   // big empty plane reading as a big empty plane.
-  const cLow = new THREE.Color(0x46633a);
-  const cMid = new THREE.Color(0x3a5530);
-  const cHigh = new THREE.Color(0x5f6c4c);
-  const cDry = new THREE.Color(0x6f7245);
+  // lighter than they would be as flat colour, because the grass texture
+  // multiplies over them and takes about a third back off
+  const cLow = new THREE.Color(0x6a9450);
+  const cMid = new THREE.Color(0x587f44);
+  const cHigh = new THREE.Color(0x8a9a6c);
+  const cDry = new THREE.Color(0x9ea062);
   const tmp = new THREE.Color();
 
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i) + cx, z = pos.getZ(i) + cz;
     const y = heightAt(x, z);
     pos.setY(i, y);
-    if (city) { col[i * 3] = 0.35; col[i * 3 + 1] = 0.36; col[i * 3 + 2] = 0.38; continue; }
+    if (city) { col[i * 3] = 0.93; col[i * 3 + 1] = 0.88; col[i * 3 + 2] = 0.80; continue; }
     const up = smoothstep(base + amp * 0.10, base + amp * 0.70, y);
     const patch = vnoise(x * 0.012, z * 0.012);
     tmp.copy(cLow).lerp(cMid, patch);
@@ -196,7 +201,17 @@ export function makeGround(bbox, distTo, opts = {}) {
   geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
   geo.computeVertexNormals();
 
-  const mesh = new THREE.Mesh(geo, std(0xffffff, { vertexColors: true, roughness: 1 }));
+  // A DETAIL TEXTURE over the vertex colours: the colours give the land its
+  // patches at the scale of a field, the texture gives it grain at the
+  // scale of a footstep. Either alone looks like a carpet or like paint.
+  let map = null;
+  if (opts.map) {
+    map = opts.map.clone();
+    map.needsUpdate = true;
+    map.repeat.set(w / (opts.tile || 7), d / (opts.tile || 7));
+  }
+  const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
+    color: 0xffffff, vertexColors: true, roughness: 1, map }));
   mesh.position.set(cx, 0, cz);
   mesh.receiveShadow = true;
   return { mesh, heightAt };
@@ -257,16 +272,19 @@ export function makeGrass(points, leftOf, from, to, heightAt, opts = {}) {
   const buckets = [];
   for (let c = 0; c < chunks; c++) buckets.push([[], [], []]);
 
+  const { keep } = opts;
   for (let i = 0; i < n - 1; i += step) {
     const p = points[i], l = leftOf(p.h);
     const c = Math.min(chunks - 1, Math.floor((i / n) * chunks));
     for (let k = 0; k < perSample; k++) {
       const side = rnd() < 0.5 ? 1 : -1;
-      const off = side * (from + rnd() * (to - from));
+      const f = at(from, i, side), t = at(to, i, side);
+      const off = side * (f + rnd() * (t - f));
       // jitter along the track as well, or they line up in visible rows
       const ahead = (rnd() - 0.5) * step * 2.4;
       const x = p.x + l[0] * off + Math.sin(p.h) * ahead;
       const z = p.z + l[1] * off + Math.cos(p.h) * ahead;
+      if (keep && !keep(x, z)) { rnd(); rnd(); rnd(); continue; }
       buckets[c][k % 3].push({
         x, y: heightAt(x, z), z,
         s: 0.75 + rnd() * 0.9, r: rnd() * Math.PI * 2, t: rnd(),
@@ -369,17 +387,23 @@ export function makeTrees(points, leftOf, from, to, heightAt, opts = {}) {
   const buckets = [];
   for (let c = 0; c < chunks; c++) buckets.push(kinds.map(() => []));
 
+  const { keep } = opts;
   for (let i = 0; i < n - 1; i += 6) {
     const c = Math.min(chunks - 1, Math.floor((i / n) * chunks));
     for (const side of [1, -1]) {
       if (rnd() > density * 0.55) continue;
       const p = points[i], l = leftOf(p.h);
-      const off = side * (from + rnd() * (to - from));
+      const f = at(from, i, side), t = at(to, i, side);
+      const off = side * (f + rnd() * (t - f));
       const cx = p.x + l[0] * off, cz = p.z + l[1] * off;
       const count = 2 + Math.floor(rnd() * 7);
       for (let k = 0; k < count; k++) {
         const a = rnd() * Math.PI * 2, rad = rnd() * 17;
         const x = cx + Math.cos(a) * rad, z = cz + Math.sin(a) * rad;
+        // EVERY tree asks, not just the clump: a clump centred safely
+        // beside one road still throws trees seventeen metres, which is
+        // onto the next one
+        if (keep && !keep(x, z)) { rnd(); rnd(); rnd(); rnd(); rnd(); continue; }
         buckets[c][Math.floor(rnd() * kinds.length)].push({
           x, y: heightAt(x, z), z,
           s: 0.65 + rnd() * 0.9,
@@ -458,13 +482,16 @@ export function makeBushes(points, leftOf, from, to, heightAt, opts = {}) {
 
   const buckets = [];
   for (let c = 0; c < chunks; c++) buckets.push([[], [], []]);
+  const { keep } = opts;
   for (let i = 0; i < n - 1; i += 3) {
     const c = Math.min(chunks - 1, Math.floor((i / n) * chunks));
     for (const side of [1, -1]) {
       if (rnd() > density * 0.5) continue;
       const p = points[i], l = leftOf(p.h);
-      const off = side * (from + rnd() * (to - from));
+      const f = at(from, i, side), t = at(to, i, side);
+      const off = side * (f + rnd() * (t - f));
       const x = p.x + l[0] * off, z = p.z + l[1] * off;
+      if (keep && !keep(x, z)) { rnd(); rnd(); rnd(); continue; }
       buckets[c][Math.floor(rnd() * 3)].push({
         x, y: heightAt(x, z), z, s: 0.7 + rnd() * 1.1,
         r: rnd() * Math.PI * 2, hue: rnd(),
@@ -567,6 +594,79 @@ export function makeSky(opts = {}) {
   clouds.renderOrder = -1;
   sky.add(clouds);
   return sky;
+}
+
+// ---------------------------------------------------------------------
+// THE ENVIRONMENT PROBE - what the bodywork can see
+// ---------------------------------------------------------------------
+/**
+ * A racing car is a mirror. Two thirds of what you see on a real one is
+ * not its paint, it is the sky in its paint: the horizon line lying along
+ * the sidepod, the ground darkening the underside of the nose, a white
+ * smear of sun across the engine cover that slides as the car turns. Until
+ * now APEX had none of that - three lights and nothing to reflect - so the
+ * cars read as coloured shapes rather than objects with a surface.
+ *
+ * This builds the thing they reflect: a tiny scene of sky, ground and sun,
+ * blurred by PMREMGenerator into the roughness-aware probe three.js wants,
+ * and handed to scene.environment. Every MeshStandard/Physical material in
+ * the game picks it up for free - paint, visors, rims, the halo, the wet
+ * road - which is the whole reason to do it this way rather than hanging
+ * an envMap on each one.
+ *
+ * It is rebuilt only when the weather has visibly moved (see weather.js),
+ * because a 128 px cube map is cheap to make once and not cheap to make
+ * sixty times a second.
+ */
+export function envProbe(renderer) {
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  pmrem.compileEquirectangularShader();
+  const scene = new THREE.Scene();
+
+  // the same gradient the sky dome uses, so what the car reflects and what
+  // you see behind it are the same sky
+  const cTop = new THREE.Color(0x3d74c4), cMid = new THREE.Color(0x9cc0dd), cBot = new THREE.Color(0x6a7360);
+  const skyMat = new THREE.ShaderMaterial({
+    side: THREE.BackSide, depthWrite: false,
+    uniforms: { cTop: { value: cTop }, cMid: { value: cMid }, cBot: { value: cBot } },
+    vertexShader: 'varying float vH;\nvoid main() { vH = normalize(position).y;\n'
+      + 'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'uniform vec3 cTop, cMid, cBot;\nvarying float vH;\nvoid main() {\n'
+      + '  float h = clamp(vH, -1.0, 1.0);\n'
+      + '  vec3 c = h > 0.0 ? mix(cMid, cTop, pow(h, 0.62)) : mix(cMid, cBot, min(1.0, -h * 3.0));\n'
+      + '  gl_FragColor = vec4(c, 1.0);\n}',
+  });
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(60, 24, 16), skyMat));
+
+  // THE SUN, as a disc the paint can catch. Without it the reflection is a
+  // flat wash and the car never glints; with it there is one bright spot
+  // that travels across the bodywork as the car rotates, which is what the
+  // eye reads as gloss.
+  const sunMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  const sunBlob = new THREE.Mesh(new THREE.SphereGeometry(5.5, 12, 8), sunMat);
+  scene.add(sunBlob);
+
+  let rt = null;
+  return {
+    /**
+     * top/mid/bottom: the sky. ground: what is under the car, which is
+     * mostly grass and asphalt averaged together. dir: where the sun is.
+     * strength: how bright it burns, which the cloud cover pulls down.
+     */
+    update({ top, mid, bottom, ground, dir, strength = 1 }) {
+      if (top !== undefined) cTop.set(top);
+      if (mid !== undefined) cMid.set(mid);
+      if (bottom !== undefined) cBot.set(bottom);
+      if (ground !== undefined) cBot.set(ground);
+      if (dir) sunBlob.position.copy(dir).normalize().multiplyScalar(44);
+      sunMat.color.setRGB(strength * 2.4, strength * 2.3, strength * 2.1);
+      sunBlob.visible = strength > 0.06;
+      if (rt) rt.dispose();
+      rt = pmrem.fromScene(scene, 0, 1, 200);
+      return rt.texture;
+    },
+    dispose() { if (rt) rt.dispose(); pmrem.dispose(); },
+  };
 }
 
 // ---------------------------------------------------------------------

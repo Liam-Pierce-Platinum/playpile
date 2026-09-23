@@ -6,141 +6,320 @@
 <title>APEX</title>
 <style>
   :root {
-    --ink: #e8edf4;
-    --dim: #8b96a6;
-    --hot: #e03a2f;
-    --go:  #35d07f;
-    --panel: rgba(10,13,19,0.72);
+    --ink: #eef2f7;
+    --dim: #8e99a9;
+    --faint: #5b6677;
+    --hot: #e8392e;
+    --go: #35d07f;
+    --purple: #b56cff;
+    --amber: #f0c040;
+    --panel: rgba(9, 12, 18, 0.78);
+    --edge: rgba(255, 255, 255, 0.08);
+    --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; background: #05070b; overflow: hidden;
     font-family: 'Segoe UI', system-ui, sans-serif; color: var(--ink); }
   canvas { display: block; }
-  #hud { position: fixed; inset: 0; pointer-events: none; }
+  .tab { font-variant-numeric: tabular-nums; }
+  #hud { position: fixed; inset: 0; pointer-events: none; display: none; }
+  #hud.on { display: block; }
+  .panel { background: var(--panel); border: 1px solid var(--edge); border-radius: 10px;
+    backdrop-filter: blur(6px); }
 
-  /* ---- bottom left: the important numbers ---- */
-  #dash { position: absolute; left: 26px; bottom: 24px;
-    display: flex; align-items: flex-end; gap: 20px; }
-  #gear { font-size: 92px; line-height: 0.8; font-weight: 700; letter-spacing: -4px;
-    text-shadow: 0 3px 20px rgba(0,0,0,.8); min-width: 74px; text-align: center; }
-  #speedbox { padding-bottom: 6px; }
-  #speed { font-size: 46px; font-weight: 600; line-height: 0.9;
-    text-shadow: 0 3px 16px rgba(0,0,0,.8); font-variant-numeric: tabular-nums; }
-  #speed span { font-size: 15px; color: var(--dim); font-weight: 400; margin-left: 5px; }
+  /* ---- top left: where you are ---- */
+  #where { position: absolute; left: 24px; top: 20px; padding: 10px 14px; min-width: 190px; }
+  #circuit { font-size: 15px; font-weight: 700; letter-spacing: .6px; white-space: nowrap; }
+  #modeName { font-size: 11px; color: var(--dim); letter-spacing: 2px; margin-top: 2px; }
+  #corner { font-size: 13px; color: var(--hot); margin-top: 6px; min-height: 17px; font-weight: 600; }
 
-  /* ---- the rev bar and shift lights ---- */
-  #revwrap { position: absolute; left: 50%; top: 22px; transform: translateX(-50%);
-    width: 620px; max-width: 70vw; }
-  #lights { display: flex; gap: 7px; justify-content: center; margin-bottom: 9px; }
-  #lights i { width: 22px; height: 10px; border-radius: 2px; background: #1d222b;
-    border: 1px solid #2b3240; transition: background .04s; }
-  #revbar { height: 13px; background: rgba(10,13,19,0.66); border: 1px solid #2b3240;
-    border-radius: 3px; overflow: hidden; }
+  /* ---- the running order (race) ---- */
+  #tower { position: absolute; left: 24px; top: 112px; padding: 6px 0; min-width: 214px; display: none; }
+  #tower.on { display: block; }
+  #tower .row { display: grid; grid-template-columns: 26px 6px 1fr auto; gap: 8px; align-items: center;
+    padding: 3px 12px; font-size: 13px; }
+  #tower .row .p { color: var(--dim); text-align: right; font-weight: 700; }
+  #tower .row .c { width: 4px; height: 14px; border-radius: 2px; }
+  #tower .row .g { color: var(--dim); font-size: 12px; font-family: var(--mono); }
+  #tower .row.me { background: rgba(232, 57, 46, 0.22); }
+  #tower .row.me .n { font-weight: 700; }
+  #tower .row.out { opacity: .55; }
+
+  /* ---- top centre: revs ---- */
+  #revwrap { position: absolute; left: 50%; top: 20px; transform: translateX(-50%); width: 560px; max-width: 46vw; }
+  #lights { display: flex; gap: 6px; justify-content: center; margin-bottom: 8px; }
+  #lights i { width: 22px; height: 9px; border-radius: 2px; background: #1b2029; border: 1px solid #2a3140; }
+  #revbar { height: 10px; background: rgba(10,13,19,0.7); border: 1px solid #2a3140; border-radius: 3px; overflow: hidden; }
   #revfill { height: 100%; width: 0%; background: linear-gradient(90deg,#2f7de0,#35d07f 62%,#e6c03a 84%,var(--hot)); }
 
-  /* ---- timing, top right ---- */
-  #timing { position: absolute; right: 26px; top: 22px; text-align: right;
-    background: var(--panel); border: 1px solid #232a35; border-radius: 8px;
-    padding: 13px 17px; min-width: 208px; }
-  #timing .row { display: flex; justify-content: space-between; gap: 22px;
-    font-size: 14px; margin: 4px 0; }
-  #timing .row b { font-variant-numeric: tabular-nums; font-weight: 600; }
+  /* ---- top right: timing ---- */
+  #timing { position: absolute; right: 24px; top: 20px; padding: 12px 16px; min-width: 236px; }
+  #big { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; }
+  #pos { font-size: 34px; font-weight: 800; letter-spacing: -1px; display: none; }
+  #pos small { font-size: 15px; color: var(--dim); font-weight: 600; margin-left: 2px; }
+  #laptime { font-size: 28px; font-weight: 700; letter-spacing: -.5px; font-family: var(--mono); }
+  #lapcount { font-size: 12px; color: var(--dim); letter-spacing: 2px; margin-top: 2px; }
+  #delta { font-size: 16px; font-weight: 700; font-family: var(--mono); min-height: 20px; margin-top: 2px; }
+  #delta.up { color: var(--hot); } #delta.down { color: var(--go); }
+  #sectors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 8px 0 6px; }
+  #sectors div { height: 5px; border-radius: 2px; background: #252c38; }
+  #sectors div.pb { background: var(--purple); } #sectors div.good { background: var(--go); }
+  #sectors div.slow { background: var(--amber); }
+  #timing .row { display: flex; justify-content: space-between; gap: 18px; font-size: 13px; margin: 3px 0; }
+  #timing .row b { font-family: var(--mono); font-weight: 600; }
   #timing .k { color: var(--dim); }
-  #lap { font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums;
-    letter-spacing: -1px; margin-bottom: 4px; }
-  .best { color: var(--go); }
-  #delta { font-size: 15px; font-variant-numeric: tabular-nums; }
+  .best { color: var(--purple); }
 
-  /* ---- corner name + circuit, top left ---- */
-  #where { position: absolute; left: 26px; top: 22px; background: var(--panel);
-    border: 1px solid #232a35; border-radius: 8px; padding: 11px 15px; }
-  #circuit { font-size: 17px; font-weight: 700; letter-spacing: .4px; }
-  #country { font-size: 12px; color: var(--dim); margin-top: 1px; }
-  #corner { font-size: 13px; color: var(--hot); margin-top: 7px; min-height: 17px;
-    font-weight: 600; letter-spacing: .3px; }
-
-  /* ---- DRS + off-track flag ---- */
-  #flags { position: absolute; left: 50%; top: 86px; transform: translateX(-50%);
-    display: flex; gap: 10px; }
-  .flag { padding: 5px 13px; border-radius: 4px; font-size: 13px; font-weight: 700;
-    letter-spacing: 1.4px; opacity: 0; transition: opacity .12s; }
-  #drs { background: var(--go); color: #06231a; }
-  #off { background: #e6c03a; color: #2a2000; }
+  /* ---- messages in the middle ---- */
+  #flags { position: absolute; left: 50%; top: 70px; transform: translateX(-50%); display: flex; gap: 8px; }
+  .flag { padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 800; letter-spacing: 1.6px; opacity: 0; transition: opacity .12s; }
+  #drs { background: var(--go); color: #05241a; }
+  #drsAvail { background: transparent; color: var(--go); border: 1px solid var(--go); }
+  #off { background: var(--amber); color: #2a2000; }
+  #invalid { background: var(--hot); color: #fff; }
   .on { opacity: 1 !important; }
+  #banner { position: absolute; left: 50%; top: 30%; transform: translate(-50%, -50%); text-align: center;
+    font-size: 44px; font-weight: 800; letter-spacing: 3px; text-shadow: 0 4px 30px rgba(0,0,0,.7);
+    opacity: 0; transition: opacity .25s; white-space: nowrap; }
+  #banner small { display: block; font-size: 17px; letter-spacing: 2px; color: var(--dim); font-weight: 600; margin-top: 4px; }
+  #banner.show { opacity: 1; }
+  #startlights { position: absolute; left: 50%; top: 26%; transform: translate(-50%, -50%); display: none; gap: 14px; padding: 16px 22px; }
+  #startlights.on { display: flex; }
+  #startlights .col { width: 54px; height: 118px; background: #0b0d12; border-radius: 10px; display: flex; flex-direction: column;
+    align-items: center; justify-content: space-evenly; border: 1px solid #1f2430; }
+  #startlights .col i { width: 38px; height: 38px; border-radius: 50%; background: #2a0808; }
+  #startlights .col.lit i { background: radial-gradient(circle at 40% 35%, #ff8a7a, #e31c10 55%, #7a0600); box-shadow: 0 0 22px #ff2a1a; }
 
-  /* ---- minimap ---- */
-  #map { position: absolute; right: 26px; bottom: 24px; width: 210px; height: 210px;
-    background: var(--panel); border: 1px solid #232a35; border-radius: 8px; }
+  /* ---- bottom ---- */
+  #dash { position: absolute; left: 24px; bottom: 22px; display: flex; align-items: flex-end; gap: 18px; }
+  #gear { font-size: 86px; line-height: .8; font-weight: 800; letter-spacing: -4px; text-shadow: 0 3px 20px rgba(0,0,0,.8);
+    min-width: 70px; text-align: center; }
+  #speed { font-size: 44px; font-weight: 700; line-height: .9; text-shadow: 0 3px 16px rgba(0,0,0,.8); font-variant-numeric: tabular-nums; }
+  #speed span { font-size: 14px; color: var(--dim); font-weight: 500; margin-left: 5px; }
+  /* ---- speed lines, under the HUD ---- */
+  #speedlines { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
-  /* ---- help ---- */
-  #help { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%);
-    font-size: 12px; color: var(--dim); background: var(--panel); padding: 7px 15px;
-    border-radius: 20px; border: 1px solid #232a35; white-space: nowrap; }
+  /* ---- bottom left: the car - tyres, temperatures, damage, weather ---- */
+  #carbox { position: absolute; left: 24px; bottom: 128px; padding: 10px 12px; width: 214px; font-size: 12px; }
+  #carbox .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  #compound { width: 26px; height: 26px; border-radius: 50%; border: 3px solid #ccc; display: grid; place-items: center;
+    font-weight: 800; font-size: 12px; background: #0b0d12; }
+  #wx { color: var(--dim); letter-spacing: 1px; font-size: 11px; text-align: right; line-height: 1.35; }
+  #wx b { color: var(--ink); font-weight: 700; }
+  #tyres { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 26px; position: relative; }
+  #tyres::before { content: ''; position: absolute; left: 50%; top: 6px; bottom: 6px; width: 10px; margin-left: -5px;
+    border: 2px solid #2b3342; border-radius: 4px; }
+  #tyres .t { border-radius: 6px; padding: 4px 6px; background: #1b2029; border: 2px solid #2b3342; font-family: var(--mono);
+    display: flex; justify-content: space-between; font-size: 11px; }
+  #tyres .t b { font-weight: 700; }
+  #tyres .t.flat { border-color: var(--hot); background: rgba(232,57,46,.25); }
+  #tyres .t.gone { border-style: dashed; border-color: var(--hot); background: transparent; color: var(--hot); }
+  #dmg { color: var(--hot); font-weight: 700; margin-top: 7px; font-size: 11px; letter-spacing: .6px; min-height: 14px; text-transform: uppercase; }
+
+  /* ---- the pit wall talking to you ---- */
+  #pitbox { position: absolute; left: 50%; bottom: 58px; transform: translateX(-50%); padding: 8px 14px; display: none;
+    align-items: center; gap: 12px; font-size: 13px; }
+  #pitbox.on { display: flex; }
+  #pitbox .k { color: var(--amber); font-weight: 800; letter-spacing: 2px; }
+  #pitbox .c { padding: 3px 9px; border-radius: 6px; border: 1px solid #2b3342; font-weight: 700; font-size: 12px; }
+  #pitbox .c.sel { background: #eef2f7; color: #05070b; }
+  #pitbox .c i { font-style: normal; color: var(--faint); margin-right: 4px; }
+  #pitbox .c.sel i { color: #56606e; }
+
+  #map { position: absolute; right: 24px; bottom: 22px; width: 200px; height: 200px; }
+  #help { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); font-size: 12px; color: var(--dim);
+    padding: 6px 14px; border-radius: 20px; white-space: nowrap; transition: opacity 1s; }
   #help b { color: var(--ink); font-weight: 600; }
 
-  /* ---- the circuit picker ---- */
-  #menu { position: fixed; inset: 0; background: rgba(4,6,10,.93);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 26px; z-index: 10; }
-  #menu h1 { margin: 0; font-size: 74px; letter-spacing: 14px; font-weight: 200; }
-  #menu h1 b { font-weight: 700; color: var(--hot); }
-  #menu p { margin: -18px 0 6px; color: var(--dim); font-size: 13px; letter-spacing: 3.4px; }
-  #picks { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; max-width: 900px; }
-  .pick { pointer-events: auto; cursor: pointer; background: #0d1219; border: 1px solid #253040;
-    border-radius: 10px; padding: 16px 22px; min-width: 172px; text-align: left;
-    transition: border-color .12s, transform .12s; }
-  .pick:hover { border-color: var(--hot); transform: translateY(-3px); }
-  .pick .n { font-size: 19px; font-weight: 700; }
-  .pick .c { font-size: 12px; color: var(--dim); margin-top: 3px; }
-  .pick .d { font-size: 12px; color: #5f6a7a; margin-top: 9px; font-variant-numeric: tabular-nums; }
-  #loading { position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
-    background: #05070b; z-index: 20; font-size: 15px; letter-spacing: 3px; color: var(--dim); }
+  /* ---- screens: menu, pause, results ---- */
+  .screen { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 10;
+    background: radial-gradient(120% 90% at 50% 20%, rgba(20,26,38,.9), rgba(3,4,8,.96)); overflow-y: auto; padding: 30px 20px; }
+  .screen.on { display: flex; }
+  .inner { width: min(1060px, 100%); display: flex; flex-direction: column; align-items: center; gap: 22px; margin: auto; }
+  /* the `hidden` attribute loses to display:flex without this, and every menu step showed at once */
+  .inner[hidden] { display: none; }
+  .logo { margin: 0; font-size: 84px; letter-spacing: 18px; font-weight: 200; line-height: 1; }
+  .logo b { font-weight: 800; color: var(--hot); }
+  .kicker { margin: 0; color: var(--dim); font-size: 12px; letter-spacing: 4px; }
+  h2.step { margin: 0; font-size: 13px; letter-spacing: 3px; color: var(--dim); font-weight: 600; }
+  .cards { display: grid; gap: 14px; width: 100%; }
+  .cards.modes { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  /* 33 circuits: smaller cards, a wider picker, and the screen scrolls */
+  .cards.tracks { grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 10px; }
+  .cards.tracks .card { padding: 10px 12px 12px; }
+  .cards.tracks .card canvas { height: 82px; margin-bottom: 6px; }
+  .cards.tracks .card .t { font-size: 15px; letter-spacing: .5px; line-height: 1.2; }
+  .cards.tracks .card .d { font-size: 12px; margin-top: 3px; }
+  #menuTrack { width: min(1400px, 100%); }
+  .card { pointer-events: auto; cursor: pointer; background: #0c1119; border: 1px solid #222c3b; border-radius: 12px;
+    padding: 18px 20px; text-align: left; color: inherit; font: inherit; transition: border-color .12s, transform .12s, background .12s; }
+  .card:hover, .card:focus-visible { border-color: var(--hot); transform: translateY(-3px); background: #111824; outline: none; }
+  .card .t { font-size: 20px; font-weight: 800; letter-spacing: 1px; }
+  .card .d { font-size: 13px; color: var(--dim); margin-top: 6px; line-height: 1.45; }
+  .card canvas { width: 100%; height: 110px; margin-bottom: 10px; }
+  .card .best { font-family: var(--mono); font-size: 12px; margin-top: 8px; }
+  .opts { display: grid; grid-template-columns: auto 1fr; gap: 12px 18px; align-items: center; }
+  .opts label { color: var(--dim); font-size: 13px; letter-spacing: 1px; }
+  .seg { display: flex; gap: 6px; flex-wrap: wrap; }
+  .seg button { pointer-events: auto; cursor: pointer; background: #0c1119; border: 1px solid #263244; color: var(--ink);
+    border-radius: 8px; padding: 8px 16px; font: 600 14px system-ui; }
+  .seg button.sel { background: var(--hot); border-color: var(--hot); }
+  .btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .btn { pointer-events: auto; cursor: pointer; border: 0; border-radius: 9px; padding: 12px 26px; font: 800 14px system-ui;
+    letter-spacing: 2px; background: var(--hot); color: #fff; }
+  .btn.ghost { background: transparent; border: 1px solid #334055; color: var(--ink); }
+  .btn:hover { filter: brightness(1.1); }
+  table.res { border-collapse: collapse; width: min(640px, 100%); font-size: 14px; }
+  table.res td, table.res th { padding: 7px 10px; text-align: left; border-bottom: 1px solid #1c2430; }
+  table.res th { color: var(--dim); font-weight: 600; font-size: 12px; letter-spacing: 1px; }
+  table.res td.m { font-family: var(--mono); }
+  table.res tr.me td { background: rgba(232,57,46,.16); font-weight: 700; }
+  table.res .tm { display: block; color: var(--faint); font-size: 11px; letter-spacing: 1px; font-weight: 600; }
+  /* ---- the league: a calendar strip and two tables ---- */
+  #leagueBody { width: min(860px, 100%); }
+  .calendar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; justify-content: center; }
+  .calendar .round { font-size: 12px; padding: 6px 10px; border-radius: 7px; background: #0c1119;
+    border: 1px solid #222c3b; color: var(--dim); }
+  .calendar .round.done { color: var(--ink); border-color: #2c3a4d; }
+  .calendar .round.now { border-color: var(--hot); color: var(--ink); }
+  .calendar .round b { color: var(--hot); margin-left: 6px; font-family: var(--mono); }
+  .tables { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+  .tables table.res { width: 100%; }
+  .board { width: min(420px, 100%); }
+  .board .r { display: flex; justify-content: space-between; padding: 5px 2px; border-bottom: 1px solid #1c2430; font-size: 14px; }
+  .board .r b { font-family: var(--mono); }
+  .note { color: var(--faint); font-size: 12px; }
+  .back { pointer-events: auto; cursor: pointer; background: none; border: 0; color: var(--dim); font: 600 13px system-ui; letter-spacing: 1px; }
+  .back:hover { color: var(--ink); }
+  #loading { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 20;
+    background: #05070b; font-size: 14px; letter-spacing: 4px; color: var(--dim); }
+  #loading.on { display: flex; }
 </style>
 </head>
 <body>
+<canvas id="speedlines"></canvas>
 <div id="hud">
-  <div id="where">
+  <div id="where" class="panel">
     <div id="circuit">-</div>
-    <div id="country">-</div>
+    <div id="modeName">-</div>
     <div id="corner"></div>
   </div>
+  <div id="tower" class="panel"></div>
 
   <div id="revwrap">
     <div id="lights"></div>
     <div id="revbar"><div id="revfill"></div></div>
   </div>
-
   <div id="flags">
-    <div class="flag" id="drs">DRS</div>
+    <div class="flag" id="drsAvail">DRS</div>
+    <div class="flag" id="drs">DRS OPEN</div>
     <div class="flag" id="off">OFF TRACK</div>
+    <div class="flag" id="invalid">LAP INVALID</div>
   </div>
+  <div id="banner"></div>
+  <div id="startlights" class="panel"></div>
 
-  <div id="timing">
-    <div id="lap">--:--.---</div>
-    <div id="delta">&nbsp;</div>
+  <div id="timing" class="panel">
+    <div id="big"><div id="pos"></div><div id="laptime" class="tab">--:--.---</div></div>
+    <div id="lapcount"></div>
+    <div id="delta"></div>
+    <div id="sectors"><div></div><div></div><div></div></div>
     <div class="row"><span class="k">LAST</span><b id="last">--:--.---</b></div>
-    <div class="row"><span class="k">BEST</span><b id="best">--:--.---</b></div>
-    <div class="row"><span class="k">LAPS</span><b id="laps">0</b></div>
+    <div class="row"><span class="k" id="bestLabel">BEST</span><b id="best">--:--.---</b></div>
   </div>
 
   <div id="dash">
     <div id="gear">N</div>
-    <div id="speedbox"><div id="speed">0<span>KM/H</span></div></div>
+    <div><div id="speed">0<span>KM/H</span></div></div>
   </div>
-
-  <canvas id="map" width="420" height="420"></canvas>
-
-  <div id="help">
-    <b>W</b>/<b>S</b> throttle, brake &nbsp;·&nbsp; <b>A</b>/<b>D</b> steer &nbsp;·&nbsp;
-    <b>Shift</b>/<b>Ctrl</b> gears &nbsp;·&nbsp; <b>Space</b> DRS &nbsp;·&nbsp;
-    <b>C</b> clutch &nbsp;·&nbsp; <b>V</b> camera &nbsp;·&nbsp; <b>R</b> reset &nbsp;·&nbsp; <b>Esc</b> circuits
+  <div id="carbox" class="panel">
+    <div class="top"><div id="compound">M</div><div id="wx"></div></div>
+    <div id="tyres"><div class="t"></div><div class="t"></div><div class="t"></div><div class="t"></div></div>
+    <div id="dmg"></div>
+  </div>
+  <div id="pitbox" class="panel"></div>
+  <canvas id="map" width="400" height="400"></canvas>
+  <div id="help" class="panel">
+    <b>W</b>/<b>S</b> throttle, brake · <b>A</b>/<b>D</b> steer · <b>E</b>/<b>Q</b> gear up, down ·
+    <b>Space</b> DRS · <b>P</b> pit, <b>1</b>-<b>5</b> tyres · <b>V</b> camera · <b>R</b> reset · <b>Esc</b> pause
   </div>
 </div>
 
-<div id="menu">
-  <p>FORMULA ONE</p>
-  <h1>A<b>P</b>EX</h1>
-  <div id="picks"></div>
+<!-- ---- the menu: mode, then circuit, then (race) the settings ---- -->
+<div id="menu" class="screen on">
+  <div class="inner" id="menuMode">
+    <p class="kicker">FORMULA ONE</p>
+    <h1 class="logo">A<b>P</b>EX</h1>
+    <div class="cards modes" id="modes"></div>
+  </div>
+  <div class="inner" id="menuTrack" hidden>
+    <h2 class="step" id="trackTitle">CHOOSE A CIRCUIT</h2>
+    <div class="cards tracks" id="tracks"></div>
+    <button class="back" data-back="mode">&larr; BACK</button>
+  </div>
+  <div class="inner" id="menuRace" hidden>
+    <h2 class="step" id="raceTitle">RACE</h2>
+    <div class="opts">
+      <label>LAPS</label><div class="seg" data-opt="laps"></div>
+      <label>CARS</label><div class="seg" data-opt="cars"></div>
+      <label>DIFFICULTY</label><div class="seg" data-opt="skill"></div>
+      <label>START</label><div class="seg" data-opt="grid"></div>
+      <label>WEATHER</label><div class="seg" data-opt="weather"></div>
+      <label>TYRES</label><div class="seg" data-opt="tyre"></div>
+    </div>
+    <div class="btns"><button class="btn" id="goRace">START RACE</button></div>
+    <button class="back" data-back="track">&larr; BACK</button>
+  </div>
+  <div class="inner" id="menuFree" hidden>
+    <h2 class="step" id="freeTitle">FREE DRIVE</h2>
+    <div class="opts">
+      <label>WEATHER</label><div class="seg" data-opt="weather"></div>
+      <label>TYRES</label><div class="seg" data-opt="tyre"></div>
+    </div>
+    <div class="btns"><button class="btn" id="goFree">DRIVE</button></div>
+    <button class="back" data-back="track">&larr; BACK</button>
+  </div>
+  <div class="inner" id="menuLeague" hidden>
+    <h2 class="step" id="leagueTitle">LEAGUE</h2>
+    <div id="leagueBody"></div>
+    <div class="btns"><button class="btn" id="leagueGo">START THE SEASON</button>
+      <button class="btn ghost" id="leagueDrop" hidden>ABANDON SEASON</button></div>
+    <button class="back" data-back="mode">&larr; BACK</button>
+  </div>
+  <div class="inner" id="menuBoard" hidden>
+    <h2 class="step" id="boardTitle">TIME ATTACK</h2>
+    <div class="board" id="board"></div>
+    <p class="note">Your best lap on this circuit races you as a ghost. A lap with all four wheels over the white line does not count.</p>
+    <div class="opts">
+      <label>WEATHER</label><div class="seg" data-opt="weather"></div>
+      <label>TYRES</label><div class="seg" data-opt="tyre"></div>
+    </div>
+    <div class="btns"><button class="btn" id="goAttack">DRIVE</button></div>
+    <button class="back" data-back="track">&larr; BACK</button>
+  </div>
+</div>
+
+<div id="pause" class="screen">
+  <div class="inner">
+    <h2 class="step">PAUSED</h2>
+    <div class="btns">
+      <button class="btn" data-act="resume">RESUME</button>
+      <button class="btn ghost" data-act="restart">RESTART</button>
+      <button class="btn ghost" data-act="menu">MENU</button>
+    </div>
+  </div>
+</div>
+
+<div id="results" class="screen">
+  <div class="inner">
+    <h2 class="step" id="resTitle">RESULT</h2>
+    <div id="resBody"></div>
+    <div class="btns">
+      <button class="btn" id="resNext" data-act="league" hidden>CHAMPIONSHIP</button>
+      <button class="btn" data-act="restart">RACE AGAIN</button>
+      <button class="btn ghost" data-act="menu">MENU</button>
+    </div>
+  </div>
 </div>
 <div id="loading">BUILDING CIRCUIT</div>
 

@@ -86,19 +86,51 @@ export const GAMES = [
     slug: 'apex', title: 'APEX', how: 'mounted', port: 8201, url: '/',
     web: 'apex/',
     tag: 'Racing', big: true,
-    cat: 'Driving', tags: ['new', 'racing', 'f1', 'cars', 'simulation', '3d', 'track'],
-    blurb: 'Five real Formula 1 circuits, a manual eight-speed box, and grip that grows with speed.',
-    about: `Monza, Silverstone, Suzuka, Spa and Monaco, each laid out from its real
-    corner sequence and solved until the lap closes to under a metre and measures the
-    published distance. The car makes its own grip out of air - about its own weight
-    again in downforce by 200 km/h - so it corners harder the faster it is going, and
-    the body heaves, pitches and rolls on four real springs rather than on a formula.
-    The gearbox is manual, with the shift lights across the top going green, amber,
-    red, purple like the real ones.`,
+    cat: 'Driving', tags: ['new', 'racing', 'f1', 'cars', 'simulation', '3d', 'track',
+                           'rain', 'pit stops', 'damage', 'career'],
+    blurb: 'Thirty-three real circuits, twenty-four cars, and a tow worth eighteen km/h.',
+    about: `Every circuit on the calendar and a good many that are not, each laid out
+    from its real corner sequence and solved until the lap closes to under a metre and
+    measures the published distance. The car makes its own grip out of air - about its
+    own weight again in downforce by 200 km/h - so it corners harder the faster it is
+    going, and the body heaves, pitches and rolls on four real springs rather than on
+    a formula. Twelve teams, two cars each, and the air behind them matters: sit in
+    somebody's tow down a straight and you gain eighteen km/h, follow him through the
+    corner and you are the one with seven per cent less grip. Tyres go off and get too
+    hot, it rains and the road reflects it, the car breaks when you hit things, and
+    the crew come over the wall to change four of them while you sit there. A season
+    is run race by race with a championship table at the end of it.`,
     controls: [['W S', 'throttle · brake'], ['A D', 'steer'],
-               ['Shift / Ctrl', 'up a gear · down a gear'], ['Space', 'DRS'],
-               ['C', 'clutch'], ['V', 'camera'], ['R', 'back on track'], ['Esc', 'circuit list']],
-    tips: 'Short-shift out of the slow corners. The wings do nothing at 60 km/h, so first and second are all tyre.',
+               ['E Q', 'up a gear · down a gear'], ['Space', 'DRS'],
+               ['P', 'call the pits'], ['1 - 5', 'choose tyres'],
+               ['V', 'camera'], ['R', 'back on track'], ['Esc', 'pause']],
+    tips: 'Get a tow down the straight before you commit to the move - in the corner behind him you have less grip than he does, not more. And a downshift too many will step the back out.',
+  },
+  {
+    slug: 'nascar', title: 'NASCAR', how: 'mounted', port: 8220, url: '/',
+    web: 'nascar/',
+    tag: 'Racing', big: true,
+    cat: 'Driving', tags: ['new', 'racing', 'nascar', 'stock cars', 'oval', 'cars',
+                           'simulation', '3d', 'draft', 'pit stops', 'career'],
+    blurb: 'Twenty ovals, forty cars, and a draft that decides it on the last lap.',
+    about: `Twenty speedways, each solved from its published lap distance, banking and
+    corner radius until the shape closes - Daytona's tri-oval, Bristol's concrete bowl,
+    Martinsville's paperclip, Darlington with its two different ends, Pocono's three
+    corners and Indianapolis with its straights dead flat. The banking is real
+    arithmetic: at thirty-one degrees the corner takes the tyres out of the argument
+    entirely, which is why nobody lifts at Daytona and everybody does at Phoenix.
+    The air is the other half of the race - a car on its own is slower than two cars
+    nose to tail, so the pack forms itself. The other thirty-nine drive the same car
+    you do, with the same four-speed box and the same wall. Tyres go off in about a
+    fuel run, so a stop is a decision rather than a formality, and the crew take
+    thirteen seconds over the wall because the fuel man works while the tyres are
+    changed. Run one race, a season of them, or four hundred laps in one sitting.`,
+    controls: [['W S', 'throttle · brake'], ['A D', 'steer'],
+               ['E Q', 'up a gear · down a gear'], ['P', 'call the pits'],
+               ['T', 'tear-off'], ['V', 'camera'],
+               ['Arrows', 'wedge · track bar'], ['[ ]', 'race speed'],
+               ['R', 'back on track'], ['Esc', 'pause']],
+    tips: 'Nobody wins a superspeedway race on their own. Stay on the bumper in front, and remember the man behind you is pushing because it suits him, not you.',
   },
   {
     slug: 'night-shift', title: 'NIGHT SHIFT', how: 'mounted', port: 8130, url: '/',

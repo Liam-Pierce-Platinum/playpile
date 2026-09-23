@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NASCAR</title>
+<style>
+  :root {
+    --ink: #eef2f7;
+    --dim: #8e99a9;
+    --faint: #5b6677;
+    --hot: #d93a2b;
+    --go: #35d07f;
+    --amber: #f0c040;
+    --yellow: #ffd23f;
+    --panel: rgba(9, 12, 18, 0.80);
+    --edge: rgba(255, 255, 255, 0.09);
+    --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #05070b; overflow: hidden;
+    font-family: 'Segoe UI', system-ui, sans-serif; color: var(--ink); }
+  canvas { display: block; }
+  .tab { font-variant-numeric: tabular-nums; }
+  #hud { position: fixed; inset: 0; pointer-events: none; display: none; }
+  #hud.on { display: block; }
+  .panel { background: var(--panel); border: 1px solid var(--edge); border-radius: 10px;
+    backdrop-filter: blur(6px); }
+
+  /* ---- top left: where you are ---- */
+  #where { position: absolute; left: 22px; top: 18px; padding: 9px 14px; min-width: 200px; }
+  #trackName { font-size: 15px; font-weight: 800; letter-spacing: .8px; white-space: nowrap; }
+  #modeName { font-size: 11px; color: var(--dim); letter-spacing: 2px; margin-top: 2px; }
+
+  /* ---- the running order ---- */
+  #tower { position: absolute; left: 22px; top: 96px; padding: 5px 0; min-width: 232px; display: none;
+    max-height: 62vh; overflow: hidden; }
+  #tower.on { display: block; }
+  #tower .row { display: grid; grid-template-columns: 22px 5px 34px 1fr auto; gap: 7px; align-items: center;
+    padding: 2px 11px; font-size: 12.5px; }
+  #tower .row .p { color: var(--dim); text-align: right; font-weight: 700; }
+  #tower .row .c { width: 4px; height: 13px; border-radius: 2px; }
+  #tower .row .no { font-family: var(--mono); font-weight: 700; color: var(--ink); }
+  #tower .row .g { color: var(--dim); font-size: 11.5px; font-family: var(--mono); }
+  #tower .row.me { background: rgba(217, 58, 43, 0.26); }
+  #tower .row.out { opacity: .45; }
+  #tower .row.pit .g { color: var(--amber); }
+
+  /* ---- top centre: revs ---- */
+  #revwrap { position: absolute; left: 50%; top: 16px; transform: translateX(-50%); width: 520px; max-width: 44vw; }
+  #lights { display: flex; gap: 5px; justify-content: center; margin-bottom: 7px; }
+  #lights i { width: 20px; height: 8px; border-radius: 2px; background: #1b2029; border: 1px solid #2a3140; }
+  #revbar { height: 9px; background: rgba(10,13,19,0.7); border: 1px solid #2a3140; border-radius: 3px; overflow: hidden; }
+  #revfill { height: 100%; width: 0%; background: linear-gradient(90deg,#2f7de0,#35d07f 60%,#e6c03a 82%,var(--hot)); }
+
+  /* ---- top right: timing ---- */
+  #timing { position: absolute; right: 22px; top: 18px; padding: 11px 15px; min-width: 228px; }
+  #big { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; }
+  #pos { font-size: 34px; font-weight: 800; letter-spacing: -1px; display: none; }
+  #pos small { font-size: 15px; color: var(--dim); font-weight: 600; margin-left: 2px; }
+  #laptime { font-size: 26px; font-weight: 700; letter-spacing: -.5px; font-family: var(--mono); }
+  #lapcount { font-size: 12px; color: var(--dim); letter-spacing: 2px; margin-top: 2px; }
+  #timing .row { display: flex; justify-content: space-between; gap: 18px; font-size: 12.5px; margin: 3px 0; }
+  #timing .row b { font-family: var(--mono); font-weight: 600; }
+  #timing .k { color: var(--dim); }
+
+  /* ---- flags and messages ---- */
+  #flags { position: absolute; left: 50%; top: 62px; transform: translateX(-50%); display: flex; gap: 8px; }
+  .flag { padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 800; letter-spacing: 1.6px; opacity: 0; transition: opacity .12s; }
+  #fCaution { background: var(--yellow); color: #221a00; }
+  #fDraft { background: var(--go); color: #05241a; }
+  #fPit { background: var(--amber); color: #2a2000; }
+  #fSpeed { background: var(--hot); color: #fff; }
+  .on { opacity: 1 !important; }
+  #banner { position: absolute; left: 50%; top: 27%; transform: translate(-50%, -50%); text-align: center;
+    font-size: 40px; font-weight: 800; letter-spacing: 3px; text-shadow: 0 4px 30px rgba(0,0,0,.8);
+    opacity: 0; transition: opacity .25s; white-space: nowrap; }
+  #banner small { display: block; font-size: 16px; letter-spacing: 2px; color: var(--dim); font-weight: 600; margin-top: 4px; }
+  #banner.show { opacity: 1; }
+  #radio { position: absolute; left: 50%; bottom: 96px; transform: translateX(-50%); display: flex;
+    flex-direction: column; gap: 4px; align-items: center; }
+  #radio div { font-size: 13px; font-weight: 700; letter-spacing: 1.4px; padding: 5px 13px; border-radius: 6px;
+    background: rgba(9,12,18,0.82); border: 1px solid var(--edge); }
+
+  /* ---- bottom left: the dash ---- */
+  #dash { position: absolute; left: 22px; bottom: 20px; display: flex; align-items: flex-end; gap: 16px; }
+  #gear { font-size: 78px; line-height: .8; font-weight: 800; letter-spacing: -4px;
+    text-shadow: 0 3px 20px rgba(0,0,0,.85); min-width: 62px; text-align: center; }
+  #speed { font-size: 42px; font-weight: 700; line-height: .9; text-shadow: 0 3px 16px rgba(0,0,0,.85);
+    font-variant-numeric: tabular-nums; }
+  #speed span { font-size: 13px; color: var(--dim); font-weight: 500; margin-left: 5px; }
+  #clutchLamp { font-size: 11px; letter-spacing: 2px; color: var(--amber); min-height: 14px; font-weight: 700; }
+
+  /* ---- bottom left: the car ---- */
+  #carbox { position: absolute; left: 22px; bottom: 126px; padding: 9px 11px; width: 218px; font-size: 12px; }
+  #carbox .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px;
+    font-size: 11px; letter-spacing: 1.4px; color: var(--dim); }
+  #fuelbar { height: 7px; background: #1b2029; border: 1px solid #2b3342; border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+  #fuelfill { height: 100%; background: linear-gradient(90deg,var(--hot),var(--amber) 35%,var(--go)); }
+  #tyres { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 24px; position: relative; }
+  #tyres .t { border-radius: 5px; padding: 3px 6px; background: #1b2029; border: 2px solid #2b3342;
+    font-family: var(--mono); display: flex; justify-content: space-between; font-size: 11px; }
+  #tyres .t.hot { border-color: var(--amber); }
+  #tyres .t.flat { border-color: var(--hot); background: rgba(217,58,43,.25); }
+  #tyres .t.gone { border-style: dashed; border-color: var(--hot); background: transparent; color: var(--hot); }
+  #balance { margin-top: 8px; font-size: 11px; letter-spacing: 1px; color: var(--dim); }
+  #balbar { height: 6px; background: #1b2029; border: 1px solid #2b3342; border-radius: 3px; position: relative; margin-top: 3px; }
+  #balbar i { position: absolute; top: -2px; width: 3px; height: 10px; background: var(--ink); border-radius: 2px; left: 50%; }
+  #dmg { color: var(--hot); font-weight: 700; margin-top: 7px; font-size: 11px; letter-spacing: .6px;
+    min-height: 14px; text-transform: uppercase; line-height: 1.4; }
+  #setup { margin-top: 7px; font-size: 11px; color: var(--dim); letter-spacing: 1px; }
+  #setup b { color: var(--ink); font-family: var(--mono); }
+
+  #map { position: absolute; right: 22px; bottom: 20px; width: 190px; height: 190px; }
+  #help { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); font-size: 12px; color: var(--dim);
+    padding: 6px 14px; border-radius: 20px; white-space: nowrap; transition: opacity 1s; }
+  #help b { color: var(--ink); font-weight: 600; }
+
+  /* ---- screens ---- */
+  .screen { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 10;
+    background: radial-gradient(120% 90% at 50% 15%, rgba(26,20,20,.92), rgba(3,4,8,.97)); overflow-y: auto; padding: 28px 20px; }
+  .screen.on { display: flex; }
+  .inner { width: min(1020px, 100%); display: flex; flex-direction: column; align-items: center; gap: 20px; margin: auto; }
+  .inner[hidden] { display: none; }
+  .logo { margin: 0; font-size: 76px; letter-spacing: 14px; font-weight: 200; line-height: 1; }
+  .logo b { font-weight: 800; color: var(--hot); }
+  .kicker { margin: 0; color: var(--dim); font-size: 12px; letter-spacing: 5px; }
+  h2.step { margin: 0; font-size: 13px; letter-spacing: 3px; color: var(--dim); font-weight: 600; }
+  .cards { display: grid; gap: 14px; width: 100%; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .card { pointer-events: auto; cursor: pointer; background: #0c1119; border: 1px solid #222c3b; border-radius: 12px;
+    padding: 16px 18px; text-align: left; color: inherit; font: inherit;
+    transition: border-color .12s, transform .12s, background .12s; }
+  .card:hover, .card:focus-visible { border-color: var(--hot); transform: translateY(-3px); background: #131a25; outline: none; }
+  .card .t { font-size: 19px; font-weight: 800; letter-spacing: 1px; }
+  .card .d { font-size: 12.5px; color: var(--dim); margin-top: 6px; line-height: 1.45; }
+  .card canvas { width: 100%; height: 108px; margin-bottom: 8px; }
+  .opts { display: grid; grid-template-columns: auto 1fr; gap: 11px 18px; align-items: center; }
+  .opts label { color: var(--dim); font-size: 13px; letter-spacing: 1px; }
+  .seg { display: flex; gap: 6px; flex-wrap: wrap; }
+  .seg button { pointer-events: auto; cursor: pointer; background: #0c1119; border: 1px solid #263244; color: var(--ink);
+    border-radius: 8px; padding: 7px 14px; font: 600 13.5px system-ui; }
+  .seg button.sel { background: var(--hot); border-color: var(--hot); }
+  .btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .btn { pointer-events: auto; cursor: pointer; border: 0; border-radius: 9px; padding: 12px 26px; font: 800 14px system-ui;
+    letter-spacing: 2px; background: var(--hot); color: #fff; }
+  .btn.ghost { background: transparent; border: 1px solid #334055; color: var(--ink); }
+  .btn:hover { filter: brightness(1.12); }
+  table.res { border-collapse: collapse; width: min(700px, 100%); font-size: 13.5px; }
+  table.res td, table.res th { padding: 6px 9px; text-align: left; border-bottom: 1px solid #1c2430; }
+  table.res th { color: var(--dim); font-weight: 600; font-size: 11.5px; letter-spacing: 1px; }
+  table.res td.m { font-family: var(--mono); }
+  table.res tr.me td { background: rgba(217,58,43,.18); font-weight: 700; }
+  .note { color: var(--faint); font-size: 12px; max-width: 640px; text-align: center; line-height: 1.5; }
+  .back { pointer-events: auto; cursor: pointer; background: none; border: 0; color: var(--dim); font: 600 13px system-ui; letter-spacing: 1px; }
+  .back:hover { color: var(--ink); }
+  #loading { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 20;
+    background: #05070b; font-size: 14px; letter-spacing: 4px; color: var(--dim); }
+  #loading.on { display: flex; }
+  /* ---- the season: a calendar strip and a points table ---- */
+  #seasonBody { width: min(820px, 100%); }
+  .calendar { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 16px; }
+  .calendar .round { font: 600 12px/1 system-ui; padding: 7px 10px; border-radius: 7px;
+    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.10); color: #97a3b6; }
+  .calendar .round.done { color: #e7ecf3; }
+  .calendar .round.now { border-color: #ffb648; color: #ffd9a8; }
+  .calendar .round b { color: #ffb648; margin-left: 6px; font-family: ui-monospace, Consolas, monospace; }
+  table.res { border-collapse: collapse; width: 100%; font: 400 14px/1.5 system-ui; }
+  table.res td, table.res th { padding: 6px 10px; text-align: left; border-bottom: 1px solid rgba(255,255,255,.07); }
+  table.res th { color: #8b96a8; font: 600 11px/1 system-ui; letter-spacing: 1px; }
+  table.res td.m { font-family: ui-monospace, Consolas, monospace; }
+  table.res tr.me td { background: rgba(255,182,72,.14); font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="hud">
+  <div id="where" class="panel">
+    <div id="trackName">-</div>
+    <div id="modeName">-</div>
+  </div>
+  <div id="tower" class="panel"></div>
+
+  <div id="revwrap">
+    <div id="lights"></div>
+    <div id="revbar"><div id="revfill"></div></div>
+  </div>
+  <div id="flags">
+    <div class="flag" id="fCaution">CAUTION</div>
+    <div class="flag" id="fDraft">IN THE DRAFT</div>
+    <div class="flag" id="fPit">PIT ROAD</div>
+    <div class="flag" id="fSpeed">TOO FAST</div>
+  </div>
+  <div id="banner"></div>
+  <div id="radio"></div>
+
+  <div id="timing" class="panel">
+    <div id="big"><div id="pos"></div><div id="laptime" class="tab">--:--.---</div></div>
+    <div id="lapcount"></div>
+    <div class="row"><span class="k">LAST</span><b id="last">--:--.---</b></div>
+    <div class="row"><span class="k">BEST</span><b id="best">--:--.---</b></div>
+    <div class="row"><span class="k">GAP AHEAD</span><b id="gap">--</b></div>
+  </div>
+
+  <div id="dash">
+    <div><div id="gear">N</div><div id="clutchLamp"></div></div>
+    <div><div id="speed">0<span>MPH</span></div></div>
+  </div>
+  <div id="carbox" class="panel">
+    <div class="top"><span>FUEL</span><span id="fuelTxt">-</span></div>
+    <div id="fuelbar"><div id="fuelfill"></div></div>
+    <div id="tyres"><div class="t"></div><div class="t"></div><div class="t"></div><div class="t"></div></div>
+    <div id="balance">LOOSE &nbsp;&larr;&nbsp; BALANCE &nbsp;&rarr;&nbsp; TIGHT<div id="balbar"><i></i></div></div>
+    <div id="setup">WEDGE <b id="wedgeTxt">0.0</b> &nbsp; TRACK BAR <b id="barTxt">0.0</b></div>
+    <div id="dmg"></div>
+  </div>
+  <canvas id="map" width="380" height="380"></canvas>
+  <div id="help" class="panel">
+    <b>W</b>/<b>S</b> throttle, brake · <b>A</b>/<b>D</b> steer · <b>E</b>/<b>Q</b> gear · <b>C</b> clutch ·
+    <b>V</b> camera · <b>&uarr;/&darr;</b> wedge · <b>&larr;/&rarr;</b> track bar · <b>R</b> reset · <b>Esc</b> pause
+  </div>
+</div>
+
+<!-- ---- the menu ---- -->
+<div id="menu" class="screen on">
+  <div class="inner" id="menuMode">
+    <p class="kicker">STOCK CAR RACING</p>
+    <h1 class="logo">N<b>A</b>SCAR</h1>
+    <div class="cards" id="modes"></div>
+    <p class="note">Fifteen hundred kilos, six hundred and seventy horsepower, a four-speed you shift
+      yourself, and a banking steep enough that the tyres are not the limit &mdash; the air is.</p>
+  </div>
+  <div class="inner" id="menuTrack" hidden>
+    <h2 class="step" id="trackTitle">CHOOSE A TRACK</h2>
+    <div class="cards" id="tracks"></div>
+    <button class="back" data-back="mode">&larr; BACK</button>
+  </div>
+  <div class="inner" id="menuRace" hidden>
+    <h2 class="step" id="raceTitle">RACE</h2>
+    <div class="opts">
+      <label>LAPS</label><div class="seg" data-opt="laps"></div>
+      <label>CARS</label><div class="seg" data-opt="cars"></div>
+      <label>DIFFICULTY</label><div class="seg" data-opt="skill"></div>
+      <label>START</label><div class="seg" data-opt="grid"></div>
+      <label>STABILITY ASSIST</label><div class="seg" data-opt="assist"></div>
+    </div>
+    <div class="btns"><button class="btn" id="goRace">GO RACING</button></div>
+    <button class="back" data-back="track">&larr; BACK</button>
+  </div>
+  <div class="inner" id="menuEndurance" hidden>
+    <h2 class="step" id="enduranceTitle">ENDURANCE</h2>
+    <div class="opts">
+      <label>LAPS</label><div class="seg" data-opt="elaps"></div>
+      <label>CARS</label><div class="seg" data-opt="cars"></div>
+      <label>DIFFICULTY</label><div class="seg" data-opt="skill"></div>
+      <label>START</label><div class="seg" data-opt="grid"></div>
+      <label>STABILITY ASSIST</label><div class="seg" data-opt="assist"></div>
+    </div>
+    <p class="note">Run in three stages with a caution at the end of each. Tyres go off, fuel runs
+      out, and the stops decide it. <b>P</b> calls your crew, <b>[</b> and <b>]</b> wind the race
+      clock on up to eight times so four hundred laps fit in an evening.</p>
+    <div class="btns"><button class="btn" id="goEndurance">GO RACING</button></div>
+    <button class="back" data-back="track">&larr; BACK</button>
+  </div>
+  <div class="inner" id="menuSeason" hidden>
+    <h2 class="step" id="seasonTitle">SEASON</h2>
+    <div id="seasonBody"></div>
+    <div class="btns"><button class="btn" id="seasonGo">START THE SEASON</button>
+      <button class="btn ghost" id="seasonDrop" hidden>ABANDON SEASON</button></div>
+    <button class="back" data-back="mode">&larr; BACK</button>
+  </div>
+  <div class="inner" id="menuPractice" hidden>
+    <h2 class="step" id="practiceTitle">PRACTICE</h2>
+    <div class="opts">
+      <label>OTHER CARS</label><div class="seg" data-opt="pcars"></div>
+      <label>STABILITY ASSIST</label><div class="seg" data-opt="assist"></div>
+    </div>
+    <div class="btns"><button class="btn" id="goPractice">RUN</button></div>
+    <button class="back" data-back="track">&larr; BACK</button>
+  </div>
+</div>
+
+<div id="pause" class="screen">
+  <div class="inner">
+    <h2 class="step">PAUSED</h2>
+    <div class="btns">
+      <button class="btn" data-act="resume">RESUME</button>
+      <button class="btn ghost" data-act="restart">RESTART</button>
+      <button class="btn ghost" data-act="menu">MENU</button>
+    </div>
+  </div>
+</div>
+
+<div id="results" class="screen">
+  <div class="inner">
+    <h2 class="step" id="resTitle">RESULT</h2>
+    <div id="resBody"></div>
+    <div class="btns">
+      <button class="btn" id="resSeason" data-act="season" hidden>CHAMPIONSHIP</button>
+      <button class="btn" data-act="restart">RACE AGAIN</button>
+      <button class="btn ghost" data-act="menu">MENU</button>
+    </div>
+  </div>
+</div>
+<div id="loading">BUILDING THE SPEEDWAY</div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

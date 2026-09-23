@@ -52,8 +52,14 @@ export const P = {
   coat1: '#2e4166', coat2: '#3f5a86', coat3: '#587aab',
   foe1: '#5a2a34', foe2: '#7d3a46', foe3: '#a04f5c',
   red: '#d8443c', gold: '#e8b83c', flame: '#ffd06a', hot: '#fff3c8',
-  toxic: '#7ad84c', tag1: '#e0503a', tag2: '#3ab0e0', tag3: '#e8c840',
-  tag4: '#8a5ad8', tag5: '#40c880',
+  toxic: '#7ad84c',
+  /* SPRAY. These were saturated signal colours - #3ab0e0, #40c880 - and
+     they sat on the back wall behind the fight, brighter than any man in
+     the room. Paint on damp concrete at dusk is none of those things.
+     Same five hues, dropped into the range the walls already live in, so
+     a tag reads as a mark on a wall instead of as something on the HUD. */
+  tag1: '#7e3830', tag2: '#2f6482', tag3: '#8a7334',
+  tag4: '#4f3c6e', tag5: '#376b52',
 };
 
 /* ---- the canvas ------------------------------------------------------------

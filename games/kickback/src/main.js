@@ -26,6 +26,8 @@ for (const s of level.spawns) {
 const world = {
   solids: level.solids, level, enemies, player,
   fx: null, freeze: 0,
+  /* how long the crosshair has left to say the last shot landed */
+  hit: 0, hitKill: false,
   /* ---- the firing token ---------------------------------------------------
      One man on a floor may be lining up a shot at a time. Four telegraphs
      landing together is not four times the difficulty, it is an unavoidable
@@ -123,6 +125,11 @@ function pick(i) {
   player.owned[u.id] = (player.owned[u.id] || 0) + 1;
   player.regear();
   player.shells = player.mods.shells;
+  /* AND IT PATCHES YOU UP. Not all the way - a floor you took badly is
+     still a floor you took badly - but there is no other healing in the
+     building and six floors on one bar is not a run, it is a coin flip.
+     The crate at the top of every stair is the checkpoint. */
+  player.hp = Math.min(100, player.hp + 45);
   choosing.crate.taken = true;
   choosing = null;
 }
@@ -151,6 +158,7 @@ function step(dt) {
      shotgun hit is a number going down, with it the whole screen flinches. */
   if (world.freeze > 0) { world.freeze -= dt; world.fx.update(dt); return; }
   time += dt;
+  world.hit = Math.max(0, world.hit - dt);
   IN.aim = aimFromMouse();
   if (held) IN.fire = true;
   if (held2) IN.fire2 = true;
@@ -279,6 +287,19 @@ function drawHUD(g) {
   px(cx - 5, cy, 3, 1); px(cx + 3, cy, 3, 1);
   px(cx, cy - 5, 1, 3); px(cx, cy + 3, 1, 3);
   if (!off) px(cx, cy, 1, 1, player.shells > 0 ? P.white : P.red);
+  /* THE HIT MARKER, and it is not decoration. A shotgun at this range is
+     seven rays and a number going down somewhere off the side of the
+     screen; without a mark here the honest player conclusion is that
+     shooting people does nothing at all. Four diagonals, white for a hit
+     and red for a kill, kicking outward as they fade. */
+  if (world.hit > 0) {
+    const f2 = world.hit / 0.26;
+    const sp = 3 + Math.round((1 - f2) * 3);
+    const col = world.hitKill ? P.red : P.white;
+    for (const [dx2, dy2] of [[-1, -1], [1, -1], [-1, 1], [1, 1]])
+      for (let i = 0; i < 3; i++)
+        px(cx + dx2 * (sp + i), cy + dy2 * (sp + i), 1, 1, col);
+  }
 
   if (!player.alive) {
     px(0, 0, W, H, 'rgba(21,18,30,0.62)');

@@ -64,7 +64,10 @@ export const UPGRADES = [
   {
     id: 'slug', name: 'SLUG LOADS', max: 1,
     blurb: 'One ball, not seven.\nHits like a truck.\nNo forgiveness.',
-    apply: (m) => { m.pellets = 2; m.damage *= 3.4; m.kick += 2.0; m.range += 6; m.spread *= 0.4; },
+    /* the cap has to come up with the damage or the upgrade is a lie:
+       seven pellets and two both ran into the same 62 and the slug was
+       strictly the worse shell at every range. */
+    apply: (m) => { m.pellets = 2; m.damage *= 3.4; m.kick += 2.0; m.range += 6; m.spread *= 0.4; m.maxWound *= 2.4; },
   },
   {
     id: 'brace', name: 'BRACED STOCK', max: 1,
@@ -87,7 +90,8 @@ export function rollMods(owned) {
   const m = {
     shells: GUN.shells, kick: GUN.kick, reload: GUN.reload, refire: GUN.refire,
     pellets: GUN.pellets, spread: GUN.spread, range: GUN.range, damage: GUN.damage,
-    barrel: GUN.barrel, gravity: G.gravity, groundKick: 1, twin: false,
+    barrel: GUN.barrel, maxWound: GUN.maxWound,
+    gravity: G.gravity, groundKick: 1, twin: false,
   };
   for (const id in owned)
     for (let i = 0; i < owned[id]; i++) UPGRADES.find((u) => u.id === id).apply(m);
@@ -110,7 +114,14 @@ function sweep(e, dx, dy, solids) {
       if (b.noWalk) continue;
       if (e.y >= b.y1 - 0.001 || e.y + Ht <= b.y0 + 0.001) continue;
       if (e.x + R <= b.x0 || e.x - R >= b.x1) continue;
-      if (b.y1 - e.y > 0 && b.y1 - e.y <= G.step) { e.y = b.y1; continue; }
+      /* A BOX MAY BE CLIMBABLE ABOVE THE ORDINARY BOOT HEIGHT, and the
+         barricades are. Left at the default they were a toll gate: a
+         waist-high brick wall across the floor that could only be crossed
+         by firing a shell into the ground, which is the one resource the
+         whole game is about spending. You walk up onto them now, and they
+         are still cover and still a thing to stand on. */
+      const st = b.step || G.step;
+      if (b.y1 - e.y > 0 && b.y1 - e.y <= st) { e.y = b.y1; continue; }
       e.x = dx > 0 ? b.x0 - R : b.x1 + R;
       hit.x = true; hit.wall = dx > 0 ? 1 : -1;
     }
@@ -135,10 +146,24 @@ function onGround(e, solids) {
   return false;
 }
 /* a ray against the boxes. A ray that STARTS inside one hits it at zero,
-   which is what makes a muzzle held against a wall register as a wall. */
-export function rayBoxes(ox, oy, dx, dy, maxT, solids) {
+   which is what makes a muzzle held against a wall register as a wall.
+
+   `shot` is the difference between a bullet and a shoulder. A bullet
+   ignores two things a body cannot:
+
+   - anything marked noShoot. THE COLUMNS. A full-storey column every
+     4.4 m across a flat floor is not cover, it is a wall - a level shot
+     past one bay was eaten every single time, by you and by them, and
+     because you walk straight THROUGH a column you could not even see
+     why nothing was landing. Waist-high cover and the drums still stop
+     a pellet, and those you can read at a glance.
+   - the box it is already standing in. You cannot be shot by a wall you
+     are inside; only the KICK probe cares about that, and it asks
+     separately. */
+export function rayBoxes(ox, oy, dx, dy, maxT, solids, shot) {
   let best = maxT, hit = null;
   for (const b of solids) {
+    if (shot && b.noShoot) continue;
     let t0 = -1e9, t1 = 1e9, ok = true;
     for (const [o, d, lo, hi] of [[ox, dx, b.x0, b.x1], [oy, dy, b.y0, b.y1]]) {
       if (Math.abs(d) < 1e-9) { if (o < lo || o > hi) { ok = false; break; } continue; }
@@ -149,7 +174,7 @@ export function rayBoxes(ox, oy, dx, dy, maxT, solids) {
       if (t0 > t1) { ok = false; break; }
     }
     if (!ok) continue;
-    if (t0 < 0 && t1 >= 0) t0 = 0;
+    if (t0 < 0 && t1 >= 0) { if (shot) continue; t0 = 0; }
     if (t0 >= 0 && t0 < best) { best = t0; hit = b; }
   }
   return hit ? { t: best, box: hit } : null;
@@ -307,6 +332,21 @@ class Actor {
   }
   draw(mods) {
     const g = gfx();
+    /* THE CONTACT SHADOW, and it is the cheapest thing in the file.
+       Behind every figure is a mile of lit harbour and four hundred
+       windows; a man with nothing under his boots floats in front of it
+       like a sticker. Three flat bars on the slab, narrowing, and he is
+       standing on the floor instead of in front of the view. It also
+       says, at a glance and from across the room, which of the people up
+       there are actually on your storey. */
+    if (this.alive && this.grounded) {
+      g.globalAlpha = 0.5;
+      rect(this.x - 0.34, this.y, 0.68, 0.05, P.ink);
+      rect(this.x - 0.24, this.y + 0.05, 0.48, 0.04, P.ink);
+      g.globalAlpha = 0.28;
+      rect(this.x - 0.46, this.y, 0.92, 0.04, P.ink);
+      g.globalAlpha = 1;
+    }
     if (this.flash > 0) g.globalAlpha = 0.999;
     const pal = this.flash > 0
       ? Object.assign({}, this.pal, { coat: P.white, coatLit: P.white, coatDark: P.pale, skin: P.white })
@@ -351,20 +391,27 @@ export function fire(world, sh) {
     side * 3.5 + (Math.random() - 0.5), up * 3.5 + 3, 1.1, P.gold, 1);
   fx.shake = Math.min(1.5, fx.shake + (sh.shooter === world.player ? 0.7 : 0.25));
 
+  /* THE KICK PROBE, asked once along the aim rather than fished out of
+     wherever the pellets happened to land. A column counts here - shooting
+     into one still throws you off it - and a drum does not, because a drum
+     is not a wall, it is an explosion you have not had yet. */
   let nearestWall = m.range;
+  {
+    const w = rayBoxes(ox, oy, Math.cos(aim), Math.sin(aim), GUN.wallNear, world.solids);
+    if (w && w.box.kind !== 'barrel') nearestWall = w.t;
+  }
   const wounds = new Map();
   for (let p = 0; p < m.pellets; p++) {
     const a = aim + (Math.random() - 0.5) * 2 * m.spread;
     const dx = Math.cos(a), dy = Math.sin(a);
     let t = m.range, kind = null, victim = null;
-    const hb = rayBoxes(ox, oy, dx, dy, t, world.solids);
+    const hb = rayBoxes(ox, oy, dx, dy, t, world.solids, true);
     if (hb) { t = hb.t; kind = hb.box.kind; victim = hb.box; }
     for (const q of sh.targets) {
       if (!q.alive || q === sh.shooter) continue;
       const hc = rayActor(ox, oy, dx, dy, t, q);
       if (hc) { t = hc.t; kind = 'body'; victim = q; }
     }
-    if (kind && kind !== 'body' && kind !== 'barrel') nearestWall = Math.min(nearestWall, t);
     const ex = ox + dx * t, ey = oy + dy * t;
     fx.streak(ox + dx * 0.3, oy + dy * 0.3, ex, ey, 0.06);
     if (kind === 'body') {
@@ -379,8 +426,17 @@ export function fire(world, sh) {
       fx.burst(ex, ey, 3, 4.5, 0.22, [P.flame, P.bone, P.cret4], 1);
     }
   }
+  /* AND SAY SO. Half of "hitting them does nothing" is that nothing on
+     the screen agreed that you had. The crosshair is the one thing the
+     eye is already on, so the confirmation goes there. */
+  let killed = false;
   for (const [v, wv] of wounds) {
     v.hurt(Math.min(m.maxWound || GUN.maxWound, wv.d), wv.kx / wv.n, wv.ky / wv.n, world);
+    if (!v.alive) killed = true;
+  }
+  if (sh.shooter === world.player && wounds.size) {
+    world.hit = 0.26;
+    world.hitKill = killed;
   }
   let k = m.kick;
   if (nearestWall < GUN.wallNear) k += GUN.wallBonus * (1 - nearestWall / GUN.wallNear);
@@ -469,9 +525,14 @@ export class Enemy extends Actor {
        difficulty curve: floor one gives you three quarters of a second to
        be somewhere else, floor six gives you a third */
     this.tell = Math.max(0.30, 0.78 - tier * 0.085);
+    /* THESE NUMBERS HAD NEVER BEEN MEASURED AGAINST A LIVE PLAYER,
+       because until the columns stopped eating the pellets their shots
+       arrived roughly never. With the line of sight working, 38 a shell
+       meant three mistakes killed you across a six-floor run with no
+       healing anywhere in it. Down a notch, so the run has a shape. */
     this.mods = Object.assign({}, GUN, {
       gravity: G.gravity, groundKick: 0, spread: GUN.spread * (kind === 'heavy' ? 1.1 : 1.45),
-      damage: kind === 'heavy' ? 12 : 9, pellets: 6, maxWound: kind === 'heavy' ? 46 : 38,
+      damage: kind === 'heavy' ? 12 : 9, pellets: 6, maxWound: kind === 'heavy' ? 38 : 29,
       barrel: GUN.barrel, range: GUN.range,
     });
   }
@@ -479,7 +540,7 @@ export class Enemy extends Actor {
     const dx = player.x - this.x, dy = (player.y + 0.7) - (this.y + B.shoulder);
     const d = Math.hypot(dx, dy);
     if (d > this.mods.range) return 0;
-    const hit = rayBoxes(this.x, this.y + B.shoulder, dx / d, dy / d, d - 0.4, world.solids);
+    const hit = rayBoxes(this.x, this.y + B.shoulder, dx / d, dy / d, d - 0.4, world.solids, true);
     return hit ? 0 : d;
   }
   update(dt, world, player) {

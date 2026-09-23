@@ -22,22 +22,22 @@ export const L = {
 export const HX = L.span / 2;
 export const TOP = L.storey * L.floors;
 
-/* A box can stop a bullet without stopping a person. In three dimensions
-   you walk round a column; in two there is no round, so a full-height
-   column that blocked movement would wall the floor off completely - and
-   that is exactly what it did, with the stair on the far side of it.
-   Columns and drums are : you brush past them, and they still
-   eat everything fired at you. Which is what taking cover behind a pillar
-   in a side-scroller has always meant. */
-/* A box can stop a bullet without stopping a person. In three dimensions
-   a column is walked round; in two there is no round, so a full-height
-   column that blocked movement walled the floor off completely - and it
-   did, with the stair on the far side of it. Columns and drums are
-   marked noWalk: you brush past them, and they still eat everything
-   fired at you, which is what taking cover behind a pillar in a
-   side-scroller has always meant. */
-export function aabb(x0, y0, x1, y1, kind, noWalk) {
-  return { x0, y0, x1, y1, kind: kind || 'solid', noWalk: !!noWalk };
+/* TWO FLAGS, AND THE COLUMNS NEED BOTH.
+
+   noWalk came first. In three dimensions you walk round a column; in two
+   there is no round, so a full-height column that blocked movement walled
+   the floor off completely, with the stair on the far side of it. So you
+   pass through them.
+
+   noShoot is the other half, and leaving it off is what broke the fight.
+   A 0.68 m column every 4.4 m of a 44 m floor is not cover to a shot
+   fired along that floor - it is a fence. Every level shot past one bay
+   died on concrete, yours and theirs, and since you walk straight THROUGH
+   the thing there was no way to see why. Cover on this floor is the
+   waist-high barricades and the drums, which you can read at a glance and
+   duck behind on purpose. The columns are architecture. */
+export function aabb(x0, y0, x1, y1, kind, noWalk, noShoot) {
+  return { x0, y0, x1, y1, kind: kind || 'solid', noWalk: !!noWalk, noShoot: !!noShoot };
 }
 
 /* the stair for floor f runs to the right on even floors, left on odd */
@@ -70,7 +70,7 @@ export function buildLevel() {
     /* --- columns ------------------------------------------------------- */
     for (let bx = -HX + L.bayW; bx < HX - 1; bx += L.bayW) {
       if (bx > sx0 - 1.2 && bx < sx1 + 1.2) continue;
-      solids.push(aabb(bx - 0.34, y, bx + 0.34, y + L.storey, 'pillar', true));
+      solids.push(aabb(bx - 0.34, y, bx + 0.34, y + L.storey, 'pillar', true, true));
       props.push({ kind: 'column', x: bx, y, tagged: R() < 0.45, spall: R() < 0.3, f });
     }
 
@@ -98,12 +98,23 @@ export function buildLevel() {
       barrels.push({ x: bx, y, r: 0.42, alive: true, f, wob: R() * 6.28 });
       solids.push(barrels[barrels.length - 1].solid = aabb(bx - 0.36, y, bx + 0.36, y + 1.0, 'barrel', true));
     }
+    /* THE BARRICADES, and the number that matters is 0.62.
+       The gun leaves the muzzle at 0.75 m off the slab. These were 0.95 m
+       - higher than the barrel - so a man standing anywhere on the floor
+       had two chest-high brick walls between him and everybody, and
+       seven pellets in ten died on one of them at every range past four
+       metres. Cover you cannot shoot over is not cover, it is a lid.
+       Hip-high: the shot clears it standing, and it still stops you
+       walking through and still eats anything fired downward at
+       somebody crouched behind it from the storey above. */
     for (let i = 0; i < 2; i++) {
       const bx = -HX + 5 + R() * (L.span - 10);
       if (!clear(bx)) continue;
       const w = 1.5 + R() * 0.7;
-      solids.push(aabb(bx - w / 2, y, bx + w / 2, y + 0.95, 'cover'));
-      props.push({ kind: 'cover', x: bx, y, w, tall: 0.95, f });
+      const c = aabb(bx - w / 2, y, bx + w / 2, y + 0.62, 'cover');
+      c.step = 0.7;                     // hip-high, and you climb it
+      solids.push(c);
+      props.push({ kind: 'cover', x: bx, y, w, tall: 0.62, f });
     }
     for (let i = 0; i < 2; i++) {
       const bx = -HX + 4 + R() * (L.span - 8);
@@ -135,7 +146,7 @@ const TAGCOLS = [P.tag1, P.tag2, P.tag3, P.tag4, P.tag5];
 
 /* a tag: three or four hard strokes with a drop shadow and a highlight,
    drawn from a seed so it is the same tag every time you come past it */
-function drawTag(g, x, y, w, h, seed) {
+function drawTag(g, x, y, w, h, seed, alpha) {
   const R = rng(seed * 7919 + 13);
   const col = TAGCOLS[(R() * TAGCOLS.length) | 0];
   const x0 = toScreenX(x), y0 = toScreenY(y + h);
@@ -148,6 +159,11 @@ function drawTag(g, x, y, w, h, seed) {
   g.beginPath();
   g.rect(x0, y0, pw, ph);
   g.clip();
+  /* AND SOAKED INTO IT. Spray on wet concrete is not a decal: it is the
+     wall, a shade off. At full strength these read brighter than the
+     people standing in front of them, which is the wrong way round for
+     the only thing in the frame you have to shoot at. */
+  g.globalAlpha = alpha === undefined ? 0.5 : alpha;
 
   const bars = 3;
   const bw = Math.max(3, Math.floor(pw / (bars * 1.7)));
@@ -160,15 +176,16 @@ function drawTag(g, x, y, w, h, seed) {
     const bx = x0 + 2 + i * ((pw - 4 - bw) / (bars - 1));
     const t = top + (R() - 0.5) * ph * 0.08;
     const b = bot + (R() - 0.5) * ph * 0.08;
-    /* the keyline first, then the fill inside it, then the shine */
+    /* the keyline first, then the fill inside it. No white shine: a hard
+       white edge is the brightest thing the palette owns and it was
+       landing on a back wall. */
     put(bx - 1, t - 1, bw + 2, b - t + 2, P.ink);
     put(bx + lean * 0.3, t, bw, b - t, col);
-    put(bx + lean * 0.3, t, Math.max(1, bw * 0.34), b - t, P.white);
   }
-  /* the bar across, which is what turns three strokes into a word */
+  /* the bar across, which is what turns three strokes into a word - short
+     of the full width, so it stops reading as a drawn rectangle */
   const cy = top + (bot - top) * (0.45 + R() * 0.2);
-  put(x0 + 1, cy - 1, pw - 2, 4, P.ink);
-  put(x0 + 2, cy, pw - 4, 2, col);
+  put(x0 + 3, cy, pw - 7, 2, col);
   /* and a drip or two off the bottom of one of them */
   const dx = x0 + 2 + ((R() * (pw - 6)) | 0);
   put(dx, bot, 2, ph * (0.06 + R() * 0.14), col);
@@ -203,7 +220,7 @@ export function drawBackWall(lv, camY) {
       const R = rng((f * 977 + k * 131) | 0);
       for (let s = 0; s < 3; s++)
         rect(bx + 0.1 + R() * (pw - 0.2), y + SILL, 0.06, (0.4 + R() * 1.6), P.cret1);
-      if (((f * 3 + k) % 3) === 0)
+      if (((f * 3 + k) % 4) === 0)
         drawTag(g, bx + 0.1, y + SILL + 0.3, pw - 0.2, L.storey - SILL - HEAD - 0.6, f * 31 + k * 7);
       k++;
     }
@@ -230,8 +247,13 @@ export function drawLight(lv, camY, t) {
   const SILL = 0.5, HEAD = 0.5;
   const f0 = Math.max(0, Math.floor((camY - 7) / L.storey));
   const f1 = Math.min(L.floors - 1, Math.ceil((camY + 7) / L.storey));
-  const SKEW = 1.5;                       // how far the beam leans as it falls
-  g.globalAlpha = 0.085;
+  const SKEW = 1.8;                       // how far the beam leans as it falls
+  /* TWO PASSES AT 8.5% EACH came to a sixth of a very light colour laid
+     over the whole opening, sky included - which does not read as a shaft
+     of light in a dark room, it reads as a smear on the window. The room
+     is what the light lands on, so the beam is faint and the leaning is
+     what sells it. */
+  g.globalAlpha = 0.055;
   for (let f = f0; f <= f1; f++) {
     const y = f * L.storey;
     const top = y + L.storey - HEAD, bot = y;
@@ -247,7 +269,7 @@ export function drawLight(lv, camY, t) {
       g.lineTo(x1 + sk, yB); g.lineTo(x0 + sk, yB);
       g.closePath(); g.fill();
       /* a brighter core down the middle of it */
-      const q0 = x0 + (x1 - x0) * 0.28, q1 = x0 + (x1 - x0) * 0.72;
+      const q0 = x0 + (x1 - x0) * 0.34, q1 = x0 + (x1 - x0) * 0.66;
       g.beginPath();
       g.moveTo(q0, yT); g.lineTo(q1, yT);
       g.lineTo(q1 + sk, yB); g.lineTo(q0 + sk, yB);
@@ -358,17 +380,22 @@ export function drawStructure(lv, camY) {
         for (let i = 0; i < 3; i++) rect(p.x - 0.16 + i * 0.14, y + 1.5, 0.05, 1.0, P.rust3);
         for (let i = 0; i < 4; i++) rect(p.x - 0.2, y + 1.6 + i * 0.24, 0.4, 0.05, P.rust2);
       }
-      if (p.tagged) drawTag(gfx(), p.x - 0.3, y + 1.0, 0.6, 1.4, p.f * 91 + (p.x | 0));
+      /* the column tag used to sit from 1.0 m to 2.4 m, which is exactly
+         where a head, a gun and a mark over a man's head all live. A
+         column is where people stand; it stays bare, and the paint goes
+         on the back wall where nothing walks. */
       /* starter bars out of the top */
       for (let i = 0; i < 3; i++)
         rect(p.x - 0.2 + i * 0.17, y + L.storey - L.slab, 0.05, 0.3, P.rust2);
     } else if (p.kind === 'cover') {
       rect(p.x - p.w / 2, y, p.w, p.tall, P.rust1);
-      for (let r = 0; r < 4; r++)
+      for (let r = 0; r < 3; r++)
         for (let c = 0; c < 5; c++)
           rect(p.x - p.w / 2 + 0.06 + c * (p.w - 0.12) / 5 + (r % 2) * 0.1,
-            y + 0.06 + r * (p.tall - 0.12) / 4, (p.w - 0.12) / 5 - 0.06, (p.tall - 0.12) / 4 - 0.06,
+            y + 0.05 + r * (p.tall - 0.1) / 3, (p.w - 0.12) / 5 - 0.06, (p.tall - 0.1) / 3 - 0.05,
             r % 2 ? P.rust2 : P.rust3);
+      /* the capping course, so the top edge reads as a thing to shoot over */
+      rect(p.x - p.w / 2 - 0.04, y + p.tall - 0.07, p.w + 0.08, 0.07, P.rust3);
     } else if (p.kind === 'rebar') {
       for (let i = 0; i < 6; i++)
         rect(p.x - 1.3 + (i % 2) * 0.08, y + 0.03 + i * 0.055, 2.6, 0.05, i % 2 ? P.rust2 : P.rust3);

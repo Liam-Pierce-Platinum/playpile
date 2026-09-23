@@ -75,7 +75,13 @@ export function lanePlan(track, tune, skill = 1) {
   const gearTop = (tune.redline * 0.98) * (2 * Math.PI / 60) * tune.wheelRadius
                   / (tune.gears[tune.gears.length - 1] * tune.finalDrive);
   const VMAX = Math.min(dragTop, gearTop);
-  const mu0 = (tune.gripFront + tune.gripRear) / 2 * 0.93 * skill;
+  // THE FIELD RUNS CLOSER TO THE LIMIT THAN IT DID. Liam: "I need the
+  // other people to go faster and keep pace". The plan was drawn at 93% of
+  // what the tyre has, which is a comfortable club driver; 96.5% is a Cup
+  // field, and it is the right lever because it speeds them up everywhere
+  // at once - corner entry, mid-corner and exit - rather than handing them
+  // a straight-line bonus they did not earn.
+  const mu0 = (tune.gripFront + tune.gripRear) / 2 * 0.965 * skill;
   // TWICE THE TYRE'S OWN LOAD SENSITIVITY, and that is not a fudge factor.
   // stock.js applies loadSens per wheel, and in a 2.3 g corner on a high
   // centre of mass the two outside wheels are carrying nearly all of it -
@@ -359,7 +365,7 @@ export class Driver {
     // a gap I could put my nose in.
     let ahead = null, aheadGap = Infinity;
     let anyAhead = null, anyGap = Infinity;        // in front, any lane
-    let sideL = false, sideR = false, behindClose = false;
+    let sideL = false, sideR = false, behindClose = false, attacker = null;
     const near = [];
     for (const o of others) {
       if (o === this.r || o.out) continue;
@@ -373,6 +379,13 @@ export class Driver {
         if (lt > 0) sideL = true; else sideR = true;
       }
       if (f < -0.5 && f > -7 && Math.abs(lt) < 2.0) behindClose = true;
+      // WHO IS COMING, AND WHICH SIDE HE HAS PICKED. A car within three
+      // lengths, out of line, and closing is a man making a move - and
+      // that is the one thing a driver in front actually reacts to.
+      if (f < -0.5 && f > -13 && Math.abs(lt) < 6.0) {
+        const closingOn = o.car.forwardSpeed - car.forwardSpeed;
+        if (closingOn > -0.5 && (!attacker || f > attacker.f)) attacker = { o, f, lt, closingOn };
+      }
     }
 
     // ---- WHICH LANE ------------------------------------------------------
@@ -393,6 +406,60 @@ export class Driver {
     // forty cars twitching a foot sideways for three hundred laps and not
     // one pass all race. A driver commits.
     const room = tr.halfWidth - 1.3;
+
+    // ---- DEFENDING THE POSITION -------------------------------------------
+    //
+    // Liam: "I need to realy want to have to work to pass them needing
+    // strategy".
+    //
+    // Until now nobody in front ever reacted to the man behind. Every pass
+    // in the game was decided entirely by the attacker: pick a lane, have
+    // more speed, done. That is not a pass, it is an overtake button with
+    // extra steps, and it is why the racing felt like traffic rather than
+    // like a fight.
+    //
+    // So a driver who has somebody out of line behind him and closing will
+    // MOVE ACROSS TO COVER THE LANE THE ATTACKER PICKED. Three things keep
+    // it from being a wrecking ball:
+    //
+    //   ONLY ON THE STRAIGHT. Weaving across a banked corner at 190 is how
+    //   both cars end up in the fence, and no driver does it.
+    //   ONLY SOME OF THEM, AND ONLY SOMETIMES. It is rolled against his
+    //   aggression, so the field has blockers and gentlemen in it, and it
+    //   is re-rolled rather than held, which is where "he might cover it,
+    //   he might not" - the thing that makes you commit - comes from.
+    //   ONE MOVE, NOT TWO. Having covered a lane he stays there for a
+    //   second and a half rather than chasing the attacker back and forth,
+    //   because chasing is blocking and blocking is what gets you turned
+    //   round.
+    //
+    // The attacker already knows what to do about it: his own commit logic
+    // above keeps a move alive while there is a car alongside, so a cover
+    // that comes late gets passed anyway. That is the strategy - go early
+    // and he covers you, go late and you have the run but less road.
+    this.blockUntil = Math.max(0, (this.blockUntil || 0) - dt);
+    if (attacker && !ahead && this.blockUntil <= 0
+        && Math.abs(tr.points[i].curve) < this.plan.maxCurve * 0.55
+        && Math.abs(attacker.lt) > 1.6
+        // ...AND NOT WHEN HE IS ALREADY THERE. Moving across a car that
+        // has its nose alongside is not defending, it is turning him
+        // round, and it is how a blocker ends up in the fence with him.
+        && attacker.f < -3.0
+        && Math.random() < dt * 0.5 * this.aggression) {
+      // HALF A COVER. The first version took eight tenths of the way to
+      // the attacker's lane and held it for a second and a half, and it
+      // worked far too well: measured, ZERO lead changes in forty laps of
+      // Daytona and the Charlotte leader half a minute clear, because
+      // nobody could get by anybody. Liam asked to have to work for a
+      // pass, not to be locked out of one. Half the distance for a second
+      // leaves the door open to somebody who commits early.
+      const cover = clamp(attacker.lt * 0.45, -room + 1.2, room - 1.2);
+      if (Math.abs(cover - this.lane) > 0.8) {
+        this.blockLat = cover;
+        this.blockUntil = 1.0;
+      }
+    }
+
     let wantLat = this.homeLat();
     this.commit = Math.max(0, (this.commit || 0) - dt);
     const closing = ahead ? car.forwardSpeed - ahead.car.forwardSpeed : 0;
@@ -439,6 +506,12 @@ export class Driver {
         this.commitLat = wantLat;
         this.blockedFor = 0;
       }
+    } else if (attacker && !ahead && this.blockUntil > 0) {
+      // STILL COVERING HIM. Once a driver has moved to defend he stays
+      // there for a moment - a block that is re-decided every frame is a
+      // twitch, and a car that twitches reads as broken rather than as
+      // defending.
+      wantLat = this.blockLat;
     } else if (ahead && aheadGap < 45) {
       // NOT trying to pass: get in the hole in the air. The tow is worth
       // more than the groove, and lining up behind somebody is what a pack

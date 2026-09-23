@@ -133,8 +133,12 @@ export const TUNE = {
   // overall. It gives up more gently than a slick and it wants a big slip
   // angle - which is why a stock car is steered as much with the throttle
   // as with the wheel.
-  gripFront:   1.32,
-  gripRear:    1.42,    // rear a shade more, same reason as APEX: run out of
+  // A LITTLE MORE GRIP AT BOTH ENDS. Not for lap time - the AI is held to
+  // the same plan either way - but because the margin between "turning"
+  // and "sliding" is what you feel, and a wider margin is a car that does
+  // not step out every time you ask it a question.
+  gripFront:   1.42,
+  gripRear:    1.54,    // rear a shade more, same reason as APEX: run out of
                         // front first, and understeer gives you a second to think
   loadSens:    0.16,    // mu falls as you lean on the tyre. Heavier car, bigger effect.
   // HOW SHARPLY IT BUILDS TO THE PEAK, in slip angle. With this Pacejka
@@ -147,8 +151,18 @@ export const TUNE = {
   // g is more than a thousand newtons of induced drag - the car lost
   // twenty-one miles an hour in every turn and the draft could not be
   // measured through the noise.
-  stiffFront:  14.0,
-  stiffRear:   15.0,
+  // AND IT IS STIFFER THAN IT WAS. Liam: "I need it so that ... it has
+  // literally no skid or drifting there still is some".
+  //
+  // This is the number that decides how far the car has to slide sideways
+  // before the tyre is giving everything it has. At 14 the peak sat at
+  // about nine and a half degrees of slip, so ANY hard corner was taken
+  // with the car visibly crabbing - which is authentic for a stock car and
+  // is the thing he does not want to see. At 19 the peak is at about seven,
+  // and the tyre is already giving four fifths of its grip at three, so the
+  // car turns where it is pointed instead of arriving sideways.
+  stiffFront:  24.0,
+  stiffRear:   25.0,
   // PACEJKA C, the sticky-vs-lethal knob. Liam: "get rid of spin outs".
   //
   // This is the number that decides whether a car that has gone past the
@@ -159,7 +173,7 @@ export const TUNE = {
   // runs wide, the back gets light, you feel all of it, and it does not
   // come round. You can still lose it - lift in the middle of a corner at
   // Bristol and it will go - but you have to earn it.
-  shape:       1.12,
+  shape:       1.06,
   // and the long slide past that costs less grip too, so a car that IS
   // sideways can be driven back straight rather than simply continuing
   falloff:     0.97,
@@ -215,9 +229,15 @@ export const TUNE = {
   // to run away from you, and it now pushes harder when it gets there.
   // With the assist switched off in the menu the car is exactly as it was
   // in this respect - that switch is still honest.
-  escSlip:     6.5,     // degrees of body slip before it does anything
-  escNm:       44000,   // Nm per radian past that
-  escMax:      9200,
+  // AND WITH LANE CONTROL ON IT ALLOWS ALMOST NOTHING. Six and a half
+  // degrees is a slide you can see from the grandstand. Two and a half is
+  // the point where a real driver has already started correcting, and the
+  // authority behind it is now enough to actually hold it there rather
+  // than to watch. The switch is still honest - turn it off and the car
+  // underneath is the tyre model above, which is tight but is not glued.
+  escSlip:     1.5,     // degrees of body slip before it does anything
+  escNm:       86000,   // Nm per radian past that
+  escMax:      21000,
 
   // ---- brakes ----------------------------------------------------------
   // Enough to lock all four, which at Bristol you will.
@@ -236,12 +256,26 @@ export const TUNE = {
   // twenty. Every controller in the game went unstable on the banking until
   // this number went up. At 190 mph it leaves 6.8 degrees, at Bristol's 105
   // it leaves 11, and at walking pace it leaves all of it.
+  // SHARPER. Liam: "make turning sharper so wall bumping is less common".
+  //
+  // The lock was not the problem - it is the RATE. At 2.6 rad/s the wheel
+  // took about a fifth of a second to reach full lock, and a fifth of a
+  // second at 180 mph is sixteen metres, which on a mile-and-a-half oval
+  // is most of the distance between the groove and the wall. By the time
+  // the car answered, the correction was already too late and the next one
+  // was an overcorrection. At 4.4 it answers inside five metres, which is
+  // what makes a save possible; the return spring is quicker to match, so
+  // it also comes back to centre rather than winding up.
   steerMax:    0.52,    // rad, about 30 degrees at the wheels
-  steerSpeedDrop: 0.50,
-  steerRate:   2.6,     // and slower hands than a formula car's
-  steerReturn: 4.0,
+  steerSpeedDrop: 0.46,
+  steerRate:   4.4,
+  steerReturn: 6.0,
 
   // ---- the world -------------------------------------------------------
+  // Nm per rad/s of yaw, see the damping in step(). A locked diff and a
+  // wide rear track do this in the real thing.
+  yawDamp:     8000,
+
   rollResist:  0.013,
   // kg of fuel per joule of crank work. A Cup car does about five miles to
   // the gallon and carries eighteen of them, so a green-flag run is a
@@ -795,6 +829,23 @@ export class Car {
     const s = Math.sin(this.yaw), c = Math.cos(this.yaw);
     this.vx += (accLon * s + accLat * c) * dt;
     this.vz += (accLon * c - accLat * s) * dt;
+    // AND THE CAR'S OWN RESISTANCE TO BEING TURNED.
+    //
+    // Liam: "if lane control is on or off ... it has literally no skid or
+    // drifting". With the assist ON he now sees three to five degrees,
+    // which is a car that goes where it is pointed. With it OFF the tyre
+    // model on its own still gave ten to fourteen, because that is what a
+    // stock car does, and the switch is meant to be honest rather than to
+    // be the only thing holding the car together.
+    //
+    // So this is not the nanny. It is damping that is always there, and it
+    // is a real thing: a fifteen-hundred kilo car with a wide rear track
+    // and a near-locked differential does not change direction quickly,
+    // and both rear tyres being tied together fights yaw directly. Sized
+    // against tools/spin.mjs - enough to take the assist-off slide to
+    // about half what it was, not enough to stop the car rotating when it
+    // is asked to.
+    Mz -= this.yawRate * T.yawDamp;
     this.yawRate += (Mz / T.inertia) * dt;
 
     this.x += this.vx * dt;

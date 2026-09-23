@@ -9,7 +9,8 @@
 //
 // So everything here makes the same trade on purpose: each individual
 // object is almost nothing - a tuft of grass is nine triangles, a tree
-// about sixty - and there are tens of thousands of them, drawn in a
+// between thirty and a hundred and forty depending on how close to the
+// track it stands - and there are tens of thousands of them, drawn in a
 // couple of dozen calls because they are instanced. The cost goes into
 // the COUNT, which the GPU does not care about, instead of into the
 // detail of any one thing, which it does.
@@ -18,9 +19,9 @@
 //   WIND / windify   one clock, and a shader that bends things with it
 //   makeGround       hills made of noise, flattened where the track is
 //   makeGrass        instanced tufts in a band outside the barriers
-//   makeTrees        conifers and broadleaves, in clumps, swaying
+//   makeTrees        six species, in clumps, swaying, near ones detailed
 //   makeBushes       low scrub, the step between grass and treeline
-//   makeSky          a gradient dome, and clouds
+//   makeSky          a gradient dome, and a layer of soft lit clouds
 //   makeMountains    a ring of hazy shapes on the horizon
 //
 // THE ONE RULE ABOUT SWAY
@@ -327,41 +328,243 @@ export function makeGrass(points, leftOf, from, to, heightAt, opts = {}) {
 // ---------------------------------------------------------------------
 // TREES
 // ---------------------------------------------------------------------
-// Two kinds, because a hillside of one kind is a texture and a hillside
-// of two is a wood. Both are modelled base-at-zero so the wind shader
-// works on them, and both are split trunk-from-crown so only the crown
-// moves - a swaying trunk looks like an earthquake.
-function conifer(rnd) {
-  const h = 7 + rnd() * 5;
-  const parts = [];
-  for (let i = 0; i < 3; i++) {
-    const t = i / 3;
-    const r = (2.5 - t * 1.25) * (0.85 + rnd() * 0.3);
-    const ch = h * (0.44 - t * 0.07);
-    const g = new THREE.ConeGeometry(r, ch, 6);
-    // The first pass started the lowest cone at 30% of the tree's height
-    // and every tree on the circuit was a lollipop on a bare pole. Real
-    // conifer skirts reach most of the way down.
-    g.translate(0, h * (0.15 + t * 0.25) + ch / 2, 0);
-    parts.push(g);
+// A hillside of one kind is a texture; a hillside of several is a wood.
+// Every species here is modelled base-at-zero so the wind shader works on
+// it, and split trunk-from-crown so only the crown moves - a swaying
+// trunk looks like an earthquake.
+//
+// WHERE THE BUDGET GOES NOW
+// The first pass gave every tree the same seventy-odd triangles whether it
+// stood twelve metres from the centre line or a hundred and twenty. That
+// is exactly backwards: at 300 km/h the tree beside the barrier is on
+// screen for a tenth of a second but it fills a third of it, and the ones
+// on the far ridge are four pixels of silhouette.
+//
+// So there are two sets of species - a near set with tiered ragged crowns
+// and visible branches, and a far set cut down to the outline - and the
+// scatter picks by how far out the tree stands. Measured at Monza: a near
+// tree is 78-140 triangles where it used to be 60-94, a far one 30-80,
+// and the average over the whole scatter went from 77 to 97. That 26% is
+// paid for several times over by the draw calls, which went the other way:
+// the tree scatter is 84 calls where it was 144, because all six species
+// now share one trunk mesh per chunk (see makeTrees). Over a whole frame
+// at ten matched viewpoints across four circuits that came out at about
+// +3% triangles and -17% draw calls.
+const TAU = Math.PI * 2;
+
+/**
+ * Wobble a solid of revolution so it stops looking like one.
+ *
+ * A ConeGeometry is perfectly round and perfectly straight, and five of
+ * them stacked is still unmistakably five cones - which is what made the
+ * old treeline read as green triangles. Scaling each vertex's distance
+ * from the axis by a smooth function of its ANGLE, and letting the wide
+ * end sag, turns the same triangles into a ragged, drooping skirt.
+ *
+ * It has to be a function of the angle and not of a random number per
+ * vertex: the seam vertex of a cone exists twice, and two different
+ * random pushes tear it open. sin(3a) and sin(5a) are periodic over a
+ * full turn, so the seam closes by construction.
+ */
+function ragged(geo, phase, amt = 0.24, droop = 0) {
+  const p = geo.attributes.position;
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i), z = p.getZ(i);
+    const r = Math.hypot(x, z);
+    if (r < 1e-4) continue;
+    const a = Math.atan2(z, x);
+    const k = 1 + amt * (Math.sin(a * 3 + phase) * 0.62 + Math.sin(a * 5 - phase * 1.3) * 0.38);
+    p.setX(i, x * k); p.setZ(i, z * k);
+    if (droop) p.setY(i, p.getY(i) - droop * r);
   }
-  return { crown: mergeGeometries(parts), trunkH: h * 0.20, trunkR: 0.26 };
+  return geo;
 }
 
-function broadleaf(rnd) {
-  const h = 6 + rnd() * 4;
+/**
+ * A top-lit gradient baked into a crown's vertices.
+ *
+ * Flat shading gives a crown facets, but every facet of a roughly
+ * spherical blob catches roughly the same amount of a sky that is
+ * everywhere, so the whole thing settles to one value and the tree goes
+ * back to being a flat green silhouette. Real foliage is a gradient: the
+ * top of a crown sees the whole sky, the underside sees the ground.
+ *
+ * Baking that as a vertex colour costs three floats a vertex and no
+ * shader work at all, and it MULTIPLIES with the per-instance hue that
+ * three.js already applies, so every tree keeps its own green and gains
+ * the same internal shading. 0.50 to 1.16 was chosen against the species
+ * greens below: shallower and the crown is flat again, deeper and the
+ * sunlit tops of the pale species clip to white.
+ */
+function shadeByHeight(geo, lo = 0.50, hi = 1.16) {
+  const p = geo.attributes.position;
+  let y0 = Infinity, y1 = -Infinity;
+  for (let i = 0; i < p.count; i++) { const y = p.getY(i); if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  const span = Math.max(0.001, y1 - y0);
+  const c = new Float32Array(p.count * 3);
+  for (let i = 0; i < p.count; i++) {
+    const t = (p.getY(i) - y0) / span;
+    const v = lo + (hi - lo) * (t * t * (3 - 2 * t));
+    c[i * 3] = v; c[i * 3 + 1] = v; c[i * 3 + 2] = v;
+  }
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(c, 3));
+  return geo;
+}
+
+/**
+ * One icosahedral lump of foliage, squashed and wobbled.
+ *
+ * The wobble is deliberately small - 0.14, where the conifer skirts take
+ * 0.26. A twenty-face ball pushed hard enough to look ragged just looks
+ * like a crumpled sheet of paper, because there are not enough faces left
+ * to read as a surface. A crown is made ragged by having several lumps,
+ * not by mangling one.
+ */
+function lump(rnd, r, flat, x, y, z) {
+  const g = new THREE.IcosahedronGeometry(r, 0);
+  g.scale(1, flat, 1);
+  ragged(g, rnd() * TAU, 0.14);
+  g.translate(x, y, z);
+  return g;
+}
+
+/** a limb: a four-sided open cone, six triangles, and the thing that makes a broadleaf a tree */
+function limb(x0, y0, z0, x1, y1, z1, r) {
+  const len = Math.hypot(x1 - x0, y1 - y0, z1 - z0);
+  const g = new THREE.CylinderGeometry(r * 0.45, r, len, 4, 1, true);
+  g.translate(0, len / 2, 0);
+  const q = new THREE.Quaternion().setFromUnitVectors(
+    new THREE.Vector3(0, 1, 0),
+    new THREE.Vector3(x1 - x0, y1 - y0, z1 - z0).normalize());
+  g.applyQuaternion(q);
+  g.translate(x0, y0, z0);
+  return g;
+}
+
+/**
+ * Glue a species' parts into one crown.
+ *
+ * Everything is forced non-indexed first. ConeGeometry and
+ * CylinderGeometry come indexed and IcosahedronGeometry does not, and
+ * mergeGeometries refuses a mixture - which is why the old shapes were
+ * all-cones or all-blobs and never a blob on a branch. The cost is a
+ * third more vertices on the coniferous ones and not one extra triangle,
+ * on six geometries that the whole circuit shares.
+ */
+const species = (parts, rest) => ({
+  crown: shadeByHeight(mergeGeometries(parts.map((g) => (g.index ? g.toNonIndexed() : g)))),
+  ...rest,
+});
+
+// SPRUCE - the classic conifer, but as five ragged drooping skirts rather
+// than three clean cones. The lowest skirt reaches down to a tenth of the
+// tree's height, because a conifer whose branches start half way up is a
+// lollipop on a pole.
+function spruce(rnd, near) {
+  const h = 9 + rnd() * 7;
+  const tiers = near ? 5 : 3, seg = near ? 7 : 5;
   const parts = [];
-  const blobs = 3 + Math.floor(rnd() * 2);
-  for (let i = 0; i < blobs; i++) {
-    const r = (2.0 + rnd() * 1.4) * (i === 0 ? 1.15 : 0.8);
-    const g = new THREE.IcosahedronGeometry(r, 0);
-    g.scale(1, 0.82, 1);
-    const a = (i / blobs) * Math.PI * 2 + rnd();
-    const rad = i === 0 ? 0 : 1.2 + rnd() * 1.1;
-    g.translate(Math.cos(a) * rad, h * 0.50 + (rnd() - 0.4) * 1.6, Math.sin(a) * rad);
+  for (let i = 0; i < tiers; i++) {
+    const t = i / tiers;
+    const r = (2.9 - t * 1.7) * (0.85 + rnd() * 0.3);
+    // The far one's three tiers used to sit so deep inside each other that
+    // they merged back into a single smooth cone - the exact thing this
+    // was meant to stop. Shorter tiers, spaced further apart, leave a step
+    // in the outline, which is all a four-pixel tree has to offer.
+    const ch = h * (near ? 0.34 - t * 0.05 : 0.40 - t * 0.06);
+    const g = new THREE.ConeGeometry(r, ch, seg);
+    ragged(g, rnd() * TAU, near ? 0.26 : 0.22, near ? 0.20 : 0.13);
+    g.translate(0, h * (near ? 0.10 + t * 0.155 : 0.12 + t * 0.26) + ch / 2, 0);
     parts.push(g);
   }
-  return { crown: mergeGeometries(parts), trunkH: h * 0.50, trunkR: 0.3 };
+  // the leader: the thin spike above the top skirt that gives a spruce its
+  // point. Eight triangles, and it is most of the silhouette
+  if (near) {
+    const g = new THREE.ConeGeometry(0.62, h * 0.20, 4);
+    g.translate(0, h * 0.86, 0);
+    parts.push(g);
+  }
+  return species(parts, {
+    trunkH: h * 0.26, trunkR: 0.22, sway: [0.020, 0.30],
+    bark: 0x4a3226, hue: [0x1c3a24, 0x315434],
+  });
+}
+
+// UMBRELLA PINE - a long bare trunk and a flat wide head. Kept for the far
+// set because that flat-topped silhouette is what tells a distant ridge
+// apart from a row of spruce spikes.
+function pine(rnd, near) {
+  // A stone pine is about as wide as it is tall. The first pass made it
+  // eleven to eighteen metres with a four-metre head and every one of them
+  // came out a lamp post with a lid on. Shorter and much wider: a crown
+  // that spans roughly 12 m on a 12 m tree, which is the real proportion.
+  const h = 8.5 + rnd() * 4.5;
+  const parts = [];
+  const blobs = near ? 5 : 4;
+  for (let i = 0; i < blobs; i++) {
+    const a = (i / blobs) * TAU + rnd();
+    const rad = i === 0 ? 0 : 2.7 + rnd() * 1.7;
+    parts.push(lump(rnd, 3.1 + rnd() * 1.5, 0.34,
+      Math.cos(a) * rad, h * (0.84 + (rnd() - 0.5) * 0.07), Math.sin(a) * rad));
+  }
+  if (near) for (let i = 0; i < 2; i++) {
+    const a = rnd() * TAU;
+    parts.push(limb(0, h * 0.58, 0, Math.cos(a) * 3.0, h * 0.82, Math.sin(a) * 3.0, 0.24));
+  }
+  return species(parts, {
+    trunkH: h * 0.82, trunkR: 0.34, sway: [0.026, 0.34],
+    bark: 0x6b4a33, hue: [0x2c4a2a, 0x4a6b33],
+  });
+}
+
+// OAK - wide, heavy and lumpy, with the fork of limbs showing under the
+// crown. The limbs are eighteen triangles and they are the difference
+// between a tree and a ball balanced on a stick.
+function oak(rnd, near) {
+  const h = 7 + rnd() * 5;
+  const parts = [];
+  // Five modest lumps spread wide beat one big one with four beside it:
+  // the crown gets a bumpy outline all the way round instead of a single
+  // dominant polyhedron with warts.
+  const blobs = near ? 5 : 2;
+  for (let i = 0; i < blobs; i++) {
+    const a = (i / blobs) * TAU + rnd();
+    const rad = i === 0 ? 0 : 2.0 + rnd() * 1.1;
+    parts.push(lump(rnd, (1.7 + rnd() * 0.8) * (i === 0 ? 1.35 : 1), 0.86,
+      Math.cos(a) * rad, h * (0.66 + (rnd() - 0.4) * 0.18), Math.sin(a) * rad));
+  }
+  if (near) for (let i = 0; i < 3; i++) {
+    const a = (i / 3) * TAU + rnd() * 0.8;
+    parts.push(limb(0, h * 0.40, 0, Math.cos(a) * 1.9, h * 0.66, Math.sin(a) * 1.9, 0.26));
+  }
+  return species(parts, {
+    trunkH: h * 0.46, trunkR: 0.40, sway: [0.032, 0.40],
+    bark: 0x4a3f31, hue: [0x33511f, 0x63803a],
+  });
+}
+
+// POPLAR - the tall thin one planted in rows down the side of a circuit.
+// Narrow enough that it sways visibly where the others barely move, which
+// is the only thing on the verge that reads as wind from a cockpit.
+function poplar(rnd) {
+  const h = 13 + rnd() * 8;
+  const parts = [];
+  // Seven small lumps, overlapping, not four big stretched ones. Stretching
+  // an icosahedron to 1.7 turns its twenty faces into long diamonds, and
+  // four of those stacked came out looking like a corn cob. Seven rounder
+  // lumps at 1.15, spaced well under their own height so they merge, give
+  // the same slender column with a soft edge to it.
+  for (let i = 0; i < 7; i++) {
+    const t = i / 6;
+    // and each one a different size, thrown off the axis: a perfectly
+    // regular stack reads as beads on a string however much they overlap
+    parts.push(lump(rnd, (1.05 + Math.sin((0.25 + t * 0.7) * Math.PI) * 0.8) * (0.82 + rnd() * 0.36), 1.15,
+      (rnd() - 0.5) * 1.1, h * (0.34 + t * 0.50), (rnd() - 0.5) * 1.1));
+  }
+  return species(parts, {
+    trunkH: h * 0.40, trunkR: 0.24, sway: [0.055, 0.78],
+    bark: 0x7d7768, hue: [0x4a6b2c, 0x7f9445],
+  });
 }
 
 /**
@@ -371,18 +574,31 @@ function broadleaf(rnd) {
  * a field of cones: real woodland comes in stands, with gaps. So the
  * scatter picks clump centres along the lap and throws a handful of trees
  * around each. It costs nothing and it is most of the difference.
+ *
+ * SIX SPECIES, THREE NEAR AND THREE FAR. A tree lands in the near set if
+ * it is inside the first 35% of the band this circuit plants in - a
+ * fraction rather than a fixed distance, because the band starts at the
+ * edge of the run-off and Spa's run-off is not Monza's.
+ *
+ * ONE TRUNK GEOMETRY FOR ALL SIX. Every species used to bring its own
+ * trunk mesh, so a chunk of lap cost twelve draw calls of which six were
+ * posts. They are all the same tapered post with a root flare; the
+ * species only differ in how tall and how thick, which is a scale applied
+ * after the tree's own transform. That is one call per chunk instead of
+ * six, and the whole scatter dropped from 144 draw calls to 84.
  */
 export function makeTrees(points, leftOf, from, to, heightAt, opts = {}) {
-  const { density = 0.5, chunks = 12, seed = 23, variants = 6 } = opts;
+  const { density = 0.5, chunks = 12, seed = 23 } = opts;
   const rnd = rng(seed);
   const n = points.length;
   const group = new THREE.Group();
   if (density <= 0) return group;
 
-  // Six shapes, reused. That is plenty of variety once scale, lean and
-  // hue are varied per instance on top of them.
-  const kinds = [];
-  for (let i = 0; i < variants; i++) kinds.push(i % 2 === 0 ? conifer(rnd) : broadleaf(rnd));
+  // 0-2 are the trees you drive past; 3-5 are the ones on the ridge
+  const kinds = [
+    spruce(rnd, true), oak(rnd, true), poplar(rnd),
+    spruce(rnd, false), oak(rnd, false), pine(rnd, false),
+  ];
 
   const buckets = [];
   for (let c = 0; c < chunks; c++) buckets.push(kinds.map(() => []));
@@ -394,7 +610,9 @@ export function makeTrees(points, leftOf, from, to, heightAt, opts = {}) {
       if (rnd() > density * 0.55) continue;
       const p = points[i], l = leftOf(p.h);
       const f = at(from, i, side), t = at(to, i, side);
-      const off = side * (f + rnd() * (t - f));
+      const lat = f + rnd() * (t - f);
+      const off = side * lat;
+      const set = lat - f < (t - f) * 0.35 ? 0 : 3;
       const cx = p.x + l[0] * off, cz = p.z + l[1] * off;
       const count = 2 + Math.floor(rnd() * 7);
       for (let k = 0; k < count; k++) {
@@ -404,7 +622,7 @@ export function makeTrees(points, leftOf, from, to, heightAt, opts = {}) {
         // beside one road still throws trees seventeen metres, which is
         // onto the next one
         if (keep && !keep(x, z)) { rnd(); rnd(); rnd(); rnd(); rnd(); continue; }
-        buckets[c][Math.floor(rnd() * kinds.length)].push({
+        buckets[c][set + Math.floor(rnd() * 3)].push({
           x, y: heightAt(x, z), z,
           s: 0.65 + rnd() * 0.9,
           r: rnd() * Math.PI * 2,
@@ -415,43 +633,76 @@ export function makeTrees(points, leftOf, from, to, heightAt, opts = {}) {
     }
   }
 
-  const dark = new THREE.Color(0x24401f), light = new THREE.Color(0x4f7233);
-  const olive = new THREE.Color(0x6b7739);
+  // THE TRUNK, once. Base at y=0, one metre tall, one metre across, so a
+  // scale of (trunkR, trunkH, trunkR) makes any species' post. Open-ended
+  // because you never see either end - the bottom is in the ground and the
+  // top is inside the crown - which pays for the second height segment
+  // that the root flare needs, so it is the same 24 triangles as the
+  // straight-sided cylinder it replaces.
+  const trunkGeo = new THREE.CylinderGeometry(0.58, 1, 1, 6, 2, true);
+  trunkGeo.translate(0, 0.5, 0);
+  {
+    const p = trunkGeo.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      // the bottom ring only: a real trunk swells where it meets the ground
+      if (p.getY(i) > 0.01) continue;
+      p.setX(i, p.getX(i) * 1.45); p.setZ(i, p.getZ(i) * 1.45);
+    }
+  }
+  const trunkMat = std(0xffffff, { roughness: 1 });
+
+  // One crown material per SPECIES, hoisted out of the chunk loop. The old
+  // code built a fresh material inside it, so a circuit carried seventy-two
+  // identical materials and the renderer re-uploaded their uniforms for
+  // each one. Six is also six wind programs, which is the point: a poplar
+  // has to flutter where a spruce stands still.
+  const crownMats = kinds.map((k) => windify(
+    std(0xffffff, { roughness: 1, vertexColors: true }), k.sway[0], k.sway[1]));
+  const hues = kinds.map((k) => [new THREE.Color(k.hue[0]), new THREE.Color(k.hue[1])]);
+  const barks = kinds.map((k) => new THREE.Color(k.bark));
+  // a few trees on the turn, which is what stops a wood being one colour
+  const turning = new THREE.Color(0x9a7d33);
+
   const tmp = new THREE.Color();
   const d = new THREE.Object3D();
-  const trunkMat = std(0x4a3a2a, { roughness: 1 });
+  const m = new THREE.Matrix4(), sc = new THREE.Vector3();
 
   for (let c = 0; c < chunks; c++) {
+    const total = buckets[c].reduce((s, l) => s + l.length, 0);
+    if (!total) continue;
+    const trunks = new THREE.InstancedMesh(trunkGeo, trunkMat, total);
+    let ti = 0;
+
     for (let ki = 0; ki < kinds.length; ki++) {
       const list = buckets[c][ki];
       if (!list.length) continue;
       const kind = kinds[ki];
-
-      const trunkGeo = new THREE.CylinderGeometry(kind.trunkR * 0.7, kind.trunkR, kind.trunkH, 6);
-      trunkGeo.translate(0, kind.trunkH / 2, 0);
-      const trunks = new THREE.InstancedMesh(trunkGeo, trunkMat, list.length);
-      const crowns = new THREE.InstancedMesh(kind.crown,
-        windify(std(0xffffff, { roughness: 1 }), 0.035, 0.42), list.length);
+      const crowns = new THREE.InstancedMesh(kind.crown, crownMats[ki], list.length);
 
       list.forEach((t, i) => {
         d.position.set(t.x, t.y, t.z);
         d.rotation.set(t.lean, t.r, t.lean * 0.7);
         d.scale.set(t.s, t.s * (0.88 + t.hue * 0.35), t.s);
         d.updateMatrix();
-        trunks.setMatrixAt(i, d.matrix);
         crowns.setMatrixAt(i, d.matrix);
-        tmp.copy(dark).lerp(light, t.hue);
-        if (t.hue > 0.86) tmp.lerp(olive, 0.6);
+        m.copy(d.matrix).scale(sc.set(kind.trunkR, kind.trunkH, kind.trunkR));
+        trunks.setMatrixAt(ti, m);
+        trunks.setColorAt(ti, tmp.copy(barks[ki]).multiplyScalar(0.8 + t.hue * 0.4));
+        ti++;
+        tmp.copy(hues[ki][0]).lerp(hues[ki][1], t.hue);
+        if (t.hue > 0.94) tmp.lerp(turning, 0.55);
         crowns.setColorAt(i, tmp);
       });
-      trunks.instanceMatrix.needsUpdate = true;
       crowns.instanceMatrix.needsUpdate = true;
       if (crowns.instanceColor) crowns.instanceColor.needsUpdate = true;
       crowns.castShadow = true;
-      trunks.computeBoundingSphere();
       crowns.computeBoundingSphere();
-      group.add(trunks); group.add(crowns);
+      group.add(crowns);
     }
+    trunks.instanceMatrix.needsUpdate = true;
+    if (trunks.instanceColor) trunks.instanceColor.needsUpdate = true;
+    trunks.computeBoundingSphere();
+    group.add(trunks);
   }
   return group;
 }
@@ -572,28 +823,218 @@ export function makeSky(opts = {}) {
   sky.frustumCulled = false;
   sky.renderOrder = -2;
 
-  // Clouds: flattened lumps, lit by nothing, high enough that they are
-  // only ever seen from below. Cheap, and the sky stops being a wash.
-  const rnd = rng(9001);
-  const parts = [];
-  for (let i = 0; i < 40; i++) {
-    const a = rnd() * Math.PI * 2, rad = 1100 + rnd() * 2600;
-    const cx = Math.cos(a) * rad, cz = Math.sin(a) * rad;
-    const cy = 620 + rnd() * 460;
-    const lumps = 3 + Math.floor(rnd() * 4);
-    for (let k = 0; k < lumps; k++) {
-      const g = new THREE.IcosahedronGeometry(26 + rnd() * 42, 0);
-      g.scale(1.7, 0.4, 1.2);
-      g.translate(cx + (rnd() - 0.5) * 150, cy + (rnd() - 0.5) * 22, cz + (rnd() - 0.5) * 150);
-      parts.push(g);
-    }
-  }
-  const clouds = new THREE.Mesh(mergeGeometries(parts), new THREE.MeshBasicMaterial({
-    color: 0xeef4f9, fog: false, transparent: true, opacity: 0.82, depthWrite: false }));
-  clouds.frustumCulled = false;
-  clouds.renderOrder = -1;
+  const clouds = makeClouds();
   sky.add(clouds);
   return sky;
+}
+
+// ---------------------------------------------------------------------
+// CLOUDS
+// ---------------------------------------------------------------------
+/**
+ * A cloud layer built out of soft billboard puffs.
+ *
+ * WHAT WAS WRONG. The first pass was forty flattened icosahedra in one
+ * unlit MeshBasicMaterial. Three things fell out of that and all three
+ * are visible from the cockpit: the edges were straight polygon edges, so
+ * a cloud was a white paper cut-out; there was no shading at all, so it
+ * had no volume, only an outline; and they sat in a RING between 1.1 and
+ * 3.7 km, which leaves a hole directly overhead - look up on the grid and
+ * the sky is empty.
+ *
+ * WHAT THIS IS. Each cloud is a cluster of camera-facing quads with a
+ * soft radial falloff. That is the oldest trick in the book and it is
+ * still the right one here: two triangles per puff, the whole sky in one
+ * draw call, genuinely soft edges, and - because a quad's own local axes
+ * ARE the view axes - a free surface normal to light it with. So each
+ * puff is shaded like a little sphere, lit from the sun's side and dark
+ * underneath, on top of a cloud-wide gradient from a shadowed base to a
+ * sunlit top. That gradient is what makes a cumulus look like a tower of
+ * something rather than a white shape.
+ *
+ * It is also CHEAPER than what it replaces: 1,904 triangles against the
+ * 3,600-odd of forty icosahedral clouds, in the same single draw call.
+ *
+ * THE SORT. These are transparent and they do not write depth, so within
+ * the mesh they blend in buffer order. Every puff is therefore written
+ * top-down by altitude, which is exactly back-to-front for a viewer under
+ * the layer - and a driver is always under the layer. Two separate clouds
+ * at different heights can still overlap out of order, but both are pale
+ * and far away and the error is not findable.
+ */
+function makeClouds() {
+  const rnd = rng(9001);
+  const puffs = [];
+  // x,z on a disc of area-uniform radius, so the layer is a layer and not
+  // a ring. `min` keeps the tall types from sitting on top of the camera,
+  // where a 200 m cumulus would fill the screen.
+  const spot = (min, max) => {
+    const a = rnd() * TAU, r = Math.sqrt(min * min + rnd() * (max * max - min * min));
+    return [Math.cos(a) * r, Math.sin(a) * r];
+  };
+  /**
+   * w,h are half-sizes in metres; `up` is height within this cloud, 0 base
+   * 1 top; `hard` is where the soft edge starts, as a fraction of the
+   * puff's radius. A cumulus has a definite boil to its edge and wants a
+   * short falloff; cirrus is half vapour and wants almost all falloff.
+   * One number, and it is the difference between cloud and cigarette smoke.
+   */
+  const puff = (x, y, z, w, h, up, a, hard) =>
+    puffs.push({ x, y, z, w, h, up, a, hard, seed: rnd() * 12 });
+
+  // ---- CUMULUS: flat-bottomed, billowing upwards -------------------------
+  // The flat base is the whole cue. Packing the vertical placement with
+  // u*u puts most puffs low and wide and a few high, which is the shape a
+  // fair-weather cumulus actually has.
+  for (let i = 0; i < 22; i++) {
+    const [cx, cz] = spot(420, 3300);
+    const base = 660 + rnd() * 280;
+    const W = 150 + rnd() * 210, H = 120 + rnd() * 190;
+    const squash = 0.6 + rnd() * 0.7;              // some are long, some compact
+    for (let k = 0; k < 28; k++) {
+      const u = rnd(), hy = u * u;
+      const rad = W * Math.sqrt(1 - hy * 0.8) * Math.sqrt(rnd());
+      const a = rnd() * TAU;
+      const s = (54 + rnd() * 46) * (1 - hy * 0.35);
+      puff(cx + Math.cos(a) * rad, base + hy * H + (rnd() - 0.5) * 18, cz + Math.sin(a) * rad * squash,
+        s, s * (0.78 + rnd() * 0.3), hy, 0.72, 0.56);
+    }
+  }
+
+  // ---- STRATUS: the flat low stuff, wide and thin and barely shaded ------
+  for (let i = 0; i < 18; i++) {
+    const [cx, cz] = spot(300, 3300);
+    const y = 470 + rnd() * 140;
+    const W = 260 + rnd() * 380, D = 120 + rnd() * 200;
+    const turn = rnd() * TAU, ct = Math.cos(turn), st = Math.sin(turn);
+    for (let k = 0; k < 14; k++) {
+      const ox = (rnd() - 0.5) * 2 * W, oz = (rnd() - 0.5) * 2 * D;
+      const w = 110 + rnd() * 90;
+      puff(cx + ox * ct - oz * st, y + (rnd() - 0.5) * 26, cz + ox * st + oz * ct,
+        w, 22 + rnd() * 16, 0.42 + rnd() * 0.2, 0.34, 0.24);
+    }
+  }
+
+  // ---- CIRRUS: high combed streaks, all on one bearing -------------------
+  // One bearing for the whole sky, because cirrus is drawn out by a single
+  // jet stream and a sky of streaks pointing every way looks like a mess.
+  const comb = rnd() * TAU, cc = Math.cos(comb), cs = Math.sin(comb);
+  for (let i = 0; i < 12; i++) {
+    const [cx, cz] = spot(200, 3200);
+    const y = 1500 + rnd() * 620;
+    const L = 420 + rnd() * 520;
+    for (let k = 0; k < 7; k++) {
+      const t = (k / 6 - 0.5) * 2 * L;
+      puff(cx + cc * t, y + (rnd() - 0.5) * 40, cz + cs * t,
+        130 + rnd() * 90, 13 + rnd() * 10, 0.95, 0.22 + rnd() * 0.12, 0.06);
+    }
+  }
+
+  puffs.sort((p, q) => q.y - p.y);
+
+  const N = puffs.length;
+  const pos = new Float32Array(N * 12);
+  const quad = new Float32Array(N * 16);     // corner.xy, halfsize.xy
+  const look = new Float32Array(N * 16);     // up-in-cloud, alpha, seed, hardness
+  const idx = new Uint32Array(N * 6);
+  const CORNERS = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
+  for (let i = 0; i < N; i++) {
+    const p = puffs[i];
+    for (let v = 0; v < 4; v++) {
+      const o = i * 4 + v;
+      pos[o * 3] = p.x; pos[o * 3 + 1] = p.y; pos[o * 3 + 2] = p.z;
+      quad[o * 4] = CORNERS[v][0]; quad[o * 4 + 1] = CORNERS[v][1];
+      quad[o * 4 + 2] = p.w; quad[o * 4 + 3] = p.h;
+      look[o * 4] = p.up; look[o * 4 + 1] = p.a;
+      look[o * 4 + 2] = p.seed; look[o * 4 + 3] = p.hard;
+    }
+    const b = i * 4;
+    idx.set([b, b + 1, b + 2, b, b + 2, b + 3], i * 6);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('aQuad', new THREE.BufferAttribute(quad, 4));
+  geo.setAttribute('aPuff', new THREE.BufferAttribute(look, 4));
+  geo.setIndex(new THREE.BufferAttribute(idx, 1));
+
+  // WHERE THE SUN IS. main.js hangs the key light at a fixed offset from
+  // the car - (-90, +150, +70) - so the direction to it never changes and
+  // there is nothing to keep in sync; this is that offset, normalised.
+  const sun = new THREE.Vector3(-90, 150, 70).normalize();
+  const tint = new THREE.Color(0xeef4f9);
+
+  const mat = new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false, fog: false,
+    uniforms: {
+      uTint: { value: tint }, uOpacity: { value: 0.82 }, uSun: { value: sun },
+    },
+    vertexShader: [
+      'attribute vec4 aQuad;',
+      'attribute vec4 aPuff;',
+      'varying vec2 vUv;',
+      'varying vec4 vP;',          // up-in-cloud, alpha, seed, edge hardness
+      'void main() {',
+      '  vec4 mv = modelViewMatrix * vec4(position, 1.0);',
+      // the quad is built in VIEW space, so it always faces the camera and
+      // its x/y are the camera's right and up - which is what lets the
+      // fragment shader fake a sphere normal for nothing
+      '  mv.xy += aQuad.xy * aQuad.zw;',
+      '  vUv = aQuad.xy;',
+      '  vP = aPuff;',
+      '  gl_Position = projectionMatrix * mv;',
+      '}',
+    ].join('\n'),
+    fragmentShader: [
+      'uniform vec3 uTint;',
+      'uniform vec3 uSun;',
+      'uniform float uOpacity;',
+      'varying vec2 vUv;',
+      'varying vec4 vP;',
+      'void main() {',
+      '  float d = length(vUv);',
+      // A circle is a ball, and a cloud made of balls looks like a cloud
+      // made of balls the moment you are close enough to tell. Two octaves
+      // of sine lobes keyed to the puff\'s own seed break the outline into
+      // something irregular, for eight instructions and no texture.
+      '  d *= 1.0 + 0.26 * sin(vUv.x * 5.1 + vP.z) * sin(vUv.y * 4.3 - vP.z * 1.7)',
+      '            + 0.13 * sin(vUv.x * 9.7 - vP.z * 2.3) * sin(vUv.y * 11.3 + vP.z);',
+      '  float a = smoothstep(1.0, vP.w, d) * vP.y * uOpacity;',
+      '  if (a < 0.004) discard;',
+      // the puff as a sphere, in view space
+      '  vec3 n = vec3(vUv, sqrt(max(0.0, 1.0 - min(1.0, d * d))));',
+      '  vec3 sunV = normalize((viewMatrix * vec4(uSun, 0.0)).xyz);',
+      '  vec3 upV = normalize((viewMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz);',
+      '  float lam = 0.5 + 0.5 * dot(n, sunV);',
+      // the cloud-wide gradient does most of the work; the puff\'s own
+      // up-facing term rounds each lump inside it
+      '  float t = vP.x * 0.66 + 0.34 * (0.5 + 0.5 * dot(n, upV));',
+      // the shadowed side of a cloud is not grey, it is blue - it is lit by
+      // the sky rather than the sun - and warming the lit side by the same
+      // amount is what sells the depth
+      '  vec3 shade = uTint * vec3(0.52, 0.57, 0.70);',
+      '  vec3 col = mix(shade, uTint, clamp(t * 0.70 + lam * 0.46, 0.0, 1.0));',
+      // the silver lining: where the sun grazes a rim, it burns through
+      '  col += uTint * pow(max(0.0, lam), 7.0) * smoothstep(0.5, 1.0, d) * 0.55;',
+      '  gl_FragColor = vec4(col, a);',
+      '}',
+    ].join('\n'),
+  });
+
+  // THE CONTRACT WITH weather.js. It greys the sky by writing
+  // clouds.material.color.setRGB(...) and clouds.material.opacity = x
+  // every frame. A ShaderMaterial has neither of those wired to anything,
+  // so `color` IS the tint uniform's Color object - mutating it writes
+  // straight through - and `opacity` is forwarded to its uniform.
+  mat.color = tint;
+  Object.defineProperty(mat, 'opacity', {
+    get: () => mat.uniforms.uOpacity.value,
+    set: (v) => { mat.uniforms.uOpacity.value = v; },
+  });
+
+  const clouds = new THREE.Mesh(geo, mat);
+  clouds.frustumCulled = false;
+  clouds.renderOrder = -1;
+  return clouds;
 }
 
 // ---------------------------------------------------------------------

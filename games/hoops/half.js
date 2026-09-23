@@ -1326,6 +1326,24 @@ export class HalfCourt {
   /** a swipe at the ball in somebody's hands */
   #swat(p, c) {
     if (p.cool > 0) return;
+    // A MAN IN THE ACT OF SHOOTING CANNOT BE PICKPOCKETED.
+    //
+    // Liam: "when shooting the player still gets the ball taken
+    // immediately ... the only defense while shooting is jumping for ball
+    // which should be rare".
+    //
+    // A shot is a gather and then a release - see #shoot - and the gather
+    // is a sixth of a second during which the ball is still in his hands
+    // and every swipe in the game could still reach it. So you would
+    // commit to the shot, the animation would start, and the ball would
+    // simply be gone: no block, no contest, nothing you could have done
+    // differently. Whatever else defence is, it should not be able to
+    // undo a decision you have already made.
+    //
+    // From the moment he goes up, the swipe does nothing. The one thing
+    // that can stop the shot is somebody leaving the floor and getting a
+    // hand on the ball, which is what a block is.
+    if (c.wind > 0 || c.shotAsk) return;
     if (!this.#spend(p, 0.12)) return;
     p.cool = 0.38; p.swatT = 0;
     const d = this.#dist(p, c);
@@ -1342,13 +1360,7 @@ export class HalfCourt {
     // guarding cost you was position; now it also costs stamina, so it can
     // afford to work more often - and Liam asked for the defence to be
     // easier outright. Tired arms are worse arms, which is the trade.
-    // AND A BOT'S HANDS ARE NOT YOUR HANDS. You asked for the defence to
-    // be easier and then for the NPCs to be worse at guarding, which is
-    // the same request twice - so the swipe keeps its old odds when YOU
-    // make it and comes off about half as often when one of them does.
-    const hands = p.you ? 1 : 0.68;
-    const chance = clamp((0.50 * front * p.reach - d * 0.05) * (1.25 - c.aim * 0.5)
-                          * (0.65 + 0.35 * this.#legs(p)) * hands, 0.05, 0.78);
+    const chance = clamp((0.50 * front * p.reach - d * 0.05) * (1.25 - c.aim * 0.5) * (0.65 + 0.35 * this.#legs(p)), 0.06, 0.78);
     if (Math.random() < chance) {
       const b = this.ball;
       b.holder = null; b.live = true; b.shot = false; b.from = p;
@@ -1676,22 +1688,22 @@ export class HalfCourt {
     const ballAt = carrier ? { x: carrier.x, z: carrier.z } : { x: b.x, z: b.z };
     const passLen = Math.hypot(ballAt.x - m.x, ballAt.z - m.z);
     if (onBall) {
-      // A STRIDE AND A HALF, NOT A HALF STRIDE. Liam: "guarding is way too
-      // good for NPC's make them worse at guarding".
+      // RIGHT UP ON HIM, which is where this started and where it has
+      // ended up again.
       //
-      // This sat at 1.35 m, which is inside the metre and a half that
-      // #contest calls a hand in the face - so a man with the ball was
-      // contested from the moment he caught it until he got rid of it, and
-      // there was no such thing as an open look against these bots. At
-      // 2.05 he is a defender rather than a coat: close enough to make you
-      // hurry, far enough that a step back or a drive buys you a shot.
-      tx = m.x + dx / L * 2.05; tz = m.z + dz / L * 2.05;
+      // It was pushed out to 2.05 m when Liam said "guarding is way too
+      // good", and then, once shooting was fixed, "bring defense back to
+      // old level" - because the thing that made the defence unplayable
+      // was never how close they stood. It was that a shot could be taken
+      // off you by a man with his feet on the ground (see the catch test)
+      // and that the gather could be pickpocketed (see #swat). Both of
+      // those are fixed, so he can come back in and be a nuisance again.
+      tx = m.x + dx / L * 1.35; tz = m.z + dz / L * 1.35;
     } else if (passLen < 7.5) {
-      // deny: in the passing lane, on his shoulder, not behind him - and
-      // half a metre further off it than it was, so a pass can be made
+      // deny: in the passing lane, on his shoulder, not behind him
       const ux = (ballAt.x - m.x) / (passLen || 1), uz = (ballAt.z - m.z) / (passLen || 1);
-      tx = m.x + ux * 1.85 + dx / L * 0.45;
-      tz = m.z + uz * 1.85 + dz / L * 0.45;
+      tx = m.x + ux * 1.35 + dx / L * 0.45;
+      tz = m.z + uz * 1.35 + dz / L * 0.45;
     } else {
       // sag: hang back towards the lane between your man and the ring
       tx = m.x + dx / L * 2.6 + (ballAt.x - m.x) * 0.12;
@@ -1713,17 +1725,11 @@ export class HalfCourt {
       }
     }
 
-    // AND HE CANNOT MIRROR YOU. Closing out at 1.06 of running speed means
-    // the man guarding you is FASTER than you are, so no first step ever
-    // beat anybody - the defender simply arrived wherever you did. At 0.94
-    // a good move gets you half a yard, which is the whole point of having
-    // a first step.
-    this.#seek(p, tx, tz, onBall ? 0.94 : 0.88);
+    this.#seek(p, tx, tz, onBall ? 1.06 : 0.9);
     p.guard = onBall && this.#dist(p, m) < 3.4;
-    // and go for the ball now and then - NOT CONSTANTLY. Twice a second
-    // inside three metres is a man with his hand in the cookie jar on
-    // every possession; see #swat for what each swipe is worth.
-    if (b.holder === m && p.cool <= 0 && this.#dist(p, m) < 2.3 && Math.random() < dt * 0.24 * p.iq) {
+    // and go for the ball now and then - not constantly; see #swat, which
+    // will refuse outright if the man has already gone up to shoot
+    if (b.holder === m && p.cool <= 0 && this.#dist(p, m) < 2.9 && Math.random() < dt * 0.42 * p.iq) {
       this.#swat(p, m);
     }
     // CONTEST IT, AND GO FOR THE BLOCK. A defender who is close enough
@@ -1737,7 +1743,11 @@ export class HalfCourt {
     // metre, and a read he only makes some of the time, puts it back where
     // a block is a moment rather than the normal outcome of shooting.
     if (b.live && b.shot && p.y <= 0 && p.land <= 0 && this.#dist2(p.x, p.z, b.x, b.z) < 1.0
-        && b.y < FLOOR + 4.6 && this.#legs(p) > 0.45 && Math.random() < 0.24 * p.iq
+        // RARE. Liam: "the only defense while shooting is jumping for ball
+        // which should be rare". A defender who is there, and who reads it,
+        // about one time in six - so a block is a moment somebody earned
+        // rather than the tax on shooting near anybody.
+        && b.y < FLOOR + 4.6 && this.#legs(p) > 0.45 && Math.random() < 0.11 * p.iq
         && this.#spend(p, 0.12)) {
       p.vy = 10.2 + 2.4 * this.#legs(p);
       p.land = 0.25;

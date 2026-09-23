@@ -5,11 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
 <title>CROSSING — PLAYPILE</title>
 <style>
-  html,body{margin:0;height:100%;overflow:hidden;background:#0a0e14;
+  html,body{margin:0;height:100%;overflow:hidden;background:#150f1c;
     display:grid;place-items:center;
     font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;color:#8b96a8}
   #app{line-height:0}
-  canvas{image-rendering:auto;border-radius:2px}
+  /* THE WHOLE POINT. The game draws at 330x323 and is blitted to a 660x646
+     canvas with smoothing off; this is what stops the browser putting the
+     smoothing back when it scales that canvas to fill the window. Without
+     it the art is soft again at every size except exactly 1:1, and the
+     border-radius was rounding the corners off a pixel-art screen. */
+  canvas{image-rendering:pixelated;image-rendering:crisp-edges}
 </style>
 </head>
 <body>

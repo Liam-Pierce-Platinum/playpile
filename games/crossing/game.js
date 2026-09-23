@@ -29,13 +29,45 @@
 import { Deck, clamp, rnd, pick } from '../_deck/deck.js';
 import { Board } from '../_deck/board.js';
 import { Home } from '../_deck/home.js';
+import * as A from './art.js';
 
 const CELL = 44;
 const COLS = 15;
 const VIEW = 14;                       // rows of world visible at once
 const TOP = 30;                        // the HUD bar
 const W = COLS * CELL;
-const D = new Deck({ key: 'crossing', w: W, h: TOP + VIEW * CELL, bg: '#0a0e14' });
+const D = new Deck({ key: 'crossing', w: W, h: TOP + VIEW * CELL, bg: A.P.ink });
+
+// ---------------------------------------------------------------------
+// THE PIXEL BUFFER
+// ---------------------------------------------------------------------
+// The world is drawn at HALF the cabinet's resolution and blitted up with
+// smoothing off, which is what makes this pixel art rather than smooth
+// shapes that happen to be square. art.js has the long version of why;
+// the short version is that a buffer with no sub-pixels in it cannot be
+// drawn into off the grid, so nothing here has to remember to snap.
+//
+// It is one canvas, made once. Nothing in the frame allocates.
+const PX = A.PX;
+const BW = W / PX, BH = (TOP + VIEW * CELL) / PX;   // 330 x 323
+const TOP_A = TOP / PX, CELL_A = A.CELL_A;
+const buf = document.createElement('canvas');
+buf.width = BW; buf.height = BH;
+const bc = buf.getContext('2d');           // "buffer context"
+bc.imageSmoothingEnabled = false;
+const SPR = A.buildSprites();
+
+// THE EDGE THAT KILLS YOU. The camera's row is always the bottom row of
+// the screen, so this is a fixed band up the bottom of the canvas: the
+// light going out of the world behind you. It used to be a
+// createLinearGradient, which is the one thing you cannot have in pixel
+// art - a smooth ramp is visibly not made of pixels. Ten hard bands of
+// increasing alpha with a dithered row on each seam is the pixel-art
+// answer, and the strings are built once because a colour string per band
+// per frame is 600 strings a second for nothing.
+const EDGE_H = 5;                                    // art px per band
+const EDGE = [];
+for (let i = 0; i < 10; i++) EDGE.push('rgba(36,27,43,' + (0.08 + i * 0.098).toFixed(3) + ')');
 
 const HOP = 0.12;                      // seconds per hop
 const LEAD = 8;                         // the player is never more than VIEW-LEAD rows up
@@ -72,8 +104,6 @@ function bandFor(r) {
   return band.type;
 }
 
-const CAR_COLS = ['#e8c34a', '#6fd4e0', '#d95757', '#a56fd4', '#e08a3c', '#7fe08a'];
-
 function makeRow(r) {
   const type = r < 4 ? 'grass' : bandFor(r);
   const sp = clamp(1 + r * 0.007, 1, 2.7);          // everything speeds up
@@ -86,7 +116,12 @@ function makeRow(r) {
     const n = r < 4 ? 0 : Math.floor(Math.random() * 5);
     for (let i = 0; i < n; i++) lane.trees.add(Math.floor(Math.random() * COLS));
     if (lane.trees.size > COLS - 4) lane.trees.delete([...lane.trees][0]);
-    lane.tint = Math.random() < 0.5 ? '#1b2e1f' : '#1f3423';
+    // Which of the two greens this verge is, and which tree each slot
+    // grows. Both are LOOKS ONLY - decided here rather than in draw()
+    // because a verge that changed shade every frame would strobe.
+    lane.dark = Math.random() < 0.5;
+    lane.tree = {};
+    for (const c of lane.trees) lane.tree[c] = Math.floor(Math.random() * 3);
     return lane;
   }
 
@@ -95,7 +130,8 @@ function makeRow(r) {
     const truck = Math.random() < 0.3;
     lane.itemW = (truck ? 1.7 + Math.random() * 0.8 : 1.0) * CELL;
     lane.v = lane.dir * (truck ? 55 + Math.random() * 45 : 75 + Math.random() * 75) * sp;
-    lane.col = pick(CAR_COLS);
+    lane.truck = truck;                      // drawn as a cab and a box
+    lane.paint = pick(A.CAR_PAINT);
     lane.gap = [CELL * 2.2, CELL * 6.5];
   } else {
     const turtle = Math.random() < 0.42;
@@ -215,111 +251,183 @@ const diving = (it) => ((D.t + it.dive) % 6) > 4.6;
 // ---------------------------------------------------------------------
 // drawing
 // ---------------------------------------------------------------------
-function draw(g) {
-  const first = Math.floor(camRow) - 1, last = Math.floor(camRow) + VIEW + 1;
+//
+// Everything from here on paints into `bc`, the half-resolution buffer,
+// in whole art pixels, and the last thing draw() does is blit that buffer
+// over the cabinet canvas at 2x with smoothing off.
+const P = A.P;
+const dot = A.px;                       // a rectangle of whole art pixels
 
-  for (let r = Math.max(0, first); r <= last; r++) {
+/** lay a ground texture across the row. 5 blits: the tile is 3 cells wide. */
+function tile(img, y) { for (let x = 0; x < BW; x += img.width) bc.drawImage(img, x, y); }
+
+/** the moving surface of a river row, two layers at different speeds */
+function waves(lane, y, r) {
+  const v = lane.v / PX;                            // art pixels per second
+  const a = Math.round(D.t * v * 0.55), c = Math.round(D.t * v * 0.30);
+  const y1 = y + 4 + (r % 3), y2 = y + 13 + (r % 4);
+  for (let x = ((a % 31) + 31) % 31 - 31; x < BW; x += 31) {
+    dot(bc, x, y1, 8, 1, P.wat2);
+    dot(bc, x + 2, y1 + 1, 5, 1, P.wat1);
+  }
+  for (let x = ((c % 47) + 47) % 47 - 47; x < BW; x += 47) {
+    dot(bc, x, y2, 6, 1, P.wat2);
+    dot(bc, x + 1, y2 + 1, 4, 1, P.wat1);
+  }
+}
+
+function draw(g) {
+  const first = Math.max(0, Math.floor(camRow) - 1);
+  const last = Math.floor(camRow) + VIEW + 1;
+
+  dot(bc, 0, 0, BW, BH, P.ink);
+
+  // ---- pass one: the ground -----------------------------------------
+  //
+  // Rounding each row's top edge on its own is safe because rows are
+  // exactly CELL apart, so every row rounds with the same fractional
+  // offset and no one-pixel seam can open between them as the camera
+  // creeps. That is also why the camera creeping looks like scrolling
+  // rather than like the world wobbling.
+  for (let r = first; r <= last; r++) {
     const lane = rows[r];
     if (!lane) continue;
-    const y = rowY(r);
-    if (y > D.H || y + CELL < TOP) continue;
+    const y = Math.round(rowY(r) / PX);
+    if (y > BH || y + CELL_A < 0) continue;
+    const up = rows[r + 1], down = rows[r - 1];     // r+1 is drawn ABOVE r
 
     if (lane.type === 'grass') {
-      g.fillStyle = lane.tint; g.fillRect(0, y, W, CELL);
+      tile(SPR.grass[lane.dark ? 1 : 0], y);
     } else if (lane.type === 'river') {
-      g.fillStyle = '#12304a'; g.fillRect(0, y, W, CELL);
-      // a little surface movement, so still water does not look like tile
-      g.fillStyle = 'rgba(255,255,255,.05)';
-      for (let x = ((D.t * lane.v * 0.3) % 52 + 52) % 52 - 52; x < W; x += 52) {
-        g.fillRect(x, y + 8 + (r % 3) * 9, 22, 2);
+      tile(SPR.water, y);
+      waves(lane, y, r);
+      // A BANK WHEREVER THE WATER STOPS. Without it a four-row river is
+      // one undifferentiated blue field and you cannot see where it is
+      // safe to land; the foam line is the edge of the bank you are
+      // jumping off, and it costs two rows of pixels.
+      if (!up || up.type !== 'river') {
+        dot(bc, 0, y, BW, 1, P.wat4); dot(bc, 0, y + 1, BW, 1, P.foam);
+      }
+      if (!down || down.type !== 'river') {
+        dot(bc, 0, y + CELL_A - 2, BW, 1, P.foam);
+        dot(bc, 0, y + CELL_A - 1, BW, 1, P.wat4);
       }
     } else {
-      g.fillStyle = '#191d24'; g.fillRect(0, y, W, CELL);
-      g.fillStyle = 'rgba(255,255,255,.10)';
-      for (let x = 0; x < W; x += 34) g.fillRect(x, y + CELL - 1, 18, 2);
+      tile(SPR.tarmac[r & 1], y);
+      // A LANE LINE ONLY WHERE THERE IS ANOTHER LANE. Dashes between two
+      // road rows, a solid painted edge and a kerb lip where the band
+      // stops - which is what tells you at a glance how many lanes deep
+      // the road you are about to step into is. The old version drew the
+      // same dashes on every row edge including the kerb, so a one-lane
+      // road and a four-lane road looked identical.
+      if (up && up.type === 'road') {
+        dot(bc, 0, y, BW, 1, P.ink);
+        for (let x = 3; x < BW; x += 18) dot(bc, x, y + 1, 9, 1, P.paint2);
+      } else {
+        dot(bc, 0, y, BW, 1, P.ink);
+        dot(bc, 0, y + 1, BW, 1, P.tar1);
+        dot(bc, 0, y + 2, BW, 1, P.paint2);
+      }
+      if (!down || down.type !== 'road') {
+        dot(bc, 0, y + CELL_A - 3, BW, 1, P.paint2);
+        dot(bc, 0, y + CELL_A - 2, BW, 1, P.tar1);
+        dot(bc, 0, y + CELL_A - 1, BW, 1, P.ink);
+      }
     }
+  }
+
+  // ---- pass two: everything standing on the ground -------------------
+  //
+  // Backwards, from the top of the screen down. A tree is taller than its
+  // cell and pokes into the row above, and that row is FURTHER AWAY, so
+  // it has to have been drawn already. Done in one pass with the ground,
+  // the next row's grass painted the tops off every tree.
+  for (let r = last; r >= first; r--) {
+    const lane = rows[r];
+    if (!lane) continue;
+    const y = Math.round(rowY(r) / PX);
+    if (y > BH || y + CELL_A < -8) continue;
 
     if (lane.type === 'grass') {
-      for (const c of lane.trees) tree(g, c * CELL + CELL / 2, y + CELL, r + c);
+      for (const c of lane.trees) {
+        const s = SPR.trees[(lane.tree && lane.tree[c]) || 0];
+        bc.drawImage(s, c * CELL_A, y + CELL_A - s.height);
+      }
       continue;
     }
 
     for (const it of lane.items) {
       if (it.x > W + 8 || it.x + lane.itemW < -8) continue;
+      const x = Math.round(it.x / PX), w = Math.round(lane.itemW / PX);
       if (lane.type === 'road') {
-        g.fillStyle = lane.col;
-        D.box(it.x, y + 8, lane.itemW, CELL - 16, lane.col, 5);
-        g.fillStyle = 'rgba(0,0,0,.35)';
-        g.fillRect(lane.v > 0 ? it.x + lane.itemW - 13 : it.x + 5, y + 11, 8, CELL - 22);
+        dot(bc, x + 3, y + 19, w - 5, 2, P.ink2);       // contact shadow
+        A.car(bc, x, y + 2, w, 14, lane.paint, lane.dir, lane.truck);
       } else if (lane.kind === 'log') {
-        D.box(it.x, y + 6, lane.itemW, CELL - 12, '#6b4a2f', 8);
-        g.fillStyle = 'rgba(0,0,0,.22)';
-        for (let k = 1; k < lane.itemW / CELL; k++) g.fillRect(it.x + k * CELL, y + 6, 2, CELL - 12);
+        dot(bc, x + 1, y + 18, w - 2, 2, P.wat4);       // the log's shadow
+        A.log(bc, x, y + 3, w, 16);
       } else {
-        const under = diving(it);
-        g.globalAlpha = under ? 0.30 : 1;
-        g.fillStyle = under ? '#2d5a4a' : '#3f9070';
         const n = Math.round(lane.itemW / CELL);
-        for (let k = 0; k < n; k++) {
-          g.beginPath(); g.arc(it.x + k * CELL + CELL / 2, y + CELL / 2, CELL * 0.32, 0, 7); g.fill();
-        }
-        g.globalAlpha = 1;
+        const s = diving(it) ? SPR.turtleDive : SPR.turtle[lane.dir > 0 ? 0 : 1];
+        for (let k = 0; k < n; k++) bc.drawImage(s, x + k * CELL_A, y);
       }
     }
   }
 
-  // THE EDGE THAT KILLS YOU, drawn so it is never a surprise: a dark band
-  // creeping up the bottom of the screen with the light going out of it.
-  const edge = rowY(camRow) + CELL;
-  const grad = g.createLinearGradient(0, edge - 90, 0, edge);
-  grad.addColorStop(0, 'rgba(10,14,20,0)');
-  grad.addColorStop(1, 'rgba(10,14,20,.92)');
-  g.fillStyle = grad; g.fillRect(0, edge - 90, W, 92);
-
-  // the frog
+  // ---- the frog ------------------------------------------------------
   if (!player.dead || Math.floor(D.t * 12) % 2) {
-    let py = player.r, px = player.x;
+    let py = player.r, vx = player.x;
     if (player.hop > 0) {
       const t = 1 - player.hop / HOP;
-      px = player.fx + (player.x - player.fx) * t;
+      vx = player.fx + (player.x - player.fx) * t;
       py = player.fy + (player.r - player.fy) * t;
     }
     const lift = player.hop > 0 ? Math.sin((1 - player.hop / HOP) * Math.PI) * 8 : 0;
-    frogShape(g, px + CELL / 2, rowY(py) + CELL / 2 - lift,
-              player.dir, player.dead ? '#d95757' : '#7fe08a');
+    const fx = Math.round(vx / PX), fy = Math.round(rowY(py) / PX);
+    // The shadow stays on the ground while the frog leaves it. A four
+    // art-pixel hop is small, and without something staying behind it
+    // just looks like the sprite twitching upward.
+    const on = rows[player.r];
+    if (on && on.type === 'river') dot(bc, fx + 4, fy + 19, 14, 1, P.foam);
+    else dot(bc, fx + 4, fy + 17, 14, 3, P.ink2);
+    bc.drawImage((player.dead ? SPR.frogDead : SPR.frog)[player.dir],
+                 fx, fy - Math.round(lift / PX));
   }
 
-  D.hud('SCORE ' + score, 'BEST ' + D.best);
-  if (msgT > 0 && !over) D.text(msg, W / 2, D.H / 2, 22, '#ff9f43', 'center');
+  // ---- the dark creeping up behind you -------------------------------
+  let ey = BH - EDGE.length * EDGE_H;
+  for (let i = 0; i < EDGE.length; i++) {
+    dot(bc, 0, ey, BW, EDGE_H, EDGE[i]);
+    // a dithered row on each seam: without it the ten bands read as ten
+    // stripes, with it they read as one soft fade made out of pixels,
+    // which is how a pixel-art gradient is done
+    if (i) {
+      bc.fillStyle = EDGE[i];
+      for (let x = i & 1; x < BW; x += 2) bc.fillRect(x, ey - 1, 1, 1);
+    }
+    ey += EDGE_H;
+  }
+
+  // ---- the HUD -------------------------------------------------------
+  dot(bc, 0, 0, BW, TOP_A, P.ink);
+  dot(bc, 0, 0, BW, 1, P.ink2);
+  dot(bc, 0, TOP_A - 1, BW, 1, P.ink3);
+  A.text(bc, 'SCORE', 5, 6, P.uiDim, 1);
+  A.text(bc, score, 5 + A.textW('SCORE') + 5, 3, P.ui1, 2);
+  A.text(bc, D.best, BW - 5, 3, P.ui3, 2, 'right');
+  A.text(bc, 'BEST', BW - 8 - A.textW(String(D.best), 2) - A.textW('BEST'), 6, P.uiDim, 1);
+
+  if (msgT > 0 && !over) A.text(bc, msg, BW / 2, BH / 2, P.ui2, 2, 'center');
   if (!moved && !over) {
-    D.text('UP to go · the bottom of the screen is rising',
-           W / 2, D.H - 9, 12, '#8b96a8', 'center');
+    A.text(bc, 'UP TO GO', BW / 2, BH - 28, P.ui4, 1, 'center');
+    A.text(bc, 'THE BOTTOM OF THE SCREEN IS RISING', BW / 2, BH - 18, P.uiDim, 1, 'center');
   }
-}
 
-function tree(g, x, base, seed) {
-  const h = 26 + (seed * 37 % 16);
-  g.fillStyle = '#3d2c1e';
-  g.fillRect(x - 3, base - 12, 6, 12);
-  g.fillStyle = seed % 2 ? '#2f6b34' : '#35793a';
-  g.beginPath();
-  g.moveTo(x, base - h - 10); g.lineTo(x + 15, base - 8); g.lineTo(x - 15, base - 8);
-  g.closePath(); g.fill();
-}
-
-function frogShape(g, x, y, dir, col) {
-  g.save();
-  g.translate(x, y);
-  g.rotate(dir * Math.PI / 2);
-  g.fillStyle = col;
-  g.beginPath();
-  if (g.roundRect) g.roundRect(-11, -9, 22, 19, 6); else g.rect(-11, -9, 22, 19);
-  g.fill();
-  g.fillRect(-15, -2, 5, 11); g.fillRect(10, -2, 5, 11);
-  g.fillStyle = '#0a0e14';
-  g.beginPath(); g.arc(-5, -6, 2.6, 0, 7); g.fill();
-  g.beginPath(); g.arc(5, -6, 2.6, 0, 7); g.fill();
-  g.restore();
+  // ---- and up onto the cabinet ---------------------------------------
+  // Set every frame rather than once: the cabinet does not own this flag
+  // and nothing promises another game or a context reset has not cleared
+  // it. It is a boolean assignment, not a state change worth avoiding.
+  g.imageSmoothingEnabled = false;
+  g.drawImage(buf, 0, 0, D.W, D.H);
 }
 
 // ---------------------------------------------------------------------
@@ -434,7 +542,26 @@ if (D.shot) {
   started = true; moved = true;
   camRow = 26; maxRow = 31; score = 31;
   ensureRows(Math.floor(camRow) + VIEW + 4);
-  player.r = 31; player.x = 7 * CELL; player.dir = 0;
+  // STAND HIM ON SOMETHING. Row 31 is whatever the generator felt like,
+  // and about half the time that is open water or a live lane - so the
+  // card for the game was a GAME OVER screen with the wash over it, taken
+  // a frame after the shutter opened. Walk out from 31 to the nearest
+  // verge with a free column on it. Only ?shot does this; it is the
+  // photographer moving the subject, not the game.
+  let r = 31, col = 7;
+  for (let d = 0; d <= 5; d++) {
+    const cand = [31 + d, 31 - d];
+    let found = false;
+    for (const cr of cand) {
+      const lane = rows[cr];
+      if (!lane || lane.type !== 'grass') continue;
+      for (let c = 7; c < COLS; c++) if (!blocked(cr, c)) { r = cr; col = c; found = true; break; }
+      if (found) break;
+    }
+    if (found) break;
+  }
+  player.r = r; player.x = col * CELL; player.dir = 0;
+  camRow = r - 5;
 }
 
 D.run(step);

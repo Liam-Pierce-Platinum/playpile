@@ -447,15 +447,19 @@ export class Combat {
     const right = V3(1, 0, 0).applyQuaternion(this.camera.quaternion);
     this.fx.muzzle(mz, dir, right, G.flash || 1);
 
+    // EVERY PELLET GETS ITS OWN STREAK, TO ITS OWN IMPACT. One tracer
+    // down the middle was a lie about a shotgun in particular: nine
+    // pellets went out and one line was drawn, through the gap between
+    // them.
     for (let p = 0; p < (G.pellets || 1); p++) {
       const d = dir.clone();
       d.x += (Math.random() - 0.5) * G.spread;
       d.y += (Math.random() - 0.5) * G.spread;
       d.z += (Math.random() - 0.5) * G.spread;
       d.normalize();
-      this.hitscan(eye, d, G, P, player);
+      const end = this.hitscan(eye, d, G, P, player);
+      this.tracer(mz, end || eye.clone().add(d.multiplyScalar(G.range)));
     }
-    this.tracer(mz, dir, G.range);
   }
 
   hitscan(eye, d, G, P, player) {
@@ -501,7 +505,7 @@ export class Combat {
     // A CASE IN FRONT OF HIM TAKES THE ROUND. Tested before the man, or
     // you could shoot a fire axe out of its cabinet through a guard.
     const hitCase = this.caseHit(eye, d, best ? best.t : G.range);
-    if (hitCase) { this.breakCase(hitCase, d); return; }
+    if (hitCase) { this.breakCase(hitCase, d); return eye.clone().add(d.clone().multiplyScalar(best ? best.t : G.range * 0.5)); }
     if (best) {
       const part = partAt(best.py - best.a.base, best.a.body.height);
       const head = part === 'head';
@@ -509,7 +513,9 @@ export class Combat {
       const dmg = G.dmg * (head ? 2.8 : part.startsWith('leg') ? 0.7 : 1);
       this.maybeSever(best.a, part, d, this.held, best.t, best.a.hp - dmg <= 0);
       this.damage(best.a, dmg, d, part, false, player);
-      return;
+      // WHERE IT LANDED ON HIM, so the streak ends in the man rather than
+      // carrying on through him to the far wall
+      return V3(best.a.x, best.py, best.a.z);
     }
     // ---- nothing hit: put the round in whatever is there --------------
     //
@@ -534,7 +540,9 @@ export class Combat {
     if (shot) {
       this.fx.impact(shot.p, shot.n, shot.kind);
       if (G.burns) this.fx.litFlare(shot.p);
+      return shot.p.clone();
     }
+    return null;
   }
 
   /**
@@ -975,13 +983,57 @@ export class Combat {
     return best;
   }
 
-  tracer(from, dir, len) {
-    const g = new THREE.BufferGeometry().setFromPoints([V3(0, 0, 0), dir.clone().multiplyScalar(len)]);
+  /**
+   * THE TRACER GOES TO WHAT THE ROUND HIT.
+   *
+   * It used to be drawn from the muzzle ALONG THE CAMERA DIRECTION for
+   * the weapon's full range, which is a line parallel to the shot and a
+   * quarter of a metre to the right of it - the muzzle is not the eye.
+   * So the round you fired and the streak you saw were two different
+   * lines, and at the range this game actually fights at the streak
+   * visibly went past the man you had just killed.
+   *
+   * Two points, both of them real: out of the muzzle, in to the impact.
+   */
+  tracer(from, to) {
+    const g = new THREE.BufferGeometry().setFromPoints([V3(0, 0, 0), to.clone().sub(from)]);
     const l = new THREE.Line(g, new THREE.LineBasicMaterial({
       color: 0xffd9a0, transparent: true, opacity: 0.45 }));
     l.position.copy(from);
     l.userData.t = 0.045;
     this.tracers.add(l);
+  }
+
+  /**
+   * HOW FAR AWAY THE MAN UNDER THE CROSSHAIR IS - the range the view
+   * model's barrel is zeroed to, so the gun points at him rather than
+   * past him. See the toe-in in hands.js.
+   *
+   * The same cylinder test the rounds use, with a wider skirt: the gun
+   * should start leading onto somebody slightly before you are dead on
+   * him, or it snaps the moment the crosshair crosses his shoulder. If
+   * there is nobody there it falls back to the default zero, which puts
+   * the barrel where it has always been.
+   */
+  aimRange(player) {
+    const dir = V3(0, 0, -1).applyQuaternion(this.camera.quaternion);
+    const eye = player.eyePoint();
+    const hl = Math.hypot(dir.x, dir.z) || 1e-6;
+    const ux = dir.x / hl, uz = dir.z / hl;
+    let best = 0;
+    for (const a of this.actors) {
+      if (!a.alive) continue;
+      const ax = a.fx !== undefined ? a.fx : a.x, az = a.fz !== undefined ? a.fz : a.z;
+      const ox = ax - eye.x, oz = az - eye.z;
+      const t = ox * ux + oz * uz;
+      if (t < 0.6 || t > 40) continue;
+      if (Math.hypot(ox - ux * t, oz - uz * t) > 0.75) continue;
+      const py = eye.y + (dir.y / hl) * t;
+      const ry = py - a.base;
+      if (ry < -0.3 || ry > a.body.height + 0.3) continue;
+      if (!best || t < best) best = t;
+    }
+    return best || 0;
   }
 
   // =====================================================================
@@ -993,6 +1045,19 @@ export class Combat {
     // sight test and every round fired, so cover means the same thing to
     // the AI, to their bullets and to yours. See blocker() in collide.js.
     this.cover = (this.game.level && this.game.level.props) || null;
+
+    // WHAT THE BARREL IS ZEROED ON THIS FRAME. Measured once here and
+    // handed to the view model, so the gun leads onto a man as the
+    // crosshair finds him and eases back to its default when he is gone.
+    // The ease matters: snapping the weapon between two angles the moment
+    // a shoulder crosses the reticle reads as a glitch rather than as
+    // aiming. Six per frame-second gets there in about a fifth of a
+    // second, which is roughly how fast a hand does it.
+    if (this.hands) {
+      const want = this.aimRange(player) || 25;
+      this.hands.converge += (want - this.hands.converge) * Math.min(1, dt * 6);
+    }
+
     this.cool = Math.max(0, this.cool - dt);
     this.kick *= Math.pow(0.02, dt);
     if (this.reloading > 0) {

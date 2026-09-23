@@ -1737,7 +1737,7 @@ export class HalfCourt {
     // metre, and a read he only makes some of the time, puts it back where
     // a block is a moment rather than the normal outcome of shooting.
     if (b.live && b.shot && p.y <= 0 && p.land <= 0 && this.#dist2(p.x, p.z, b.x, b.z) < 1.0
-        && b.y < FLOOR + 4.6 && this.#legs(p) > 0.45 && Math.random() < 0.45 * p.iq
+        && b.y < FLOOR + 4.6 && this.#legs(p) > 0.45 && Math.random() < 0.24 * p.iq
         && this.#spend(p, 0.12)) {
       p.vy = 10.2 + 2.4 * this.#legs(p);
       p.land = 0.25;
@@ -2059,6 +2059,31 @@ export class HalfCourt {
         // minutes, measured, and nobody could score.
         const air = p.y > 0.15 ? (p.you ? 1.25 : 0.38) * Math.min(1, p.y / 1.2 + 0.45) : 0;
         const reach = 1.45 + air + (b.to === p ? 0.5 : 0);
+
+        // YOU HAVE TO LEAVE THE FLOOR TO BLOCK A SHOT.
+        //
+        // Liam: "when trying to shoot its like impossible to not get
+        // blocked". This test is the reason, and it had nothing to do with
+        // how well the bots guard. It catches ANY ball passing within a
+        // metre and a half of a man, at any height up to FLOOR + 3.3 -
+        // and it did not care whether his feet were on the ground.
+        //
+        // Now look at where a shot starts. It leaves your hands at about
+        // FLOOR + 1.9, the ring is at FLOOR + 3.9, and the man guarding
+        // you is standing two metres away between you and it. So the ball
+        // spends the first half of its flight low, rising, and passing
+        // directly over him - which put it inside his radius and under his
+        // ceiling on almost every shot anybody took. He did not jump. He
+        // did not read it. He just happened to be standing there.
+        //
+        // A ball still on its way to the ring - it has not touched the
+        // ring, the board or anybody - can only be taken out of the air by
+        // a man who is actually off the floor. Once it HAS touched
+        // something it is a rebound, and a rebound is fought for on the
+        // ground like always. The player's own block is untouched: SPACE
+        // puts you in the air, and in the air you have the long arm.
+        const inFlight = b.shot && !b.touched;
+        if (inFlight && p.y <= 0.15) continue;
         // A BALL ON THE FLOOR IS STILL A BALL.
         //
         // The height test used to be a window a metre and a half either
@@ -2069,8 +2094,20 @@ export class HalfCourt {
         // loose-ball errand, which is why "a pass reaches a team-mate"
         // failed some runs with the ball still loose a second and a half
         // later. Anything from the boards up to the top of his reach counts.
-        if (this.#dist2(p.x, p.z, b.x, b.z) < reach
-            && b.y >= FLOOR && b.y < FLOOR + 3.3 + p.y * 1.2) {
+        // AND IT HAS TO BE WITHIN REACH OF HIS HANDS.
+        //
+        // The height test was a ceiling - anything below it counted - which
+        // for a man at the top of a jump was everything up to six units off
+        // the floor, well above the ring. He could pick a shot out of the
+        // air on its way DOWN into the basket. A ball is caught at hand
+        // height or not at all, so a shot in flight now has to be within a
+        // window around his hands rather than merely underneath the top of
+        // his reach. A loose ball keeps the old ceiling: a rebound is
+        // scrabbled for at any height from the boards up.
+        const hands = FLOOR + 2.0 + p.y;
+        const inReach = inFlight ? Math.abs(b.y - hands) < (p.you ? 1.2 : 0.9)
+                                 : (b.y >= FLOOR && b.y < FLOOR + 3.3 + p.y * 1.2);
+        if (this.#dist2(p.x, p.z, b.x, b.z) < reach && inReach) {
           // A PASS IS NOT INTERCEPTED FIFTY-FIVE TIMES A SECOND.
           //
           // This roll used to be a flat 0.55, and it lives inside the catch

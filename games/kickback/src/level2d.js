@@ -373,7 +373,10 @@ export function drawStructure(lv, camY) {
       rect(p.x - 0.34, y, 0.68, L.storey - L.slab, P.cret2);
       rect(p.x - 0.34, y, 0.14, L.storey - L.slab, P.cret3);
       rect(p.x + 0.24, y, 0.10, L.storey - L.slab, P.cret1);
-      rect(p.x - 0.36, y + 0.7, 0.72, 0.12, P.rust2);      // the leak line
+      /* the leak line, moved DOWN. At 0.7 m it sat at exactly gun height
+         on a 1.4 m figure, so every column in the building drew a rust bar
+         straight through the arm of whoever was standing in front of it. */
+      rect(p.x - 0.36, y + 0.33, 0.72, 0.12, P.rust2);
       if (p.spall) {
         /* the cover has come off and the cage is showing */
         rect(p.x - 0.2, y + 1.5, 0.4, 1.0, P.ink);

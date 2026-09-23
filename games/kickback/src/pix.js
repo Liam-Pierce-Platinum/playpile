@@ -48,7 +48,11 @@ export const P = {
   sea1: '#12294d', sea2: '#1c3d6b', sea3: '#2b578c', sea4: '#4179b0',
   city1: '#2c3f60', city2: '#3a5479', city3: '#4a6b96', city4: '#6289b4',
   /* people and things that matter */
-  skin: '#f0c090', skin2: '#c68a5e', hair: '#2a2233',
+  /* three tones, not two. The brow, the chin and the far cheek were all
+     hardcoded to skin2 - which is the BASE skin of the thug and the heavy,
+     so on two of the three people in the building the entire face below
+     the hairline was one flat colour with two eyes floating on it. */
+  skin: '#f0c090', skin2: '#c68a5e', skin3: '#9c6742', hair: '#2a2233',
   coat1: '#2e4166', coat2: '#3f5a86', coat3: '#587aab',
   foe1: '#5a2a34', foe2: '#7d3a46', foe3: '#a04f5c',
   red: '#d8443c', gold: '#e8b83c', flame: '#ffd06a', hot: '#fff3c8',

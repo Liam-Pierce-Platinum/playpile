@@ -8,7 +8,7 @@ import {
 import { drawCity, buildCity } from './city.js';
 import { buildLevel, drawBackWall, drawLight, drawStructure, drawForeground, drawCrate, L, HX, TOP, stairSpan } from './level2d.js';
 import { B } from './rig2d.js';
-import { Player, Enemy, UPGRADES, G, GUN, rollMods, makeFX, fire, rayBoxes, enemyMark } from './game.js';
+import { Player, Enemy, UPGRADES, G, GUN, rollMods, makeFX, fire, falloff, rayBoxes, enemyMark } from './game.js';
 
 const canvas = document.getElementById('view');
 initCanvas(canvas);
@@ -279,14 +279,44 @@ function drawHUD(g) {
       yy += 9;
     }
   }
-  /* the crosshair: a gap, never a dot, so it cannot hide what it is over */
+  /* THE CROSSHAIR IS THE PATTERN, and this is the only honest way to tell
+     somebody what a shotgun's range is. Four ticks sitting at the actual
+     radius the pellets will cover at the distance you are pointing: close
+     up they are almost touching, across the room they are a hand's width
+     apart, and you can SEE the gun opening as you back off. Then the
+     colour is the falloff - white inside the sweet spot, bone through the
+     middle of the curve, grey once you are past the end of the gun. There
+     is no number anywhere and there does not need to be. */
   const cx = Math.max(3, Math.min(W - 4, Math.round(mx)));
   const cy = Math.max(3, Math.min(H - 4, Math.round(my)));
   const off = (cx !== Math.round(mx) || cy !== Math.round(my));
-  g.fillStyle = player.shells > 0 ? (off ? P.gold : P.white) : P.red;
-  px(cx - 5, cy, 3, 1); px(cx + 3, cy, 3, 1);
-  px(cx, cy - 5, 1, 3); px(cx, cy + 3, 1, 3);
-  if (!off) px(cx, cy, 1, 1, player.shells > 0 ? P.white : P.red);
+  const aimD = Math.hypot(toWorldX(mx) - player.x, toWorldY(my) - (player.y + B.shoulder));
+  /* FOUR CORNERS, NOT FOUR TICKS. The first version put a tick at the true
+     pattern radius, which at six metres is twenty-five pixels out - and
+     four lone pixels twenty-five apart are not a crosshair, they are four
+     bits of litter. An L at each corner reads as ONE box however wide it
+     opens. And the radius is the pattern scaled down rather than actual
+     size, because honest and unreadable is still unreadable. */
+  const r = Math.max(4, Math.min(16, Math.round(3 + Math.tan(m.spread) * aimD * PPM * 0.45)));
+  const reach = aimD <= m.range;
+  const fall = falloff(Math.min(aimD, m.range), m);
+  /* and the colour is the falloff: white where it kills, gold through the
+     middle of the curve, rust where it is down to a chip, grey once you
+     are past the end of the gun */
+  const col = player.shells <= 0 ? P.red
+    : !reach ? P.slate
+      : fall > 0.95 ? P.white : (fall > 0.55 ? P.gold : P.rust3);
+  for (const [ox2, oy2] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+    const bx2 = cx + ox2 * r, by2 = cy + oy2 * r;
+    px(ox2 < 0 ? bx2 : bx2 - 2, by2, 3, 1, col);
+    px(bx2, oy2 < 0 ? by2 : by2 - 2, 1, 3, col);
+  }
+  /* a pip in the middle, one pixel, so the thing you are pointing at is
+     never hidden by the thing telling you where you are pointing */
+  px(cx, cy, 1, 1, off ? P.gold : col);
+  /* past the end of the gun the box gets a bar through it, which says
+     "nothing you do from here does anything" without a word */
+  if (!reach && player.shells > 0) px(cx - r + 2, cy, r * 2 - 4, 1, P.slate);
   /* THE HIT MARKER, and it is not decoration. A shotgun at this range is
      seven rays and a number going down somewhere off the side of the
      screen; without a mark here the honest player conclusion is that

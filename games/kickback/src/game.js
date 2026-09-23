@@ -20,18 +20,42 @@ import {
 } from './pix.js';
 import { drawCity, buildCity } from './city.js';
 import { buildLevel, drawBackWall, drawStructure, drawCrate, L, HX, TOP, stairSpan } from './level2d.js';
-import { B, SKINS, makeAnim, stepAnim, drawFigure } from './rig2d.js';
+import { B, SKINS, makeAnim, stepAnim, drawFigure, muzzleAt } from './rig2d.js';
 
 /* ---- the numbers that make it a game ------------------------------------- */
 export const G = {
   gravity: 27, walk: 4.2, accel: 44, friction: 15, airAccel: 11, airDrag: 0.4,
   maxFall: 36, step: 0.44, halfW: 0.30, height: 1.26,
 };
+/* THE RANGE, AND WHY IT IS 13 AND NOT 18.
+
+   The screen is 480 pixels at 32 to the metre: fifteen metres across, so
+   seven and a half either side of the camera and about ten ahead of you
+   once the lead is counted. The gun reached eighteen. Everything past ten
+   was therefore being fired at people who were not on the screen - and
+   worse, the falloff was FLAT for the first half of the reach, which put
+   the entire part of the curve you could see on a plateau: point blank
+   and the far edge of the picture did the same damage, so a shotgun's one
+   idea, get close, was not in the game anywhere. Then it ended in a cliff,
+   six damage at eighteen metres and exactly none at twenty.
+
+   Thirteen puts the whole curve inside the window. maxWound came up with
+   it, because a cap of 62 against a seven-by-eleven pattern was clipping
+   every shot inside five metres and doing the flattening a second time. */
 export const GUN = {
   shells: 2, kick: 10.8, wallBonus: 5.0, wallNear: 1.6,
   reload: 0.95, refire: 0.17, pellets: 7, spread: 0.13,
-  range: 18, damage: 11, maxWound: 62, barrel: 0.30,
+  range: 13, sweet: 0.19, tail: 0.26, damage: 11, maxWound: 74, barrel: 0.30,
 };
+
+/* how much of a pellet is left after t metres of air: all of it inside the
+   sweet spot, then a straight line down to the tail */
+export function falloff(t, m) {
+  const sweet = m.range * (m.sweet === undefined ? GUN.sweet : m.sweet);
+  const tail = m.tail === undefined ? GUN.tail : m.tail;
+  if (t <= sweet) return 1;
+  return Math.max(tail, 1 - ((t - sweet) / (m.range - sweet)) * 0.98);
+}
 
 /* =====================================================================
    UPGRADES
@@ -49,12 +73,18 @@ export const UPGRADES = [
   {
     id: 'saw', name: 'SHORTER BARREL', max: 2,
     blurb: 'Harder kick, wider spread.\nYou go further.\nYou hit less.',
-    apply: (m) => { m.kick += 3.2; m.spread *= 1.34; m.barrel -= 0.075; m.range -= 3; },
+    apply: (m) => { m.kick += 3.2; m.spread *= 1.34; m.barrel -= 0.075; m.range -= 2; },
   },
   {
     id: 'choke', name: 'CHOKE', max: 2,
     blurb: 'Tighter pattern,\nlonger reach.\nDuelling, not brawling.',
-    apply: (m) => { m.spread *= 0.56; m.range += 5; },
+    /* IT USED TO COST NOTHING. Two of these turned 24 damage at twelve
+       metres into 60 and took nothing away, which is not a choice, it is
+       simply the right answer - and it broke this file's one rule, that
+       every upgrade moves the one verb. A choked barrel sends more of the
+       gas down the pipe and less of it into your shoulder, so it costs
+       KICK, which is the thing you travel on. */
+    apply: (m) => { m.spread *= 0.56; m.range += 2.5; m.kick -= 1.4; },
   },
   {
     id: 'quick', name: 'QUICK HANDS', max: 2,
@@ -67,7 +97,7 @@ export const UPGRADES = [
     /* the cap has to come up with the damage or the upgrade is a lie:
        seven pellets and two both ran into the same 62 and the slug was
        strictly the worse shell at every range. */
-    apply: (m) => { m.pellets = 2; m.damage *= 3.4; m.kick += 2.0; m.range += 6; m.spread *= 0.4; m.maxWound *= 2.4; },
+    apply: (m) => { m.pellets = 2; m.damage *= 3.4; m.kick += 2.0; m.range += 3; m.spread *= 0.4; m.maxWound *= 2.0; m.sweet = 0.34; },
   },
   {
     id: 'brace', name: 'BRACED STOCK', max: 1,
@@ -91,6 +121,7 @@ export function rollMods(owned) {
     shells: GUN.shells, kick: GUN.kick, reload: GUN.reload, refire: GUN.refire,
     pellets: GUN.pellets, spread: GUN.spread, range: GUN.range, damage: GUN.damage,
     barrel: GUN.barrel, maxWound: GUN.maxWound,
+    sweet: GUN.sweet, tail: GUN.tail,
     gravity: G.gravity, groundKick: 1, twin: false,
   };
   for (const id in owned)
@@ -287,7 +318,8 @@ class Actor {
   muzzle() {
     /* computed from the aim, never read off the drawing - the drawing
        happens after the physics and would be a frame stale */
-    return [this.x + Math.cos(this.aim) * B.muzzle, this.y + B.shoulder + Math.sin(this.aim) * B.muzzle];
+    const mz = muzzleAt(this.mods ? this.mods.barrel : GUN.barrel);
+    return [this.x + Math.cos(this.aim) * mz, this.y + B.shoulder + Math.sin(this.aim) * mz];
   }
   hurt(d, kx, ky, world) {
     if (!this.alive || this.iframe > 0) return;
@@ -340,11 +372,10 @@ class Actor {
        says, at a glance and from across the room, which of the people up
        there are actually on your storey. */
     if (this.alive && this.grounded) {
-      g.globalAlpha = 0.5;
-      rect(this.x - 0.34, this.y, 0.68, 0.05, P.ink);
-      rect(this.x - 0.24, this.y + 0.05, 0.48, 0.04, P.ink);
-      g.globalAlpha = 0.28;
-      rect(this.x - 0.46, this.y, 0.92, 0.04, P.ink);
+      g.globalAlpha = 0.42;
+      rect(this.x - 0.26, this.y, 0.52, 0.045, P.ink);
+      g.globalAlpha = 0.22;
+      rect(this.x - 0.38, this.y, 0.76, 0.035, P.ink);
       g.globalAlpha = 1;
     }
     if (this.flash > 0) g.globalAlpha = 0.999;
@@ -380,7 +411,7 @@ export function fire(world, sh) {
   const [ox, oy] = sh.shooter.muzzle();
   const aim = sh.aim;
   const fx = world.fx;
-  fx.star(ox + Math.cos(aim) * 0.1, oy + Math.sin(aim) * 0.1, 0.38, aim, 0.085);
+  fx.star(ox + Math.cos(aim) * 0.02, oy + Math.sin(aim) * 0.02, 0.4, aim, 0.1);
   for (let i = 0; i < 7; i++) {
     const a = aim + (Math.random() - 0.5) * 1.1;
     fx.bit(ox, oy, Math.cos(a) * 7, Math.sin(a) * 7, 0.16, i % 2 ? P.flame : P.bone, 0.4);
@@ -415,7 +446,7 @@ export function fire(world, sh) {
     const ex = ox + dx * t, ey = oy + dy * t;
     fx.streak(ox + dx * 0.3, oy + dy * 0.3, ex, ey, 0.06);
     if (kind === 'body') {
-      const fall = Math.max(0.3, 1 - Math.max(0, t - m.range * 0.5) / (m.range * 0.5));
+      const fall = falloff(t, m);
       const wv = wounds.get(victim) || { d: 0, kx: 0, ky: 0, n: 0 };
       wv.d += m.damage * fall; wv.kx += dx; wv.ky += dy; wv.n++;
       wounds.set(victim, wv);
@@ -513,7 +544,10 @@ export class Player extends Actor {
 export class Enemy extends Actor {
   constructor(x, y, tier, kind) {
     super(x, y, kind === 'heavy' ? SKINS.heavy : SKINS.thug);
-    this.hp = kind === 'heavy' ? 120 + tier * 14 : 58 + tier * 12;
+    /* down a notch with the range change: the gun now does a quarter of
+       its damage at the far edge of the picture instead of nine tenths, so
+       the old bars would turn every mid-range exchange into a reload queue */
+    this.hp = kind === 'heavy' ? 104 + tier * 11 : 48 + tier * 9;
     this.tier = tier; this.kind = kind;
     this.homeY = y;
     this.state = 'idle'; this.t = 0;
@@ -533,7 +567,11 @@ export class Enemy extends Actor {
     this.mods = Object.assign({}, GUN, {
       gravity: G.gravity, groundKick: 0, spread: GUN.spread * (kind === 'heavy' ? 1.1 : 1.45),
       damage: kind === 'heavy' ? 12 : 9, pellets: 6, maxWound: kind === 'heavy' ? 38 : 29,
-      barrel: GUN.barrel, range: GUN.range,
+      /* ELEVEN METRES, so that a man who can shoot you is a man you can
+         SEE. At eighteen they opened up from three metres off the side of
+         the picture, and the mark over their heads - which is the entire
+         combat interface - was off the screen with them. */
+      barrel: GUN.barrel, range: 11,
     });
   }
   sees(player, world) {

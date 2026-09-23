@@ -26,7 +26,7 @@
    an eye you can read an expression off. Everything else is short and
    thick for the same reason: a four-pixel limb has no silhouette.
    ===================================================================== */
-import { poly, limb, P, hash } from './pix.js';
+import { poly, limb, rect, P, hash } from './pix.js';
 
 /* every measurement, in metres, of the 1.40 m figure */
 export const B = {
@@ -37,17 +37,25 @@ export const B = {
   thigh: 0.155, shin: 0.155, foot: 0.15,
   upArm: 0.175, loArm: 0.155,
   halfHip: 0.07, halfSh: 0.125,
-  muzzle: 0.54,                              // shoulder to the end of the barrel
+  /* THE MUZZLE IS NOT A CONSTANT, because the barrel is not a constant -
+     SHORTER BARREL saws a quarter of it off. It used to be pinned at
+     0.54 while the gun was drawn out to 0.67, so every flash and every
+     pellet left the figure from a point a third of the way back down the
+     barrel. `muzzleAt` is the same arithmetic drawGun uses, and it is now
+     the only place either of them asks. */
+  wrist: 0.33,                               // shoulder to the grip: upArm + loArm
+  breech: 0.04,                              // grip to where the barrels start
 };
+export const muzzleAt = (gunLen) => B.wrist + B.breech + (gunLen === undefined ? 0.30 : gunLen);
 
 /* ---- palettes -------------------------------------------------------------
    A character is five colours and the fifth is the accent. Keeping every
    figure to the same five, only swapped, is what makes the player read
    instantly against a room full of people built the same way. */
 export const SKINS = {
-  player: { coat: P.coat2, coatLit: P.coat3, coatDark: P.coat1, skin: P.skin, hair: P.hair, acc: P.red, boot: P.ink },
-  thug: { coat: P.foe2, coatLit: P.foe3, coatDark: P.foe1, skin: P.skin2, hair: P.ink, acc: P.gold, boot: P.ink },
-  heavy: { coat: P.ash, coatLit: P.mid, coatDark: P.slate, skin: P.skin2, hair: P.ink, acc: P.toxic, boot: P.ink },
+  player: { coat: P.coat2, coatLit: P.coat3, coatDark: P.coat1, skin: P.skin, shade: P.skin2, hair: P.hair, acc: P.red, boot: P.ink },
+  thug: { coat: P.foe2, coatLit: P.foe3, coatDark: P.foe1, skin: P.skin2, shade: P.skin3, hair: P.ink, acc: P.gold, boot: P.ink },
+  heavy: { coat: P.ash, coatLit: P.mid, coatDark: P.slate, skin: P.skin2, shade: P.skin3, hair: P.ink, acc: P.toxic, boot: P.ink },
 };
 
 /* ---- the animation state a figure carries around ------------------------- */
@@ -191,64 +199,115 @@ export function drawFigure(s, an, pal) {
       [B.bodyW * sx * 0.92, B.bodyH], [-B.bodyW * sx * 0.92, B.bodyH]],
     bx, by, tilt, pal.coatLit);
     /* and the rim: the sky is behind the building, so the top of every
-       shoulder has a hard bright line on it */
-    poly([[-B.bodyW * sx * 0.92, B.bodyH - 0.028], [B.bodyW * sx * 0.92, B.bodyH - 0.028],
-      [B.bodyW * sx * 0.92, B.bodyH], [-B.bodyW * sx * 0.92, B.bodyH]],
-    bx, by, tilt, P.sky6);
-    /* the bandolier across the chest, and the shells in it */
-    poly([[-0.045, -B.bodyH], [0.045, -B.bodyH], [0.045, B.bodyH], [-0.045, B.bodyH]],
-      bx + F * 0.045, by, tilt, pal.acc);
-    for (let i = 0; i < 3; i++)
-      poly([[-0.028, -0.022], [0.028, -0.022], [0.028, 0.022], [-0.028, 0.022]],
-        bx + F * 0.045, by - 0.09 + i * 0.09, tilt, P.gold);
+       shoulder has a line on it. In sky6 - the lightest colour in the
+       whole palette - across the full width of the shoulders it was not a
+       rim, it was a white collar. */
+    poly([[-B.bodyW * sx * 0.74, B.bodyH - 0.024], [B.bodyW * sx * 0.74, B.bodyH - 0.024],
+      [B.bodyW * sx * 0.74, B.bodyH], [-B.bodyW * sx * 0.74, B.bodyH]],
+    bx, by, tilt, P.sky5);
+    /* THE BANDOLIER, and it took three goes. Straight down the middle of
+       the chest it was a necktie. Straight across it was a bib. A
+       bandolier is neither of those things - it is a strap over one
+       shoulder and down to the opposite hip, and at this size that
+       DIAGONAL is the entire reason it reads as ammunition and not as
+       clothing. Four rounds of brass on it, and they go round with the
+       figure because the whole strap is drawn at one angle. */
+    const sash = tilt + (F > 0 ? 0.66 : -0.66);
+    /* SHORT ENOUGH TO STAY ON HIM. A strap long enough to reach corner to
+       corner of the torso pokes out of both corners once it is diagonal,
+       and a bandolier hanging in the air beside a man is worse than no
+       bandolier at all. 0.18 half-length across a 0.38 x 0.31 chest. */
+    const SL = 0.18, SW = 0.026;
+    poly([[-SL, -SW], [SL, -SW], [SL, SW], [-SL, SW]], bx, by, sash, pal.acc);
+    poly([[-SL, -SW], [SL, -SW], [SL, -SW * 0.4], [-SL, -SW * 0.4]], bx, by, sash, P.ink);
+    for (let i = -1; i <= 1; i++)
+      poly([[i * 0.096 - 0.017, -0.023], [i * 0.096 + 0.017, -0.023],
+        [i * 0.096 + 0.017, 0.023], [i * 0.096 - 0.017, 0.023]],
+      bx, by, sash, P.gold);
   }
 
   /* ---- the head ------------------------------------------------------------
-     Big, and it leads the body: the neck angle lags the aim, so when you
-     whip the gun round the head arrives a beat later. */
+     DRAWN ON WHOLE PIXELS, and that is the whole repair.
+
+     The head used to be tilted by up to a fifth of a radian, and every
+     feature on it was a polygon rotated by that same amount: an eye white
+     two pixels across, a pupil one and a bit inside it, a highlight inside
+     that. Rasterised on a rotated grid what came out was not an eye, it was
+     three stripes - and turning the figure round dragged the fringe down
+     across them and made a domino mask of the whole face. On top of that
+     the "jaw shadow" covered the bottom forty-five per cent of the head,
+     which does not read as a jaw at this size. It reads as a beard.
+
+     A seventeen-pixel-wide head gets its features placed on whole pixels or
+     it gets nothing. So the head does not rotate at all any more, and every
+     feature is laid out in PIXELS from the middle of it. The life that the
+     tilt was there to provide comes back as the thing it was standing in
+     for: the eyes look where the gun is pointing. */
   {
-    const hA = an.headA * 0.5 - lean * 0.5;
-    const hx = x + leanX * 1.9 + F * 0.012, hy = headYc;
-    const tilt = LA(-Math.PI / 2 + hA) + Math.PI / 2;
+    const up = clamp(-an.headA / 0.30, -1, 1);       // +1 aiming up, -1 down
+    const hx = x + leanX * 1.9 + F * 0.012;
+    const hy = headYc + up * 0.010 - lean * 0.012;
     const HW = B.headW * sx, HH = B.headH * sy;
-    /* the skull, with the corners knocked off - a rounded rect made of a
-       hexagon, which is what a rounded shape is at this size */
+    const PXL = 1 / 32;                              // one screen pixel, in metres
+    const SH = pal.shade || P.skin2;                 // his skin, one step down
+
+    /* a block of whole pixels on the face, measured from the middle of the
+       head in the figure's own terms: +x is the way he is facing, +y up */
+    const face = (fx, fy, fw, fh, col) => {
+      const x0 = F > 0 ? hx + fx * PXL : hx - (fx + fw) * PXL;
+      rect(x0, hy + fy * PXL, fw * PXL, fh * PXL, col);
+    };
+
+    /* the skull, corners knocked off - a hexagon is what a rounded shape is
+       at this size */
     poly([[-HW, -HH * 0.72], [-HW * 0.72, -HH], [HW * 0.72, -HH], [HW, -HH * 0.72],
       [HW, HH * 0.7], [HW * 0.66, HH], [-HW * 0.66, HH], [-HW, HH * 0.7]],
-    hx, hy, tilt, pal.skin);
-    /* the rim over the crown, same light */
-    poly([[-HW * 0.7, HH - 0.03], [HW * 0.7, HH - 0.03], [HW * 0.66, HH], [-HW * 0.66, HH]],
-      hx, hy, tilt, P.sky6);
-    /* the jaw shadow */
-    poly([[-HW * 0.9, -HH], [HW * 0.9, -HH], [HW * 0.86, -HH * 0.55], [-HW * 0.86, -HH * 0.55]],
-      hx, hy, tilt, P.skin2);
-    /* hair: a cap over the crown and a fringe that overhangs the brow */
-    poly([[-HW, HH * 0.16], [-HW * 0.72, HH], [HW * 0.72, HH], [HW, HH * 0.16],
-      [HW * 0.8, HH * 0.3], [-HW * 0.8, HH * 0.3]], hx, hy, tilt, pal.hair);
-    poly([[-HW * 0.7, HH - 0.028], [HW * 0.7, HH - 0.028], [HW * 0.64, HH], [-HW * 0.64, HH]],
-      hx, hy, tilt, P.sky5);
-    poly([[-HW, HH * 0.16], [HW * 0.25, HH * 0.16], [HW * 0.55, HH * 0.44], [-HW, HH * 0.5]],
-      hx, hy, tilt, pal.hair, F < 0);
-    /* THE EYES. Two of them, both visible, the far one smaller and nearer
-       the edge - which is how every chibi in the world is drawn in
-       three-quarter and reads as looking where the gun is pointing. */
-    const open = an.blink > 0 ? 0.12 : 1;
-    for (const [ox, w2, h2] of [[0.115, 0.066, 0.082], [-0.062, 0.052, 0.070]]) {
-      const ex = ox * F, ew = w2, eh = h2 * open;
-      poly([[ex - ew, -eh], [ex + ew, -eh], [ex + ew, eh], [ex - ew, eh]],
-        hx, hy - 0.005, tilt, P.white);
-      poly([[ex - ew * 0.55 + F * 0.012, -eh * 0.9], [ex + ew * 0.55 + F * 0.012, -eh * 0.9],
-        [ex + ew * 0.55 + F * 0.012, eh * 0.9], [ex - ew * 0.55 + F * 0.012, eh * 0.9]],
-      hx, hy - 0.005, tilt, P.ink);
-      if (open > 0.5)
-        poly([[ex + ew * 0.1, eh * 0.2], [ex + ew * 0.5, eh * 0.2],
-          [ex + ew * 0.5, eh * 0.75], [ex + ew * 0.1, eh * 0.75]],
-        hx, hy - 0.005, tilt, P.white);
+    hx, hy, 0, pal.skin);
+    /* the chin, and ONLY the chin - two pixels of it */
+    face(-4, -9, 8, 2, SH);
+    /* one pixel of shade down the far cheek. A three-pixel block here was
+       a hard vertical seam through the middle of the face; one pixel is a
+       cheekbone and nothing else. */
+    face(-8, -7, 1, 9, SH);
+
+    /* HAIR. Cut to the skull's own outline - the old trapezoid was
+       narrower than the head between the brow and the crown and left two
+       tan corners standing out of it like ears. And the hairline sits
+       above the brow and STAYS there whichever way he turns. */
+    poly([[-HW, HH * 0.40], [-HW, HH * 0.70], [-HW * 0.72, HH],
+      [HW * 0.72, HH], [HW, HH * 0.70], [HW, HH * 0.40]], hx, hy, 0, pal.hair);
+    face(-8, 4, 16, 2, pal.hair);
+    /* a sideburn at the BACK of the head: at this size it is the only
+       thing that says which way he is facing when the gun points at you */
+    face(-8, 1, 2, 4, pal.hair);
+    /* and the rim along the crown, because the sky is behind the building.
+       In sky5 against black hair it was a hard cyan stripe that read as a
+       headband; a sheen wants to be a step, not a jump. */
+    face(-4, 8, 8, 1, P.steel2);
+
+    /* THE EYES. Three pixels of white and two of pupil for the near one,
+       two and one for the far one, a single pixel of light in the corner,
+       and a heavy brow over each - which is the entire expression budget a
+       head this size has. The pupils ride up and down with the aim. */
+    const shut = an.blink > 0;
+    const pupUp = up > 0.45 ? 1 : (up < -0.45 ? -1 : 0);
+    /* the brow is SKIN, one shade down, with a pixel of clear skin between
+       it and the hairline. Drawn in the hair colour it simply joined the
+       fringe and the face lost its top half. */
+    face(1, 2, 4, 1, SH);                       // near brow
+    face(-5, 2, 3, 1, SH);                      // far brow
+    if (shut) {
+      face(1, 0, 4, 1, SH);
+      face(-5, 0, 3, 1, SH);
+    } else {
+      face(1, -2, 4, 4, P.white);                    // near eye
+      face(-5, -1, 3, 3, P.white);                   // far eye
+      face(3, -2 + pupUp, 2, 3, P.ink);              // near pupil
+      face(-4, -1 + pupUp, 2, 2, P.ink);             // far pupil
+      face(2, 1, 1, 1, P.white);                     // the catchlight
     }
-    /* and a mouth, which is one dark pixel wide and does a lot of work */
-    poly([[-0.028 + F * 0.06, -0.012], [0.028 + F * 0.06, -0.012],
-      [0.028 + F * 0.06, 0.012], [-0.028 + F * 0.06, 0.012]],
-    hx, hy - 0.13, tilt, P.skin2);
+    /* and a mouth, two pixels of it, which does more work than it looks */
+    face(1, -5, 2, 1, SH);
   }
 
   /* ---- THE GUN ARM ---------------------------------------------------------
@@ -265,9 +324,18 @@ export function drawFigure(s, an, pal) {
   const ex2 = ox2 + Math.cos(aim) * B.upArm, ey2 = oy2 + Math.sin(aim) * B.upArm;
   limb(ex2, ey2, B.loArm, 0.10, aim, pal.skin);
   const wx = ex2 + Math.cos(aim) * B.loArm, wy = ey2 + Math.sin(aim) * B.loArm;
-  drawGun(wx, wy, aim, kick, s.gunLen || 0.30, s.shells);
+  const gunLen = s.gunLen === undefined ? 0.30 : s.gunLen;
+  drawGun(wx, wy, aim, kick, gunLen, s.shells);
+  /* THE FIST. Without it the forearm simply becomes the gun, and what you
+     read from across the room is a long bare arm with a barrel on the end
+     of it rather than a man holding something. */
+  poly([[-0.078, -0.050], [-0.010, -0.050], [-0.010, 0.050], [-0.078, 0.050]],
+    wx, wy, aim, pal.boot);
+  poly([[-0.078, -0.050], [-0.010, -0.050], [-0.010, -0.026], [-0.078, -0.026]],
+    wx, wy, aim, pal.coatDark);
 
-  return { muzzleX: ox2 + Math.cos(aim) * B.muzzle, muzzleY: oy2 + Math.sin(aim) * B.muzzle };
+  const mz = muzzleAt(gunLen);
+  return { muzzleX: ox2 + Math.cos(aim) * mz, muzzleY: oy2 + Math.sin(aim) * mz };
 }
 
 /* ---- the sawed-off --------------------------------------------------------

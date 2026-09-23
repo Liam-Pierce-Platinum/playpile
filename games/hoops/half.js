@@ -1344,6 +1344,27 @@ export class HalfCourt {
     // that can stop the shot is somebody leaving the floor and getting a
     // hand on the ball, which is what a block is.
     if (c.wind > 0 || c.shotAsk) return;
+    // ...AND THAT STARTS WHEN HE STARTS THE PULL, NOT WHEN HE LETS GO.
+    //
+    // Liam, twice: "when trying to shoot its like impossible to not get
+    // blocked", and then "blocking is not better".
+    //
+    // The guard above covers the gather - the sixth of a second between
+    // letting go of the mouse and the ball leaving his hands. That is not
+    // where the ball was going. A player draws the pull back over a good
+    // second or more, deciding how hard to hit it, and for that whole
+    // second he was holding the ball still, in the open, next to a man
+    // whose swipe comes round twice a second. Measured through the real
+    // mouse gesture rather than the debug hook: NINETEEN attempts out of
+    // nineteen ended before the shot went up, most of them "STRIPPED".
+    // The debug path said 8% because it skips the pull entirely, which is
+    // why it disagreed with the person playing the game.
+    //
+    // So the moment he begins to draw a shot, the swipe is off. He has
+    // committed; the answer to a man who has committed is to jump. This
+    // cannot be camped in: aiming while moving is a travel (#travelWatch)
+    // and the shot clock is still running.
+    if (this.drag && this.ball.holder === c && !this.drag.pass && this.drag.power > 0.04) return;
     if (!this.#spend(p, 0.12)) return;
     p.cool = 0.38; p.swatT = 0;
     const d = this.#dist(p, c);

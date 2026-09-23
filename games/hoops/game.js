@@ -130,7 +130,23 @@ addEventListener('keydown', (e) => {
 });
 import { HalfCourt, FLOOR as HALF_FLOOR } from './half.js';
 
-const D = new Deck3D({ key: 'hoops', w: 520, h: 680, units: 15, bg: '#101826',
+// A BASKETBALL COURT IS A WIDE THING AND THIS WAS A TALL WINDOW.
+//
+// Liam: "on the official site its impossible to move in the hoops game".
+// It was not the controls - they work, and tools/livehoops.mjs proves it.
+// It was the shape. 520 x 680 is a phone held upright, and playpile.net
+// gives a game a wide stage, so HOOPS ran as a narrow vertical strip down
+// the middle of it with black either side: the court squeezed into a
+// sliver, the men the size of a fingernail, and the home screen stacked
+// into one thin column with the scoreboard pushed off the bottom. You
+// could move. You just could not see that you had.
+//
+// Landscape fixes all of it at once. Home (see _deck/home.js) lays out in
+// TWO columns above 620 wide, so the buttons and the high scores stop
+// fighting for the same strip; and `units` goes up with the width so the
+// same amount of court is still in shot - the extra pixels go into the
+// floor either side, which is where the running happens.
+const D = new Deck3D({ key: 'hoops', w: 960, h: 600, units: 28, bg: '#101826',
                        tilt: 0.13, scale: 2 });
 
 const G = -17;
@@ -903,6 +919,8 @@ window.__hoops = {
   },
   startHalf,
   startFull: () => startHalf('full'),
+  /** how close the man on you is standing, for tools/guarded.mjs */
+  guardProbe: () => (half ? half.guardProbe() : null),
   camX: () => (half ? +half.camX(CAM[court].hw * 2).toFixed(2) : null),
   you: () => (half ? { ...half.you } : null),
   freeze: (on) => { if (half) half.frozen = !!on; },

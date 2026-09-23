@@ -86,6 +86,15 @@ export class Deck {
     const down = (e) => {
       const p = pos(e); if (p) { this.mouse.x = p.x; this.mouse.y = p.y; }
       this.mouse.down = true; this._taps++; this._audio();
+      // TAKE THE KEYBOARD. On playpile.net every game runs inside an
+      // iframe, and the only reason a click on it normally hands it the
+      // keyboard is the browser's DEFAULT action for a mousedown - which
+      // the preventDefault below cancels. So the player would press PLAY,
+      // the game would start (it handles its own clicks), and then every
+      // key went to the page around it instead: HOOPS looked like a game
+      // you could watch but not move in. Ask for focus explicitly and the
+      // default we are cancelling stops mattering.
+      try { if (window.top !== window) window.focus(); } catch (err) { window.focus(); }
       if (e.cancelable) e.preventDefault();
     };
     const up = (e) => { this.mouse.down = false; this._rels++; };

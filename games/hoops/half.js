@@ -369,6 +369,8 @@ export class HalfCourt {
     this.camAt = undefined;            // the tracking camera starts where the ball is
     this.drag = null;
     this.tally = { shots: 0, makes: 0, passes: 0, steals: 0, picks: 0, clock: 0, out: 0 };
+    /* seconds of a possession during which the other side cannot take it */
+    this.OPEN = 7;
     this.#reset(0, true);
     this.say(this.size + ' v ' + this.size + '  ·  '
       + (this.C.id === 'half' ? 'first to 11' : 'two minutes'), 2.2);
@@ -493,7 +495,39 @@ export class HalfCourt {
     return r.x - r.face * (this.C.arc + 1.4);
   }
 
+  /* ---- SEVEN SECONDS ----------------------------------------------------
+     Liam, a fourth time: "taking the ball is still too easy for NPC's when
+     the player is trying to shoot make it so they can only try to steal
+     the ball while the player is hooting after 7 secs".
+
+     Every previous answer to this was a probability - a smaller chance of
+     a swipe, a rarer block, a shorter window - and every one of them
+     measured as fixed and came back as still happening. Measured here
+     again through the real mouse: sixteen pulls with a man glued to him,
+     sixteen shots away, nothing taken. That is the third time the numbers
+     and the person playing the game have disagreed, and when that keeps
+     happening the numbers are answering the wrong question. A chance that
+     is small is still a thing that happens, and the one it happens to is
+     the one holding the mouse.
+
+     So this is not a probability. It is a clock. For the first seven
+     seconds of a possession nobody on the other side may take the ball off
+     you AT ALL - not a swipe, not a block, not a hand in the air on a shot
+     in flight. They can stand in your way and lean on you, which is what
+     #shove is for and what he asked them to do instead. After seven
+     seconds, which is a long time to be standing about with it, they are
+     allowed to try.
+
+     It is on the clock rather than on "while shooting" because a shot is
+     the END of a possession, not a state you can be caught in: by the time
+     a swipe would have reached the pull you had already been holding it
+     for four or five seconds, and the thing that needed protecting was
+     all of them. */
+  #settled(c) { return c && this.time - (c.gotAt || -99) >= this.OPEN; }
+
   #give(p) {
+    p.gotAt = this.time;
+    this.ball.free = false;
     const b = this.ball;
     const was = this.possession;
     b.holder = p;
@@ -896,6 +930,11 @@ export class HalfCourt {
    * second and the shot never happens at all, which is exactly right.
    */
   #shoot(p, power, angle) {
+    /* A SHOT CARRIES ITS OWN PROTECTION. Once it leaves his hands there
+       is no holder left to ask about, so whether the seven seconds had
+       run has to be written on the BALL at the moment of release - it is
+       the shot that was earned, not the man. */
+    this.ball.free = !this.#settled(p);
     if (p.you) this.#spend(p, 0.06);
     p.shotT = 0;
     p.wind = 0.15;
@@ -1374,6 +1413,10 @@ export class HalfCourt {
 
   #swat(p, c) {
     if (p.cool > 0) return;
+    // THE SEVEN SECONDS. A bot may not go for it at all until the man has
+    // had it that long; your own swipe is your defence and keeps working,
+    // because what was asked for was worse defence FROM THEM.
+    if (!p.you && !this.#settled(c)) return;
     // A MAN IN THE ACT OF SHOOTING CANNOT BE PICKPOCKETED.
     //
     // Liam: "when shooting the player still gets the ball taken
@@ -1822,6 +1865,23 @@ export class HalfCourt {
        your shirt; what is gone is the ball leaving your hands because a
        coin came up heads. */
     if (b.holder === m && onBall && !this.noShove) this.#shove(p, m, dt);
+
+    /* ---- AND AFTER SEVEN SECONDS, THEY MAY GO FOR IT --------------------
+       Last time round the swipe was taken off the bots completely, because
+       what was asked for was "they should just be able to push you". This
+       is the other half of the same instruction arriving: they may try,
+       but only once you have had it seven seconds.
+
+       Which makes it a decision instead of a dice roll. Inside the window
+       the ball is yours and the only thing between you and the ring is a
+       man leaning on you; past it, standing about with it costs something.
+       On a half court that is seven seconds of a twelve second clock, so
+       most of a possession is safe and the end of one is not - and the bar
+       over your legs counts it down, so it is never a surprise. */
+    if (b.holder === m && p.cool <= 0 && this.#settled(m)
+        && this.#dist(p, m) < 2.9 && Math.random() < dt * 0.38 * p.iq) {
+      this.#swat(p, m);
+    }
     // CONTEST IT, AND GO FOR THE BLOCK. A defender who is close enough
     // when a shot goes up jumps at the flight of it rather than at the
     // shooter, which is what turns a contest into a block - and he will
@@ -1832,7 +1892,7 @@ export class HalfCourt {
     // TWENTY-FIVE ATTEMPTS - over half of everything anybody threw up. A
     // metre, and a read he only makes some of the time, puts it back where
     // a block is a moment rather than the normal outcome of shooting.
-    if (b.live && b.shot && p.y <= 0 && p.land <= 0 && this.#dist2(p.x, p.z, b.x, b.z) < 1.0
+    if (b.live && b.shot && !b.free && p.y <= 0 && p.land <= 0 && this.#dist2(p.x, p.z, b.x, b.z) < 1.0
         // RARE. Liam: "the only defense while shooting is jumping for ball
         // which should be rare". A defender who is there, and who reads it,
         // about one time in six - so a block is a moment somebody earned
@@ -2245,6 +2305,12 @@ export class HalfCourt {
         // puts you in the air, and in the air you have the long arm.
         const inFlight = b.shot && !b.touched;
         if (inFlight && p.y <= 0.15) continue;
+        /* AND NOT A PROTECTED ONE, EVER. The block jump above is gated on
+           the same flag, so this is the belt to its braces: a bot who
+           happens to be in the air for some other reason - coming down
+           off his own shot, scrambling at a rebound - must not come down
+           with a shot that was taken inside the seven seconds either. */
+        if (inFlight && b.free && !p.you && p.team !== (b.from && b.from.team)) continue;
         // A BALL ON THE FLOOR IS STILL A BALL.
         //
         // The height test used to be a window a metre and a half either
@@ -2917,6 +2983,12 @@ export class HalfCourt {
       // where the game ends on a score rather than on a clock
       game: this.C.id === 'full' ? Math.max(0, this.gameClock) : null,
       ball: this.ball.holder ? (this.ball.holder.you ? 'YOU' : TEAM[this.ball.holder.team].name) : 'LOOSE',
+      /* HOW LONG YOU ARE LEFT ALONE FOR, 1 down to 0, or null when it is
+         not yours. A rule nobody can see is the thing that made the old
+         swipe feel unfair - you were robbed and nothing on the screen had
+         ever said you could be. */
+      safe: this.ball.holder && this.ball.holder.you
+        ? Math.max(0, 1 - (this.time - (this.ball.holder.gotAt || 0)) / this.OPEN) : null,
       check: this.needCheck,
       msg: this.msgT > 0 ? this.msg : '',
       drag: this.drag,

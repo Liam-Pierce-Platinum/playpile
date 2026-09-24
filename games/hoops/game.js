@@ -567,6 +567,21 @@ function drawHalfHud() {
     g.strokeStyle = 'rgba(255,255,255,.22)'; g.lineWidth = 1;
     g.strokeRect(bx + 0.5, by + 0.5, bw - 1, bh - 1);
     D.text('LEGS', bx, by - 5, 9, '#8b96a8');
+    /* ---- AND HOW LONG THEY HAVE TO LEAVE YOU ALONE ---------------------
+       A thin bar over the legs, only while the ball is yours. For seven
+       seconds nobody on the other side may take it off you - see #settled
+       in half.js - and a rule the player cannot see is the thing that made
+       the old swipe feel like being robbed. It runs down, it goes amber at
+       the end of it, and when it is gone they are allowed to try. */
+    if (h.safe != null) {
+      const sy = by - 16;
+      g.fillStyle = 'rgba(8,12,18,0.75)';
+      g.fillRect(bx - 2, sy - 2, bw + 4, 5 + 4);
+      g.fillStyle = h.safe > 0.25 ? '#4dc9ff' : '#d8ac4a';
+      g.fillRect(bx, sy, bw * h.safe, 5);
+      D.text(h.safe > 0 ? 'BALL IS YOURS' : 'THEY CAN COME FOR IT',
+        bx + bw, sy - 3, 9, h.safe > 0 ? '#4dc9ff' : '#d8ac4a', 'right');
+    }
     if (online.role) D.text(online.role === 'host' ? 'ONLINE · ROOM ' + online.code : 'ONLINE', bx, by + 22, 9, '#35d07f');
     D.text('✦ ' + coinsNow(), bx + bw, by - 5, 10, '#ffd166', 'right');
   }
@@ -927,6 +942,9 @@ window.__hoops = {
   /** turn the juke off, so tools/juke.mjs can measure what it is worth */
   noJuke: (on) => { if (half) half.noJuke = !!on; },
   noShove: (on) => { if (half) half.noShove = !!on; },
+  /** TEST ONLY: hold the shot clock open, so tools can measure a long
+      possession without the referee ending it for them */
+  holdClock: () => { if (half) half.shotClock = Math.max(half.shotClock, 8); },
   giveBall: (team) => half && half.debugGive(team),
   standOn: (gap) => half && half.debugStandOnCarrier(gap),
   standAt: (x, z) => half && half.debugStandAt(x, z),

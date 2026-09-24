@@ -849,6 +849,71 @@ function liveryCanvas(lv, M) {
     label(g, name, (BLADE.u0 + BLADE.u1) / 2, (BLADE.v0 + BLADE.v1) / 2,
       0.24, [1, 0], [0, 1], W, 1.80);
 
+    // ---- HARDWARE ON THE BONNET AND THE DECK -----------------------------
+    //
+    // THE BONNET IS THE COCKPIT VIEW. From the driver's seat it fills the
+    // bottom half of the screen for the whole race, and until now it was a
+    // single flat field of body colour a metre and a half across with
+    // nothing on it at all - which is most of why the view from inside
+    // read as a coloured plane rather than a car.
+    //
+    // Everything below is real Cup hardware and all of it lives on the
+    // sheet, so it costs no geometry and no draw call:
+    //   THE SHUT LINES round the bonnet and the deck lid. The single
+    //   cheapest thing that turns one moulded lump into panels.
+    //   FOUR HOOD PINS with their lanyards, which is how a Cup bonnet is
+    //   held down and the thing the eye goes to first from the seat.
+    //   THE COWL PLENUM, the black box across the back of the bonnet that
+    //   feeds the air box.
+    //
+    // The bonnet band appears TWICE on the sheet, mirrored about the top
+    // centre at u = 2.55, so everything here is drawn once and comes out
+    // on both sides of the car: one pin per side becomes two, and a line
+    // near u = 2.55 becomes one seam down the middle.
+    {
+      const NOSE_V = 2.42, TAIL_V = -1.62;         // where the panels end
+      const COWL_V = M.cowlZ, DECK_V = M.deckZ;
+      const seam = (u0, u1, v0, v1) => {
+        g.strokeStyle = 'rgba(0,0,0,0.42)';
+        g.lineWidth = 0.014;
+        g.beginPath(); g.moveTo(u0, v0); g.lineTo(u1, v1); g.stroke();
+      };
+      // the seam where the bonnet meets the wing, both ends, and the two
+      // cross seams at the cowl and over the nose
+      seam(1.905, 1.905, COWL_V, NOSE_V);
+      seam(1.905, 2.54, COWL_V + 0.015, COWL_V + 0.015);
+      seam(1.905, 2.54, NOSE_V, NOSE_V);
+      seam(2.548, 2.548, COWL_V, NOSE_V);          // down the centre line
+      // and the same round the deck lid
+      seam(1.905, 1.905, DECK_V, -0.28);
+      seam(1.905, 2.54, -0.28, -0.28);
+      seam(2.548, 2.548, DECK_V, -0.28);
+      // THE COWL PLENUM
+      poly(g, [[1.98, COWL_V + 0.03], [2.52, COWL_V + 0.03],
+               [2.52, COWL_V + 0.20], [1.98, COWL_V + 0.20]], '#14161a');
+      g.strokeStyle = 'rgba(255,255,255,0.10)'; g.lineWidth = 0.012;
+      g.beginPath(); g.moveTo(1.98, COWL_V + 0.20); g.lineTo(2.52, COWL_V + 0.20); g.stroke();
+      // HOOD PINS: a scuffed washer plate, the pin through it and the
+      // lanyard trailing back. Two on the sheet, four on the car.
+      for (const [pu, pv] of [[2.07, COWL_V + 0.30], [2.24, NOSE_V - 0.22]]) {
+        g.fillStyle = 'rgba(0,0,0,0.30)';
+        g.beginPath(); g.arc(pu, pv, 0.062, 0, Math.PI * 2); g.fill();
+        g.fillStyle = '#9fa6ae';
+        g.beginPath(); g.arc(pu, pv, 0.046, 0, Math.PI * 2); g.fill();
+        g.fillStyle = '#2b2f36';
+        g.beginPath(); g.arc(pu, pv, 0.020, 0, Math.PI * 2); g.fill();
+        g.strokeStyle = 'rgba(30,33,38,0.72)'; g.lineWidth = 0.011;
+        g.beginPath(); g.moveTo(pu, pv); g.lineTo(pu + 0.09, pv - 0.13); g.stroke();
+      }
+      // and two DECK PINS at the back
+      for (const [pu, pv] of [[2.10, -0.42], [2.34, DECK_V + 0.20]]) {
+        g.fillStyle = 'rgba(0,0,0,0.26)';
+        g.beginPath(); g.arc(pu, pv, 0.056, 0, Math.PI * 2); g.fill();
+        g.fillStyle = '#9fa6ae';
+        g.beginPath(); g.arc(pu, pv, 0.040, 0, Math.PI * 2); g.fill();
+      }
+    }
+
     // ---- the flat patches, LAST so nothing paints over them --------------
     for (const [k, col] of [['body', B], ['accent', A], ['trim', W],
       ['dark', '#171a1f'], ['chrome', '#c3c9d2']]) {
@@ -1454,14 +1519,54 @@ function buildShared(T, makeKey) {
     v.rotateY(Math.PI / 2);
     return v;
   })();
+  // ---- THE STEERING WHEEL ----------------------------------------------
+  // The nearest object to the camera in the whole game, and it was a
+  // six-sided torus with three rods poking out of the middle - a hexagon
+  // on a stick, forty centimetres from the eye, for the entire race.
+  //
+  // A Cup wheel is three things and the first two are what was missing:
+  //   A ROUND RIM. Sixteen segments round the ring instead of six, so the
+  //   silhouette is a circle and not a nut.
+  //   A HUB. Real wheels are quick-release: a fat boss in the middle with
+  //   a collar behind it. The middle of the old one was empty, which is
+  //   why the spokes read as three loose rods.
+  //   FLAT SPOKES, wider than they are thick, because that is what a
+  //   stamped spoke looks like and a cylinder never will.
+  // Two hundred and seventy triangles more per marque, three marques, and
+  // the geometry is shared by the whole field: about eight hundred
+  // triangles for the thing the driver looks at all day.
   const steerGeo = (() => {
-    const t = new THREE.TorusGeometry(0.155, 0.022, 6, 18);
-    const spokes = [];
-    for (let i = 0; i < 3; i++) {
-      const a = i * Math.PI * 2 / 3;
-      spokes.push(rod([0, 0, 0], [Math.cos(a) * 0.15, Math.sin(a) * 0.15, 0], 0.016, 5));
+    const parts = [];
+    const t = new THREE.TorusGeometry(0.152, 0.021, 7, 16);
+    parts.push(t);
+    // three flat spokes at the Cup positions - two up at nine and three,
+    // one straight down - so the top of the wheel is clear and the driver
+    // can see the dash through it
+    for (const a of [Math.PI * 0.12, Math.PI * 0.88, Math.PI * 1.5]) {
+      const s = new THREE.BoxGeometry(0.115, 0.030, 0.011);
+      s.translate(0.077, 0, 0);
+      s.rotateZ(a);
+      parts.push(s);
     }
-    return merge([t, ...spokes]);
+    // the hub: a boss standing proud of the spokes with a collar behind it
+    const boss = new THREE.CylinderGeometry(0.046, 0.042, 0.032, 12);
+    boss.rotateX(Math.PI / 2);
+    boss.translate(0, 0, 0.014);
+    parts.push(boss);
+    const collar = new THREE.CylinderGeometry(0.030, 0.030, 0.055, 10);
+    collar.rotateX(Math.PI / 2);
+    collar.translate(0, 0, -0.030);
+    parts.push(collar);
+    // and the two grips moulded into the rim at nine and three, which are
+    // the bumps your thumbs sit against and the only thing on a wheel that
+    // tells you it is not perfectly round
+    for (const s of [1, -1]) {
+      const grip = new THREE.SphereGeometry(0.030, 8, 6);
+      grip.scale(0.55, 1.5, 0.75);
+      grip.translate(s * 0.150, 0, 0);
+      parts.push(grip);
+    }
+    return merge(parts);
   })();
 
   // ---- WHEELS -----------------------------------------------------------------
@@ -1604,10 +1709,42 @@ export function buildCar(T, livery = {}) {
   // black with a stripe of sky on the shoulder. This is the single line
   // that decides whether a livery is visible at all.
   const paintMat = new THREE.MeshPhysicalMaterial({
-    map: tex, roughness: 0.42 + lv.dirt * 0.28, metalness: 0.04,
-    clearcoat: 0.95 - lv.dirt * 0.55, clearcoatRoughness: 0.05 + lv.dirt * 0.28,
-    envMapIntensity: 0.85, side: THREE.FrontSide,
+    map: tex, roughness: 0.34 + lv.dirt * 0.34, metalness: 0.04,
+    clearcoat: 1.0 - lv.dirt * 0.55, clearcoatRoughness: 0.035 + lv.dirt * 0.30,
+    // 1.25, NOT 0.85. The clear coat is the whole reason a car reads as
+    // painted metal instead of coloured plastic, and what a clear coat
+    // does is REFLECT THE PLACE IT IS STANDING IN: sky along the top of
+    // the shoulder, the grey of the grandstand across the doors, the
+    // asphalt down the rocker. sky.js already bakes exactly that - a dome,
+    // a ground disc and a band of stand grey - into the environment probe,
+    // and at 0.85 the paint was only taking two thirds of it, so the flank
+    // of every car came out as one flat value from the beltline to the
+    // sill. This is the number that makes the gradient appear.
+    envMapIntensity: 1.25, side: THREE.FrontSide,
   });
+  // ---- THE SHADOW UNDER THE CAR'S OWN BODYWORK --------------------------
+  // The one thing missing from a shape that is otherwise right: real
+  // bodywork gets darker the closer it gets to the road, because the
+  // bottom half of the hemisphere it can see is asphalt a foot away
+  // instead of sky. Nothing in an image-based light knows that - the probe
+  // is a sphere at infinity - so without it the rocker panel is exactly as
+  // bright as the roof and the car looks pasted onto the track.
+  //
+  // Done in the shader off the vertex's own height rather than as a vertex
+  // colour attribute, because paintMat is also worn by the spoiler and the
+  // splitter, and a missing colour attribute in WebGL reads as zero: the
+  // version of this that used vertexColors painted both of them black.
+  // Wheel centres are y = 0 and the sill is at about -0.14, so the ramp
+  // runs over the bottom 35 cm of the car and is gone by the door handle.
+  paintMat.onBeforeCompile = (sh) => {
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying float vBodyY;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvBodyY = transformed.y;');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying float vBodyY;')
+      .replace('#include <color_fragment>', `#include <color_fragment>
+        diffuseColor.rgb *= mix(0.46, 1.0, clamp((vBodyY + 0.26) / 0.40, 0.0, 1.0));`);
+  };
   const rimTex = TX.suede();
   rimTex.repeat.set(10, 2);
   const M = {
@@ -1624,9 +1761,19 @@ export function buildCar(T, livery = {}) {
     dark: new THREE.MeshStandardMaterial({
       color: 0x1a1d22, roughness: 0.90, side: THREE.DoubleSide, envMapIntensity: 0.95,
     }),
+    // THE WINDSCREEN WAS A SHEET OF WHITE. At envMapIntensity 2.2 on
+    // roughness 0.04 the glass was reflecting the sky dome at more than
+    // twice its real brightness through a mirror finish, so from anywhere
+    // in front of the car the screen was a blown-out white panel with the
+    // sun's disc smeared across it and you could not see the driver, the
+    // cage or the banner through it. A Cup windscreen is 3 mm of Lexan:
+    // you see straight through it into a dark cabin, with a WEAK sky
+    // reflection laid over the top. Darker tint, a hair more roughness so
+    // the sun spreads instead of burning a hole, and a probe reading a
+    // little under one.
     glass: new THREE.MeshPhysicalMaterial({
-      color: 0x93b4cc, roughness: 0.04, metalness: 0.0, transparent: true, opacity: 0.26,
-      side: THREE.DoubleSide, envMapIntensity: 2.2, clearcoat: 1,
+      color: 0x6f8496, roughness: 0.075, metalness: 0.0, transparent: true, opacity: 0.30,
+      side: THREE.DoubleSide, envMapIntensity: 0.95, clearcoat: 1, clearcoatRoughness: 0.06,
     }),
     net: new THREE.MeshStandardMaterial({
       map: TX.net(), color: 0x2c3138, roughness: 0.92, metalness: 0.0,

@@ -1306,7 +1306,13 @@ export function buildCar(T, livery = {}) {
   // suspension, a steer group inside it that yaws for the front wheels,
   // and the wheel itself inside that which spins. Nesting them that way
   // means the three motions cannot fight each other.
-  const wheels = [], hubs = [], steers = [], arms = [];
+  const wheels = [], hubs = [], steers = [], arms = [], discs = [];
+  const inbOf = (side) => -side;
+  /* one material for all four, because they heat together and it means
+     main.js changes one colour rather than four */
+  const brakeMat = new THREE.MeshStandardMaterial({
+    color: 0x14151a, emissive: 0x000000, roughness: 0.55, metalness: 0.1,
+  });
   const corner = [
     { x: -P.HT, z: P.xf, front: true },   // 0 front right
     { x:  P.HT, z: P.xf, front: true },   // 1 front left
@@ -1341,6 +1347,24 @@ export function buildCar(T, livery = {}) {
     const side = Math.sign(c.x);
     const hw = w / 2;
     steer.add(new THREE.Mesh((c.front ? P.corner.front : P.corner.rear)[side > 0 ? 1 : 0], M.carbon));
+
+    /* THE BRAKE DISC, AND IT GLOWS.
+       Liam: "way better car graphics". The model itself is not the
+       problem - it has the wings, the halo, the wishbones, a steering
+       wheel with a working display. What it had nothing of is the thing
+       you actually SEE of a racing car from the camera behind it, which
+       is carbon brakes going orange into a corner. One ring per corner,
+       inside the wheel where it belongs, on a material main.js heats and
+       cools. Twenty triangles for the single most recognisable image in
+       motor racing. */
+    const disc = new THREE.Mesh(
+      new THREE.CylinderGeometry(hw * 0.62, hw * 0.62, 0.034, 18, 1, false),
+      brakeMat,
+    );
+    disc.rotation.z = Math.PI / 2;
+    disc.position.x = inbOf(side) * (hw + 0.035);
+    steer.add(disc);
+    discs.push(disc);
 
     // `from` is a point on the chassis, `to` is a point on the upright in
     // the HUB's space (and, for the track rod, in the STEER's space, so it
@@ -1384,7 +1408,7 @@ export function buildCar(T, livery = {}) {
 
   const art = {
     group: car, wheels, hubs, steers, arms, driver, helmet, steerWheel, paddles,
-    drsFlap: flap, rainLight, floorY: P.H(0.03),
+    drsFlap: flap, rainLight, brakeMat, floorY: P.H(0.03),
     updateArms,
     // for damage.js: the painted body it dents and scratches, the shared
     // originals to put back, and the pieces it can knock off

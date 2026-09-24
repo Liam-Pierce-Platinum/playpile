@@ -924,6 +924,9 @@ window.__hoops = {
   camX: () => (half ? +half.camX(CAM[court].hw * 2).toFixed(2) : null),
   you: () => (half ? { ...half.you } : null),
   freeze: (on) => { if (half) half.frozen = !!on; },
+  /** turn the juke off, so tools/juke.mjs can measure what it is worth */
+  noJuke: (on) => { if (half) half.noJuke = !!on; },
+  noShove: (on) => { if (half) half.noShove = !!on; },
   giveBall: (team) => half && half.debugGive(team),
   standOn: (gap) => half && half.debugStandOnCarrier(gap),
   standAt: (x, z) => half && half.debugStandAt(x, z),

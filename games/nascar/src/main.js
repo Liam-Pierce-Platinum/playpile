@@ -15,7 +15,7 @@
 import * as THREE from '../vendor/three.module.js';
 import { TUNE, TYRES, WHEEL_SHORT } from './stock.js';
 import { buildOval, TRACKS } from './oval.js';
-import { buildTrack } from './track.js';
+import { buildTrack, markPitStall } from './track.js';
 import { buildCar } from './body.js';
 import { Race, PHASE } from './race.js';
 import { setAnisotropy } from './textures.js';
@@ -269,6 +269,13 @@ function start(mode, key, opts = {}) {
   // can be stepped up to eight times a frame, so a long race can be driven
   // in an evening. It is the one concession endurance needs to be playable.
   S.warp = 1;
+
+  // YOUR BOX, PAINTED AND SIGNPOSTED. It has to happen here rather than
+  // in buildTrack because which stall is yours is your grid slot, and the
+  // grid does not exist until the race does.
+  if (S.race.playerDriver) {
+    markPitStall(S.art.group, S.oval, S.race.playerDriver.stall, S.race.player.entry.number);
+  }
 
   for (const r of S.race.runners) {
     const art = buildCar(r.car.T, r.entry.livery);
@@ -781,8 +788,40 @@ function updateHUD() {
     + (weather.rain > 0.02 ? ' · ' + weather.label : '');
   $('fCaution').classList.toggle('on', race.phase === PHASE.CAUTION);
   $('fDraft').classList.toggle('on', p.tow > 0.25);
-  $('fPit').classList.toggle('on', p.inPit);
   $('fSpeed').classList.toggle('on', p.speeding);
+
+  // ---- THE PIT BOARD ------------------------------------------------------
+  // "PIT ROAD" told you the one thing you already knew. What a driver
+  // needs down a pit lane is how far to his own box and when to stop, and
+  // without it the stop is unfindable - which is why it looked as though
+  // there was no crew and no way to get the car mended.
+  {
+    const fp = $('fPit');
+    if (!p.inPit) {
+      fp.classList.remove('on', 'near', 'stop');
+      fp.textContent = 'PIT ROAD';
+    } else {
+      fp.classList.add('on');
+      const P = S.oval.pit, d = S.race.playerDriver;
+      const to = d ? P.rel(p.dist) - P.stallPose(d.stall).at : 0;
+      if (p.onBox && p.stopT) {
+        fp.classList.remove('near');
+        fp.classList.add('stop');
+        const left = Math.max(0, (p.pitNeed || 0) * (1 - p.stopT));
+        fp.textContent = 'SERVICE  ' + left.toFixed(1) + 's';
+      } else if (to > 6) {
+        fp.classList.remove('near', 'stop');
+        fp.textContent = 'BOX BEHIND YOU  ← ' + Math.round(to) + 'm';
+      } else if (to > -8) {
+        fp.classList.remove('stop');
+        fp.classList.add('near');
+        fp.textContent = Math.abs(to) < 4 ? 'YOUR BOX · STOP' : 'YOUR BOX  ' + Math.round(-to) + 'm';
+      } else {
+        fp.classList.remove('near', 'stop');
+        fp.textContent = 'YOUR BOX  ' + Math.round(-to) + 'm';
+      }
+    }
+  }
 
   if (S.mode === 'race') drawTower();
   drawMap();

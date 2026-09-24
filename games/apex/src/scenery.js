@@ -181,10 +181,16 @@ export function makeGround(bbox, distTo, opts = {}) {
   // big empty plane reading as a big empty plane.
   // lighter than they would be as flat colour, because the grass texture
   // multiplies over them and takes about a third back off
-  const cLow = new THREE.Color(0x6a9450);
-  const cMid = new THREE.Color(0x587f44);
-  const cHigh = new THREE.Color(0x8a9a6c);
-  const cDry = new THREE.Color(0x9ea062);
+  /* DESATURATED, AND MORE OF THEM. Liam: "make realistic ... grass". The
+     patching was right; the colours were poster greens - 0x6a9450 is a
+     billiard table - and three of them lerped together still only ever
+     make one kind of green. Turf at a circuit is olive, straw and mud
+     and most of it is duller than people remember. */
+  const cLow = new THREE.Color(0x5c7a49);
+  const cMid = new THREE.Color(0x49633c);
+  const cHigh = new THREE.Color(0x7d8768);
+  const cDry = new THREE.Color(0x938b5e);
+  const cBare = new THREE.Color(0x6d6148);
   const tmp = new THREE.Color();
 
   for (let i = 0; i < pos.count; i++) {
@@ -194,9 +200,15 @@ export function makeGround(bbox, distTo, opts = {}) {
     if (city) { col[i * 3] = 0.93; col[i * 3 + 1] = 0.88; col[i * 3 + 2] = 0.80; continue; }
     const up = smoothstep(base + amp * 0.10, base + amp * 0.70, y);
     const patch = vnoise(x * 0.012, z * 0.012);
+    // a second, much finer band of noise, so the field has grain inside
+    // its patches instead of four big soft blobs of colour
+    const fine = vnoise(x * 0.09 + 31, z * 0.09 - 17);
     tmp.copy(cLow).lerp(cMid, patch);
-    tmp.lerp(cDry, Math.max(0, patch - 0.62) * 1.6);
+    tmp.lerp(cDry, Math.max(0, patch - 0.55) * 1.7);
+    tmp.lerp(cBare, Math.max(0, fine - 0.78) * 1.4);
     tmp.lerp(cHigh, up);
+    const shade = 0.90 + fine * 0.20;
+    tmp.multiplyScalar(shade);
     col[i * 3] = tmp.r; col[i * 3 + 1] = tmp.g; col[i * 3 + 2] = tmp.b;
   }
   geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
@@ -293,7 +305,7 @@ export function makeGrass(points, leftOf, from, to, heightAt, opts = {}) {
     }
   }
 
-  const lush = new THREE.Color(0x4e7a35), dry = new THREE.Color(0x818a49);
+  const lush = new THREE.Color(0x466b34), dry = new THREE.Color(0x7d8052);
   const tmp = new THREE.Color();
   const d = new THREE.Object3D();
 
@@ -662,6 +674,11 @@ export function makeTrees(points, leftOf, from, to, heightAt, opts = {}) {
   const barks = kinds.map((k) => new THREE.Color(k.bark));
   // a few trees on the turn, which is what stops a wood being one colour
   const turning = new THREE.Color(0x9a7d33);
+  // the far treeline has three hundred metres of air in front of it, and
+  // air is blue: without this a ridge two kilometres away is exactly as
+  // saturated as the tree you are about to hit, which is the single
+  // biggest reason a scatter reads as scenery rather than as distance
+  const HAZE = new THREE.Color(0x7d93a8);
 
   const tmp = new THREE.Color();
   const d = new THREE.Object3D();
@@ -689,8 +706,19 @@ export function makeTrees(points, leftOf, from, to, heightAt, opts = {}) {
         trunks.setMatrixAt(ti, m);
         trunks.setColorAt(ti, tmp.copy(barks[ki]).multiplyScalar(0.8 + t.hue * 0.4));
         ti++;
+        /* A WOOD IS NOT ONE COLOUR, and lerping between a species' two
+           hues on a single random number only ever made a smooth ramp
+           between the same two greens - which from the cockpit is one
+           green. Liam: "make realistic ... trees". Three things on top of
+           the ramp: a second, independent number that lightens or darkens
+           the individual tree, a few more on the turn, and a cool shift
+           on the ones far enough back to have air in front of them.
+           None of it costs a draw call - it is a colour per instance. */
         tmp.copy(hues[ki][0]).lerp(hues[ki][1], t.hue);
-        if (t.hue > 0.94) tmp.lerp(turning, 0.55);
+        const vary = ((Math.sin(t.x * 0.37 + t.z * 0.71) * 43758.5) % 1 + 1) % 1;
+        tmp.multiplyScalar(0.74 + vary * 0.52);
+        if (t.hue > 0.88) tmp.lerp(turning, 0.30 + (t.hue - 0.88) * 3.4);
+        if (ki >= 3) tmp.lerp(HAZE, 0.22);
         crowns.setColorAt(i, tmp);
       });
       crowns.instanceMatrix.needsUpdate = true;
@@ -886,18 +914,45 @@ function makeClouds() {
   // The flat base is the whole cue. Packing the vertical placement with
   // u*u puts most puffs low and wide and a few high, which is the shape a
   // fair-weather cumulus actually has.
-  for (let i = 0; i < 22; i++) {
+  /* WHY THESE NUMBERS CHANGED. Liam: "make realistic clouds". The
+     machinery was already right - flat-bottomed cumulus, a cloud-wide
+     gradient, a silver lining - and it still came out as cotton wool,
+     because of three numbers.
+
+     Twenty-eight puffs at 54-100 m across a 300 m cloud is a cloud made
+     of about a dozen VISIBLE BALLS, and a ball is what the eye finds.
+     Fifty-two smaller ones overlap enough that no single one is the
+     outline. Second, hard = 0.56 starts the soft edge halfway out, so
+     every puff had a definite rim; real cumulus is crisp on its sunlit
+     shoulders and vapour everywhere else, which is 0.30 and let the
+     density do the rest. And third, alpha 0.72 meant one puff was nearly
+     opaque on its own - so the cloud could not build up thick in the
+     middle and thin at the edges, which is the whole of how a cloud
+     reads. Half that, and the overlap does it. */
+  for (let i = 0; i < 20; i++) {
     const [cx, cz] = spot(420, 3300);
-    const base = 660 + rnd() * 280;
-    const W = 150 + rnd() * 210, H = 120 + rnd() * 190;
+    const base = 700 + rnd() * 340;
+    const W = 170 + rnd() * 240, H = 150 + rnd() * 230;
     const squash = 0.6 + rnd() * 0.7;              // some are long, some compact
-    for (let k = 0; k < 28; k++) {
+    for (let k = 0; k < 52; k++) {
       const u = rnd(), hy = u * u;
       const rad = W * Math.sqrt(1 - hy * 0.8) * Math.sqrt(rnd());
       const a = rnd() * TAU;
-      const s = (54 + rnd() * 46) * (1 - hy * 0.35);
-      puff(cx + Math.cos(a) * rad, base + hy * H + (rnd() - 0.5) * 18, cz + Math.sin(a) * rad * squash,
-        s, s * (0.78 + rnd() * 0.3), hy, 0.72, 0.56);
+      const s = (34 + rnd() * 40) * (1 - hy * 0.3);
+      puff(cx + Math.cos(a) * rad, base + hy * H + (rnd() - 0.5) * 22, cz + Math.sin(a) * rad * squash,
+        s, s * (0.74 + rnd() * 0.34), hy, 0.36, 0.30);
+    }
+    /* AND THE FLAT BOTTOM, WHICH IS THE ONE THING A CUMULUS HAS. It is
+       the condensation level - the height at which the air gets cold
+       enough - and it is the same height for every cloud in the sky, and
+       dead flat, and in shadow. Without a skirt of wide dark puffs pinned
+       to it, all the gradient in the world still reads as a floating
+       lump rather than as weather. */
+    for (let k = 0; k < 14; k++) {
+      const a = rnd() * TAU, rad = W * 0.86 * Math.sqrt(rnd());
+      const s = 52 + rnd() * 46;
+      puff(cx + Math.cos(a) * rad, base - 4 + (rnd() - 0.5) * 10, cz + Math.sin(a) * rad * squash,
+        s, s * 0.30, 0.0, 0.34, 0.22);
     }
   }
 
@@ -911,7 +966,7 @@ function makeClouds() {
       const ox = (rnd() - 0.5) * 2 * W, oz = (rnd() - 0.5) * 2 * D;
       const w = 110 + rnd() * 90;
       puff(cx + ox * ct - oz * st, y + (rnd() - 0.5) * 26, cz + ox * st + oz * ct,
-        w, 22 + rnd() * 16, 0.42 + rnd() * 0.2, 0.34, 0.24);
+        w, 22 + rnd() * 16, 0.42 + rnd() * 0.2, 0.20, 0.12);
     }
   }
 
@@ -926,7 +981,7 @@ function makeClouds() {
     for (let k = 0; k < 7; k++) {
       const t = (k / 6 - 0.5) * 2 * L;
       puff(cx + cc * t, y + (rnd() - 0.5) * 40, cz + cs * t,
-        130 + rnd() * 90, 13 + rnd() * 10, 0.95, 0.22 + rnd() * 0.12, 0.06);
+        130 + rnd() * 90, 13 + rnd() * 10, 0.95, 0.13 + rnd() * 0.09, 0.03);
     }
   }
 
@@ -1011,8 +1066,8 @@ function makeClouds() {
       // the shadowed side of a cloud is not grey, it is blue - it is lit by
       // the sky rather than the sun - and warming the lit side by the same
       // amount is what sells the depth
-      '  vec3 shade = uTint * vec3(0.52, 0.57, 0.70);',
-      '  vec3 col = mix(shade, uTint, clamp(t * 0.70 + lam * 0.46, 0.0, 1.0));',
+      '  vec3 shade = uTint * vec3(0.44, 0.50, 0.66);',
+      '  vec3 col = mix(shade, uTint, clamp(t * 0.82 + lam * 0.40, 0.0, 1.0));',
       // the silver lining: where the sun grazes a rim, it burns through
       '  col += uTint * pow(max(0.0, lam), 7.0) * smoothstep(0.5, 1.0, d) * 0.55;',
       '  gl_FragColor = vec4(col, a);',

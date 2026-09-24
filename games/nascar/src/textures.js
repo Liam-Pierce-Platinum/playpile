@@ -278,24 +278,53 @@ export const catchfence = () => once('catchfence', () => {
 // into rainbow static. One tile is about eight rows by twelve seats.
 // ---------------------------------------------------------------------
 export const crowd = () => once('crowd', () => {
-  const S = 256, [c, g] = canvas(S, S);
-  g.fillStyle = '#26282d'; g.fillRect(0, 0, S, S);
+  // 512 and not 256: this tile is what fills the rows BETWEEN the rows of
+  // real instanced spectators, so at the front of the main grandstand it
+  // is thirty metres from the camera and a 256 tile was showing its
+  // pixels there as flat coloured squares.
+  const S = 512, [c, g] = canvas(S, S);
+  g.fillStyle = '#2a2d33'; g.fillRect(0, 0, S, S);
   const r = rng(101);
-  const rows = 10, cols = 14;
+  const rows = 11, cols = 16;
+  const w = S / cols, hh = S / rows;
   for (let y = 0; y < rows; y++) {
-    // the seats themselves, showing between people
-    g.fillStyle = '#1c1f24';
-    g.fillRect(0, y * S / rows, S, S / rows * 0.82);
+    // The seat backs behind them, in shadow. This is what shows through
+    // the gaps, so it decides what the whole stand reads as where the
+    // crowd thins. Nearly black (#14161a) put a void between every pair of
+    // shoulders and the bank came out as bright specks floating on
+    // nothing; a shaded moulded seat is dark grey, not a hole.
+    g.fillStyle = '#212429';
+    g.fillRect(0, y * hh, S, hh * 0.84);
     for (let x = 0; x < cols; x++) {
-      if (r() < 0.14) continue;                       // an empty seat
-      const h = 200 + r() * 90, sat = 8 + r() * 26, l = 34 + r() * 34;
-      g.fillStyle = `hsl(${(r() * 360) | 0}, ${sat}%, ${l}%)`;
-      const w = S / cols, hh = S / rows;
-      g.fillRect(x * w + w * 0.14, y * hh + hh * 0.12, w * 0.72, hh * 0.56);
-      // a head
-      g.fillStyle = `hsl(28, ${18 + r() * 18}%, ${28 + r() * 34}%)`;
+      if (r() < 0.12) continue;                       // an empty seat
+      // THE SAME PALETTE AS THE REAL SPECTATORS NEXT TO THEM: mostly navy,
+      // charcoal and denim, a sixth of them in a light shirt and one in
+      // twelve in something bright. When this tile was drawn from a
+      // different set of numbers than crowd.js, the rows alternated between
+      // a dark band of geometry and a pale band of paint all the way up.
+      const k = r();
+      const hue = k < 0.32 ? 212 + r() * 18 : k < 0.58 ? (r() * 360) | 0
+                : k < 0.78 ? 28 + r() * 22 : k < 0.94 ? 36 : (r() * 360) | 0;
+      const sat = k < 0.32 ? 14 + r() * 20 : k < 0.58 ? 4 + r() * 8
+                : k < 0.78 ? 6 + r() * 12 : k < 0.94 ? 4 : 26 + r() * 24;
+      const lit = k < 0.32 ? 21 + r() * 14 : k < 0.58 ? 17 + r() * 14
+                : k < 0.78 ? 34 + r() * 18 : k < 0.94 ? 54 + r() * 18 : 29 + r() * 16;
+      // shoulders: wider than the head and narrower than the seat, which
+      // is the one proportion that stops a row of these reading as bricks
+      const cx = x * w + w * 0.5, top = y * hh + hh * 0.30;
+      g.fillStyle = `hsl(${hue | 0}, ${sat | 0}%, ${lit | 0}%)`;
+      g.fillRect(cx - w * 0.34, top, w * 0.68, hh * 0.54);
+      // and a shade down the body, because these sit in the same seat-back
+      // shadow the instanced spectators have baked into them
+      g.fillStyle = 'rgba(0,0,0,0.34)';
+      g.fillRect(cx - w * 0.34, top + hh * 0.30, w * 0.68, hh * 0.24);
+      // the head, on top, skin or a cap
+      const bare = r() < 0.55;
+      g.fillStyle = bare
+        ? `hsl(${24 + r() * 8 | 0}, ${26 + r() * 16 | 0}%, ${22 + r() * 34 | 0}%)`
+        : `hsl(${hue | 0}, ${sat | 0}%, ${(lit * 0.5) | 0}%)`;
       g.beginPath();
-      g.arc(x * w + w * 0.5, y * hh + hh * 0.12, w * 0.19, 0, Math.PI * 2);
+      g.arc(cx + (r() - 0.5) * w * 0.2, top - hh * 0.02, w * 0.20, 0, Math.PI * 2);
       g.fill();
     }
   }

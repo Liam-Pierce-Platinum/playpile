@@ -25,6 +25,7 @@ import * as TX from './textures.js';
 import { grassBand, treeGeometry, canopyMaterial } from './flora.js';
 import { buildDetail } from './detail.js';
 import { Crowd, motorhomes, flags } from './crowd.js';
+import { mergeGeometries } from '../vendor/jsm/utils/BufferGeometryUtils.js';
 
 const DEG = Math.PI / 180;
 const leftOf = (h) => [Math.cos(h), -Math.sin(h)];
@@ -412,6 +413,93 @@ function buildPits(oval, group, at, wrapI) {
   group.userData.pitBoxes = boxGroup;
 }
 
+/**
+ * YOUR BOX.
+ *
+ * Liam: "there is no pit crew in you lane for the nascar and their is no
+ * way to actually get car fixed".
+ *
+ * Both halves of that are one thing. The pit road is forty identical
+ * yellow rectangles with a number painted flat on the tarmac, which you
+ * are reading at fifty-five miles an hour from a car whose nose is in the
+ * way - and the crew only exist once you have STOPPED on the right one.
+ * Miss it and there is no crew, no fuel, no tyres and no repair, and
+ * nothing anywhere tells you that you missed it or by how much. The stop
+ * was not broken; it was unfindable.
+ *
+ * So the player's stall gets what a real team gives its driver: the box
+ * repainted in a colour nobody else has, and a BOARD ON A POLE above it,
+ * which is the thing you actually look for down a pit lane because it is
+ * the only part of a pit box that is not lying flat on the floor.
+ */
+export function markPitStall(group, oval, k, number) {
+  const PIT = oval.pit;
+  const old = group.getObjectByName('yourbox');
+  if (old) {
+    group.remove(old);
+    old.traverse((o) => { if (o.geometry) o.geometry.dispose(); });
+  }
+  const mark = new THREE.Group();
+  mark.name = 'yourbox';
+  const pose = PIT.stallPose(k, PIT.box);
+
+  // the box itself, repainted. Sitting a little higher than the yellow one
+  // so it wins the depth fight rather than flickering through it.
+  {
+    const halfL = Math.min(5.0, PIT.boxGap * 0.44), halfW = 2.6;
+    const steps = 10;
+    const geo = [];
+    for (let i = 0; i < steps; i++) {
+      const d0 = pose.at - halfL + (2 * halfL * i) / steps;
+      const d1 = pose.at - halfL + (2 * halfL * (i + 1)) / steps;
+      const p0i = oval.pos(d0, PIT.box - halfW), p0o = oval.pos(d0, PIT.box + halfW);
+      const p1i = oval.pos(d1, PIT.box - halfW), p1o = oval.pos(d1, PIT.box + halfW);
+      const g = new THREE.BufferGeometry();
+      const v0 = i / steps, v1 = (i + 1) / steps;
+      g.setAttribute('position', new THREE.Float32BufferAttribute([
+        p0i.x, p0i.y + 0.045, p0i.z, p1i.x, p1i.y + 0.045, p1i.z, p1o.x, p1o.y + 0.045, p1o.z,
+        p0i.x, p0i.y + 0.045, p0i.z, p1o.x, p1o.y + 0.045, p1o.z, p0o.x, p0o.y + 0.045, p0o.z,
+      ], 3));
+      g.setAttribute('uv', new THREE.Float32BufferAttribute([
+        0, v0, 0, v1, 1, v1, 0, v0, 1, v1, 1, v0,
+      ], 2));
+      g.computeVertexNormals();
+      geo.push(g);
+    }
+    const merged = mergeGeometries(geo);
+    for (const g of geo) g.dispose();
+    mark.add(new THREE.Mesh(merged, new THREE.MeshStandardMaterial({
+      map: TX.pitBox(number, '#3ddcff'), roughness: 0.86,
+      polygonOffset: true, polygonOffsetFactor: -6,
+    })));
+  }
+
+  // THE BOARD. On the wall side, up where a windscreen can see it, with
+  // the car number on both faces because you come past it one way and
+  // leave the other.
+  {
+    const q = oval.pos(pose.at, PIT.box + 5.6);
+    const post = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.06, 0.06, 3.1, 6),
+      new THREE.MeshStandardMaterial({ color: 0x20242b, roughness: 0.7, metalness: 0.4 }),
+    );
+    post.position.set(q.x, q.y + 1.55, q.z);
+    post.castShadow = true;
+    mark.add(post);
+    const board = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.5, 1.05),
+      new THREE.MeshStandardMaterial({ map: TX.pitBox(number, '#3ddcff'), roughness: 0.7,
+        emissive: 0x0a2630, emissiveIntensity: 0.6, side: THREE.DoubleSide }),
+    );
+    board.position.set(q.x, q.y + 3.0, q.z);
+    board.rotation.y = q.h + Math.PI / 2;
+    board.castShadow = true;
+    mark.add(board);
+  }
+  group.add(mark);
+  return mark;
+}
+
 // =====================================================================
 // THE GRANDSTANDS
 // =====================================================================
@@ -427,6 +515,10 @@ function buildStands(oval, group, at, wrapI, fenceTop, crowd) {
   const G = spec.grandstand || { from: -600, to: 400, rows: 40, height: 30 };
   const steps = new Soup(), fronts = new Soup(), roof = new Soup(), back = new Soup();
   const seats = [];
+  // its own generator, seeded, so a track builds the same stand twice and
+  // the empty seats do not move when anything else in here changes
+  let seatSeed = 20773;
+  const seatRnd = () => (seatSeed = (Math.imul(seatSeed, 1103515245) + 12345) & 0x7fffffff) / 0x7fffffff;
 
   // `depth` and not `back`: the parameter used to be called back and it
   // shadowed the Soup of the same name, so the stands' back wall tried to
@@ -458,10 +550,19 @@ function buildStands(oval, group, at, wrapI, fenceTop, crowd) {
         if (crowd && r % 2 === 1) {
           const mid = at(i, (lat0 + lat1) / 2);
           for (let q = -2; q <= 2; q += 2) {
+            // AN EMPTY SEAT HERE AND THERE. Three people at exactly the
+            // same spacing on every other row of every section is a
+            // lattice, and the eye finds a lattice instantly however good
+            // the individual figure is. One in eleven left empty, plus the
+            // jitter below, is enough to break the grid without the stand
+            // looking like it failed to sell out.
+            if (seatRnd() < 0.09) continue;
+            const along = (seatRnd() - 0.5) * 0.30;     // shuffle along the row
+            const across = (seatRnd() - 0.5) * 0.22;    // and forward in the seat
             seats.push({
-              x: mid[0] + Math.sin(P[i].h) * q * 0.33,
+              x: mid[0] + Math.sin(P[i].h) * (q * 0.33 + along) + Math.cos(P[i].h) * across,
               y: y1 + 0.02,
-              z: mid[2] + Math.cos(P[i].h) * q * 0.33,
+              z: mid[2] + Math.cos(P[i].h) * (q * 0.33 + along) - Math.sin(P[i].h) * across,
               // FACING THE TRACK. The person geometry looks down +Z, and
               // rotating by h - 90 turns it to -leftOf(h), which from
               // outside the wall is straight at the racing surface. With

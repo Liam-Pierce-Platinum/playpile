@@ -184,6 +184,22 @@ export const TUNE = {
   brakeTorque: 24000,   // Nm total
   brakeBias:   0.58,    // to the front
 
+  // ---- THE SHAPE OF THE GRIP, as tools/bench.mjs measures it ----------
+  // lateral g = gripRefA + gripRefB * v^2, which is the wings arriving.
+  // The steering uses it to work out how much corner full lock should be
+  // worth at the speed you are doing.
+  gripRefA:    1.78,
+  gripRefB:    3.27e-4,
+  // a tyre needs a slip angle before it makes a force, so the geometric
+  // Ackermann angle alone always under-delivers; this is the gap.
+  steerGain:   1.75,
+
+  // HOW FAR SIDEWAYS IT MAY EVER GET. See the limiter at the end of
+  // substep. A racing car at the limit runs six to ten degrees of slip;
+  // twenty-two leaves room to feel the car move and to catch a slide,
+  // and takes away the part where it keeps going round.
+  spinLimit:   22,
+
   // ---- what the driver can do ----------------------------------------
   // Barely a fifth of a turn. A racing car does not need lock, it needs
   // precision, and a big wheel angle would be unusable at this grip.
@@ -410,7 +426,37 @@ export class Car {
     if (i.steerRight) want -= 1;
     // an analogue wheel, for the robot drivers: -1 full right to +1 full left
     if (typeof i.steer === 'number') want = clamp(i.steer, -1, 1);
-    const target = clamp(want, -1, 1) * maxLock;
+    want = clamp(want, -1, 1);
+
+    /* ---- THE PERFECT ANGLE ------------------------------------------------
+       Liam: "I don't want turning to be a chore though so make the perfect
+       steering angle so the player can stay glued".
+
+       A wheel angle is the wrong thing to give a driver on a car like
+       this. The same 22 degrees of lock is a hairpin at 60 km/h and about
+       four times more lateral g than exists at 300, so holding a line
+       meant a different amount of input at every speed and a constant
+       correction in between - which IS the chore. The speed-sensitive
+       lock above was an attempt at the same problem and it only ever
+       rescaled the mistake.
+
+       So the input asks for a CORNER instead. Full lock means "as much of
+       a turn as this car can hold right now", and the wheel angle that
+       delivers it is worked out from the speed: it is the Ackermann angle
+       for the yaw rate the available grip allows, times an understeer
+       gain, because a real tyre needs a slip angle before it makes the
+       force. That number - lateral g against speed - is not invented, it
+       is what tools/bench.mjs measures this car doing: 2.09 g at 110 km/h
+       and 3.36 g at 250.
+
+       Below about 40 km/h it hands full lock straight back, because a
+       hairpin is a geometry problem and not a grip one. */
+    const vRef = Math.max(spd, 11);
+    const latG = T.gripRefA + T.gripRefB * spd * spd;      // g the car can hold
+    const maxYaw = (latG * g) / vRef;                      // rad/s it can sustain
+    const ackermann = (maxYaw * T.wheelbase) / vRef * T.steerGain;
+    const usable = Math.min(maxLock, ackermann);
+    const target = want * usable;
     const rate = (want === 0 ? T.steerReturn : T.steerRate) * (typeof i.steer === 'number' ? 1.6 : 1) * dt;
     this.steer = clamp(this.steer + clamp(target - this.steer, -rate, rate), -maxLock, maxLock);
 
@@ -791,6 +837,47 @@ export class Car {
     this.x += this.vx * dt;
     this.z += this.vz * dt;
     this.yaw += this.yawRate * dt;
+
+    /* ---- IT CANNOT COME ROUND --------------------------------------------
+       Liam: "literally unable to spin out no matter what".
+
+       Everything above is a tyre model, and the electronics that sit on
+       top of it - traction control, the overrun map, the stability
+       control - only ever ASK for something; a tyre model that is any
+       good can always be asked for more than it has, and once the back is
+       past about forty degrees no moment any of them can produce will
+       bring it back. "Literally" and "no matter what" are not a tuning
+       request, so this is not a tuning answer: it is a hard limit on the
+       angle between where the car points and where it is going, applied
+       after the integration, every substep.
+
+       Which means it is honest about what it is. It does not invent grip
+       and it does not pretend the slide is not happening - you can still
+       get the thing well out of shape, feel it, and lose time to it. What
+       it cannot do is keep rotating past the point of no return. Below 8
+       m/s it lets go completely, because a car being turned round in a
+       run-off or reversed out of a gravel trap is not a spin.  */
+    const spinSpd = Math.hypot(this.vx, this.vz);
+    if (spinSpd > 8) {
+      const vAng = Math.atan2(this.vx, this.vz);
+      let beta = this.yaw - vAng;
+      while (beta > Math.PI) beta -= 2 * Math.PI;
+      while (beta < -Math.PI) beta += 2 * Math.PI;
+      // going backwards is not a slip angle, it is a different problem,
+      // and clamping it would fight the reverse gear
+      if (Math.abs(beta) < Math.PI / 2) {
+        const lim = T.spinLimit * (Math.PI / 180);
+        if (Math.abs(beta) > lim) {
+          const over = Math.abs(beta) - lim;
+          this.yaw -= sign(beta) * over;
+          // and the rotation that was taking it there stops with it,
+          // otherwise it sits against the limit buzzing
+          if (sign(this.yawRate) === sign(beta)) this.yawRate *= 0.35;
+          this.caught = Math.min(1, (this.caught || 0) + over * 6);
+        }
+      }
+    }
+    this.caught = Math.max(0, (this.caught || 0) - dt * 2.5);
 
     // ---- AND A CAR THAT IS STOPPED IS STOPPED ------------------------------
     // A model whose only brake is multiplying by slightly less than one

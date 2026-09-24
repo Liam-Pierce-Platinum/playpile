@@ -33,25 +33,8 @@ import { mergeGeometries } from '../vendor/jsm/utils/BufferGeometryUtils.js';
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * clamp(t, 0, 1);
 
-/** a crew member: standing, about sixty triangles, facing +Z */
-function manGeometry() {
-  const parts = [];
-  const legs = new THREE.CylinderGeometry(0.13, 0.15, 0.82, 6, 1, true);
-  legs.translate(0, 0.41, 0);
-  parts.push(legs);
-  const torso = new THREE.CylinderGeometry(0.20, 0.17, 0.62, 6, 1, true);
-  torso.translate(0, 1.10, 0);
-  parts.push(torso);
-  const head = new THREE.SphereGeometry(0.135, 7, 5);
-  head.translate(0, 1.54, 0);
-  parts.push(head);
-  // arms, held forward - a pit crewman is always carrying something
-  for (const s of [1, -1]) {
-    const arm = new THREE.CylinderGeometry(0.058, 0.055, 0.56, 5, 1);
-    arm.rotateX(Math.PI / 2.4);
-    arm.translate(s * 0.22, 1.12, 0.18);
-    parts.push(arm);
-  }
+/** merge a pile of primitives into one attribute-clean geometry */
+function weld(parts) {
   const g = mergeGeometries(parts.map((p) => {
     const o = p.index ? p.toNonIndexed() : p;
     if (!o.attributes.uv) {
@@ -66,7 +49,77 @@ function manGeometry() {
   return g;
 }
 
-let MAN = null;
+/**
+ * A CREW MEMBER, IN TWO COLOURS.
+ *
+ * Liam: "have the visual crew helping". They were there - seven of them,
+ * in the right places, on a timeline - but every one of them was a single
+ * instanced mesh in a single flat team colour, so what arrived beside
+ * your car was six orange sticks with their arms out. A man reads as a
+ * man because his head is not the same colour as his overalls, so the
+ * geometry is split in two: the SUIT takes the team's colour, and the
+ * KIT - helmet, visor, boots, gloves, and the gun in a changer's hands -
+ * is dark and does not.
+ */
+function suitGeometry() {
+  const parts = [];
+  const legs = new THREE.CylinderGeometry(0.13, 0.15, 0.70, 6, 1, true);
+  legs.translate(0, 0.47, 0);
+  parts.push(legs);
+  const torso = new THREE.CylinderGeometry(0.21, 0.175, 0.62, 6, 1, true);
+  torso.translate(0, 1.10, 0);
+  parts.push(torso);
+  // the shoulders, so the silhouette is not a pipe
+  const yoke = new THREE.SphereGeometry(0.215, 7, 4);
+  yoke.scale(1, 0.5, 0.8);
+  yoke.translate(0, 1.38, 0);
+  parts.push(yoke);
+  for (const s of [1, -1]) {
+    const arm = new THREE.CylinderGeometry(0.062, 0.055, 0.52, 5, 1);
+    arm.rotateX(Math.PI / 2.6);
+    arm.translate(s * 0.215, 1.16, 0.16);
+    parts.push(arm);
+  }
+  return weld(parts);
+}
+
+/** the dark half: boots, gloves, helmet, visor */
+function kitGeometry() {
+  const parts = [];
+  for (const s of [1, -1]) {
+    const boot = new THREE.BoxGeometry(0.13, 0.11, 0.26);
+    boot.translate(s * 0.075, 0.055, 0.03);
+    parts.push(boot);
+    const glove = new THREE.SphereGeometry(0.075, 5, 4);
+    glove.translate(s * 0.235, 1.33, 0.40);
+    parts.push(glove);
+  }
+  const helmet = new THREE.SphereGeometry(0.155, 8, 6);
+  helmet.translate(0, 1.60, 0);
+  parts.push(helmet);
+  // the visor: a band round the front of it, which is the one detail that
+  // turns a ball on a pipe into somebody looking at your left front wheel
+  const visor = new THREE.SphereGeometry(0.158, 8, 6, 0, Math.PI, 1.0, 0.75);
+  visor.rotateY(Math.PI / 2);
+  visor.translate(0, 1.60, 0);
+  parts.push(visor);
+  return weld(parts);
+}
+
+/** the wheel gun a changer carries, held out in front of him */
+function gunGeometry() {
+  const parts = [];
+  const body = new THREE.BoxGeometry(0.11, 0.15, 0.30);
+  body.translate(0, 1.26, 0.46);
+  parts.push(body);
+  const barrel = new THREE.CylinderGeometry(0.045, 0.045, 0.26, 6);
+  barrel.rotateX(Math.PI / 2);
+  barrel.translate(0, 1.26, 0.70);
+  parts.push(barrel);
+  return weld(parts);
+}
+
+let MAN = null, KIT = null, GUN = null;
 
 // ---------------------------------------------------------------------
 // WHERE EACH MAN IS, AT EACH MOMENT OF THE STOP
@@ -91,6 +144,7 @@ const ROLES = [
       return [WALL_X, 1.0, 0];
     },
     face: () => -Math.PI / 2,
+    works: true,                 // the jackman pumps
   },
   {
     name: 'front changer',
@@ -101,7 +155,7 @@ const ROLES = [
       return [WALL_X, 0.55, 1.4];
     },
     face: (t) => (t < 0.52 ? -Math.PI / 2 : Math.PI / 2),
-    kneel: 0.5,
+    kneel: 0.5, works: true, gun: true,
   },
   {
     name: 'rear changer',
@@ -112,25 +166,25 @@ const ROLES = [
       return [WALL_X, 0.55, -1.4];
     },
     face: (t) => (t < 0.52 ? -Math.PI / 2 : Math.PI / 2),
-    kneel: 0.5,
+    kneel: 0.5, works: true, gun: true,
   },
   {
     name: 'front carrier',
     at(t) {
-      if (t < 0.08) return [WALL_X, 1.0, 1.9];
-      if (t < 0.52) return [-1.85, 1.0, 1.8];
-      if (t < 0.92) return [1.85, 1.0, 1.8];
-      return [WALL_X, 1.0, 1.9];
+      if (t < 0.08) return [WALL_X, 1.0, 2.2];
+      if (t < 0.52) return [-2.45, 1.0, 2.05];
+      if (t < 0.92) return [2.45, 1.0, 2.05];
+      return [WALL_X, 1.0, 2.2];
     },
     face: (t) => (t < 0.52 ? -Math.PI / 2 : Math.PI / 2),
   },
   {
     name: 'rear carrier',
     at(t) {
-      if (t < 0.08) return [WALL_X, 1.0, -1.9];
-      if (t < 0.52) return [-1.85, 1.0, -1.8];
-      if (t < 0.92) return [1.85, 1.0, -1.8];
-      return [WALL_X, 1.0, -1.9];
+      if (t < 0.08) return [WALL_X, 1.0, -2.2];
+      if (t < 0.52) return [-2.45, 1.0, -2.05];
+      if (t < 0.92) return [2.45, 1.0, -2.05];
+      return [WALL_X, 1.0, -2.2];
     },
     face: (t) => (t < 0.52 ? -Math.PI / 2 : Math.PI / 2),
   },
@@ -159,7 +213,7 @@ const ROLES = [
 
 export class PitCrew {
   constructor(colour = 0xd93a2b) {
-    if (!MAN) MAN = manGeometry();
+    if (!MAN) { MAN = suitGeometry(); KIT = kitGeometry(); GUN = gunGeometry(); }
     this.group = new THREE.Group();
     this.group.name = 'pitcrew';
     this.group.visible = false;
@@ -170,6 +224,20 @@ export class PitCrew {
     this.men.castShadow = true;
     this.men.frustumCulled = false;
     this.group.add(this.men);
+    // the dark half, on the same matrices: helmets, visors, boots, gloves
+    this.kit = new THREE.InstancedMesh(KIT, new THREE.MeshStandardMaterial({
+      color: 0x15171c, roughness: 0.38, metalness: 0.25, envMapIntensity: 1.2,
+    }), ROLES.length);
+    this.kit.castShadow = true;
+    this.kit.frustumCulled = false;
+    this.group.add(this.kit);
+    // and two wheel guns, for the two changers
+    this.guns = new THREE.InstancedMesh(GUN, new THREE.MeshStandardMaterial({
+      color: 0xb8bcc4, roughness: 0.3, metalness: 0.8,
+    }), 2);
+    this.guns.castShadow = true;
+    this.guns.frustumCulled = false;
+    this.group.add(this.guns);
 
     // the jack, the fuel can and a spare tyre - small props, big signal
     this.jack = new THREE.Mesh(
@@ -218,18 +286,45 @@ export class PitCrew {
       pos.y + y,
       pos.z + z * c - x * s,
     ];
+    /* WORKING, NOT STANDING. Every man was a static pose slid from one
+       spot to the next, so five of the twelve seconds looked like a group
+       of people who had come to watch. A crewman at his wheel is never
+       still: this bobs him on the gun, leans him into the car and lets
+       the jackman pump. It is one number per man per frame and it is the
+       difference between a crew and a row of traffic cones. */
+    const work = (i) => Math.sin(t * 46 + i * 1.7);
+    let gi = 0;
     ROLES.forEach((role, i) => {
       const [x, y, z] = role.at(t);
-      const kneel = role.kneel && t > 0.12 && t < 0.9 ? role.kneel : 0;
+      const busy = t > 0.12 && t < 0.9;
+      const kneel = role.kneel && busy ? role.kneel : 0;
+      const bob = busy && role.works ? work(i) * 0.035 : 0;
       const w = toWorld(x, 0, z);
-      this.dummy.position.set(w[0], w[1], w[2]);
-      this.dummy.rotation.set(0, yaw + role.face(t), 0);
+      this.dummy.position.set(w[0], w[1] + Math.max(0, bob), w[2]);
+      this.dummy.rotation.set(
+        busy && role.works ? bob * 1.6 : 0,
+        yaw + role.face(t),
+        0,
+      );
       const sc = 1 - kneel * 0.42;
       this.dummy.scale.set(1, sc, 1);
       this.dummy.updateMatrix();
       this.men.setMatrixAt(i, this.dummy.matrix);
+      this.kit.setMatrixAt(i, this.dummy.matrix);
+      // the two changers carry the guns, on the same matrix
+      if (role.gun && gi < 2) { this.guns.setMatrixAt(gi++, this.dummy.matrix); }
     });
+    // any gun with no changer goes under the floor rather than hanging in
+    // the air at the origin of the world
+    for (; gi < 2; gi++) {
+      this.dummy.position.set(0, -50, 0);
+      this.dummy.rotation.set(0, 0, 0); this.dummy.scale.set(1, 1, 1);
+      this.dummy.updateMatrix();
+      this.guns.setMatrixAt(gi, this.dummy.matrix);
+    }
     this.men.instanceMatrix.needsUpdate = true;
+    this.kit.instanceMatrix.needsUpdate = true;
+    this.guns.instanceMatrix.needsUpdate = true;
 
     // the jack: under the right rail, and it LIFTS
     const up = this.lift(t);

@@ -70,6 +70,12 @@
   #fCaution { background: var(--yellow); color: #221a00; }
   #fDraft { background: var(--go); color: #05241a; }
   #fPit { background: var(--amber); color: #2a2000; }
+  /* the pit board is a live readout now, not a label, so it needs room
+     and it needs to change colour as you get to your box */
+  #fPit { min-width: 152px; text-align: center; font-variant-numeric: tabular-nums; }
+  #fPit.near { background: #3ddcff; color: #04222c; }
+  #fPit.stop { background: var(--go); color: #05241a; animation: boxpulse .5s ease-in-out infinite alternate; }
+  @keyframes boxpulse { from { filter: brightness(1); } to { filter: brightness(1.45); } }
   #fSpeed { background: var(--hot); color: #fff; }
   .on { opacity: 1 !important; }
   #banner { position: absolute; left: 50%; top: 27%; transform: translate(-50%, -50%); text-align: center;

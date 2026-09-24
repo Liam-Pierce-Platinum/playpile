@@ -43,6 +43,15 @@ export class Runner {
     this.allOut = false;          // all four wheels over the white line
     this.surface = 'asphalt';
     this.hitWall = 0;             // speed into the last barrier, for the camera shake and the robots
+    /* HOW THIS ONE OVERTAKES, as the rest of the grid has learnt it.
+       A running average of the side he comes down: -1 always the right,
+       +1 always the left, 0 unpredictable. ai.js writes it while being
+       passed and reads it while defending, so going down the inside four
+       times means the fifth driver is already covering the inside. It
+       lives on the runner rather than in the driver because the whole
+       field shares one memory of you - which is the difference between
+       "they adapt" and twenty drivers each learning it separately. */
+    this.style = { side: 0 };
     this.y = 0; this.grade = 0; this.lat = 0; this.i = 0;
     this.started = false;         // has crossed the line for the first time (a flying lap)
     this.events = [];             // 'lap' | 'sector' | 'invalid' - read and cleared by the game

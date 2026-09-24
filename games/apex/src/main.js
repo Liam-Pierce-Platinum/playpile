@@ -1155,6 +1155,20 @@ function syncArt(r, dt) {
   art.driver.position.z = 0.50 - THREE.MathUtils.clamp(car.lonG * 0.02, -0.05, 0.05);
   art.drsFlap.rotation.x = car.drs ? -0.55 : 0.0;
   art.rainLight.material.emissive.setHex(car.speed > 2 && car.lonG < -1.5 ? 0xff1010 : 0x220000);
+  /* CARBON BRAKES GLOW, AND THEY DO NOT GLOW INSTANTLY. A disc goes from
+     black to orange over a corner's worth of braking and takes most of the
+     following straight to go out again - so it is a temperature that
+     follows the brake pedal, not a light switch wired to it. Heat is what
+     you see of a car braking from 320, and it was the one part of that
+     picture missing. */
+  if (art.brakeMat) {
+    const cl = THREE.MathUtils.clamp;
+    const into = cl(-car.lonG / 4.2, 0, 1) * cl(car.speed / 28, 0, 1);
+    art.heat = cl((art.heat || 0) + (into - (art.heat || 0)) * dt * (into > (art.heat || 0) ? 3.4 : 0.85), 0, 1);
+    const h = art.heat * art.heat;
+    art.brakeMat.emissive.setRGB(h * 1.0, h * h * 0.34, h * h * h * 0.06);
+    art.brakeMat.emissiveIntensity = 1.6;
+  }
 
   if (far < 160) {
     const c = Math.cos(car.yaw), sn = Math.sin(car.yaw);

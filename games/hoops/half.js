@@ -614,6 +614,7 @@ export class HalfCourt {
   step(dt) {
     if (this.over) return;
     this.time += dt;
+    if (this.shoveSay > 0) this.shoveSay -= dt; else this.shoveSay = 0;
     // THE CHECK. Nobody plays until the ball is checked in; the clock
     // does not run and the ball sits in the offence's hands.
     if (this.phase === 'check') {
@@ -1324,6 +1325,53 @@ export class HalfCourt {
   }
 
   /** a swipe at the ball in somebody's hands */
+  /**
+   * THE SHOVE. A defender's whole body against the man with the ball.
+   *
+   * It moves him POSITIONALLY and not by velocity, and that is not a
+   * detail. Aiming a shot while your feet are moving at more than 1.8 m/s
+   * is a travel (#travelWatch), so a shove that worked on velocity would
+   * whistle the man being shoved - punishing the player for what the
+   * defence did to him, which is the exact shape of the thing this is
+   * meant to remove. Driving him a metre off his spot does everything
+   * wanted and none of that.
+   *
+   * The direction matters too: the man on the ball stands between you and
+   * the ring, so shoving you away from him is shoving you AWAY FROM THE
+   * BASKET. He walls you off and backs you out, and you either go round
+   * him or you are shooting from further out than you meant to.
+   */
+  #shove(p, c, dt) {
+    if ((p.beat || 0) > 0) return;          // he is still going the other way
+    if (c.y > 0.25 || p.y > 0.25) return;   // nobody leans on a man in the air
+    if ((p.shoveCd || 0) > 0) return;
+    const dx = c.x - p.x, dz = c.z - p.z;
+    const d = Math.hypot(dx, dz);
+    if (d > 1.15 || d < 0.001) return;
+    /* ONCE EVERY THREE QUARTERS OF A SECOND, NOT EVERY FRAME.
+       The first cut applied this continuously, which is a conveyor belt
+       and not a shove: 1.35 m per second of drive, for as long as anybody
+       stood next to you, always directly away from the ring. Measured over
+       forty seconds of bot-against-bot that was ZERO SHOTS TAKEN and
+       three shot-clock violations - the defence had stopped being a
+       nuisance and started being a wall that carried the whole offence
+       backwards out of range. A shove is also a thing you should be able
+       to SEE, which a constant force is not. */
+    p.shoveCd = 0.8;
+    const f = (1.15 - d) / 1.15;
+    const kick = 0.34 * (0.6 + 0.4 * this.#legs(p)) * (0.5 + 0.5 * f);
+    c.x += (dx / d) * kick;
+    c.z += (dz / d) * kick;
+    /* and it costs him ground as well, because contact is two men and not
+       a wall - otherwise the defender is a bulldozer and backing INTO him
+       is free */
+    p.x -= (dx / d) * kick * 0.35;
+    p.z -= (dz / d) * kick * 0.35;
+    c.bumped = 0.3;                         // and he is off balance a moment
+    p.leanT = 0.18;
+    if (c.you && !this.shoveSay) { this.shoveSay = 0.9; this.D.beep(120, 0.05, 'sine', 0.03); }
+  }
+
   #swat(p, c) {
     if (p.cool > 0) return;
     // A MAN IN THE ACT OF SHOOTING CANNOT BE PICKPOCKETED.
@@ -1748,11 +1796,32 @@ export class HalfCourt {
 
     this.#seek(p, tx, tz, onBall ? 1.06 : 0.9);
     p.guard = onBall && this.#dist(p, m) < 3.4;
-    // and go for the ball now and then - not constantly; see #swat, which
-    // will refuse outright if the man has already gone up to shoot
-    if (b.holder === m && p.cool <= 0 && this.#dist(p, m) < 2.9 && Math.random() < dt * 0.42 * p.iq) {
-      this.#swat(p, m);
-    }
+
+    /* ---- THEY DO NOT PICK YOUR POCKET ANY MORE -------------------------
+       Liam, a third time: "when shooting NPC's immediatly take the ball
+       make their defense worse they should just be able to push you so
+       you have to move left and right and juke them out".
+
+       Twice before, the answer was to protect the SHOT - the gather, and
+       then the whole pull. Both of those landed, and measured through the
+       real mouse gesture (tools/pull.mjs) not one shot in twelve was
+       taken off a man who had started to draw it. It still was not the
+       thing he was describing, because the swipe never needed to catch
+       him mid-shot: it caught him three seconds earlier. Measured with
+       tools/guarded.mjs, standing still with it in your hands, they took
+       it off you FIVE TIMES IN TWENTY-FIVE SECONDS - a steal every five
+       seconds - so you never got as far as shooting and the honest report
+       from the seat is "they take the ball when I try to shoot".
+
+       A swipe you cannot see coming and cannot answer is not defence, it
+       is a dice roll on a timer. So the bots do not swipe at all. What
+       they do instead is stand in your way and lean on you, which is a
+       thing you can see, a thing that has a direction, and a thing with
+       an answer: go the other way. #shove and the juke in #move are the
+       two halves of that. The block is still there and so is the man in
+       your shirt; what is gone is the ball leaving your hands because a
+       coin came up heads. */
+    if (b.holder === m && onBall && !this.noShove) this.#shove(p, m, dt);
     // CONTEST IT, AND GO FOR THE BLOCK. A defender who is close enough
     // when a shot goes up jumps at the flight of it rather than at the
     // shooter, which is what turns a contest into a block - and he will
@@ -1817,7 +1886,11 @@ export class HalfCourt {
     // stops a bot walking out of his own jump shot.
     if (p.wind > 0) { p.wantX = 0; p.wantZ = 0; }
     const tired = 0.66 + 0.34 * this.#legs(p);
-    const SPD = 7.4 * p.speed * tired * (p.guard ? 0.72 : 1) * (this.ball.holder === p ? 0.94 : 1);
+    /* a man who has just been sent the wrong way is slow getting back,
+       and that half second is the whole reward for beating him */
+    const beaten = (p.beat || 0) > 0 ? 0.56 : 1;
+    const jolted = (p.bumped || 0) > 0 ? 0.82 : 1;   // a shove puts you off stride
+    const SPD = 7.4 * p.speed * tired * beaten * jolted * (p.guard ? 0.72 : 1) * (this.ball.holder === p ? 0.94 : 1);
     const ax = (p.wantX || 0) * SPD, az = (p.wantZ || 0) * SPD;
     // heavy legs: you accelerate into a run and slide out of one
     const k = p.y > 0 ? 3.0 : 13;
@@ -1848,6 +1921,63 @@ export class HalfCourt {
     }
     if (p.land > 0) p.land -= dt;
     if (p.foulT > 0) p.foulT -= dt;
+    if (p.beat > 0) p.beat -= dt;
+    if (p.jukeT > 0) p.jukeT -= dt;
+    if (p.leanT > 0) p.leanT -= dt;
+    if (p.bumped > 0) p.bumped -= dt;
+    if (p.shoveCd > 0) p.shoveCd -= dt;
+
+    /* ---- THE JUKE -----------------------------------------------------
+       Liam: "you have to move left and right and juke them out".
+
+       This is the answer to #shove, and it is the whole of the new
+       defence read: the man leaning on you has put his weight where you
+       were GOING. Change your mind hard enough and he is a step past it.
+
+       "Hard enough" is measured against a heading that lags a third of a
+       second behind the feet, not against last frame - compare two
+       consecutive frames and a turn is always gradual and no cut ever
+       registers. Against the lagged heading, going back the way you came
+       reads as what it is. */
+    if (this.ball.holder === p && p.y <= 0.05 && this.phase === 'live') {
+      const sp = Math.hypot(p.vx, p.vz);
+      if (sp > 1.7) {
+        const nx = p.vx / sp, nz = p.vz / sp;
+        if (p.runX !== undefined) {
+          /* NORMALISE FOR THE COMPARISON, NOT IN THE STORE. Normalising
+             the smoothed heading after every step undoes the smoothing
+             completely when the run is along one axis: lerp 1 towards -1
+             by a twentieth and you get 0.893, and dividing that by its own
+             length puts it straight back to 1. Measured, runZ sat at
+             exactly 1.00 while the feet went from +7 m/s to -7, and no cut
+             in the game ever registered. */
+          const rl = Math.hypot(p.runX, p.runZ) || 1;
+          const dot = (nx * p.runX + nz * p.runZ) / rl;
+          /* noJuke is for tools/juke.mjs: the only way to show that the cut
+             is what bought the daylight is to run the same cut with it off */
+          if (dot < 0.12 && (p.jukeT || 0) <= 0 && !this.noJuke) {
+            p.jukeT = 0.55;                       // one cut per half second
+            let beat = 0;
+            for (const q of this.players) {
+              if (q.team === p.team || q.y > 0.3) continue;
+              if (this.#dist(p, q) > 2.3) continue;
+              q.beat = Math.max(q.beat || 0, 0.6);
+              beat++;
+            }
+            if (beat && this.tally) this.tally.jukes = (this.tally.jukes || 0) + 1;
+            if (beat) {
+              /* and you GO. Without the burst the cut is a fact in the
+                 numbers and nothing at all in the hands. */
+              p.vx += nx * 2.4; p.vz += nz * 2.4;
+              if (p.you) { this.say('JUKED HIM'); this.#earn(1, 'juke'); }
+              this.D.beep(660, 0.05, 'triangle', 0.045);
+            }
+          }
+          p.runX += (nx - p.runX) * Math.min(1, 3.2 * dt);
+          p.runZ += (nz - p.runZ) * Math.min(1, 3.2 * dt);
+        } else { p.runX = nx; p.runZ = nz; }
+      }
+    } else { p.runX = undefined; }
 
     p.x = clamp(p.x, this.C.x0 + 0.4, this.C.x1 - 0.4);
     p.z = clamp(p.z, this.C.z0 + 0.4, this.C.z1 - 0.4);

@@ -157,8 +157,12 @@ export class Driver {
     this.skill = skill;
     this.name = name;
     this.passOff = 0;             // metres of extra lateral offset to go round somebody
+    this.defOff = 0;              // ...and to cover somebody coming past
     this.stuckFor = 0;
     this.mistake = 0;
+    this.pace = 1;                // how hard he is trying, right now
+    this.covering = 0;            // which side he has moved to, -1/0/+1
+    this.moveT = 0;               // one move is a defence; four is weaving
   }
 
   /** decide this frame's inputs */
@@ -171,6 +175,25 @@ export class Driver {
     // ---- traffic: anyone just ahead and slower? go round them
     let blocked = false, sideWant = 0, follow = Infinity;
     const fwd = [Math.sin(car.yaw), Math.cos(car.yaw)], left = [Math.cos(car.yaw), -Math.sin(car.yaw)];
+    /* ---- WHO IS COMING, AND DOWN WHICH SIDE ------------------------------
+       Liam: "strategic combat with cars that adapt to you speed and style
+       so the play has one option and that is dodging weaving and juking
+       past cars fighting and playing defense".
+
+       Until now these drivers only ever OVERTOOK. Nobody ever looked in a
+       mirror, so a faster car went past on whichever side it fancied,
+       every time, and the whole of racing-through-a-field was pointing at
+       a gap that was always there. Half of racing is the other half. */
+    let threat = null, threatLat = 0, threatGap = 99;
+    for (const o of others) {
+      if (o === this.r || o.out) continue;
+      const dx = o.car.x - car.x, dz = o.car.z - car.z;
+      const back = -(dx * fwd[0] + dz * fwd[1]);
+      const lat = dx * left[0] + dz * left[1];
+      if (back < 0.5 || back > 34 || Math.abs(lat) > 7 || Math.abs(o.y - this.r.y) > 2) continue;
+      if (o.car.speed < car.speed + 0.4) continue;      // not actually catching
+      if (back < threatGap) { threat = o; threatLat = lat; threatGap = back; }
+    }
     for (const o of others) {
       if (o === this.r || o.out) continue;
       const dx = o.car.x - car.x, dz = o.car.z - car.z;
@@ -196,6 +219,42 @@ export class Driver {
     const targetPass = blocked ? sideWant * 3.2 : 0;
     this.passOff += clamp(targetPass - this.passOff, -2.2 * dt, 2.2 * dt);
 
+    /* ---- AND COVERING IT ---------------------------------------------------
+       ONE MOVE. A defending driver may move once to cover a line and then
+       has to hold it - a car that slides across every time you feint is
+       not defending, it is a windscreen wiper, and it makes overtaking
+       either impossible or meaningless depending on how fast it is. So
+       the side is chosen when the attack starts, held while he is there,
+       and only re-chosen once he has gone away and come back.
+
+       HE ALSO LEARNS. style.side is a running average of which side this
+       particular attacker keeps coming down, shared across the grid,
+       because twenty drivers who each have to be taught the same lesson
+       separately is not "they adapt to you", it is twenty goldfish. Go
+       down the inside four times and the fifth one is already there. */
+    this.moveT = Math.max(0, this.moveT - dt);
+    let targetDef = 0;
+    if (threat && threatGap < 26) {
+      if (!this.covering) {
+        const style = threat.style;
+        const learned = style && Math.abs(style.side) > 0.35 ? Math.sign(style.side) : 0;
+        this.covering = Math.abs(threatLat) > 1.0 ? Math.sign(threatLat) : (learned || (line[i].off > 0 ? -1 : 1));
+        this.moveT = 0.9;
+      }
+      // never cover so hard he leaves the road, and never off the racing
+      // line in a corner - defending into a 250 km/h fifth-gear left is
+      // how you arrive in the barrier, not how you keep a place
+      const corner = Math.min(1, Math.abs(tr.points[i].curve) * 340);
+      targetDef = this.covering * 2.7 * (1 - corner * 0.75) * this.skill;
+      // and remember what he did, for the next time and for everybody else
+      if (threat.style && threatGap < 16) {
+        threat.style.side += (Math.sign(threatLat) - threat.style.side) * dt * 0.55;
+      }
+    } else if (!threat) {
+      this.covering = 0;
+    }
+    this.defOff += clamp(targetDef - this.defOff, -1.5 * dt, 1.5 * dt);
+
     // ---- where to aim. Closer on a narrow track: at Monaco a far aim
     // point sits round the NEXT corner and the car cuts into the wall of
     // this one to get to it.
@@ -203,25 +262,36 @@ export class Driver {
     const look = narrow ? clamp(4 + car.speed * 0.26, 6, 30) : clamp(8 + car.speed * 0.36, 9, 40);
     const j = (i + Math.round(look / tr.spacing)) % n;
     const p = tr.points[j], lj = [Math.cos(p.h), -Math.sin(p.h)];
-    const off = clamp(line[j].off + this.passOff, -room, room);
+    const off = clamp(line[j].off + this.passOff + this.defOff, -room, room);
     const ax = p.x + lj[0] * off, az = p.z + lj[1] * off;
     const dx = ax - car.x, dz = az - car.z;
     const aLeft = dx * left[0] + dz * left[1], aFwd = dx * fwd[0] + dz * fwd[1];
     // pure pursuit: the steering angle that puts the car on an arc through the aim point
     const Ld = Math.max(4, Math.hypot(aLeft, aFwd));
     const delta = Math.atan2(2 * car.T.wheelbase * aLeft / (Ld * Ld), 1);
+    /* WHAT ONE UNIT OF STEER IS WORTH, and it is no longer the lock.
+       car.js now takes `steer` as a fraction of the CORNER the car can
+       hold at this speed rather than of the wheel angle, so the pure
+       pursuit angle has to be divided by the same thing the car will
+       multiply it back by - otherwise every robot on the grid is asking
+       for a different amount of steering than it thinks it is, which at
+       Monaco is a wall. */
     const maxLock = car.T.steerMax / (1 + Math.max(0, car.speed - 10) * car.T.steerSpeedDrop / 10);
+    const vRef = Math.max(car.speed, 11);
+    const latCap = car.T.gripRefA + car.T.gripRefB * car.speed * car.speed;
+    const ack = ((latCap * 9.81) / vRef) * (car.T.wheelbase / vRef) * car.T.steerGain;
+    const usable = Math.max(1e-4, Math.min(maxLock, ack));
     // CROSS-TRACK ERROR. Pure pursuit fixes the heading but not a car that
     // is already five metres wide of where it should be; in Monaco's
     // chicanes it drifted seven metres off the line and into the barrier
     // while pointing exactly where it meant to. So: how far off the line
     // it is now, and how fast that is growing.
     const here = tr.points[i], lh = [Math.cos(here.h), -Math.sin(here.h)];
-    const want = clamp(line[i].off + this.passOff, -room, room);
+    const want = clamp(line[i].off + this.passOff + this.defOff, -room, room);
     const eLat = this.r.lat - want;
     const vLat = car.vx * lh[0] + car.vz * lh[1];
     const kc = narrow ? 1.6 : 1;
-    let steer = clamp(delta / maxLock - car.yawRate * 0.04 - (eLat * 0.05 + vLat * 0.025) * kc, -1, 1);
+    let steer = clamp(delta / usable - car.yawRate * 0.04 - (eLat * 0.05 + vLat * 0.025) * kc, -1, 1);
 
     // ---- how fast: the plan a few metres ahead, less a little if passing
     const k = (i + Math.round(Math.max(4, car.speed * 0.25) / tr.spacing)) % n;
@@ -232,7 +302,31 @@ export class Driver {
     // it consistent.
     const aero = (car.dmg.aeroF + car.dmg.aeroR) / 2;
     const gripK = Math.sqrt(clamp(car.gripNow, 0.3, 1.06) * (0.62 + 0.38 * aero));
-    let target = Math.min(speeds[i], speeds[k], follow) * (blocked ? 0.985 : 1) * gripK;
+
+    /* ---- HOW HARD HE IS TRYING ---------------------------------------------
+       Liam: "cars that adapt to you speed and style".
+
+       This file used to open by promising no rubber banding, and it meant
+       it: the field ran at its own pace and a quick player drove away from
+       it in four laps, after which there was nothing left to race. The
+       thing being asked for here is not a faster car when you are winning,
+       it is a RACE - somebody to fight, for the whole of it.
+
+       So it is bounded, and it is honest about what it does. A driver may
+       try between 92% and 100% of what his skill would give him, and that
+       is all: he is never given grip, or power, or a shorter track, and he
+       can never go faster than the plan says the car can. A long way
+       ahead of you and he settles; a long way behind and he stops
+       settling. Nobody is dragged up the road on a piece of elastic. */
+    const you = others.find((o) => o.isPlayer && !o.out);
+    if (you && you !== this.r) {
+      const ahead = this.r.progress - you.progress;           // + is in front
+      const want = ahead > 0 ? clamp(1 - ahead / 900, 0.92, 1) : clamp(1 + (-ahead) / 1400, 1, 1.0);
+      this.pace += clamp(want - this.pace, -0.14 * dt, 0.14 * dt);
+    } else if (this.pace !== 1) {
+      this.pace += clamp(1 - this.pace, -0.2 * dt, 0.2 * dt);
+    }
+    let target = Math.min(speeds[i], speeds[k], follow) * (blocked ? 0.985 : 1) * gripK * this.pace;
     if (this.r.offTrack) target = Math.min(target, 30);
     const err = target - car.speed;
     let throttle = clamp(err * 0.45 + 0.2, 0, 1);

@@ -181,8 +181,26 @@ export class Damage {
   }
 
   /** a wheel off, or the nose completely gone: the car is finished */
+  /**
+   * OVER, AS OPPOSED TO BADLY HURT.
+   *
+   * Liam: "their is no way to actually get car fixed". A wheel off was
+   * INSTANT retirement, and retirement in race.js is `if (r.out) continue`
+   * at the top of the loop - which skips the player's whole branch,
+   * including the pit stop. So the first serious contact ended the
+   * afternoon with the pit road right there and a crew standing in it,
+   * and nothing you could do reached them. The stop was never broken.
+   * You were simply not in the race any more and it had not said so
+   * loudly enough to be obvious.
+   *
+   * A wheel off is now what it is on television: a car dragging itself
+   * round to the pit road at forty miles an hour with the crew waiting,
+   * and mend() puts four new ones on. What ends a day is the car being
+   * genuinely destroyed, and that threshold has come up with it, because
+   * the old one was picked when a wheel off was doing the retiring.
+   */
   get terminal() {
-    return this.tyre.some((t) => t === 'off') || this.severity > 0.72;
+    return this.severity > 0.88;
   }
 
   /**

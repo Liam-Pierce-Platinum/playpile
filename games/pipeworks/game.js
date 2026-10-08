@@ -407,7 +407,7 @@ const home = new Home(D, {
   board,
   buttons: [{ label: 'OPEN THE VALVE', sub: 'the rising water is the clock',
               fn: () => { started = true; stage = 0; score = 0; reset(false); } }],
-  hint: 'CLICK a pipe to turn it · SPACE releases the water early for a bonus',
+  hint: 'CLICK a pipe to turn it · water flows once it joins · time left is the bonus',
 });
 
 stage = 0; score = 0; started = false; msg = ''; msgT = 0;

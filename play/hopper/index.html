@@ -51,7 +51,10 @@
 
   <main id="main">
     <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/category/arcade/">Arcade</a><i>&rsaquo;</i><b>HOPPER</b></nav>
-    <div id="ad-play-leader"></div>
+    <!-- NO ADVERT ABOVE THE GAME (removed 2026-10-07). It sat 16px over the
+         stage and its Play button - AdSense's "ads interfering" policy bars
+         ads beside action items where they draw accidental clicks, and a
+         click near the top edge of a running game could land on it. -->
 
     <div class="play">
       <div>
@@ -130,7 +133,7 @@
 <h3>Does it save my distance and coins?</h3>
 <p>Yes, on this device. The home screen keeps a top-ten table of distances with three initials each. Your lifetime coin total and your outfit are remembered too.</p>
 <h3>Can I play it on a phone?</h3>
-<p>Yes for jumping: tap to hop, and keep your finger down for a higher jump. The dive needs a keyboard, though &ndash; the down arrow, <kbd>S</kbd> or <kbd>Shift</kbd>.</p>
+<p>Yes for jumping: tap to hop, and keep your finger down for a higher jump. Swipe down to dive; on a keyboard it is the down arrow, <kbd>S</kbd> or <kbd>Shift</kbd>.</p>
 <h3>Which keys jump?</h3>
 <p><kbd>Space</kbd>, <kbd>Enter</kbd> or a click starts a jump. Holding <kbd>Space</kbd>, the mouse button, the up arrow or <kbd>W</kbd> keeps it rising.</p>
 <h3>Can I pause?</h3>
@@ -309,7 +312,6 @@ document.getElementById('alsorows').innerHTML =
 
 // ---- adverts: every slot that existed before, in the same place -----
 await loadAds();
-slot(document.getElementById('ad-play-leader'), 'play_leader');
 slot(document.getElementById('ad-play-rail'), 'play_rail');
 slot(document.getElementById('ad-play-tall'), 'play_tall');
 slot(document.getElementById('ad-play-footer'), 'play_footer');

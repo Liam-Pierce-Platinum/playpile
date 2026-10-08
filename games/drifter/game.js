@@ -27,11 +27,44 @@ const D = new Deck({ key: 'drifter', w: 720, h: 540, bg: '#05070c' });
 const SHOT_COST = 6, THRUST_COST = 12;   // per second, for thrust
 
 let ship, rocks, shots, bits, stars, score, wave, lives, over, started, inv;
+let hyperHeld = false;   // SHIFT is a press, not a hold - see hyperspace below
+
+// ---- TOUCH ----------------------------------------------------------
+//
+// Turning was keys only, so on a phone the ship pointed one way for
+// ever. Every finger counts, so one thumb can turn while the other
+// thrusts: the LEFT and RIGHT THIRDS turn, the MIDDLE of the lower half
+// thrusts, and a quick TAP anywhere fires. Only a quick tap - the cabinet
+// counts every touch as a press, and a finger put down to turn should not
+// spend 6 fuel on a shot nobody asked for.
+let touchMode = false, fingers = [], touchShots = 0;
+const downAt = new Map();
+const readFingers = (e) => {
+  const r = D.cv.getBoundingClientRect();
+  fingers = [...e.touches].map((t) => ({ x: (t.clientX - r.left) / r.width * D.W,
+                                         y: (t.clientY - r.top) / r.height * D.H }));
+};
+D.cv.addEventListener('touchstart', (e) => {
+  touchMode = true; readFingers(e);
+  for (const t of e.changedTouches) downAt.set(t.identifier, performance.now());
+});
+D.cv.addEventListener('touchmove', readFingers);
+addEventListener('touchend', (e) => {
+  readFingers(e);
+  for (const t of e.changedTouches) {
+    if (performance.now() - (downAt.get(t.identifier) || 0) < 220) touchShots++;
+    downAt.delete(t.identifier);
+  }
+});
+addEventListener('touchcancel', (e) => { readFingers(e); downAt.clear(); });
+addEventListener('mousedown', () => { touchMode = false; });
+addEventListener('keydown', () => { touchMode = false; });
+const finger = (f) => fingers.some(f);
 
 function reset(full) {
   if (full) { score = 0; wave = 1; lives = 3; }
   ship = { x: D.W / 2, y: D.H / 2, vx: 0, vy: 0, a: -Math.PI / 2, fuel: 100 };
-  rocks = []; shots = []; bits = []; over = false; inv = 2.2;
+  rocks = []; shots = []; bits = []; over = false; inv = 2.2; touchShots = 0;
   stars = Array.from({ length: 90 }, () => ({ x: rnd(D.W), y: rnd(D.H), b: rnd(0.15, 0.7) }));
   spawnWave();
 }
@@ -80,9 +113,12 @@ function step(dt, g) {
   }
 
   // ---- ship ---------------------------------------------------------
-  if (D.held('a', 'A', 'ArrowLeft')) ship.a -= 3.4 * dt;
-  if (D.held('d', 'D', 'ArrowRight')) ship.a += 3.4 * dt;
-  const wantThrust = D.held('w', 'W', 'ArrowUp') || (D.mouse.down && D.mouse.y > D.H * 0.5);
+  const third = D.W / 3;
+  if (D.held('a', 'A', 'ArrowLeft') || finger((f) => f.x < third)) ship.a -= 3.4 * dt;
+  if (D.held('d', 'D', 'ArrowRight') || finger((f) => f.x > third * 2)) ship.a += 3.4 * dt;
+  const wantThrust = D.held('w', 'W', 'ArrowUp') || (touchMode
+    ? finger((f) => f.x >= third && f.x <= third * 2 && f.y > D.H * 0.5)
+    : D.mouse.down && D.mouse.y > D.H * 0.5);
   ship.thrusting = wantThrust && ship.fuel > 1;
   if (ship.thrusting) {
     ship.vx += Math.cos(ship.a) * 250 * dt;
@@ -99,13 +135,20 @@ function step(dt, g) {
   ship.x += ship.vx * dt; ship.y += ship.vy * dt; wrap(ship);
   if (inv > 0) inv -= dt;
 
-  if (D.tapped() && ship.fuel >= SHOT_COST) {
+  let fire = D.tapped();
+  if (touchMode) { fire = touchShots; }   // the press was the touchstart; the shot is the tap
+  touchShots = 0;
+  if (fire && ship.fuel >= SHOT_COST) {
     ship.fuel -= SHOT_COST;
     shots.push({ x: ship.x + Math.cos(ship.a) * 13, y: ship.y + Math.sin(ship.a) * 13,
                  vx: ship.vx + Math.cos(ship.a) * 430, vy: ship.vy + Math.sin(ship.a) * 430, life: 1.15 });
     D.beep(880, 0.05, 'square', 0.04, -500);
   }
-  if (D.held('Shift') && ship.fuel > 30) {   // hyperspace, at a price
+  // ONCE PER PRESS. Tested as held, it fired again every frame the tank
+  // was over 30, and a full tank was gone in three frames.
+  const shift = D.held('Shift');
+  const hyper = shift && !hyperHeld; hyperHeld = shift;
+  if (hyper && ship.fuel > 30) {   // hyperspace, at a price
     ship.fuel -= 30; ship.x = rnd(D.W); ship.y = rnd(D.H); ship.vx = ship.vy = 0;
     inv = 0.8; D.noise(0.2, 0.05, 900);
   }
@@ -203,7 +246,9 @@ const home = new Home(D, {
           'sit still and it fills faster - and sitting still is not safe'],
   board,
   buttons: [{ label: 'FLY', sub: 'three ships, waves until they get you', fn: () => { started = true; reset(true); } }],
-  hint: 'A D turn · W thrust · SPACE fire · SHIFT hyperspace · P pause',
+  hint: matchMedia('(pointer: coarse)').matches
+    ? 'HOLD a side to turn · HOLD bottom middle to thrust · TAP to fire'
+    : 'A D turn · W thrust · SPACE fire · SHIFT hyperspace · P pause',
 });
 
 reset(true); started = false;

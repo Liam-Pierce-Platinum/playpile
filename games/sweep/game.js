@@ -11,7 +11,7 @@
 // alone always gets you home, and the clock is short enough that being
 // certain costs more than it is worth.
 //
-//       SMALL 7x7    TINY 9x9     LARGE 12x10   HUGE 16x12
+//       TINY 7x7     SMALL 9x9    LARGE 12x10   HUGE 16x12
 //       EASY 11%     NORMAL 16%   HARD 21%      BRUTAL 26%
 //
 // Everything else about the run is unchanged and is why this is not just
@@ -34,9 +34,13 @@ import { Home } from '../_deck/home.js';
 
 const D = new Deck({ key: 'sweep', w: 560, h: 660, bg: '#151a21' });
 
+// THE NAMES WERE THE WRONG WAY ROUND - 'TINY' was the 9x9 and bigger than
+// 'SMALL'. Only the labels moved. 'key' is what each size's leaderboard
+// is stored under, and it stays the old name, so the times already set on
+// a 7x7 stay on the 7x7 board instead of turning up on the 9x9 one.
 const SIZES = [
-  { name: 'SMALL', cols: 7, rows: 7 },
-  { name: 'TINY',  cols: 9, rows: 9 },
+  { name: 'TINY',  key: 'SMALL', cols: 7, rows: 7 },
+  { name: 'SMALL', key: 'TINY',  cols: 9, rows: 9 },
   { name: 'LARGE', cols: 12, rows: 10 },
   { name: 'HUGE',  cols: 16, rows: 12 },
 ];
@@ -153,7 +157,7 @@ function check() {
 }
 
 /** one leaderboard per size-and-difficulty, so the times are comparable */
-const timeBoard = () => new Board('sweep.' + SIZES[sizeI].name + '.' + LEVELS[levelI].name,
+const timeBoard = () => new Board('sweep.' + (SIZES[sizeI].key || SIZES[sizeI].name) + '.' + LEVELS[levelI].name,
   { lower: true, unit: 'TIME', format: (v) => v.toFixed(1) + 's' });
 
 // ---------------------------------------------------------------------
@@ -169,8 +173,12 @@ function step(dt, g) {
   }
   if (D.shot) { draw(g); return; }
 
-  time -= dt;
-  if (!first) elapsed += dt;        // the clock on THIS board, from the first click
+  // BOTH CLOCKS START AT THE FIRST CLICK. The countdown used to start
+  // when the board appeared and the leaderboard time at the first click,
+  // so the two disagreed. The first click is the fairer start: it is
+  // always safe and there is nothing to read before it, so seconds spent
+  // before it are not seconds spent sweeping.
+  if (!first) { time -= dt; elapsed += dt; }   // the clock on THIS board
   if (recordT > 0) recordT -= dt;
   if (time <= 0) { over = true; D.record(score); D.noise(0.6, 0.09, 180); }
   for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {

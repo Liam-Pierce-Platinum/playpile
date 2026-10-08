@@ -132,6 +132,18 @@ function addRoof() {
   if (roofs.length > 30) roofs.shift();
 }
 
+// DIVE ON A PHONE: SWIPE DOWN. A tap is already the jump, so the dive is
+// a finger dragged downward, and it holds until you land - a flick is
+// over before the next frame, and a dive that let go with the finger
+// would be no dive at all. Measured in the game's pixels, not the phone's.
+let swipeY = null, touchDive = false;
+const gameY = (t) => { const r = D.cv.getBoundingClientRect(); return (t.clientY - r.top) / r.height * D.H; };
+D.cv.addEventListener('touchstart', (e) => { swipeY = gameY(e.touches[0]); });
+D.cv.addEventListener('touchmove', (e) => {
+  if (swipeY !== null && e.touches[0] && gameY(e.touches[0]) - swipeY > 30) { touchDive = true; swipeY = null; }
+});
+addEventListener('touchend', () => { swipeY = null; });
+
 function step(dt, g) {
   if (!started) { draw(); blit(); home.step(dt); return; }
   if (over) {
@@ -146,11 +158,12 @@ function step(dt, g) {
   speed = 250 + Math.min(320, dist * 0.24);
   dist += speed * dt / 12;
 
-  const pressing = D.mouse.down || D.held(' ', 'Space', 'ArrowUp', 'w', 'KeyW');
+  if (p.onGround) touchDive = false;
+  const pressing = (D.mouse.down && !touchDive) || D.held(' ', 'Space', 'ArrowUp', 'w', 'KeyW');
   if (D.tapped() && p.onGround) { p.vy = JUMP; p.onGround = false; held = 0;
                                   D.beep(430, 0.08, 'square', 0.045, 240); }
   if (!p.onGround && pressing && held < MAXHOLD && p.vy < 0) { p.vy += HOLD * dt; held += dt; }
-  p.dive = D.held('ArrowDown', 's', 'KeyS', 'Shift') && !p.onGround;
+  p.dive = (D.held('ArrowDown', 's', 'KeyS', 'Shift') || touchDive) && !p.onGround;
   p.vy += (p.dive ? G * 2.6 : G) * dt;
   p.y += p.vy * dt * SCROLL * 3.4;
 
@@ -399,7 +412,9 @@ const home = new Home(D, {
           'coins over the gaps unlock what you can wear'],
   board,
   buttons: [{ label: 'RUN', sub: 'the city does not stop', fn: () => { started = true; reset(); } }],
-  hint: 'SPACE or CLICK to jump · DOWN to dive · P pause',
+  hint: matchMedia('(pointer: coarse)').matches
+    ? 'TAP to jump, hold for higher · SWIPE DOWN to dive'
+    : 'SPACE or CLICK to jump · DOWN to dive · P pause',
   panel: {
     draw: (Dd, x, y, w) => {
       Dd.text('YOUR RUNNER', x, y + 12, 10, '#5a6577');

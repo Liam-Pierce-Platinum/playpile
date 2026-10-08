@@ -915,7 +915,7 @@ function drawTrail() {
 
 // ---------------------------------------------------------------------
 function reset() {
-  scoreL = 0; scoreR = 0; over = false; skill = 0; rally = 0; bestRally = 0;
+  scoreL = 0; scoreR = 0; over = false; skill = 0; rally = 0; bestRally = 0; tJump = false;
   you = { x: -5, y: FLOOR, vy: 0, air: false, squash: 0 };
   cpu = { x: 5, y: FLOOR, vy: 0, air: false, squash: 0, wait: 0, target: 5 };
   serve(1);
@@ -946,7 +946,7 @@ function step(dt) {
   // ---- the left slime ------------------------------------------------
   drive(you, dt, {
     left: D.held('a', 'A', 'KeyA'), right: D.held('d', 'D', 'KeyD'),
-    jump: D.held('w', 'W', 'KeyW'),
+    jump: D.held('w', 'W', 'KeyW') || touchJump(),
   }, -10.2, NET_X - R - 0.1);
 
   // ---- the right slime: a person, or the machine ----------------------
@@ -1012,7 +1012,7 @@ function step(dt) {
       else { scoreL++; if (!twoPlayer) skill += 1;
              msg = twoPlayer ? 'LEFT SCORES' : 'YOUR POINT'; }
       if (rally > bestRally) bestRally = rally;
-      D.record(rally);
+      if (!twoPlayer) D.record(rally);   // same rule as the board: one player only
       msgT = 1.3;
       D.noise(0.2, 0.05, 500);
       if (scoreL >= 11 || scoreR >= 11) over = true;
@@ -1024,6 +1024,25 @@ function step(dt) {
   place();
   drawHud();
 }
+
+// JUMP ON A PHONE. The finger already steers - the slime chases wherever
+// it is held - so a jump is a SECOND finger going down while the first
+// steers, or a quick TAP on its own. Asked for and spent once, like a press.
+let tJump = false;
+const tDown = new Map();
+D.cv.addEventListener('touchstart', (e) => {
+  // a tap that SERVES is a serve, not a jump as well
+  const t0 = ball && ball.live ? performance.now() : -1e9;
+  for (const t of e.changedTouches) tDown.set(t.identifier, t0);
+  if (e.touches.length > 1) tJump = true;
+});
+addEventListener('touchend', (e) => {
+  for (const t of e.changedTouches) {
+    if (performance.now() - (tDown.get(t.identifier) || 0) < 200 && !e.touches.length) tJump = true;
+    tDown.delete(t.identifier);
+  }
+});
+const touchJump = () => { const j = tJump; tJump = false; return j; };
 
 /** one slime, driven by a set of buttons */
 function drive(s, dt, btn, lo, hi) {
@@ -1150,7 +1169,9 @@ const home = new Home(D, {
     { label: 'ONE PLAYER', sub: 'against the computer', fn: () => { twoPlayer = false; menu = false; started = true; reset(); } },
     { label: 'TWO PLAYER', sub: 'A D W against the arrow keys', fn: () => { twoPlayer = true; menu = false; started = true; reset(); } },
   ],
-  hint: 'A D move · W jump    ← → move · ↑ jump · first to eleven',
+  hint: matchMedia('(pointer: coarse)').matches
+    ? 'HOLD to steer · TAP, or a second finger, to jump · first to eleven'
+    : 'A D move · W jump    ← → move · ↑ jump · first to eleven',
   wash: 'rgba(10,18,26,.72)',
 });
 

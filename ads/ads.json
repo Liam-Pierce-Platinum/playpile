@@ -14,7 +14,6 @@
       "home_row1": "1775985163",
       "home_row2": "1775985163",
       "home_rail": "1775985163",
-      "play_leader": "1775985163",
       "play_rail": "1775985163",
       "play_tall": "1775985163",
       "play_footer": "1775985163",
@@ -22,12 +21,13 @@
     }
   },
   "interstitial": {
-    "enabled": true,
+    "enabled": false,
     "_note": "The panel shown while a game loads. It is the most valuable slot on a games site and the least annoying place to put one, because the player is already waiting.",
     "_adsense": "Left empty on purpose: a normal AdSense display unit inside a panel that covers the page breaks their placement policy. It keeps showing a house ad. Loading-screen ads need AdSense for Games (H5 Games Ads), which is a separate application.",
     "seconds": 5,
     "minGapMinutes": 3,
-    "_minGap": "Never show it twice inside this many minutes, however many games are opened."
+    "_minGap": "Never show it twice inside this many minutes, however many games are opened.",
+    "_off": "Switched off 2026-10-07: a countdown panel before the content is a prestitial, which the Better Ads Standards (part of AdSense policy) ban on the same page as Google ads. Do not turn back on; loading-screen ads need AdSense for Games."
   },
   "houseAds": {
     "_note": "Shown in every slot that has no network id yet, instead of a dashed placeholder. They promote your own games, which is worth more than an empty box - and on a LIVE site a dashed box labelled advert reads as broken. Set false to go back to placeholders.",

@@ -633,3 +633,12 @@ body > main.wrap > .hero p{margin:0;color:var(--dim);max-width:62ch}
 .updates h2{font-size:17px;line-height:1.35}
 .updates li{margin:0 0 8px;color:var(--dim);line-height:1.6}
 .updates a{color:var(--accent)}
+
+/* AdSense policy: a visitor must be able to tell an advert from the site.
+   Google allows exactly two labels, "Advertisements" or "Sponsored Links".
+   Only a slot holding a live Google unit gets it - not an unfilled one, and
+   not a house card for one of our own games. Drawn in the slot's top margin
+   so it never changes the slot's size. */
+.ad{position:relative}
+.ad:has(> ins.adsbygoogle):not(.ad-unfilled)::before{content:'Advertisements';position:absolute;
+  top:-15px;left:0;font:10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#5d7189}

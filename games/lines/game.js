@@ -26,8 +26,8 @@
 //   A GHOST. The outline showing where it will land. It removes counting
 //   without removing decisions.
 //
-// Scoring is the standard one: more for more lines at once, doubled for a
-// back-to-back four, and a combo for clearing on consecutive pieces.
+// Scoring is the standard one: more for more lines at once, half again for
+// a back-to-back four, and a combo for clearing on consecutive pieces.
 import { Deck, clamp } from '../_deck/deck.js';
 import { Board } from '../_deck/board.js';
 import { Home } from '../_deck/home.js';
@@ -175,7 +175,7 @@ function settle() {
     lines += n;
     combo++;
     const base = [0, 100, 300, 500, 800][n] * level;
-    // a four, or a four straight after a four, is worth half again
+    // a four straight after a four is worth half again
     const isBig = n === 4;
     const bonus = isBig && b2b ? base * 0.5 : 0;
     score += base + bonus + Math.max(0, combo) * 50 * level;
@@ -217,6 +217,39 @@ addEventListener('keyup', (e) => {
   const k = e.key;
   if ((k === 'ArrowLeft' || k === 'a' || k === 'A') && repeat.dir === -1) repeat.dir = 0;
   if ((k === 'ArrowRight' || k === 'd' || k === 'D') && repeat.dir === 1) repeat.dir = 0;
+});
+
+// TOUCH, the way every phone version of this game does it: TAP spins,
+// DRAG sideways moves a column for every cell of drag, a slow drag down
+// soft-drops, a quick FLICK DOWN hard-drops and a flick up holds. The
+// drag is measured in the game's own pixels, so it is the same distance
+// on the board whatever size the phone draws it.
+let tch = null;
+const tpos = (t) => {
+  const r = D.cv.getBoundingClientRect();
+  return { x: (t.clientX - r.left) / r.width * D.W, y: (t.clientY - r.top) / r.height * D.H };
+};
+D.cv.addEventListener('touchstart', (e) => {
+  if (!started || over || e.touches.length > 1) { tch = null; return; }
+  const p = tpos(e.touches[0]);
+  tch = { x0: p.x, y0: p.y, x: p.x, y: p.y, t: performance.now(), moved: false };
+});
+D.cv.addEventListener('touchmove', (e) => {
+  if (!tch || !e.touches[0]) return;
+  const p = tpos(e.touches[0]), step = CELL * 0.8;
+  while (p.x - tch.x >= step) { move(1); tch.x += step; tch.moved = true; }
+  while (tch.x - p.x >= step) { move(-1); tch.x -= step; tch.moved = true; }
+  while (p.y - tch.y >= CELL) { softDrop(); tch.y += CELL; tch.moved = true; }
+  if (tch.y - p.y >= CELL) tch.moved = true;
+});
+addEventListener('touchend', (e) => {
+  if (!tch) return;
+  const p = tpos(e.changedTouches[0]), ms = performance.now() - tch.t;
+  const dx = p.x - tch.x0, dy = p.y - tch.y0;
+  if (ms < 260 && Math.abs(dy) > CELL * 2 && Math.abs(dy) > Math.abs(dx) * 2) {
+    if (dy > 0) hardDrop(); else swapHold();
+  } else if (!tch.moved && Math.hypot(dx, dy) < 14 && ms < 350) rotate(1);
+  tch = null;
 });
 
 // ---- drawing ---------------------------------------------------------
@@ -344,6 +377,7 @@ function step(dt, g) {
       }
       if (D.held('ArrowDown', 's', 'S')) softDrop();
     }
+    D.tapped();      // a touch in play is a move, not a press waiting for the card
   }
 
   draw(g);
@@ -360,11 +394,13 @@ const home = new Home(D, {
   title: 'LINES',
   lines: ['a landed piece still has half a second to be slid or spun',
           'the next piece comes out of a shuffled bag of all seven',
-          'four at once is worth double if you did it last time too'],
+          'four at once is worth half again if you did it last time too'],
   board,
   buttons: [{ label: 'PLAY', sub: 'arrows to move · up to spin · space to drop',
               fn: () => { reset(); started = true; } }],
-  hint: '← → move · ↑ / X spin · Z spin back · ↓ soft · SPACE drop · SHIFT hold',
+  hint: matchMedia('(pointer: coarse)').matches
+    ? 'TAP spin · DRAG move · FLICK down drop · FLICK up hold'
+    : '← → move · ↑ / X spin · Z spin back · ↓ soft · SPACE drop · SHIFT hold',
 });
 
 reset(); started = false;

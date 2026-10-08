@@ -93,7 +93,7 @@ export const UPGRADES = [
   },
   {
     id: 'slug', name: 'SLUG LOADS', max: 1,
-    blurb: 'One ball, not seven.\nHits like a truck.\nNo forgiveness.',
+    blurb: 'Two balls, not seven.\nHits like a truck.\nNo forgiveness.',
     /* the cap has to come up with the damage or the upgrade is a lie:
        seven pellets and two both ran into the same 62 and the slug was
        strictly the worse shell at every range. */

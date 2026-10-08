@@ -1394,7 +1394,7 @@ function menuStep(step) {
 const MODES = [
   ['free', 'FREE DRIVE', 'The circuit to yourself. Learn it, no clock that matters.'],
   ['attack', 'TIME ATTACK', 'Flying laps against your best, which races you as a ghost. Track limits count.'],
-  ['race', 'RACE', 'Five red lights and up to fifteen other drivers on the same car.'],
+  ['race', 'RACE', 'Five red lights and up to twenty-three other drivers on the same car.'],
   ['league', 'LEAGUE', 'A season, race by race: qualify, score points, and carry the table to the next round.'],
 ];
 for (const [id, t, d] of MODES) {
@@ -1481,7 +1481,7 @@ function buildLeague() {
     box.innerHTML = '<div class="opts">' + rows.map(([label, k, vals]) =>
       '<label>' + label + '</label><div class="seg" data-season="' + k + '">' + vals.map((v) =>
         '<button data-v="' + v + '"' + (menuState.season[k] === v ? ' class="sel"' : '') + '>' + String(v).toUpperCase() + '</button>').join('') + '</div>').join('') + '</div>'
-      + '<p class="note">Eight teams, sixteen cars, the same faces every round. Points are 25-18-15-12-10-8-6-4-2-1, and one for the fastest lap inside the top ten.</p>';
+      + '<p class="note">Twelve teams, twenty-four drivers, the same faces every round, and a sixteen-car grid set by qualifying. Points are 25-18-15-12-10-8-6-4-2-1, and one for the fastest lap inside the top ten.</p>';
     for (const seg of box.querySelectorAll('[data-season]')) {
       for (const b of seg.querySelectorAll('button')) {
         b.onclick = () => {

@@ -160,10 +160,8 @@ class Game {
     document.getElementById('prep').hidden = false;
     this.state = 'prep';
     this.loadout = this.loadout || {};
-    // Deliberately not enough. The whole kit is 625; this buys about three
+    // Deliberately not enough. The whole kit is 515; this buys about three
     // of it, and which three is the most interesting decision in the game.
-    // Deliberately not enough. The whole kit is 625; this buys about three of
-    // it, and which three is the most interesting decision in the game.
     if (this.save.funds === undefined) this.save.funds = 165;
     // saves made before the budget came down keep an amount that trivialises
     // the choice, so bring those in line once
@@ -534,6 +532,13 @@ class Game {
         H.houseJustRaided = false;
         this.hud.toast('YOUR PLACE HAS BEEN RAIDED', 'bad');
       }
+      // no burner: a fix on your own phone sends them to where you are now
+      if (H.phonePing) {
+        this.police.lastSeen.x = H.phonePing.x; this.police.lastSeen.y = H.phonePing.y;
+        this.police.searchT = Math.max(this.police.searchT, 25);
+        H.phonePing = null;
+        this.hud.toast('THEY PINGED YOUR PHONE', 'bad');
+      }
       this.police.updateCordons(dt, H.cordon, here.x, here.y);
       if (this.police.newCordon) {
         this.hud.banner('CHECKPOINT — ' + this.police.newCordon, '#ffcf4a');
@@ -671,7 +676,7 @@ class Game {
 
     if (!attract) {
       const t = this.mode === 'drive' ? null
-        : this.ped.target(buildings, this.mode === 'inside' ? [] : this.nearbyCars());
+        : this.footTarget(buildings);
       this.hud.update({
         car: this.mode === 'drive' ? this.myCar : { kph: this.ped.kph, gear: 1, spec: { topSpeed: 22 } },
         hp: this.combat.hp / this.combat.maxHp,
@@ -820,8 +825,24 @@ class Game {
     }
   }
 
+  // What F does on foot. At the car you got out of, with a spare set of
+  // plates and a vehicle description out on you, it swaps them first.
+  footTarget(buildings) {
+    const H = this.hunt;
+    const t = this.ped.target(buildings, this.mode === 'inside' ? [] : this.nearbyCars(), H.kit);
+    if (t && t.kind === 'car' && t.car === this.abandoned && H.kit.plates
+        && !H.plateSwapped && H.known.vehicle) {
+      return { kind: 'plates', car: t.car, label: 'SWAP THE PLATES' };
+    }
+    return t;
+  }
+
   nearbyCars() {
     const out = [];
+    // the one you got out of - it was never in reach, so it could not be
+    // driven again (or have its plates changed)
+    const a = this.abandoned;
+    if (a && !a.dead && Math.hypot(a.x - this.ped.x, a.y - this.ped.y) < 6) out.push(a);
     // parked first - it is the one you actually want, and it is not moving
     for (const c of this.traffic.parked)
       if (Math.hypot(c.x - this.ped.x, c.y - this.ped.y) < 6) out.push(c);
@@ -1003,6 +1024,17 @@ class Game {
           this.hud.banner('DESCRIPTION DROPPED', '#3ad6a0');
           this.hud.toast('THEY ARE LOOKING FOR THE WRONG CLOTHES', 'good');
         }
+      } else if (done.kind === 'plates') {
+        if (this.hunt.swapPlates()) {
+          // done in front of a unit, they just watch the new plate go on
+          if (this.witnessedAt(done.car)) {
+            this.hunt.known.vehicle = 1;
+            this.hud.banner('THEY WATCHED YOU DO IT', '#ff2d6f');
+          } else {
+            this.hud.banner('NEW PLATES', '#3ad6a0');
+            this.hud.toast('THEY ARE LOOKING FOR A PLATE THAT IS GONE', 'good');
+          }
+        }
       }
     }
     if (this.mode === 'inside') this.mode = this.ped.inside ? 'inside' : 'foot';
@@ -1015,8 +1047,7 @@ class Game {
     if (attract) return;
     if (!this.input.hit('use')) return;
 
-    const t = this.ped.target(buildings, this.mode === 'inside' ? [] : this.nearbyCars(),
-                              this.hunt.kit);
+    const t = this.footTarget(buildings);
     if (!t) return;
     if (t.kind === 'enter') {
       this.ped.enter(t.b);
@@ -1048,6 +1079,9 @@ class Game {
     } else if (t.kind === 'change') {
       this.ped.begin({ kind: 'change' }, 3.2);
       this.hud.banner('CHANGING', '#ffcf4a');
+    } else if (t.kind === 'plates') {
+      this.ped.begin({ kind: 'plates', car: t.car }, 4.0);
+      this.hud.banner('SWAPPING PLATES', '#ffcf4a');
     }
   }
 
@@ -1055,7 +1089,11 @@ class Game {
   // which is the answer to "they wrecked my car", and the reason a run does not
   // end when the car does.
   takeCar(c) {
-    if (c.copCar) {
+    const own = c === this.abandoned;
+    if (own) {
+      this.abandoned = null;
+      this.hud.banner('BACK IN THE CAR', '#3ad6a0');
+    } else if (c.copCar) {
       const i = this.police.cars.indexOf(c);
       if (i >= 0) this.police.cars.splice(i, 1);
       this.police.addHeat(1.2);
@@ -1072,8 +1110,7 @@ class Game {
     c.civilian = false;
     c.gentle = false;
     c.isPlayer = true;
-    c.basePower = c.spec.power;
-    c.baseTop = c.spec.topSpeed;
+    if (!own) { c.basePower = c.spec.power; c.baseTop = c.spec.topSpeed; }
     // A new car is a new description. This is the cheapest thing you can do
     // to make them wrong about you, and it costs nothing but the risk of
     // standing in the street to do it.
@@ -1083,7 +1120,7 @@ class Game {
     if (this.witnessedAt(c)) {
       this.hud.banner('THEY WATCHED YOU GET IN', '#ff2d6f');
       H.known.vehicle = 1;
-    } else {
+    } else if (!own) {
       if (H.known.vehicle) this.hud.banner('THEY ARE LOOKING FOR THE WRONG CAR', '#3ad6a0');
       H.swapCar();
     }

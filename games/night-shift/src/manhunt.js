@@ -60,6 +60,8 @@ export class Manhunt {
     this.identified = false;
     this.wearingMask = !!this.kit.mask;
     this.plateSwapped = false;
+    this.quietT = 0;                      // how long since anyone saw you
+    this.phoneT = 0; this.phonePing = null;
 
     // ---- the scene ----
     this.scene = null;                    // where it happened
@@ -122,9 +124,13 @@ export class Manhunt {
 
   // Shedding lines. Each of these is a thing you DO, and each needs something
   // you had the sense to bring.
-  swapCar() { this.known.vehicle = 0; this.plateSwapped = false; }
+  // (plateSwapped is not reset here - it was, which made one set of plates
+  // reusable on every car you took)
+  swapCar() { this.known.vehicle = 0; }
   swapPlates() {
     if (!this.kit.plates || this.plateSwapped) return false;
+    // the plate the witnesses gave them is gone, so the scene cannot hand it back
+    if (this.pending) this.pending.vehicle = 0;
     this.plateSwapped = true; this.known.vehicle = 0; return true;
   }
   changeClothes() {
@@ -215,7 +221,24 @@ export class Manhunt {
     const push = seen ? 0.055 + this.descriptionStrength * 0.05 : -0.004;
     const cool = hidden ? -(0.0055 + (resting ? 0.0065 : 0)) : 0;
     this.wanted = clamp01(this.wanted + (push + cool) * dt * (seen ? 1 : 1));
-    if (this.identified) this.wanted = Math.max(this.wanted, 0.18);
+    // A name keeps a floor under the response - but a floor that never moved
+    // sat above the 0.06 needed to get clear, so an identified run could not
+    // be won. It now erodes over five minutes of nobody seeing you, and one
+    // sighting puts it straight back. Roughly 200 s unseen before it is low
+    // enough to start getting clear, against none for a description.
+    this.quietT = seen ? 0 : (this.quietT || 0) + dt;
+    if (this.identified) {
+      this.wanted = Math.max(this.wanted, 0.18 * Math.max(0, 1 - this.quietT / 300));
+    }
+
+    // ---- your own phone ----
+    // Once they have your name they have your number, and your phone tells
+    // them where you are every couple of minutes until you are clear. A
+    // burner is the one thing that leaves them nothing to ping.
+    if (this.identified && !this.kit.burner && !this.won) {
+      this.phoneT = (this.phoneT || 0) + dt;
+      if (this.phoneT >= 150) { this.phoneT = 0; this.phonePing = { x: px, y: py }; }
+    }
 
     // ---- the cordon ----
     // They shut the bridges first, then the arteries. It follows the wanted
@@ -254,7 +277,6 @@ export class Manhunt {
       this.won = true;
       this.winReason = this.identified ? 'YOU WERE NEVER FOUND' : 'THEY LOST YOU';
     }
-    void px; void py;
   }
 
   // How far the description has actually travelled. Build alone circulates

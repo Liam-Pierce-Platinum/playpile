@@ -221,7 +221,7 @@ const CODE = { KeyW: 'w', KeyA: 'a', KeyS: 's', KeyD: 'd', Space: 'space',
 addEventListener('keydown', (e) => {
   const k = CODE[e.code];
   if (k) { keys[k] = true; e.preventDefault(); }
-  if (/^Digit[1-8]$/.test(e.code)) keys.slot = +e.code.slice(5);
+  if (/^Digit[1-9]$/.test(e.code)) keys.slot = +e.code.slice(5);
 });
 addEventListener('keyup', (e) => { const k = CODE[e.code]; if (k) keys[k] = false; });
 addEventListener('mousemove', (e) => {

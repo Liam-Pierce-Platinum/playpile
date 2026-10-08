@@ -112,7 +112,7 @@ const GUNS = [
   { id: 'snub',   name: 'SNUB .38',   cost: 120, dmg: 0.80, draw: 0.72, spread: 1.5,
     note: 'clears the leather fast, wanders' },
   { id: 'buffalo',name: 'BUFFALO',    cost: 260, dmg: 1.55, draw: 1.35, spread: 0.5,
-    note: 'slow out, and it only takes one' },
+    note: 'slow out, but it hits like a mule' },
   { id: 'silver', name: 'SILVER PAIR',cost: 420, dmg: 1.15, draw: 0.88, spread: 0.7,
     note: 'no weaknesses, and it shows' },
 ];

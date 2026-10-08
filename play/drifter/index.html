@@ -51,7 +51,10 @@
 
   <main id="main">
     <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/category/arcade/">Arcade</a><i>&rsaquo;</i><b>DRIFTER</b></nav>
-    <div id="ad-play-leader"></div>
+    <!-- NO ADVERT ABOVE THE GAME (removed 2026-10-07). It sat 16px over the
+         stage and its Play button - AdSense's "ads interfering" policy bars
+         ads beside action items where they draw accidental clicks, and a
+         click near the top edge of a running game could land on it. -->
 
     <div class="play">
       <div>
@@ -124,7 +127,7 @@
 <h3>Does it save my score?</h3>
 <p>Yes, on this device. The home screen keeps a top-ten table, and a run that qualifies asks for three initials.</p>
 <h3>Can I play it on a phone?</h3>
-<p>Only partly. A tap fires, and holding a finger on the lower half of the screen thrusts, but turning needs <kbd>A</kbd> and <kbd>D</kbd> or the arrow keys. It is best on a keyboard.</p>
+<p>Yes. Hold a finger on the left or right third of the screen to turn, hold the middle of the lower half to thrust, and tap to fire. Two fingers let you turn and thrust at once. It is still quickest on a keyboard.</p>
 <h3>What are all the controls?</h3>
 <p><kbd>A</kbd> <kbd>D</kbd> or the left and right arrows turn. <kbd>W</kbd> or the up arrow thrusts. <kbd>Space</kbd> or a click fires. <kbd>Shift</kbd> is hyperspace. <kbd>P</kbd> pauses, <kbd>R</kbd> abandons the run, and <kbd>F</kbd> toggles full screen.</p>
 <h3>How does it get harder?</h3>
@@ -303,7 +306,6 @@ document.getElementById('alsorows').innerHTML =
 
 // ---- adverts: every slot that existed before, in the same place -----
 await loadAds();
-slot(document.getElementById('ad-play-leader'), 'play_leader');
 slot(document.getElementById('ad-play-rail'), 'play_rail');
 slot(document.getElementById('ad-play-tall'), 'play_tall');
 slot(document.getElementById('ad-play-footer'), 'play_footer');

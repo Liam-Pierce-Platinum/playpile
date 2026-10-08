@@ -84,7 +84,24 @@ export function initCanvas(target) {
   addEventListener('resize', resize);
   return ctx;
 }
+// INSIDE THE SITE'S PLAYER the page around the game is hidden (see the
+// .embed rules in index.html) and the screen fills the frame, by height
+// as well as width - it was sized to the width alone, so in a 700x400
+// frame it came out 960 wide and ran off the bottom with the text.
+const EMBED = window.self !== window.top;
+if (EMBED) document.documentElement.classList.add('embed');
+
 export function resize() {
+  if (EMBED) {
+    const fit = Math.min(innerWidth / W, innerHeight / H);
+    SCALE = Math.max(1, Math.ceil(fit));
+    out.width = W * SCALE; out.height = H * SCALE;
+    out.style.width = Math.floor(W * fit) + 'px';
+    out.style.height = Math.floor(H * fit) + 'px';
+    octx = out.getContext('2d');
+    octx.imageSmoothingEnabled = false;
+    return;
+  }
   const avail = Math.min(innerWidth - 40, 1440);
   SCALE = Math.max(1, Math.floor(avail / W));
   out.width = W * SCALE; out.height = H * SCALE;

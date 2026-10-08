@@ -747,17 +747,24 @@ function drawDuel(g, myPtr, foePtr) {
   if (flashT > 0) { g.fillStyle = 'rgba(255,255,255,' + flashT * 2.2 + ')'; g.fillRect(0, 0, D.W, D.H); }
 
   // ---- the words -----------------------------------------------------
+  // Cream with a dark drop under it. They were dark brown at 60-80% on
+  // the sunset, which is the one colour that sky does not contrast with:
+  // the first instruction of the game was the hardest thing on it to read.
+  const say = (t, y, size, a = 1) => {
+    D.text(t, D.W / 2 + 2, y + 2, size, 'rgba(30,12,8,' + 0.55 * a + ')', 'center');
+    D.text(t, D.W / 2, y, size, 'rgba(255,242,220,' + a + ')', 'center');
+  };
   if (phase === 'settle') {
-    D.text(me.noGun ? 'HAND ON YOUR HIP  -  YOU HAVE NO GUN'
+    say(me.noGun ? 'HAND ON YOUR HIP  -  YOU HAVE NO GUN'
                     : 'PUT YOUR HAND ON THE HOLSTER',
-           D.W / 2, 92, 22, 'rgba(40,20,14,.8)', 'center');
-    D.text(volley > 1 ? 'volley ' + volley + ' - it goes on until one of you is down'
+           92, 22);
+    say(volley > 1 ? 'volley ' + volley + ' - it goes on until one of you is down'
                       : 'the wait starts when it is there',
-           D.W / 2, 118, 12, 'rgba(40,20,14,.6)', 'center');
+           118, 12, 0.85);
   }
   if (phase === 'ready') {
-    D.text('WAIT', D.W / 2, 92, 34, 'rgba(40,20,14,.75)', 'center');
-    D.text('keep the pointer on your holster', D.W / 2, 118, 12, 'rgba(40,20,14,.6)', 'center');
+    say('WAIT', 92, 34);
+    say('keep the pointer on your holster', 118, 12, 0.85);
   }
   if (phase === 'draw') D.text('DRAW', D.W / 2, 96, 52, '#fff6e0', 'center');
   if (phase === 'lull' && msgT <= 0) {

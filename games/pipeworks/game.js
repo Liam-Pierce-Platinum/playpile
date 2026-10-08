@@ -198,7 +198,12 @@ function connected() {
   }
   return out;
 }
-const solved = () => connected().has(grid.end.y * cols + grid.end.x)
+// BOTH ENDS HAVE TO FACE THEIR VALVE. connected() floods out from the
+// inlet cell whichever way it points, so before 2026-10-07 a first pipe
+// turned away from the inlet still counted, and the water ran out of a
+// pipe that was not joined to anything.
+const solved = () => (grid[grid.start.y][grid.start.x].bits & W)
+  && connected().has(grid.end.y * cols + grid.end.x)
   && (grid[grid.end.y][grid.end.x].bits & E);
 
 function step(dt, g) {
@@ -421,5 +426,8 @@ if (D.shot) {
   }
   water = 12;
 }
+
+// for the test tools
+window.__pipes = () => ({ grid, cols, rows, cell, ox, oy, stage, score });
 
 D.run(step);

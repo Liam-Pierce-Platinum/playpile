@@ -163,9 +163,10 @@ function seeded(s) {
 // is crisp, but it is also anti-aliased and proportional, and one line of
 // smooth grey text sitting on top of chunky pixels is the single loudest
 // tell that the art is a filter rather than the real thing. The HUD is
-// the only text drawn inside the pixel buffer; the home screen and the
-// GAME OVER card are the cabinet's own furniture, shared with 23 other
-// games, and are deliberately left alone.
+// the only text drawn inside the pixel buffer. Since 2026-10-07 the home
+// screen, the board, the GAME OVER card and the pause card are drawn in it
+// too (game.js, "THE FRONT OF THE CABINET") - Liam wanted the whole game
+// in pixel art, not a pixel game behind the shared smooth menu.
 //
 // 0 and O are the same glyph. At three pixels wide they always are.
 const GLYPH = {
@@ -184,6 +185,9 @@ const GLYPH = {
   9: '111101111001111',
   ' ': '000000000000000', '-': '000000111000000', '.': '000000000000010',
   '·': '000000010000000',                // the middot the hints use
+  ',': '000000000010100', ':': '000010000010000', '!': '010010010000010',
+  '?': '111001011000010', "'": '010010000000000', '/': '001001010100100',
+  '+': '000010111010000', '_': '000000000000111', '>': '100010001010100',
 };
 export const FONT_H = 5, FONT_ADV = 4;        // glyph 3 wide + 1 of air
 

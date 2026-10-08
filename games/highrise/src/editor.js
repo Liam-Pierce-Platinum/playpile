@@ -56,6 +56,9 @@ const HELP = [
   ['F6', 'back to the game'],
 ];
 
+const EDIT_HERE = ['localhost', '127.0.0.1'].includes(location.hostname)
+  || new URLSearchParams(location.search).has('edit');
+
 export class Editor {
   constructor(scene, game, loadFloor) {
     this.scene = scene;
@@ -309,7 +312,9 @@ export class Editor {
 
   bind() {
     addEventListener('keydown', (e) => {
-      if (e.code === 'F6') { e.preventDefault(); this.toggle(); return; }
+      // F6 only where the editor can save - this machine. On the published
+      // site it opened the editor for any player who hit F6 (2026-10-07).
+      if (e.code === 'F6' && EDIT_HERE) { e.preventDefault(); this.toggle(); return; }
       if (!this.on) return;
       this.keys[e.code] = true;
       this.command(e);

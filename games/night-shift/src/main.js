@@ -498,6 +498,7 @@ class Game {
       close: near,
       cornered: !!(this.siegeInfo && this.siegeInfo.onYourFloor),
       carSwapped: this.mode === 'drive' && this.myCar !== this.crimeCar,
+      quiet: !attract && !!this.job && !this.job.done,
     });
     this.loudT = Math.max(0, (this.loudT || 0) - dt);
     this.police.checkWrecks(this.traffic.cars);
@@ -858,7 +859,13 @@ class Game {
     if (!this.job || this.job.done) return null;
     const d = Math.hypot(here.x - this.job.x, here.y - this.job.y);
     if (d < 7) return 'HOLD STILL — TAKING THE MONEY';
-    return 'THE JOB — ' + Math.round(d) + ' m';
+    // WHICH WAY, not just how far (2026-10-07). The ring is only drawn at
+    // the job itself, so once it was off the screen '58 m' was all you had
+    // - and the first thing a new player did was drive the wrong way. The
+    // camera is north-up and screen y runs down, so this is a compass.
+    const a = Math.atan2(this.job.y - here.y, this.job.x - here.x);
+    const arrow = '→↘↓↙←↖↑↗'[((Math.round(a / (Math.PI / 4)) % 8) + 8) % 8];
+    return 'THE JOB ' + arrow + ' ' + Math.round(d) + ' m';
   }
 
   drivePrompt(buildings) {
@@ -1228,7 +1235,7 @@ class Game {
       hurt: this.combat.hurtT,
       gunLen: (this.combat.gun && this.combat.gun.len) || 0.5,
       floor: this.mode === 'inside' ? this.ped.floor : 0,
-      job: this.job, hunt: this.hunt,
+      job: this.job, hunt: this.hunt, here,
     });
     void here;
   }

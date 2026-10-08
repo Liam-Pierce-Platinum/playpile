@@ -10,6 +10,8 @@ canvas#screen { image-rendering: pixelated; image-rendering: crisp-edges;
   justify-content: center; background: rgba(23,19,28,.88); backdrop-filter: blur(2px); z-index: 5;
   padding: 14px; overflow: auto; }
 .overlay.hidden { display: none; }
+/* a menu taller than the window scrolls from its top, not its middle */
+.overlay { align-items: safe center; }
 
 .plate { background: #2a2131; border: 3px solid #6b4f3a; box-shadow: 0 0 0 3px #1b1520, 0 12px 0 rgba(0,0,0,.35);
   padding: 20px 24px; max-width: 940px; width: 100%; }

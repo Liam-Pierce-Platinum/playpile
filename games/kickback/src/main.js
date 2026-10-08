@@ -264,10 +264,15 @@ function drawHUD(g) {
   /* where you are, and what is between you and the roof */
   g.font = '8px ui-monospace, monospace';
   g.textAlign = 'left';
+  // On a dark backing, because the top-left corner is where the stairs
+  // are drawn on every floor and pale text over pale steel could not be
+  // read. 'N HERE' became 'N ON THIS FLOOR': nobody knew what HERE meant.
+  const left = enemies.filter((e) => e.alive && Math.abs(e.homeY - player.y) < L.storey * 0.9).length;
+  g.fillStyle = 'rgba(10,12,20,.62)';
+  g.fillRect(4, 3, left ? 82 : 52, left ? 23 : 13);
   g.fillStyle = P.bone;
   g.fillText('FLOOR ' + (player.floor + 1) + '/' + L.floors, 8, 12);
-  const left = enemies.filter((e) => e.alive && Math.abs(e.homeY - player.y) < L.storey * 0.9).length;
-  if (left) { g.fillStyle = P.red; g.fillText(left + ' HERE', 8, 22); }
+  if (left) { g.fillStyle = P.red; g.fillText(left + ' ON THIS FLOOR', 8, 22); }
   /* what you are carrying */
   {
     let yy = 12;

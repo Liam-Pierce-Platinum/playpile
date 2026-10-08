@@ -52,6 +52,21 @@ export class Home {
     // class, so this is the one place that knows the answer.
     window.__home = this;
 
+    // SPACE OR ENTER PRESSES THE FIRST BUTTON. Every one of these games
+    // says 'SPACE' in its controls, and on the home screen it did nothing
+    // - you had to find the mouse. Only while the home screen is actually
+    // up (step() ran in the last few frames), and the tap the cabinet
+    // counted for the same key is drained, or the game would read it as
+    // its first move: STACK dropped a slab the instant it started.
+    this.seen = -1e9;
+    addEventListener('keydown', (e) => {
+      if (this.mode !== 'home' || e.repeat) return;
+      if (e.key !== 'Enter' && e.code !== 'Space') return;
+      if (performance.now() - this.seen > 150) return;
+      const b = (this.o.buttons || []).find((q) => q.fn);
+      if (b) { b.fn(); this.D.tapped(); }
+    });
+
     // typing, for the initials
     addEventListener('keydown', (e) => {
       if (this.mode !== 'entry') return;
@@ -93,6 +108,7 @@ export class Home {
   /** call every frame while the game is not being played */
   step(dt) {
     const D = this.D, g = D.g, o = this.o;
+    this.seen = performance.now();
     this.flash = Math.max(0, this.flash - dt);
     this.hot = [];
 

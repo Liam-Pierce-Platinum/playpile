@@ -34,26 +34,80 @@ const BASE_W = 6.2;
 const PERFECT = 0.12;
 const GROUND_Y = -3.4;
 
-let blocks, cur, debris, score, combo, over, started, camY, shake;
+let overAt = 0;
+let blocks, cur, debris, score, combo, over, started, camY, shake, perfectT = 0;
 const root = new THREE.Group();
 D.scene.add(root);
 
 // ---- the world that is not the tower --------------------------------
 // A ground plane and a far wall, so the shadow has somewhere to land and
 // the tower is standing in a place rather than floating in a void.
-{
-  const ground = new THREE.Mesh(new THREE.BoxGeometry(80, 1.2, 40), mat('#161f2c'));
-  ground.position.set(0, GROUND_Y - 0.6, 0);
-  ground.receiveShadow = true;
-  D.scene.add(ground);
-  const back = new THREE.Mesh(new THREE.PlaneGeometry(120, 200), mat('#0e141e'));
-  back.position.set(0, 40, -18);
-  back.receiveShadow = true;
-  D.scene.add(back);
+//
+// 2026-10-07: the far wall is gone. It was a near-black plane that filled
+// the top half of the screen, so the game read as a dark box with a grey
+// strip in it. The background is now a SKY, painted into a small canvas
+// and redrawn as the tower climbs: afternoon at the bottom, sunset by
+// thirty, night and stars by sixty - so how high you are is something you
+// can see without reading the number.
+// deep enough that the camera never sees under it - at 1.2 thick the sky
+// showed through below the ground as a pale band along the bottom
+const ground = new THREE.Mesh(new THREE.BoxGeometry(80, 40, 40), mat('#3a4a6b'));
+ground.position.set(0, GROUND_Y - 20, 0);
+ground.receiveShadow = true;
+D.scene.add(ground);
+// the plinth the first slab sits on, a step wider than it
+const plinth = new THREE.Mesh(new THREE.BoxGeometry(BASE_W + 1.4, 0.5, BD + 1.4), mat('#3b4766'));
+plinth.position.set(0, GROUND_Y - 0.25 + 0.001, 0);
+plinth.receiveShadow = true; plinth.castShadow = true;
+D.scene.add(plinth);
+
+const SKY = [                                   // [height in slabs, top, bottom]
+  [0,  [ 92, 168, 232], [196, 226, 247]],      // afternoon
+  [25, [ 84, 104, 196], [244, 168, 128]],      // sunset
+  [45, [ 40,  42, 104], [176,  98, 140]],      // dusk
+  [65, [  8,  12,  38], [ 34,  40,  88]],      // night
+];
+const skyC = document.createElement('canvas'); skyC.width = 4; skyC.height = 256;
+const skyG = skyC.getContext('2d');
+const skyT = new THREE.CanvasTexture(skyC);
+skyT.colorSpace = THREE.SRGBColorSpace;
+D.scene.background = skyT;
+const STARS = Array.from({ length: 70 }, () => [Math.random(), Math.random() * 0.75, Math.random()]);
+let skyAt = -1;
+function sky(h) {
+  h = Math.round(h * 4) / 4;
+  if (h === skyAt) return;
+  skyAt = h;
+  let i = 0;
+  while (i < SKY.length - 2 && h > SKY[i + 1][0]) i++;
+  const [h0, t0, b0] = SKY[i], [h1, t1, b1] = SKY[i + 1];
+  const k = clamp((h - h0) / (h1 - h0), 0, 1);
+  const mix = (a, b) => 'rgb(' + a.map((v, j) => Math.round(v + (b[j] - v) * k)).join(',') + ')';
+  const gr = skyG.createLinearGradient(0, 0, 0, 256);
+  gr.addColorStop(0, mix(t0, t1)); gr.addColorStop(1, mix(b0, b1));
+  skyG.fillStyle = gr; skyG.fillRect(0, 0, 4, 256);
+  skyT.needsUpdate = true;
+}
+sky(0);
+// The stars are drawn on the HUD rather than into the 4px-wide sky, and
+// fade in over the dusk.
+function stars() {
+  const a = clamp((skyAt - 40) / 25, 0, 1);
+  if (a <= 0) return;
+  const g = D.g;
+  for (const [x, y, tw] of STARS) {
+    g.fillStyle = 'rgba(255,255,255,' + (a * (0.35 + 0.5 * Math.abs(Math.sin(D.t * 1.3 + tw * 9)))).toFixed(2) + ')';
+    g.fillRect(Math.round(x * D.W), Math.round(y * D.H), tw > 0.8 ? 2 : 1, tw > 0.8 ? 2 : 1);
+  }
 }
 
-const hue = (i) => (202 + i * 7) % 360;
-const colOf = (i, dark = 0) => new THREE.Color().setHSL(hue(i) / 360, 0.42, 0.52 - dark);
+// Each slab steps 11 degrees round the wheel from a random start, so a
+// tower is a rainbow you build yourself and no two runs are the same
+// colour. It used to start at slate blue and step 7 degrees at 42%
+// saturation, which made every tower grey.
+let hue0 = 0;
+const hue = (i) => (hue0 + i * 11) % 360;
+const colOf = (i, dark = 0) => new THREE.Color().setHSL(hue(i) / 360, 0.68, 0.56 - dark);
 
 function slabMesh(w, i) {
   // Six materials: top lit, front bright, sides darker. That split is
@@ -72,8 +126,12 @@ function slabMesh(w, i) {
 function reset() {
   for (const b of blocks || []) root.remove(b.mesh);
   for (const d of debris || []) root.remove(d.mesh);
+  // and the slab that was sliding when the last run ended (or the one
+  // spawned behind the home screen), which was left standing on the ground
+  if (cur) root.remove(cur.mesh);
   blocks = []; debris = [];
-  score = 0; combo = 0; over = false; camY = 0; shake = 0;
+  score = 0; combo = 0; over = false; camY = 0; shake = 0; perfectT = 0;
+  hue0 = Math.floor(Math.random() * 360);
   const m = slabMesh(BASE_W, 0);
   m.position.set(0, GROUND_Y + BH / 2, 0);
   root.add(m);
@@ -113,6 +171,7 @@ function drop() {
     cur.x = top.x;
     cur.w = Math.min(BASE_W, cur.w + gain);
     D.beep(520 + combo * 60, 0.09, 'triangle', 0.06, 260);
+    perfectT = 1;
   } else {
     combo = 0;
     const cutW = cur.w - overlap;
@@ -133,8 +192,19 @@ function drop() {
   blocks.push({ x: cur.x, w: cur.w, y: cur.y, mesh: m });
   score++;
 
+  if (perfectT === 1) ring(cur.x, cur.y, cur.w);
   if (cur.w < 0.22) { over = true; D.record(score); D.noise(0.4, 0.08, 240); cur = null; return; }
   spawn();
+}
+
+/** a white outline that swells off a perfect slab and fades */
+const rings = [];
+function ring(x, y, w) {
+  const geo = new THREE.EdgesGeometry(new THREE.BoxGeometry(w, BH, BD));
+  const m = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true }));
+  m.position.set(x, y, 0);
+  root.add(m);
+  rings.push({ m, t: 0 });
 }
 
 /** the piece that was cut off, as a real solid that tumbles away */
@@ -147,6 +217,9 @@ function fall(x, y, w, i, push) {
 
 function step(dt) {
   if (!started) {
+    // the same view the run starts from, so the menu sits over the plinth
+    // and the sky rather than over wherever the camera was left
+    D.lookAt(0, D.viewH * 0.12);
     home.step(dt);
     return;
   }
@@ -157,8 +230,10 @@ function step(dt) {
     if (cur.x < -limit) { cur.x = -limit; cur.dir = 1; }
     if (cur.x > limit) { cur.x = limit; cur.dir = -1; }
     cur.mesh.position.x = cur.x;
-    if (D.tapped()) drop();
-  } else if (D.tapped()) {
+    if (D.tapped()) { drop(); if (over) overAt = D.t; }
+  } else if (D.t - overAt > 0.6 && D.tapped()) {
+    // not the press that lost it: a player hammering the button would
+    // skip the DROPPED card before ever seeing the score
     home.finish(score);
     started = false; return;
   }
@@ -174,6 +249,14 @@ function step(dt) {
     if (debris[i].mesh.position.y < GROUND_Y - 14) { root.remove(debris[i].mesh); debris.splice(i, 1); }
   }
 
+  for (let i = rings.length - 1; i >= 0; i--) {
+    const q = rings[i]; q.t += dt * 2.2;
+    q.m.scale.set(1 + q.t * 0.5, 1 + q.t * 1.6, 1 + q.t * 0.3);
+    q.m.material.opacity = Math.max(0, 1 - q.t);
+    if (q.t >= 1) { root.remove(q.m); q.m.geometry.dispose(); rings.splice(i, 1); }
+  }
+  perfectT = Math.max(0, perfectT - dt * 1.4);
+
   // THE CAMERA CLIMBS WITH THE TOWER, smoothly, and only once the top of
   // it is past the middle of the screen. Following every slab makes the
   // whole world jump on every drop.
@@ -183,11 +266,24 @@ function step(dt) {
   shake *= 0.86;
   D.lookAt(rnd(-shake, shake), camY + rnd(-shake, shake) + D.viewH * 0.12);
 
-  D.hud('SCORE ' + score, 'BEST ' + D.best + (combo >= 2 ? '   x' + combo : ''));
-  if (over) D.card('DROPPED', [score + ' slabs', 'best ' + D.best], 'click to go again');
+  sky(blocks.length - 1);
+  stars();
+  // THE NUMBER IS THE GAME, so it is the biggest thing on the screen, in
+  // the sky over the tower - not 12px in the corner of a HUD bar.
+  if (!over) {
+    D.text(String(score), D.W / 2 + 2, 112, 64, 'rgba(0,0,0,.25)', 'center');
+    D.text(String(score), D.W / 2, 110, 64, '#ffffff', 'center');
+    D.text('BEST ' + D.best, D.W / 2, 136, 12, 'rgba(255,255,255,.75)', 'center');
+    if (perfectT > 0) {
+      const a = Math.min(1, perfectT * 2).toFixed(2);
+      D.text(combo >= 3 ? 'PERFECT x' + combo + '  - WIDER!' : 'PERFECT' + (combo >= 2 ? ' x' + combo : ''),
+             D.W / 2, 168 - (1 - perfectT) * 14, 16, 'rgba(255,233,168,' + a + ')', 'center');
+    }
+  }
+  if (over) D.card('DROPPED', [score + (score === 1 ? ' slab' : ' slabs'), 'best ' + D.best], 'click to go again');
 }
 
-const board = new Board('stack', { unit: 'SLABS', format: (v) => v + ' slabs' });
+const board = new Board('stack', { unit: 'SLABS', format: (v) => v + (v === 1 ? ' slab' : ' slabs') });
 const home = new Home(D, {
   title: 'STACK',
   lines: ['drop each slab on the one below',
@@ -218,5 +314,8 @@ if (D.shot) {
   fall(blocks[blocks.length - 1].x + 2.2, blocks[blocks.length - 1].y - 1, 0.9, 7, 1.2);
   camY = Math.max(0, blocks[blocks.length - 1].y - (GROUND_Y + D.viewH * 0.34));
 }
+
+// for the test tools: where the moving slab is, and the one under it
+window.__stack = { get cur() { return cur; }, get top() { return blocks[blocks.length - 1]; } };
 
 D.run(step);

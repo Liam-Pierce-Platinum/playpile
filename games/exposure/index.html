@@ -38,6 +38,10 @@ canvas{display:block;image-rendering:pixelated;cursor:crosshair;background:#0507
 .note i{font-style:normal;color:var(--warm)}
 .note em{font-style:normal;color:var(--cold)}
 .note strong{color:var(--text);font-weight:700}
+/* inside the site's player: the game and nothing else (see fit() in game.js) */
+.embed body{padding:0;gap:0;overflow:hidden;height:100vh}
+.embed header,.embed .keys,.embed .note{display:none}
+.embed .frame{padding:0;border:0;box-shadow:none;background:none}
 </style>
 </head>
 <body>

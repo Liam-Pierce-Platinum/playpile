@@ -21,6 +21,7 @@ import { text } from './font.js';
 import { getArena, THEMES } from './arena.js';
 import { P } from './palette.js';
 import { CHOICES, randomLook, defaultLook, cleanLook } from './looks.js';
+import './fit.js';           // every menu shrinks to fit a small window (PLAYPILE's player)
 
 const $ = (s) => document.querySelector(s);
 const STEP = 1 / 60;

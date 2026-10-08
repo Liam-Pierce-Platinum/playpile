@@ -563,3 +563,21 @@ kbd.pad-b { background: #2f7a3a; border-color: #6ad07a; color: #eaffee; }
 .brief-rows .bkeys { display: flex; gap: 4px; flex: 0 0 132px; }
 .brief-rows .btext { font-size: 9px; color: var(--dim); line-height: 1.6; }
 .brief-rows .btext b { color: var(--bone); font-size: 10px; letter-spacing: 1px; }
+
+/* ---------- short windows (2026-10-07) ----------
+   PLAYPILE's player can be 700 x 400. Under 880 wide the screens stack
+   the logo ABOVE the panel, and in a frame that short the hero panel
+   started below the bottom edge - ENTER THE VALLEY could not be seen.
+   A short window keeps them side by side with a smaller logo, and the
+   panel scales down instead of scrolling. */
+@media (max-height: 560px) {
+  .screen { flex-direction: row; gap: 18px; }
+  #title { padding: 0 2.5vw; }
+  .title-art { text-align: left; }
+  #title-logo canvas { max-width: 36vw; height: auto; }
+  #title-sub canvas { max-width: 36vw; height: auto; }
+  .title-panel { zoom: .78; max-height: 120vh; }
+}
+@media (max-height: 420px) {
+  .title-panel { zoom: .66; max-height: 140vh; }
+}

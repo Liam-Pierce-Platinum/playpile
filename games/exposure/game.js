@@ -739,7 +739,24 @@ function frame(now) {
   draw();
 }
 
+/* INSIDE THE SITE'S PLAYER (an iframe) the page around the game goes:
+   PLAYPILE's page already has the title, the keys and the whole guide
+   underneath, and with them in here too the game was a 480x320 stamp in
+   a frame of text. The screen fills the frame instead. Whole-number
+   scaling when that fills most of it; otherwise the exact fit, because
+   a game this dark needs every pixel it can get. */
+const EMBED = window.self !== window.top;
+if (EMBED) document.documentElement.classList.add('embed');
+
 function fit() {
+  if (EMBED) {
+    const fitK = Math.min(window.innerWidth / W, window.innerHeight / H);
+    const whole = Math.floor(fitK);
+    const k = whole >= 1 && whole >= fitK * 0.85 ? whole : fitK;
+    cv.style.width = Math.floor(W * k) + 'px';
+    cv.style.height = Math.floor(H * k) + 'px';
+    return;
+  }
   /* Measure the VIEWPORT, not the frame around the canvas - the frame
      shrink-wraps the canvas, so measuring it pins the scale at 1x for
      ever and the game renders postage-stamp sized. */

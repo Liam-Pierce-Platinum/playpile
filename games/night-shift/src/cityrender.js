@@ -262,6 +262,21 @@ export class CityRenderer {
       ctx.strokeStyle = 'rgba(255,45,111,' + (0.5 + 0.4 * pulse) + ')';
       ctx.lineWidth = 0.45;
       ctx.beginPath(); ctx.arc(j.x, j.y, 6.5, 0, 7); ctx.stroke();
+      // A CHEVRON BY YOU, POINTING AT IT, while it is too far to see -
+      // the ring alone was invisible from anywhere off the screen.
+      const h = scene.here;
+      if (h) {
+        const dx = j.x - h.x, dy = j.y - h.y, d = Math.hypot(dx, dy);
+        if (d > 22) {
+          const ux = dx / d, uy = dy / d, cx = h.x + ux * 9, cy = h.y + uy * 9;
+          ctx.save();
+          ctx.translate(cx, cy); ctx.rotate(Math.atan2(uy, ux));
+          ctx.fillStyle = 'rgba(255,45,111,' + (0.55 + 0.35 * pulse) + ')';
+          ctx.beginPath(); ctx.moveTo(1.8, 0); ctx.lineTo(-1.2, 1.4); ctx.lineTo(-0.5, 0); ctx.lineTo(-1.2, -1.4);
+          ctx.closePath(); ctx.fill();
+          ctx.restore();
+        }
+      }
       if (j.progress > 0) {
         ctx.strokeStyle = '#ffcf4a';
         ctx.lineWidth = 0.9;

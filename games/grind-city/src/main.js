@@ -20,6 +20,7 @@ import { drawTargets, drawCompHud } from './ui/comphud.js';
 import { buildSheets, startSheets, stopSheets, setSheetLook } from './ui/tricksheet.js';
 import { installTouch, isTouch } from './ui/touch.js';
 import * as portal from './crazygames.js';
+import './ui/fit.js';             // every menu shrinks to fit a small window (PLAYPILE's player)
 
 const canvas = document.getElementById('screen');
 const v = createView(canvas);

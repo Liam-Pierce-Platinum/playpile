@@ -27,8 +27,7 @@
 // animation you cannot cancel, so it is a game about timing rather than
 // steering.
 import { Deck, clamp, rnd, pick } from '../_deck/deck.js';
-import { Board } from '../_deck/board.js';
-import { Home } from '../_deck/home.js';
+import { Board, playerName, setPlayerName } from '../_deck/board.js';
 import * as A from './art.js';
 
 const CELL = 44;
@@ -73,6 +72,7 @@ const HOP = 0.12;                      // seconds per hop
 const LEAD = 8;                         // the player is never more than VIEW-LEAD rows up
 const MARGIN = 70;                     // how far off screen traffic lives
 
+let newBest = false;
 let rows, player, camRow, maxRow, score, over, started, dead, msg, msgT, moved;
 
 // Row r is drawn with row `camRow` sitting on the bottom edge.
@@ -217,6 +217,8 @@ let touch = null;
 addEventListener('touchstart', (e) => { const t = e.touches[0]; touch = { x: t.clientX, y: t.clientY }; });
 addEventListener('touchend', (e) => {
   if (!touch) return;
+  // the tap on PLAY is not also the first hop
+  if (D.t - startedAt < 0.35) { touch = null; return; }
   const t = e.changedTouches[0];
   const dx = t.clientX - touch.x, dy = t.clientY - touch.y;
   if (Math.hypot(dx, dy) < 20) { hop(0, 1); touch = null; return; }
@@ -240,9 +242,10 @@ function reset() {
 // and the run is the unit here - the whole point is how far you got.
 function die(why) {
   if (player.dead) return;
+  if (D.shot) return;        // the photographer's frog cannot be run over mid-shutter
   player.dead = true; over = true; dead = D.t; msg = why;
   D.noise(0.35, 0.09, 220);
-  D.record(score);
+  newBest = D.record(score) && score > 0;
 }
 
 /** turtles dive on a cycle, and a diving one will not hold you */
@@ -417,10 +420,13 @@ function draw(g) {
   A.text(bc, 'BEST', BW - 8 - A.textW(String(D.best), 2) - A.textW('BEST'), 6, P.uiDim, 1);
 
   if (msgT > 0 && !over) A.text(bc, msg, BW / 2, BH / 2, P.ui2, 2, 'center');
-  if (!moved && !over) {
+  if (started && !moved && !over) {
     A.text(bc, 'UP TO GO', BW / 2, BH - 28, P.ui4, 1, 'center');
     A.text(bc, 'THE BOTTOM OF THE SCREEN IS RISING', BW / 2, BH - 18, P.uiDim, 1, 'center');
   }
+
+  if (!started) front();
+  else if (over) overCard();
 
   // ---- and up onto the cabinet ---------------------------------------
   // Set every frame rather than once: the cabinet does not own this flag
@@ -434,7 +440,7 @@ function draw(g) {
 // the loop
 // ---------------------------------------------------------------------
 function step(dt, g) {
-  if (!started) { draw(g); home.step(dt); return; }
+  if (!started) { draw(g); return; }
   if (msgT > 0) msgT -= dt;
 
   if (!over) {
@@ -518,23 +524,197 @@ function step(dt, g) {
 
   draw(g);
 
-  if (over) {
-    D.card('GAME OVER', [msg, score + ' rows'], 'click or SPACE for the board');
-    if (D.t - dead > 0.7 && D.tapped()) { home.finish(score, { rows: score }); started = false; }
-  }
+  // A press during the run is not a press on the card that follows it:
+  // drained every frame, so only one made after the card is up counts.
+  if (!over) D.tapped();
+  else if (D.t - dead > 0.7 && D.tapped()) toBoard();
 }
 
 const board = new Board('crossing', { unit: 'ROWS' });
-const home = new Home(D, {
-  title: 'CROSSING',
-  lines: ['it never ends - the score is how far you got',
-          'the bottom of the screen is rising, so you cannot wait',
-          'on the road touching anything kills you · on the river, nothing does'],
-  board,
-  buttons: [{ label: 'PLAY', sub: 'arrows to hop · keep going up',
-              fn: () => { reset(); started = true; } }],
-  hint: 'ARROWS or W A S D to hop · swipe on a phone · P pause · R restart',
+
+// ---------------------------------------------------------------------
+// THE FRONT OF THE CABINET, IN PIXELS
+// ---------------------------------------------------------------------
+// Liam (2026-10-07): the card should be the pixel art. Every other small
+// game uses the shared smooth home screen from _deck/home.js; this one
+// draws its own into the art buffer - title, PLAY, the board, the three
+// initials, GAME OVER and PAUSED - in the same 3x5 font and palette as the
+// world behind it, so nothing on screen is not made of pixels.
+//
+// `ui` stands in for that shared Home on window.__home: deck.js reads
+// `.mode` so R does not restart while you type initials, and the smoke
+// tools read `.hot` (canvas coordinates) to find PLAY.
+const ui = { mode: 'home', pending: null, typed: '', name: playerName(),
+             rank: 0, last: null, flash: 0, hot: [] };
+window.__home = ui;
+let startedAt = -1;
+
+function start() {
+  reset(); started = true; startedAt = D.t;
+  D.tapped();                                    // the press that started it
+}
+D.onReset = () => { if (ui.mode !== 'entry') start(); };
+
+function toBoard() {
+  started = false; ui.last = score; ui.rank = 0; ui.mode = 'home';
+  if (board.qualifies(score) && score > 0) {
+    ui.pending = score;
+    ui.typed = ui.name === 'YOU' ? '' : ui.name;
+    ui.mode = 'entry';
+  }
+}
+function commit() {
+  const n = (ui.typed || 'YOU').slice(0, 3);
+  setPlayerName(n); ui.name = n;
+  ui.rank = board.submit(ui.pending, n, { rows: ui.pending });
+  ui.pending = null; ui.mode = 'home'; ui.flash = 2;
+  D.tapped();                                    // ENTER is a tap too; not a PLAY
+  D.beep(760, 0.16, 'triangle', 0.06, 320);
+}
+addEventListener('keydown', (e) => {
+  if (started || e.repeat) return;
+  if (ui.mode === 'entry') {
+    if (e.key === 'Enter') commit();
+    else if (e.key === 'Backspace') ui.typed = ui.typed.slice(0, -1);
+    else if (/^[a-zA-Z0-9]$/.test(e.key) && ui.typed.length < 3) ui.typed += e.key.toUpperCase();
+    return;
+  }
+  if (e.code === 'Space' || e.key === 'Enter' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') start();
 });
+
+// a 2x2 dither, laid over the world under the menus: half the pixels ink,
+// half left alone, which is how a pixel-art screen dims what is behind it
+const DITHER = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 2;
+  const x = c.getContext('2d'); x.fillStyle = P.ink;
+  x.fillRect(0, 0, 1, 1); x.fillRect(1, 1, 1, 1);
+  return bc.createPattern(c, 'repeat');
+})();
+function wash() {
+  dot(bc, 0, 0, BW, BH, 'rgba(36,27,43,.45)');
+  bc.fillStyle = DITHER; bc.fillRect(0, 0, BW, BH);
+}
+/** a framed box: ink outside, a lit rim, a solid fill */
+function panel(x, y, w, h, fill = P.ink, rim = P.ink3) {
+  dot(bc, x - 1, y - 1, w + 2, h + 2, P.ink);
+  dot(bc, x, y, w, h, rim);
+  dot(bc, x + 1, y + 1, w - 2, h - 2, fill);
+  dot(bc, x + 1, y + h - 2, w - 2, 1, P.ink2);   // a shaded bottom lip
+}
+/** text with a one-step drop shadow, for anything big */
+function big(s, x, y, col, scale, align = 'left') {
+  A.text(bc, s, x, y + scale, P.ink, scale, align);
+  A.text(bc, s, x, y, col, scale, align);
+}
+const over_ = (h, mx, my) => mx >= h.x && mx < h.x + h.w && my >= h.y && my < h.y + h.h;
+
+function front() {
+  const mx = D.mouse.x / PX, my = D.mouse.y / PX;
+  ui.flash = Math.max(0, ui.flash - D.dt);
+  const hot = [];
+  wash();
+
+  // the title, with a frog either side of it
+  big('CROSSING', BW / 2, 18, P.ui1, 4, 'center');
+  const f = SPR.frog[0], bob = Math.floor(D.t * 3) % 2;
+  bc.drawImage(f, BW / 2 - 92 - f.width / 2, 14 - bob);
+  bc.drawImage(f, BW / 2 + 92 - f.width / 2, 14 - (1 - bob));
+  A.text(bc, 'IT NEVER ENDS - YOUR SCORE IS HOW FAR YOU GET', BW / 2, 48, P.ui4, 1, 'center');
+  A.text(bc, 'THE BOTTOM OF THE SCREEN RISES, SO YOU CANNOT WAIT', BW / 2, 57, P.uiDim, 1, 'center');
+
+  // ---- left column: PLAY, or the three initials
+  const lx = 16, lw = 142;
+  let y = 76;
+  if (ui.mode === 'entry') {
+    panel(lx, y, lw, 110, P.ink, P.ui2);
+    big('TOP TEN RUN!', lx + lw / 2, y + 8, P.ui1, 2, 'center');
+    big(ui.pending + ' ROWS', lx + lw / 2, y + 24, P.ui4, 2, 'center');
+    A.text(bc, 'TYPE THREE LETTERS', lx + lw / 2, y + 42, P.uiDim, 1, 'center');
+    for (let i = 0; i < 3; i++) {
+      const bx = lx + lw / 2 - 40 + i * 28, by = y + 52;
+      panel(bx, by, 24, 26, P.ink2, i === ui.typed.length ? P.ui1 : P.ink3);
+      const ch = ui.typed[i];
+      if (ch) A.text(bc, ch, bx + 12, by + 6, P.ui4, 3, 'center');
+      else if (i === ui.typed.length && Math.floor(D.t * 2) % 2) A.text(bc, '_', bx + 12, by + 6, P.ui1, 3, 'center');
+    }
+    // a button for the thumb, since a phone has no ENTER to press
+    const ok = { x: lx + lw / 2 - 30, y: y + 86, w: 60, h: 16, fn: commit };
+    const on = over_(ok, mx, my);
+    panel(ok.x, ok.y, ok.w, ok.h, on ? P.ui1 : P.ink2, P.ui2);
+    A.text(bc, 'ENTER', ok.x + ok.w / 2, ok.y + 5, on ? P.ink : P.ui1, 1, 'center');
+    hot.push(ok);
+  } else {
+    const play = { x: lx, y, w: lw, h: 40, fn: start };
+    const on = over_(play, mx, my);
+    panel(play.x, play.y, play.w, play.h, on ? P.ui1 : P.grs3, on ? P.paint1 : P.grs1);
+    big('PLAY', lx + lw / 2, y + 9, on ? P.ink : P.paint1, 3, 'center');
+    A.text(bc, 'SPACE  ·  UP  ·  CLICK', lx + lw / 2, y + 29, on ? P.ink2 : P.grs1, 1, 'center');
+    hot.push(play);
+    y += 52;
+
+    panel(lx, y, lw, 48, P.ink, P.ink3);
+    const keys = [['ARROWS / WASD', 'HOP'], ['SWIPE', 'HOP ON A PHONE'], ['P', 'PAUSE'], ['R', 'RESTART']];
+    keys.forEach(([k, w], i) => {
+      A.text(bc, k, lx + 7, y + 7 + i * 10, P.ui3, 1);
+      A.text(bc, w, lx + lw - 7, y + 7 + i * 10, P.uiDim, 1, 'right');
+    });
+    y += 58;
+    A.text(bc, 'ROAD: TOUCH NOTHING', lx + 2, y, P.ui4, 1);
+    A.text(bc, 'RIVER: TOUCH SOMETHING', lx + 2, y + 9, P.wat1, 1);
+    if (ui.last != null) {
+      A.text(bc, 'LAST RUN', lx + 2, y + 24, P.uiDim, 1);
+      A.text(bc, String(ui.last), lx + 2 + A.textW('LAST RUN') + 6, y + 21, ui.rank ? P.ui1 : P.ui4, 2);
+    }
+  }
+
+  // ---- right column: the ten best runs
+  const rx = 172, rw = 142, ry = 76, rows = board.rows;
+  panel(rx, ry, rw, 152, P.ink, P.ink3);
+  A.text(bc, 'BEST RUNS', rx + 7, ry + 7, P.ui3, 1);
+  A.text(bc, 'ROWS', rx + rw - 7, ry + 7, P.ui3, 1, 'right');
+  dot(bc, rx + 5, ry + 15, rw - 10, 1, P.ink3);
+  for (let i = 0; i < 10; i++) {
+    const r = rows[i], ty = ry + 21 + i * 13;
+    const hl = ui.flash > 0 && ui.rank === i + 1;
+    if (hl && Math.floor(D.t * 6) % 2) dot(bc, rx + 3, ty - 3, rw - 6, 11, P.ink2);
+    A.text(bc, String(i + 1), rx + 16, ty, hl ? P.ui1 : P.ink3, 1, 'right');
+    if (!r) { A.text(bc, '-', rx + 26, ty, P.ink3, 1); continue; }
+    A.text(bc, r.name || 'YOU', rx + 26, ty, hl ? P.ui1 : P.ui4, 1);
+    A.text(bc, board.format(r.score), rx + rw - 7, ty, P.ui1, 1, 'right');
+  }
+
+  ui.hot = hot.map((h) => ({ x: h.x * PX, y: h.y * PX, w: h.w * PX, h: h.h * PX, fn: h.fn }));
+  if (D.tapped()) {
+    for (const h of hot) if (over_(h, mx, my)) { h.fn(); break; }
+  }
+}
+
+/** GAME OVER, in the world's own pixels */
+function overCard() {
+  wash();
+  const w = 190, h = 92, x = (BW - w) / 2, y = 104;
+  panel(x, y, w, h, P.ink, P.dead2);
+  big('GAME OVER', BW / 2, y + 9, P.dead1, 3, 'center');
+  A.text(bc, msg, BW / 2, y + 30, P.ui4, 1, 'center');
+  big(score + (score === 1 ? ' ROW' : ' ROWS'), BW / 2, y + 42, P.ui1, 3, 'center');
+  if (newBest) A.text(bc, 'NEW BEST!', BW / 2, y + 63, P.ui3, 1, 'center');
+  if (D.t - dead > 0.7 && Math.floor(D.t * 2) % 2) {
+    A.text(bc, 'SPACE OR CLICK FOR THE BOARD', BW / 2, y + 77, P.uiDim, 1, 'center');
+  }
+}
+
+// PAUSED, drawn over the frame the game stopped on. The buffer still holds
+// that frame, and this panel is opaque, so drawing it every paused frame
+// leaves the picture underneath exactly as it was.
+D._pauseCard = () => {
+  const g = D.g;
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  panel(BW / 2 - 60, BH / 2 - 22, 120, 40, P.ink, P.ui3);
+  big('PAUSED', BW / 2, BH / 2 - 15, P.ui4, 2, 'center');
+  A.text(bc, 'CLICK OR P TO CARRY ON', BW / 2, BH / 2 + 4, P.uiDim, 1, 'center');
+  g.imageSmoothingEnabled = false;
+  g.drawImage(buf, 0, 0, D.W, D.H);
+};
 
 reset(); started = false;
 

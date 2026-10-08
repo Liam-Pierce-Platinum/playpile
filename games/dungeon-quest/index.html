@@ -8,6 +8,12 @@
 <script type="importmap">
 { "imports": { "three": "./vendor/three.module.js" } }
 </script>
+<script>
+  // dev tools only here, never on the published site - see .devonly
+  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) || /[?&]dev\b/.test(location.search))
+    document.documentElement.classList.add('dev');
+</script>
+<style>.devonly{display:none} .dev .devonly{display:block}</style>
 </head>
 <body>
   <div id="stage"><canvas id="game"></canvas></div>
@@ -120,6 +126,10 @@
       </div>
       <div class="sb-sep"></div>
       <button class="wide" id="btn-title">QUIT TO TITLE</button>
+      <!-- DEV TOOLS ARE FOR THIS MACHINE ONLY (2026-10-07). They were in the
+           pause sidebar on playpile.net too: +500 coin, kill all, skip to
+           the boss, for every player. Shown on localhost or with ?dev. -->
+      <div class="devonly">
       <div class="sb-sep"></div>
       <div class="krow"><span class="lbl" data-px="1" data-px-color="#ff8a4a">DEV TOOLS</span></div>
       <div class="btns dev">
@@ -134,9 +144,10 @@
         <button id="dev-clear">KILL ALL</button>
         <button id="dev-next">NEXT LEVEL</button>
       </div>
-      <button class="wide" id="btn-dragon-restart">RESTART AS THE DRAGON</button>
       <button class="wide" id="dev-finish">FINISH GAME</button>
       <button class="wide" id="dev-reset">RESET PROGRESS</button>
+      </div>
+      <button class="wide" id="btn-dragon-restart">RESTART AS THE DRAGON</button>
       <div class="sb-foot"><kbd>H</kbd> hide</div>
     </div>
   </div>

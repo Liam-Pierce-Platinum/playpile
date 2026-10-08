@@ -439,7 +439,7 @@ export class Hands {
     // AND they can never clip through a doorframe, because they are not
     // in the same depth buffer as the doorframe.
     this.scene = new THREE.Scene();
-    this.cam = new THREE.PerspectiveCamera(68, 1, 0.01, 8);
+    this.cam = new THREE.PerspectiveCamera(74, 1, 0.13, 8);
     this.scene.add(this.lag);
     this.scene.add(new THREE.HemisphereLight(0xdce6f2, 0x4a4038, 2.0));
     this.scene.add(new THREE.AmbientLight(0xffffff, 0.55));
@@ -570,7 +570,11 @@ export class Hands {
     else this.rig.clearCustom();
     // a blade is carried further out and lower than a pistol
     const G = GUNS[id] || {};
-    if (G.melee) this.rig.setFrame(0.02, -0.06, -0.13);
+    // (2026-10-07, with the pistol grip moved back - see HOLD_OFFSET in
+    // handrig.js. The old -13 cm brought the shoulders back in front of
+    // the eye and the left arm filled the screen again.)
+    if (G.melee) this.rig.setFrame(-0.02, 0.0, -0.03);
+    else if (G.unarmed) this.rig.setFrame(-0.05, 0.03, 0);
     else this.rig.setFrame(0, 0, 0);
   }
 

@@ -924,7 +924,7 @@ function reset() {
 function serve(side) {
   serving = side;
   ball = { x: side > 0 ? -5 : 5, y: FLOOR + 2.4, vx: 0, vy: 0, live: false, spin: 0 };
-  msg = side > 0 ? 'LEFT SERVE' : 'RIGHT SERVE';
+  msg = twoPlayer ? (side > 0 ? 'LEFT SERVE' : 'RIGHT SERVE') : (side > 0 ? 'YOUR SERVE' : 'CPU SERVES');
   msgT = 1.1;
   rally = 0;
 }
@@ -1153,8 +1153,14 @@ function drawHud() {
         'RALLY ' + (rally || 0) + '   BEST ' + D.best);
   if (msgT > 0) D.text(msg, D.W / 2, 74, 20, '#ffffff', 'center');
   if (ball && !ball.live && msgT <= 0) {
-    const who = serving > 0 ? (twoPlayer ? 'W' : 'click') : (twoPlayer ? '↑' : '');
-    if (who) D.text('press ' + who + ' to serve', D.W / 2, D.H - 26, 11, '#20303a', 'center');
+    // up in the sky where it can be read, not 11px of dark grey in the
+    // grass - and 'click' is not a key, so it no longer says 'press click'
+    const who = serving > 0 ? (twoPlayer ? 'press W to serve' : 'click, tap or press SPACE to serve')
+                            : (twoPlayer ? 'press ↑ to serve' : '');
+    if (who) {
+      D.text(who, D.W / 2 + 1, 117, 15, 'rgba(10,30,50,.35)', 'center');
+      D.text(who, D.W / 2, 116, 15, '#ffffff', 'center');
+    }
   }
 }
 

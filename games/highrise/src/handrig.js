@@ -108,9 +108,16 @@ const FWD   = new THREE.Vector3(0, 0, -1);
 // sixteen in front, which fills the screen with receiver. The numbers are
 // read off tools/rigsheet.mjs, which prints the muzzle for every pose.
 const HOLD_OFFSET = {
-  pistol:  new THREE.Vector3(0.035, 0.130, -0.075),
-  rifle:   new THREE.Vector3(0.060, 0.000, -0.330),
-  shotgun: new THREE.Vector3(0.060, -0.070, -0.380),
+  // 2026-10-07: back 12 cm and up 5 from where it was. The pack rig has
+  // its shoulders 10 cm IN FRONT of the eye at the old offset, so at this
+  // field of view each upper arm filled a third of the screen - the
+  // "oversized arms". With the shoulders level with the eye they are
+  // out of frame, and what is left is forearms, hands and the gun.
+  pistol:  new THREE.Vector3(0.045, 0.088, -0.051),
+  // the long guns, lower and further right (2026-10-07): at the old
+  // numbers both sat dead centre with the barrel end-on to the lens
+  rifle:   new THREE.Vector3(0.130, -0.080, -0.270),
+  shotgun: new THREE.Vector3(0.130, -0.120, -0.300),
   smg:     new THREE.Vector3(0.050, -0.040, -0.260),
 };
 
@@ -675,6 +682,15 @@ export class HandRig {
         .applyQuaternion(mq.clone().invert()).divideScalar(main.getWorldScale(new THREE.Vector3()).x || 1);
       p.add(off);
     }
+    // THE PUMP GUN'S OFF HAND GOES ON THE PUMP. Its rest pose leaves that
+    // hand eight centimetres above the barrel, open, so measured off the
+    // rest it floated over the gun waving. The Forearm bone is the pump;
+    // the hand goes just under it, closed.
+    const pump = this.id === 'shotgun' && this.bone('Forearm');
+    if (pump) {
+      p.setFromMatrixPosition(pump.matrixWorld).applyMatrix4(inv);
+      p.y -= 4;
+    }
     this.supportPos = p;
     this.supportQuat = mq.invert().multiply(sq);
     // bone lengths, in the rig's own units (the rest offsets)
@@ -683,7 +699,7 @@ export class HandRig {
     this.armL2 = ha ? ha.p.length() : 22;
     // the pistol rest leaves the off hand open by the hip, so it has to be
     // closed round the firing hand; the long guns already hold a handguard
-    this.supportCurl = two ? 0.62 : 0.18;
+    this.supportCurl = two ? 0.62 : pump ? 0.55 : 0.18;
   }
 
   /**

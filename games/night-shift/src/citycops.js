@@ -188,10 +188,18 @@ export class CityPolice {
     // Out in the open they always have something to go on - a call, a
     // description, a unit two streets over. Hiding is the only thing that
     // actually stops the clock on them.
-    if (!hidden) this.searchT = Math.max(this.searchT, 7);
+    //
+    // NOT BEFORE THERE IS ANYTHING TO LOOK FOR (2026-10-07). This is the
+    // chase from the old HIGHWAY runner, and it started the moment the
+    // shift did: SEARCHING on the HUD at 0:01 and two units driving to
+    // wherever you were, for a crime you had not committed. Until the job
+    // is done (world.quiet) nobody is searching; doing something loud is
+    // still seen, and that still starts it.
+    if (world.quiet && !see) this.searchT = 0;
+    else if (!hidden) this.searchT = Math.max(this.searchT, 7);
 
     // Heat is a manhunt mobilising, not a line of sight.
-    if (!hidden) {
+    if (!hidden && (!world.quiet || see)) {
       this.addHeat(dt * (0.045 + (playerSpeed > 26 ? 0.045 : 0) + (see ? 0.07 : 0)));
     }
     if (see) {
@@ -326,7 +334,10 @@ export class CityPolice {
       c.repathT -= dt;
       if (!c.path || c.repathT <= 0) {
         c.repathT = 1.1 + Math.random() * 0.8;
-        c.path = C.route(C.nearestNode(c.x, c.y), C.nearestNode(goalX, goalY), 420);
+        // 1,400, not 420: across a few blocks the search ran out before it
+        // found the goal, the route came back null, and the car aimed in a
+        // straight line through the buildings and sat against a wall.
+        c.path = C.route(C.nearestNode(c.x, c.y), C.nearestNode(goalX, goalY), 1400);
         c.pathI = 0;
       }
 
@@ -370,6 +381,19 @@ export class CityPolice {
       for (const b of buildings) {
         const into = boxOut(b, c, true);
         if (into > 22) { c.wrecked = 2.4; c.spinRate = (Math.random() - 0.5) * 5; }
+      }
+
+      // UNSTICK. A car wedged against a building for three seconds, short
+      // of where it is going, is put back on a road near its goal - out of
+      // the player's sight, so nobody watches it jump. Before this, the
+      // first responders could sit against a wall for the rest of the run
+      // and the scene was never worked: no description, ever.
+      const goalD = Math.hypot(c.x - goalX, c.y - goalY);
+      c.stuckT = c.speed < 1.5 && goalD > 24 ? (c.stuckT || 0) + dt : 0;
+      if (c.stuckT > 3 && dist > 75) {
+        const spot = this.spawnSpot(goalX, goalY, 30, 50, px, py);
+        if (spot) { c.place(spot.x, spot.y, spot.h); c.speed = 0; c.path = null; }
+        c.stuckT = 0;
       }
 
       // ---- shooting from the car ----
@@ -636,14 +660,17 @@ export class CityPolice {
     return true;
   }
 
-  spawnSpot(px, py) {
+  // (rMin, rSpan: how far out to look. awayX/awayY: a point the spot must
+  // be at least 75 m from - the player, when a car is being moved.)
+  spawnSpot(px, py, rMin = 95, rSpan = 130, awayX, awayY) {
     const C = this.city;
     for (let k = 0; k < 26; k++) {
       const a = Math.random() * Math.PI * 2;
-      const r = 95 + Math.random() * 130;
+      const r = rMin + Math.random() * rSpan;
       const x = px + Math.cos(a) * r, y = py + Math.sin(a) * r;
       const s = C.surfaceAt(x, y);
       if (!s.onRoad || !s.road) continue;
+      if (awayX !== undefined && Math.hypot(x - awayX, y - awayY) < 75) continue;
       return { x, y, h: Math.atan2(py - y, px - x) };
     }
     return null;

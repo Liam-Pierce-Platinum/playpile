@@ -453,3 +453,19 @@ button.ghost.small{font-size:11px;padding:8px 18px;opacity:.55}
   background:rgba(255,255,255,.04); }
 .shop-msg.on{ color:#eef3fa; background:rgba(58,214,160,.12);
   border:1px solid rgba(58,214,160,.35); }
+/* ================= 2026-10-07 HUD pass =================
+   The two lists on the left were bare text straight on the map: the
+   unlit lines of WHAT THEY HAVE (#3d4756 on a dark street) could not be
+   read at all, and the CARRYING list started where the first one ended.
+   Both sit on a dark plate now, with room between them; an unlit line is
+   dim but legible, a lit one is still the loud pink. The distance from
+   the old HIGHWAY run was still drawn across TIME FREE at the top. */
+.board, .inv{ background:rgba(8,11,17,.62); border:1px solid rgba(120,140,170,.14);
+  border-radius:.4rem; padding:.55rem .75rem .45rem; backdrop-filter:blur(2px); }
+.board li{ color:#6b778a; }
+.inv{ top:18rem; }
+.run-stats{ display:none; }
+/* IDENTIFIED sits in the header line of its own panel; underneath the
+   list it ran down over CARRYING */
+.board-id{ position:absolute; right:.5rem; top:-.62rem; margin:0; font-size:.56rem; padding:.2rem .45rem; }
+.board{ min-width:210px; }

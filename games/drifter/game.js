@@ -27,7 +27,8 @@ const D = new Deck({ key: 'drifter', w: 720, h: 540, bg: '#05070c' });
 const SHOT_COST = 6, THRUST_COST = 12;   // per second, for thrust
 
 let ship, rocks, shots, bits, stars, score, wave, lives, over, started, inv;
-let hyperHeld = false;   // SHIFT is a press, not a hold - see hyperspace below
+let hyperHeld = false;
+let rings = [], shake = 0;   // SHIFT is a press, not a hold - see hyperspace below
 
 // ---- TOUCH ----------------------------------------------------------
 //
@@ -64,8 +65,13 @@ const finger = (f) => fingers.some(f);
 function reset(full) {
   if (full) { score = 0; wave = 1; lives = 3; }
   ship = { x: D.W / 2, y: D.H / 2, vx: 0, vy: 0, a: -Math.PI / 2, fuel: 100 };
-  rocks = []; shots = []; bits = []; over = false; inv = 2.2; touchShots = 0;
-  stars = Array.from({ length: 90 }, () => ({ x: rnd(D.W), y: rnd(D.H), b: rnd(0.15, 0.7) }));
+  rocks = []; shots = []; bits = []; rings = []; over = false; inv = 2.2; touchShots = 0;
+  // three depths of star, drifting at three speeds, so space has depth
+  // even when the ship is sitting still
+  stars = Array.from({ length: 140 }, () => {
+    const z = Math.random();
+    return { x: rnd(D.W), y: rnd(D.H), z, b: 0.15 + z * 0.6, tw: rnd(6.28) };
+  });
   spawnWave();
 }
 
@@ -89,8 +95,12 @@ function makeRock(x, y, size) {
   const pts = [];
   const n = 9 + size * 2;
   for (let i = 0; i < n; i++) pts.push(rnd(0.72, 1.15));
+  const craters = Array.from({ length: size + 1 }, () => {
+    const th = rnd(6.28), d = rnd(0.1, 0.5);
+    return { x: Math.cos(th) * d, y: Math.sin(th) * d, r: rnd(0.12, 0.24) };
+  });
   return { x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, size,
-           r: size * 15, a: rnd(6.28), spin: rnd(-1.1, 1.1), pts };
+           r: size * 15, a: rnd(6.28), spin: rnd(-1.1, 1.1), pts, craters };
 }
 
 function wrap(o) {
@@ -100,7 +110,10 @@ function wrap(o) {
 
 function step(dt, g) {
   if (!started) {
-    draw(g);              // the field keeps drifting behind the home screen
+    // the field keeps drifting behind the home screen (it used to say so
+    // here and then sit perfectly still)
+    for (const r of rocks) { r.x += r.vx * dt * 0.5; r.y += r.vy * dt * 0.5; r.a += r.spin * dt * 0.5; wrap(r); }
+    draw(g);
     home.step(dt);
     return;
   }
@@ -154,7 +167,7 @@ function step(dt, g) {
   }
 
   // ---- shots and rocks ----------------------------------------------
-  for (const s of shots) { s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt; wrap(s); }
+  for (const s of shots) { s.px = s.x; s.py = s.y; s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt; wrap(s); }
   shots = shots.filter((s) => s.life > 0);
 
   for (const r of rocks) { r.x += r.vx * dt; r.y += r.vy * dt; r.a += r.spin * dt; wrap(r); }
@@ -169,8 +182,10 @@ function step(dt, g) {
       shots.splice(hit, 1); rocks.splice(i, 1);
       score += r.size === 3 ? 20 : r.size === 2 ? 50 : 100;
       D.noise(0.18, 0.05, 400 + r.size * 200);
-      for (let k = 0; k < 8; k++) bits.push({ x: r.x, y: r.y, vx: rnd(-120, 120), vy: rnd(-120, 120),
-        life: rnd(0.3, 0.7), col: '#8b96a8' });
+      for (let k = 0; k < 6 + r.size * 4; k++) bits.push({ x: r.x, y: r.y, vx: rnd(-150, 150), vy: rnd(-150, 150),
+        life: rnd(0.3, 0.8), col: ROCK_COL[r.size] });
+      rings.push({ x: r.x, y: r.y, t: 0, r: r.r * 1.6, col: ROCK_COL[r.size] });
+      shake = Math.max(shake, r.size * 2);
       if (r.size > 1) for (let k = 0; k < 2; k++) {
         const n = makeRock(r.x, r.y, r.size - 1);
         n.vx += rnd(-40, 40); n.vy += rnd(-40, 40);
@@ -179,7 +194,8 @@ function step(dt, g) {
       continue;
     }
     if (inv <= 0 && Math.hypot(ship.x - r.x, ship.y - r.y) < r.r + 8) {
-      lives--; inv = 2.4; D.noise(0.5, 0.08, 200);
+      lives--; inv = 2.4; D.noise(0.5, 0.08, 200); shake = 12;
+      rings.push({ x: ship.x, y: ship.y, t: 0, r: 70, col: '#ff6b8b' });
       for (let k = 0; k < 20; k++) bits.push({ x: ship.x, y: ship.y, vx: rnd(-200, 200), vy: rnd(-200, 200),
         life: rnd(0.4, 1), col: '#ff6b8b' });
       ship.x = D.W / 2; ship.y = D.H / 2; ship.vx = ship.vy = 0; ship.fuel = Math.max(ship.fuel, 55);
@@ -188,6 +204,10 @@ function step(dt, g) {
   }
 
   for (const b of bits) { b.x += b.vx * dt; b.y += b.vy * dt; b.life -= dt; }
+  for (const q of rings) q.t += dt * 2.4;
+  rings = rings.filter((q) => q.t < 1);
+  shake *= Math.pow(0.0015, dt);
+  if (shake < 0.3) shake = 0;
   bits = bits.filter((b) => b.life > 0);
 
   if (!rocks.length) { wave++; score += 100; ship.fuel = 100; spawnWave();
@@ -196,43 +216,120 @@ function step(dt, g) {
   draw(g);
 }
 
-function draw(g) {
-  for (const s of stars) { g.fillStyle = 'rgba(200,220,255,' + s.b + ')'; g.fillRect(s.x, s.y, 1.6, 1.6); }
+// ---- THE LOOK (2026-10-07) ------------------------------------------
+// It was grey outlines on black - correct Asteroids, and the plainest
+// thing on the site. Now it is a vector arcade screen: a nebula painted
+// once behind three depths of drifting stars, rocks that are solid with a
+// glowing rim and craters, a ship and shots that glow, and a ring and a
+// shake when something breaks. Same shapes, same rules, same hitboxes.
+const ROCK_COL = { 3: '#7fb2ff', 2: '#b58cff', 1: '#ff8cc8' };
+const NEB = (() => {
+  const c = document.createElement('canvas'); c.width = D.W; c.height = D.H;
+  const x = c.getContext('2d');
+  x.fillStyle = '#04060d'; x.fillRect(0, 0, D.W, D.H);
+  const blob = (cx, cy, r, col) => {
+    const gr = x.createRadialGradient(cx, cy, 0, cx, cy, r);
+    gr.addColorStop(0, col); gr.addColorStop(1, 'rgba(0,0,0,0)');
+    x.fillStyle = gr; x.fillRect(0, 0, D.W, D.H);
+  };
+  blob(D.W * 0.18, D.H * 0.25, 340, 'rgba(84,40,140,.30)');
+  blob(D.W * 0.85, D.H * 0.75, 380, 'rgba(20,90,130,.30)');
+  blob(D.W * 0.55, D.H * 0.45, 260, 'rgba(160,50,110,.13)');
+  blob(D.W * 0.95, D.H * 0.1, 200, 'rgba(40,70,160,.22)');
+  return c;
+})();
 
-  g.lineWidth = 1.6; g.strokeStyle = '#9fb0c6';
-  for (const r of rocks) {
-    g.save(); g.translate(r.x, r.y); g.rotate(r.a);
-    g.beginPath();
-    for (let i = 0; i < r.pts.length; i++) {
-      const th = i / r.pts.length * Math.PI * 2, rr = r.r * r.pts[i];
-      i ? g.lineTo(Math.cos(th) * rr, Math.sin(th) * rr) : g.moveTo(Math.cos(th) * rr, Math.sin(th) * rr);
-    }
-    g.closePath(); g.stroke(); g.restore();
+/** a line drawn twice: wide and faint for the glow, then thin and bright */
+function glowLine(g, col, w, path) {
+  g.strokeStyle = col; g.globalAlpha = 0.22; g.lineWidth = w * 4; path(); g.stroke();
+  g.globalAlpha = 1; g.lineWidth = w; path(); g.stroke();
+}
+
+function draw(g) {
+  const sx = shake ? rnd(-shake, shake) : 0, sy = shake ? rnd(-shake, shake) : 0;
+  g.drawImage(NEB, 0, 0);
+  for (const s of stars) {
+    s.x -= (4 + s.z * 14) * D.dt;
+    if (s.x < 0) s.x += D.W;
+    const a = s.b * (0.75 + 0.25 * Math.sin(D.t * 2 + s.tw));
+    g.fillStyle = 'rgba(210,225,255,' + a.toFixed(2) + ')';
+    const sz = s.z > 0.85 ? 2 : 1.2;
+    g.fillRect(s.x, s.y, sz, sz);
   }
 
-  for (const b of bits) { g.fillStyle = b.col; g.globalAlpha = clamp(b.life, 0, 1); g.fillRect(b.x, b.y, 2.4, 2.4); }
-  g.globalAlpha = 1;
-  g.fillStyle = '#fff';
-  for (const s of shots) g.fillRect(s.x - 1.5, s.y - 1.5, 3, 3);
-
-  if (ship && (!over) && (inv <= 0 || Math.floor(D.t * 12) % 2)) {
-    g.save(); g.translate(ship.x, ship.y); g.rotate(ship.a);
-    g.strokeStyle = '#e7ecf3'; g.lineWidth = 1.8;
-    g.beginPath(); g.moveTo(14, 0); g.lineTo(-9, 8); g.lineTo(-4, 0); g.lineTo(-9, -8);
-    g.closePath(); g.stroke();
-    if (ship.thrusting) {
-      g.strokeStyle = '#ff9f43'; g.beginPath();
-      g.moveTo(-5, 4); g.lineTo(-13 - Math.random() * 7, 0); g.lineTo(-5, -4); g.stroke();
+  g.save(); g.translate(sx, sy);
+  g.lineJoin = 'round'; g.lineCap = 'round';
+  for (const r of rocks) {
+    g.save(); g.translate(r.x, r.y); g.rotate(r.a);
+    const outline = () => {
+      g.beginPath();
+      for (let i = 0; i < r.pts.length; i++) {
+        const th = i / r.pts.length * Math.PI * 2, rr = r.r * r.pts[i];
+        i ? g.lineTo(Math.cos(th) * rr, Math.sin(th) * rr) : g.moveTo(Math.cos(th) * rr, Math.sin(th) * rr);
+      }
+      g.closePath();
+    };
+    const gr = g.createRadialGradient(-r.r * 0.35, -r.r * 0.35, 0, 0, 0, r.r * 1.15);
+    gr.addColorStop(0, '#2a3048'); gr.addColorStop(1, '#0b0e18');
+    outline(); g.fillStyle = gr; g.fill();
+    g.lineWidth = 1.2;
+    for (const c of r.craters || []) {
+      g.beginPath(); g.arc(c.x * r.r, c.y * r.r, c.r * r.r, 0, 6.28);
+      g.fillStyle = 'rgba(0,0,0,.28)'; g.fill();
+      g.beginPath(); g.arc(c.x * r.r, c.y * r.r, c.r * r.r, 3.6, 5.6);
+      g.strokeStyle = 'rgba(160,180,230,.18)'; g.stroke();
     }
+    glowLine(g, ROCK_COL[r.size], 1.8, outline);
     g.restore();
   }
 
+  for (const q of rings) {
+    g.globalAlpha = 1 - q.t; g.strokeStyle = q.col; g.lineWidth = 2;
+    g.beginPath(); g.arc(q.x, q.y, q.r * (0.3 + q.t * 0.9), 0, 6.28); g.stroke();
+  }
+  g.globalAlpha = 1;
+  for (const b of bits) {
+    g.fillStyle = b.col; g.globalAlpha = clamp(b.life * 1.6, 0, 1);
+    g.fillRect(b.x - 1.4, b.y - 1.4, 2.8, 2.8);
+    g.globalAlpha *= 0.25; g.fillRect(b.x - 3, b.y - 3, 6, 6);
+  }
+  g.globalAlpha = 1;
+  for (const s of shots) {
+    // a streak back to where it was last frame - unless it just wrapped
+    // round the screen, when that would be a line across the whole field
+    const wrapped = s.px === undefined || Math.abs(s.px - s.x) > 60 || Math.abs(s.py - s.y) > 60;
+    const px = wrapped ? s.x - s.vx * 0.02 : s.px, py = wrapped ? s.y - s.vy * 0.02 : s.py;
+    glowLine(g, '#ffe58a', 2.4, () => { g.beginPath(); g.moveTo(px, py); g.lineTo(s.x, s.y); });
+    g.fillStyle = '#fff'; g.fillRect(s.x - 1.5, s.y - 1.5, 3, 3);
+  }
+
+  if (ship && (!over) && (inv <= 0 || Math.floor(D.t * 12) % 2)) {
+    g.save(); g.translate(ship.x, ship.y); g.rotate(ship.a);
+    if (ship.thrusting) {
+      const L = 16 + Math.random() * 10;
+      const fl = g.createLinearGradient(-4, 0, -4 - L, 0);
+      fl.addColorStop(0, 'rgba(255,240,180,.95)'); fl.addColorStop(0.4, 'rgba(255,150,60,.8)');
+      fl.addColorStop(1, 'rgba(255,60,40,0)');
+      g.fillStyle = fl;
+      g.beginPath(); g.moveTo(-5, 5); g.lineTo(-4 - L, 0); g.lineTo(-5, -5); g.closePath(); g.fill();
+    }
+    const hull = () => { g.beginPath(); g.moveTo(14, 0); g.lineTo(-9, 8); g.lineTo(-4, 0); g.lineTo(-9, -8); g.closePath(); };
+    hull(); g.fillStyle = '#0f2a3a'; g.fill();
+    glowLine(g, '#6ff0ff', 1.8, hull);
+    g.fillStyle = '#d8fbff'; g.fillRect(3, -1.5, 4, 3);       // the canopy
+    g.restore();
+  }
+  g.restore();
+
   // the tank, which is the game
-  const fw = 150;
-  g.fillStyle = '#131b26'; g.fillRect(D.W - fw - 12, 38, fw, 8);
-  g.fillStyle = ship && ship.fuel < 25 ? '#ff6b8b' : '#4dc9ff';
-  g.fillRect(D.W - fw - 12, 38, fw * (ship ? ship.fuel / 100 : 0), 8);
-  D.text('FUEL', D.W - fw - 20, 46, 10, '#5a6577', 'right');
+  const fw = 150, low = ship && ship.fuel < 25, f = ship ? ship.fuel / 100 : 0;
+  g.fillStyle = 'rgba(19,27,38,.85)'; g.fillRect(D.W - fw - 12, 38, fw, 8);
+  if (!low || Math.floor(D.t * 4) % 2) {
+    g.fillStyle = low ? '#ff6b8b' : '#4dc9ff';
+    g.fillRect(D.W - fw - 12, 38, fw * f, 8);
+    g.globalAlpha = 0.25; g.fillRect(D.W - fw - 12, 36, fw * f, 12); g.globalAlpha = 1;
+  }
+  D.text(low ? 'FUEL LOW' : 'FUEL', D.W - fw - 20, 46, 10, low ? '#ff6b8b' : '#7d8aa0', 'right');
 
   D.hud('SCORE ' + score + '   WAVE ' + wave,
         '▲ '.repeat(Math.max(0, lives)) + '  BEST ' + D.best);

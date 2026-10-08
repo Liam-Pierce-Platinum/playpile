@@ -24,6 +24,10 @@ canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges}
 .note{max-width:1440px;width:100%;color:var(--dim)}
 .note strong{color:var(--text);font-weight:700}
 .note em{font-style:normal;color:#d4b02c}
+/* inside the site's player: the game and nothing else (see resize() in src/pix.js) */
+.embed body{padding:0;gap:0;overflow:hidden;height:100vh;justify-content:center}
+.embed header,.embed .cols,.embed .note{display:none}
+.embed .frame{border:0}
 </style>
 </head>
 <body>

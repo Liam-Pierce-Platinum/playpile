@@ -19,10 +19,6 @@ export const INTROS = {
     games you can finish in a minute on a phone; PENGUIN DASH is a bigger one, a
     two-kilometre sea to fish in with predators that hunt in packs. Your best runs are
     kept in your own browser.`,
-  Classic: `The games everything else is built on - the snake, the falling blocks, the
-    two bats and a ball, and the rows of marching invaders - each rebuilt with the one
-    detail that decides whether it feels right, and in some cases one new rule that
-    stops it being solved.`,
   Driving: `Two racing simulations built from real data. APEX lays out thirty-three
     circuits from their real corner sequences, with downforce, tyre wear, rain and pit
     stops; NASCAR does the same for twenty ovals, where banking and the draft decide
@@ -34,6 +30,10 @@ export const INTROS = {
   Puzzle: `Games you think your way through. A pipe-laying puzzle with six hand-made
     rooms and an endless generator after them, a minesweeper on the clock at four sizes
     and four difficulties, and a physics merge game that runs to a thousand stages.`,
+  Strategy: `Games you win by planning. INKVALE is a tower defence painted in ink and
+    watercolour, where every tower stains what it hits and two colours on one foe mix
+    into something stronger than either - so where you build matters as much as what.
+    Twelve battles, eight heroes, and a mode for two players over the internet.`,
   Shooter: `Aiming games of two very different sizes. HIGHRISE is a first-person shooter
     up all thirty-one floors of one tower, where cover actually stops bullets;
     QUICKDRAW is a western duel fought one shot at a time, with damage counted limb by

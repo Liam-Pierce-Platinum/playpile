@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INKVALE — free strategy game in your browser — PLAYPILE</title>
+<meta name="description" content="A tower defence painted in watercolour, where your towers paint the enemy and the colours mix. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/inkvale/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="INKVALE — PLAYPILE">
+<meta property="og:description" content="A tower defence painted in watercolour, where your towers paint the enemy and the colours mix. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/inkvale/">
+<meta property="og:image" content="https://playpile.net/shots/inkvale.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"INKVALE","url":"https://playpile.net/play/inkvale/","image":"https://playpile.net/shots/inkvale.png","description":"A tower defence painted in watercolour, where your towers paint the enemy and the colours mix.","genre":"Strategy","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Strategy","item":"https://playpile.net/category/strategy/"},{"@type":"ListItem","position":3,"name":"INKVALE","item":"https://playpile.net/play/inkvale/"}]}</script>
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>🕹️</text></svg>">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+<a class="skip" href="#stage">Skip to the game</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/category/strategy/">Strategy</a><i>&rsaquo;</i><b>INKVALE</b></nav>
+    <!-- NO ADVERT ABOVE THE GAME (removed 2026-10-07). It sat 16px over the
+         stage and its Play button - AdSense's "ads interfering" policy bars
+         ads beside action items where they draw accidental clicks, and a
+         click near the top edge of a running game could land on it. -->
+
+    <div class="play">
+      <div>
+        <!-- THE GAME DOES NOT LOAD UNTIL IT IS ASKED FOR.
+             Several of these are heavy, and a page that starts
+             downloading a game the moment it opens costs the player the
+             whole download for a click they might not make. The iframe
+             has no src until START. -->
+        <div class="stage" id="stage">
+          <iframe id="frame" title="game" allow="autoplay; fullscreen; gamepad; pointer-lock"
+                  allowfullscreen hidden></iframe>
+          <div class="curtain" id="curtain">
+            <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
+            <h2 id="ttl">INKVALE</h2>
+            <p id="lede">A tower defence painted in watercolour, where your tower  paint the enemy and the colour  mix.</p>
+            <button class="btn" id="start">Play</button>
+            <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
+          </div>
+        </div>
+
+        <div class="stagebar">
+          <span class="title" id="barttl">INKVALE</span>
+          <span class="where" id="how"></span>
+          <span class="sp"></span>
+          <button id="full" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
+            Fullscreen <kbd>F</kbd></button>
+          <button id="reload" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+            Restart <kbd>R</kbd></button>
+          <a class="lnk" href="/">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>
+            All games</a>
+        </div>
+
+        <section class="about">
+          <h1 id="h1">INKVALE</h1>
+          <p class="lede" id="blurb">A tower defence painted in watercolour, where your tower  paint the enemy and the colour  mix.</p>
+          <div id="about"><p>Twelve battles, three acts, and a Hollow King at the end of the road. Archers stain what they hit ochre, mages ultramarine, artillery vermilion - and a second colour on a foe that is still wet MIXES: blue and red make a hex that makes everything hit harder, yellow and blue grow vines that root it, yellow and red burst into fire that spreads. Where you build is a palette. The spells are drawn, not clicked: drag a Wash along the road to shove the crowd back and paint it blue, or an Ink Wall across it to make them hack their way through.</p>
+<p>Five tower lines split into fifteen paths, there are sixteen foes and three bosses, and every battle pays coins to hire warriors in the Hall - eight heroes in all. Two Wardens is the co-op: one of you hosts, the other joins with a four-letter code, and you each bring your own gold, towers and hero.</p></div>
+          <h4>Controls</h4>
+          <ul class="keys" id="keys"><li><kbd>Click</kbd><span>build on a plot · upgrade a tower</span></li><li><kbd>Drag + 1</kbd><span>The Wash, along the road</span></li><li><kbd>Drag + 2</kbd><span>Ink Wall, across the road</span></li><li><kbd>H</kbd><span>select your hero, then click to send</span></li><li><kbd>Space</kbd><span>call the next wave early</span></li><li><kbd>F</kbd><span>game speed</span></li><li><kbd>Esc</kbd><span>pause · cancel</span></li></ul>
+          <div class="tip" id="tip">Two colours on the same bend of road beat one big tower. Put an archer post and a mage tower side by side and watch the vines.</div>
+          <h4>Tags</h4>
+          <div class="tagrow" id="tags"><a class="chip on" href="/category/strategy/">Strategy</a><a class="chip" href="/#q=new">new</a><a class="chip" href="/#q=tower%20defence">tower defence</a><a class="chip" href="/#q=watercolour">watercolour</a><a class="chip" href="/#q=co-op">co-op</a><a class="chip" href="/#q=online">online</a><a class="chip" href="/#q=heroes">heroes</a><a class="chip" href="/#q=story">story</a><a class="chip" href="/#q=2%20player">2 player</a></div>
+        </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>INKVALE is a tower defence game painted in ink and watercolour. Foes march along the roads towards your gate, and you stop them by building towers on the plots beside the road. Click an empty plot to build; click a tower to upgrade it. Every tower line splits into three paths at its first upgrade, and each path climbs to a fourth tier with two abilities of its own. Every foe that reaches the gate costs lives, and a boss costs all of them.</p>
+<p>What sets it apart is <b>colour</b>. Three of the five tower lines paint what they hit. Archers stain foes <b>ochre</b>, mages stain them <b>ultramarine</b> and artillery stains them <b>vermilion</b>. A stain stays wet for four seconds. If a second, different colour lands on a foe while it is still wet, the two colours <b>mix</b> on the spot:</p>
+<ul>
+<li><b>Blue and red make violet, a Hex.</b> For four seconds the foe takes 35 per cent more damage from everything: towers, soldiers, your hero and spells.</li>
+<li><b>Yellow and blue make green, an Overgrowth.</b> Vines root the foe in place for over a second and thorns cut it. Flyers and bosses are slowed instead of rooted.</li>
+<li><b>Yellow and red make orange, a Flashfire.</b> The foe bursts into flame, and the fire spills onto every foe standing next to it.</li>
+</ul>
+<p>So the placement of towers matters as much as the towers themselves. Two different colours covering the same bend of road do far more than either does alone. A palette card in the corner of every battle shows the three mixes, so you never have to remember them. Barracks and beast dens carry no colour; their job is to hold the road and brawl.</p>
+<p>Your two spells are drawn rather than clicked. <b>The Wash</b> (<kbd>1</kbd>) is a stroke along the road: drag the pointer down the road and let go. A wave of water shoves the foes in it back down the road, slows them and stains them blue, which mixes with your archers and your artillery. <b>Ink Wall</b> (<kbd>2</kbd>) is a stroke across the road. Ground foes have to stop and hack through it, while flyers pass over. A single click casts either spell along or across the road under the pointer.</p>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li><b>Build in pairs of colours.</b> An archer post and a mage tower covering the same stretch will root foes in Overgrowth over and over. Add artillery nearby and every Hex and Flashfire comes free.</li>
+<li><b>Hex the big ones.</b> Armoured brutes and bosses barely notice arrows, but a Hex makes everything count for a third more. Blue and red on the same foe before your heavy hitters fire is worth more than another tower.</li>
+<li><b>The Wash is a colour as well as a spell.</b> It paints everything it touches blue. Drag it across a crowd that your archers or artillery are already staining and you set off a mix on every one of them at once.</li>
+<li><b>Draw walls at the bends.</b> A wall where the road turns, inside the range of several towers, keeps a crowd standing still in the one place where everything can reach it. Bosses smash through walls quickly, so a wall buys you seconds, not a fight.</li>
+<li><b>A stain dries.</b> A foe can be mixed again a moment after a mix, so fast-firing towers keep the reactions coming, while slow, heavy ones are better for the first colour.</li>
+<li><b>Call waves early when you are strong.</b> The skull at the start of a road calls the next wave at once, for bonus gold and a shorter wait on your spells.</li>
+</ul>
+
+<h2>What's in it</h2>
+<p>Twelve battles across three acts, with painted story panels between them, ending at the Throne of Blots and the Hollow King. Five tower lines with fifteen paths and thirty abilities, among them roaming beasts that grow from a drake into a dragon or from a bear into a war mammoth. Sixteen kinds of foe and three bosses, including ones that fly, heal, split, silence towers or douse them. A Royal Atelier of thirty permanent upgrades bought with the stars you win.</p>
+<p><b>Eight heroes.</b> Three join through the story. The other five are warriors for hire in the Hall of Warriors, paid for with the coins every battle earns: Tamsin Inkblade (250 coins), Old Hob Gaffhook (400), Vermilia Rook (550), Sir Bramwell Stout (700) and Mother Umber (900). Vermilia's bolts paint foes red, which makes her the hero for colour play. Mother Umber's curse is a Hex of her own. Heroes level up to ten and keep their experience between battles.</p>
+<p><b>Two Wardens</b> is the game for two. One player hosts and gets a four-letter code; the other types it in under Play Together. You each have your own gold, your own towers and your own hero, and you share the lives. Colours mix across both players' towers.</p>
+<p>The encyclopaedia lists every foe you have met, and every tower you have built or upgraded to. It fills in as you play.</p>
+
+<h2>Questions</h2>
+<h3>How do I earn coins?</h3>
+<p>Every battle pays coins, win or lose. A win pays 20, plus 8 for each battle further into the campaign, plus 12 for every star. A loss pays 5, plus 3 for every wave you held. Veteran pays half as much again, and Casual pays a quarter less.</p>
+<h3>How hard is it?</h3>
+<p>It is meant to be a challenge. Pick Casual, Normal or Veteran by clicking the difficulty on the world map. Normal will cost you lives in most battles if you build without thinking about colour, and Veteran is meant for players who use the mixes on purpose.</p>
+<h3>How does playing together work?</h3>
+<p>Choose Play Together on the title screen. One of you picks Host a game and reads out the code; the other picks Join a game and types it in. The host chooses the battle from their own map and keeps the game speed. Only the player who built a tower can upgrade or sell it. If one of you leaves, the other carries on, and any towers left behind become theirs. The connection goes straight between your two browsers, so no account is needed.</p>
+<h3>Does it save?</h3>
+<p>Yes, in your own browser: your stars, Atelier upgrades, coins, heroes, their levels and the encyclopaedia. Clearing your browser's site data clears the save.</p>
+<h3>Can I play on a phone?</h3>
+<p>Yes. Tap a plot or tower once to see the choices and tap again to confirm. Drag a finger along or across the road to draw a spell. On a phone, a tap on the code box opens a keyboard for joining a game.</p></article>
+
+        <div id="ad-play-footer"></div>
+
+        <!-- the rail that keeps a session going: a player who finishes
+             one game and sees eight more is worth several page views -->
+        <div id="alsorows"></div>
+      </div>
+
+      <aside class="side">
+        <div id="ad-play-rail"></div>
+        <div class="panel">
+          <h4>More games</h4>
+          <div id="more"><a class="mini" href="/play/highrise/"><span class="th" style="background-image:url('/shots/highrise.png')"></span><span><b>HIGHRISE</b><small>Shooter</small></span></a><a class="mini" href="/play/kickback/"><span class="th" style="background-image:url('/shots/kickback.png')"></span><span><b>KICKBACK</b><small>Action</small></span></a><a class="mini" href="/play/exposure/"><span class="th" style="background-image:url('/shots/exposure.png')"></span><span><b>EXPOSURE</b><small>Horror</small></span></a><a class="mini" href="/play/dungeon-quest/"><span class="th" style="background-image:url('/shots/dungeon-quest.png')"></span><span><b>DUNGEON QUEST</b><small>Adventure</small></span></a><a class="mini" href="/play/apex/"><span class="th" style="background-image:url('/shots/apex.png')"></span><span><b>APEX</b><small>Driving</small></span></a></div>
+        </div>
+        <div id="ad-play-tall"></div>
+      </aside>
+    </div>
+
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">20 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<!-- the loading interstitial: over a game that is LOADING, never one
+     that is being played, and it always has a skip -->
+<div class="gate" id="gate">
+  <div class="box">
+    <h3>Advertisement</h3>
+    <div data-ad></div>
+    <div class="count">your game starts in 5</div>
+    <button class="btn ghost" type="button">Skip</button>
+  </div>
+</div>
+
+<script type="module">
+import { GAMES, bySlug } from '/site/catalogue.js';
+import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
+import { loadAds, slot, interstitial } from '/ads/ads.js';
+
+// THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
+// server.js rewrites /play/<slug> to this file, and tools/deploy.mjs
+// writes this same file out to /play/<slug>/index.html for the static
+// host. Both leave the slug exactly where this line looks for it.
+const slug = location.pathname.split('/').filter(Boolean).pop();
+const g = bySlug(slug);
+if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
+
+mountShell({ active: catOf(g) });
+remember(g.slug);
+
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
+
+ttl.textContent = g.title;
+h1.textContent = g.title;
+barttl.textContent = g.title;
+lede.textContent = g.blurb;
+blurb.textContent = g.blurb;
+about.innerHTML = aboutHtml(g);
+tip.textContent = g.tips;
+shotbg.src = '/shots/' + g.slug + '.png';
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
+tags.innerHTML = [catOf(g), ...(g.tags || [])]
+  .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
+  .join('');
+
+// ---- where does this game actually come from? -----------------------
+//
+// ON THE WEB, NOWHERE BUT HERE. Every game is a folder under /games/,
+// the big ones included, which is why they now ask for their own files
+// by relative path rather than off the web root.
+//
+// ON THIS MACHINE they are still separate servers on separate ports,
+// because that is where they are developed and nothing about that should
+// have to change to suit a website. A port that is not answering shows
+// the browser's own error page inside the frame, which reads as the site
+// being broken - so that case asks first and says so plainly.
+//
+// WHICH OF THE TWO is decided at BUILD time rather than by sniffing the
+// hostname: tools/deploy.mjs stamps this flag into the copy it writes.
+const WEB = !!window.__PLAYPILE_WEB;
+let src = null, note = '';
+if (g.how === 'mounted' && WEB && g.web) {
+  src = '/games/' + g.web;
+  note = 'runs here';
+} else if (g.how === 'local') {
+  src = '/games/' + g.slug + '/';
+  note = 'runs here';
+} else if (g.how === 'unity') {
+  src = '/games/' + g.slug + '/build/index.html';
+  note = 'unity webgl · 83 mb first load';
+  warn.textContent = 'First load is a big download. It is cached after that.';
+} else {
+  src = 'http://localhost:' + g.port + (g.url || '/');
+  note = 'localhost:' + g.port;
+  try {
+    const list = await (await fetch('/api/mounted')).json();
+    const m = list.find((x) => x.slug === g.slug);
+    if (!m || m.state !== 'up') {
+      warn.innerHTML = 'This one runs from its own folder and is not up. '
+        + 'Start PLAYPILE with <code>node server.js</code> and it boots with the site.';
+    }
+  } catch (e) {}
+}
+how.textContent = note;
+
+start.addEventListener('click', async () => {
+  start.disabled = true;
+  await interstitial();          // the ad slot that pays, while it loads
+  frame.src = src;
+  frame.hidden = false;
+  curtain.style.display = 'none';
+  setTimeout(() => { try { frame.focus(); } catch (e) {} }, 400);
+});
+full.addEventListener('click', () => {
+  const el = document.getElementById('stage');
+  if (document.fullscreenElement) document.exitFullscreen();
+  else el.requestFullscreen && el.requestFullscreen();
+});
+reload.addEventListener('click', () => { if (frame.src) frame.src = frame.src; });
+// the two shortcuts the stage bar advertises, so they are not a lie
+addEventListener('keydown', (e) => {
+  if (e.target.matches('input,textarea')) return;
+  if (e.key === 'f' || e.key === 'F') full.click();
+  if (e.key === 'r' || e.key === 'R') reload.click();
+});
+
+// ---- more games, which is the other half of running a portal --------
+// Somebody who finishes a game and closes the tab is worth one page
+// view. The rail beside the game is five, chosen from the same category
+// first, and the row below it is everything else.
+const others = GAMES.filter((x) => x.slug !== g.slug);
+const same = others.filter((x) => catOf(x) === catOf(g));
+const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
+
+document.getElementById('alsorows').innerHTML =
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
+  + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
+
+// ---- adverts: every slot that existed before, in the same place -----
+await loadAds();
+slot(document.getElementById('ad-play-rail'), 'play_rail');
+slot(document.getElementById('ad-play-tall'), 'play_tall');
+slot(document.getElementById('ad-play-footer'), 'play_footer');
+</script>
+</body>
+</html>

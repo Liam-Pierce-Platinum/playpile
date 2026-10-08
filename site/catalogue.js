@@ -184,6 +184,29 @@ export const GAMES = [
     tips: 'If he keeps blocking high, hold SPACE and go to the body - and if you are guarding high yourself, expect him to wait half a second and go low.',
   },
   {
+    slug: 'inkvale', title: 'INKVALE', how: 'mounted', port: 8285, url: '/',
+    web: 'inkvale/',
+    tag: 'Strategy', big: true,
+    cat: 'Strategy', tags: ['new', 'tower defence', 'watercolour', 'co-op', 'online', 'heroes', 'story', '2 player'],
+    blurb: 'A tower defence painted in watercolour, where your towers paint the enemy and the colours mix.',
+    about: `Twelve battles, three acts, and a Hollow King at the end of the road. Archers stain
+    what they hit ochre, mages ultramarine, artillery vermilion - and a second colour on a
+    foe that is still wet MIXES: blue and red make a hex that makes everything hit harder,
+    yellow and blue grow vines that root it, yellow and red burst into fire that spreads.
+    Where you build is a palette. The spells are drawn, not clicked: drag a Wash along the
+    road to shove the crowd back and paint it blue, or an Ink Wall across it to make them
+    hack their way through.
+
+    Five tower lines split into fifteen paths, there are sixteen foes and three bosses,
+    and every battle pays coins to hire warriors in the Hall - eight heroes in all. Two
+    Wardens is the co-op: one of you hosts, the other joins with a four-letter code,
+    and you each bring your own gold, towers and hero.`,
+    controls: [['Click', 'build on a plot · upgrade a tower'], ['Drag + 1', 'The Wash, along the road'],
+               ['Drag + 2', 'Ink Wall, across the road'], ['H', 'select your hero, then click to send'],
+               ['Space', 'call the next wave early'], ['F', 'game speed'], ['Esc', 'pause · cancel']],
+    tips: 'Two colours on the same bend of road beat one big tower. Put an archer post and a mage tower side by side and watch the vines.',
+  },
+  {
     slug: 'penguin-dash', title: 'PENGUIN DASH', how: 'mounted', port: 8250, url: '/',
     web: 'penguin-dash/',
     tag: 'Arcade', big: true,

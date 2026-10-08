@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PLAYPILE</title>
+<!--PRE:head--><title>PLAYPILE</title><!--/PRE:head-->
 <link rel="stylesheet" href="/site/style.css">
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
@@ -39,7 +39,7 @@
   <div class="scrim" id="scrim"></div>
 
   <main id="main">
-    <nav class="crumbs" id="crumbs"></nav>
+    <nav class="crumbs" id="crumbs"><!--PRE:crumbs--><!--/PRE:crumbs--></nav>
     <div id="ad-play-leader"></div>
 
     <div class="play">
@@ -54,15 +54,15 @@
                   allowfullscreen hidden></iframe>
           <div class="curtain" id="curtain">
             <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
-            <h2 id="ttl">GAME</h2>
-            <p id="lede"></p>
+            <h2 id="ttl"><!--PRE:title-->GAME<!--/PRE:title--></h2>
+            <p id="lede"><!--PRE:blurb--><!--/PRE:blurb--></p>
             <button class="btn" id="start">Play</button>
             <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
           </div>
         </div>
 
         <div class="stagebar">
-          <span class="title" id="barttl"></span>
+          <span class="title" id="barttl"><!--PRE:title--><!--/PRE:title--></span>
           <span class="where" id="how"></span>
           <span class="sp"></span>
           <button id="full" type="button">
@@ -77,15 +77,20 @@
         </div>
 
         <section class="about">
-          <h1 id="h1">GAME</h1>
-          <p class="lede" id="blurb"></p>
-          <p id="about"></p>
+          <h1 id="h1"><!--PRE:title-->GAME<!--/PRE:title--></h1>
+          <p class="lede" id="blurb"><!--PRE:blurb--><!--/PRE:blurb--></p>
+          <div id="about"><!--PRE:about--><!--/PRE:about--></div>
           <h4>Controls</h4>
-          <ul class="keys" id="keys"></ul>
-          <div class="tip" id="tip"></div>
+          <ul class="keys" id="keys"><!--PRE:keys--><!--/PRE:keys--></ul>
+          <div class="tip" id="tip"><!--PRE:tip--><!--/PRE:tip--></div>
           <h4>Tags</h4>
-          <div class="tagrow" id="tags"></div>
+          <div class="tagrow" id="tags"><!--PRE:tags--><!--/PRE:tags--></div>
         </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><!--PRE:guide--><!--/PRE:guide--></article>
 
         <div id="ad-play-footer"></div>
 
@@ -98,7 +103,7 @@
         <div id="ad-play-rail"></div>
         <div class="panel">
           <h4>More games</h4>
-          <div id="more"></div>
+          <div id="more"><!--PRE:more--><!--/PRE:more--></div>
         </div>
         <div id="ad-play-tall"></div>
       </aside>
@@ -113,18 +118,18 @@
       <div class="cols2">
         <div>
           <div class="brand">PLAY<b>PILE</b></div>
-          <p class="blurb">23 browser games, all of them written for this site. No sign-up,
+          <p class="blurb">26 browser games, all of them written for this site. No sign-up,
              no download, and your best scores stay in your own browser.</p>
         </div>
         <div class="fl"><b>Site</b>
           <a href="/">All games</a><a href="/site/about.html">About</a>
-          <a href="/site/advertise.html">Advertise</a></div>
+          <a href="/site/updates.html">Updates</a><a href="/site/advertise.html">Advertise</a></div>
         <div class="fl"><b>Legal</b>
           <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a></div>
         <div class="fl"><b>Play</b>
-          <a href="/#c=Arcade">Arcade</a><a href="/#c=Classic">Classic</a>
-          <a href="/#c=Puzzle">Puzzle</a><a href="/#c=Sport">Sport</a>
-          <a href="/#c=Action">Action</a></div>
+          <a href="/category/arcade/">Arcade</a><a href="/category/classic/">Classic</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
       </div>
       <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
         <span>Made by one person, in a browser.</span></div>
@@ -146,6 +151,7 @@
 <script type="module">
 import { GAMES, bySlug } from '/site/catalogue.js';
 import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
 import { loadAds, slot, interstitial } from '/ads/ads.js';
 
 // THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
@@ -159,21 +165,26 @@ if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
 mountShell({ active: catOf(g) });
 remember(g.slug);
 
-document.title = g.title + ' — ' + catOf(g) + ' game — PLAYPILE';
-document.getElementById('crumbs').innerHTML =
-  '<a href="/">Games</a><i>&rsaquo;</i>'
-  + '<a href="/#c=' + encodeURIComponent(catOf(g)) + '">' + catOf(g) + '</a>'
-  + '<i>&rsaquo;</i><b>' + g.title + '</b>';
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
 
 ttl.textContent = g.title;
 h1.textContent = g.title;
 barttl.textContent = g.title;
 lede.textContent = g.blurb;
 blurb.textContent = g.blurb;
-about.textContent = g.about.replace(/\s+/g, ' ').trim();
+about.innerHTML = aboutHtml(g);
 tip.textContent = g.tips;
 shotbg.src = '/shots/' + g.slug + '.png';
-keys.innerHTML = g.controls.map(([k, w]) => `<li><kbd>${k}</kbd><span>${w}</span></li>`).join('');
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
 tags.innerHTML = [catOf(g), ...(g.tags || [])]
   .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
   .join('');
@@ -246,15 +257,10 @@ addEventListener('keydown', (e) => {
 const others = GAMES.filter((x) => x.slug !== g.slug);
 const same = others.filter((x) => catOf(x) === catOf(g));
 const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
-const rail = [...same, ...rest].slice(0, 5);
-more.innerHTML = rail.map((x) => `
-  <a class="mini" href="/play/${x.slug}">
-    <span class="th" style="background-image:url('/shots/${x.slug}.png')"></span>
-    <span><b>${x.title}</b><small>${catOf(x)}</small></span>
-  </a>`).join('');
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
 
 document.getElementById('alsorows').innerHTML =
-  row('More ' + catOf(g) + ' games', same, { seeAll: '/#c=' + encodeURIComponent(catOf(g)) })
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
   + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
 
 // ---- adverts: every slot that existed before, in the same place -----

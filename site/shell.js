@@ -131,7 +131,7 @@ const shot = (g) =>
   + ' onload="if(this.naturalHeight>this.naturalWidth)this.classList.add(\'tall\')">';
 
 export function card(g) {
-  return '<a class="card" href="/play/' + g.slug + '" title="' + g.title + '">'
+  return '<a class="card" href="/play/' + g.slug + '/" title="' + g.title + '">'
     + '<span class="thumb">'
     + '<span class="ph">' + g.title.slice(0, 2) + '</span>'
     + shot(g)
@@ -145,7 +145,7 @@ export function card(g) {
 }
 
 export function tile(g) {
-  return '<a class="tile" href="/play/' + g.slug + '" title="' + g.title + '">'
+  return '<a class="tile" href="/play/' + g.slug + '/" title="' + g.title + '">'
     + '<span class="ph">' + g.title.slice(0, 2) + '</span>'
     + shot(g)
     + '<span class="cap">' + g.title + '</span>'
@@ -194,12 +194,13 @@ export function mountShell({ active = '', onSearch = null } = {}) {
       + '</nav>'
       + '<div class="navhead">Categories</div><nav>';
     for (const c of categories()) {
-      html += link('/#c=' + encodeURIComponent(c.name), CAT_ICON[c.name] || 'grid',
+      html += link('/category/' + c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/', CAT_ICON[c.name] || 'grid',
                    c.name, c.count, active === c.name);
     }
     html += '</nav>'
       + '<div class="navrule"></div>'
-      + '<nav>' + link('/site/about.html', 'info', 'About', '', active === 'about') + '</nav>'
+      + '<nav>' + link('/site/about.html', 'info', 'About', '', active === 'about')
+      + link('/site/updates.html', 'clock', 'Updates', '', active === 'updates') + '</nav>'
       + '<div class="navsmall">'
       + '<a href="/site/advertise.html">Advertise</a>'
       + '<a href="/site/privacy.html">Privacy</a>'

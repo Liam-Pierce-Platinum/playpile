@@ -4,7 +4,17 @@
 <script>window.__PLAYPILE_WEB=1;</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PLAYPILE</title>
+<title>LINES — free classic game in your browser — PLAYPILE</title>
+<meta name="description" content="Seven shapes, ten columns, and a piece that lands still has half a second. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/lines/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="LINES — PLAYPILE">
+<meta property="og:description" content="Seven shapes, ten columns, and a piece that lands still has half a second. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/lines/">
+<meta property="og:image" content="https://playpile.net/shots/lines.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"LINES","url":"https://playpile.net/play/lines/","image":"https://playpile.net/shots/lines.png","description":"Seven shapes, ten columns, and a piece that lands still has half a second.","genre":"Classic","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Classic","item":"https://playpile.net/category/classic/"},{"@type":"ListItem","position":3,"name":"LINES","item":"https://playpile.net/play/lines/"}]}</script>
 <link rel="stylesheet" href="/site/style.css">
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
@@ -40,7 +50,7 @@
   <div class="scrim" id="scrim"></div>
 
   <main id="main">
-    <nav class="crumbs" id="crumbs"></nav>
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/category/classic/">Classic</a><i>&rsaquo;</i><b>LINES</b></nav>
     <div id="ad-play-leader"></div>
 
     <div class="play">
@@ -55,15 +65,15 @@
                   allowfullscreen hidden></iframe>
           <div class="curtain" id="curtain">
             <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
-            <h2 id="ttl">GAME</h2>
-            <p id="lede"></p>
+            <h2 id="ttl">LINES</h2>
+            <p id="lede">Seven  hape , ten column , and a piece that land   till ha  half a  econd.</p>
             <button class="btn" id="start">Play</button>
             <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
           </div>
         </div>
 
         <div class="stagebar">
-          <span class="title" id="barttl"></span>
+          <span class="title" id="barttl">LINES</span>
           <span class="where" id="how"></span>
           <span class="sp"></span>
           <button id="full" type="button">
@@ -78,15 +88,45 @@
         </div>
 
         <section class="about">
-          <h1 id="h1">GAME</h1>
-          <p class="lede" id="blurb"></p>
-          <p id="about"></p>
+          <h1 id="h1">LINES</h1>
+          <p class="lede" id="blurb">Seven  hape , ten column , and a piece that land   till ha  half a  econd.</p>
+          <div id="about"><p>The falling-block game with the four details that decide whether it feels right: a landed piece gets half a second in which it can still be slid or spun, the next piece comes from a shuffled bag of all seven rather than a dice, a rotation that would not fit is retried against the wall before being refused, and a ghost shows where it will land. Four rows at once pays half as much again if you did it last time too.</p></div>
           <h4>Controls</h4>
-          <ul class="keys" id="keys"></ul>
-          <div class="tip" id="tip"></div>
+          <ul class="keys" id="keys"><li><kbd>← →</kbd><span>move</span></li><li><kbd>↑ or X</kbd><span>spin</span></li><li><kbd>Z</kbd><span>spin back</span></li><li><kbd>↓ / S</kbd><span>soft drop</span></li><li><kbd>Space</kbd><span>hard drop</span></li><li><kbd>Shift / C</kbd><span>hold</span></li></ul>
+          <div class="tip" id="tip">The bag means the longest you can ever wait for the long piece is twelve.</div>
           <h4>Tags</h4>
-          <div class="tagrow" id="tags"></div>
+          <div class="tagrow" id="tags"><a class="chip on" href="/category/classic/">Classic</a><a class="chip" href="/#q=blocks">blocks</a><a class="chip" href="/#q=falling">falling</a><a class="chip" href="/#q=retro">retro</a><a class="chip" href="/#q=puzzle">puzzle</a><a class="chip" href="/#q=80s">80s</a></div>
         </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>Pieces made of four squares drop into a well ten columns wide and twenty rows deep. Move them, turn them and drop them so that they fill complete rows. A full row disappears and everything above it falls down. The run ends when a new piece has no room to appear at the top, or when a piece comes to rest partly above the well.</p>
+<p>You score for clearing rows, and clearing more at once pays more: 100 points for one row, 300 for two, 500 for three and 800 for four, all multiplied by your current level. You go up a level every ten rows, and each level makes the pieces fall faster. At level one a piece drops a row every 0.8 seconds. By about level sixteen it falls at its top speed. You also get 1 point for every row you soft drop and 2 for every row you hard drop.</p>
+<p>The falling-block game was created by Alexey Pajitnov in Moscow in 1984, as <i>Tetris</i>. This version keeps the details that modern players expect. It shows three pieces ahead, lets you hold one piece back, gives a landed piece half a second before it locks, and draws a ghost outline where the piece will land.</p>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li>A piece that has landed can still move. Each slide or turn restarts its half-second, up to fifteen times, before it locks no matter what. Use that time to tuck a piece under an overhang.</li>
+<li>Pieces come out of a shuffled set of all seven, and the set refills only when it is empty. The longest you can ever wait for the long bar is twelve pieces, so leaving one column open for it is a safe plan.</li>
+<li>Four rows straight after another four rows (shown as BACK TO BACK) pays half as much again on top of the 800 &times; level.</li>
+<li>Clearing rows on piece after piece builds a combo. Each clear in the chain adds 50 &times; level &times; the combo count. Any piece that clears nothing breaks the chain.</li>
+<li>The hold box can be used once per piece. It greys out until the next piece arrives, so do not hold a piece and then expect to swap straight back.</li>
+<li>A turn that would hit something is tried again a square to the side or up before it is refused. Spinning against a wall or into a notch usually works, so try it before you give up on a gap.</li>
+<li>Hard drop scores double what soft drop scores per row. Once the ghost is in the right place, <kbd>Space</kbd> is worth more points as well as being faster.</li>
+</ul>
+
+<h2>What's in it</h2>
+<p>One endless mode, with speed rising by level, and a top-ten board for score. The side panel shows the hold box, the next three pieces, your rows, your level, and the combo and back-to-back counters while they are live. Move with <kbd>&larr;</kbd> <kbd>&rarr;</kbd> (or <kbd>A</kbd> <kbd>D</kbd>). Holding a direction slides the piece repeatedly after a short pause. Spin with <kbd>&uarr;</kbd> or <kbd>X</kbd>, and spin back with <kbd>Z</kbd> or <kbd>Ctrl</kbd>. Soft drop with <kbd>&darr;</kbd> or <kbd>S</kbd>, hard drop with <kbd>Space</kbd>, and hold with <kbd>Shift</kbd> or <kbd>C</kbd>.</p>
+
+<h2>Questions</h2>
+<h3>How fast does it get?</h3>
+<p>The fall time shrinks by nearly a fifth at each level. It reaches its fastest at around level sixteen, which is 150 rows in.</p>
+<h3>Is the piece order random?</h3>
+<p>It is shuffled, not rolled. You get all seven shapes in a random order, then all seven again, so long droughts and long streaks of one shape cannot happen.</p>
+<h3>Can I play it on a phone?</h3>
+<p>It needs a keyboard. There are no touch controls for moving or turning pieces.</p></article>
 
         <div id="ad-play-footer"></div>
 
@@ -99,7 +139,7 @@
         <div id="ad-play-rail"></div>
         <div class="panel">
           <h4>More games</h4>
-          <div id="more"></div>
+          <div id="more"><a class="mini" href="/play/snake/"><span class="th" style="background-image:url('/shots/snake.png')"></span><span><b>SNAKE</b><small>Classic</small></span></a><a class="mini" href="/play/rally/"><span class="th" style="background-image:url('/shots/rally.png')"></span><span><b>RALLY</b><small>Classic</small></span></a><a class="mini" href="/play/invasion/"><span class="th" style="background-image:url('/shots/invasion.png')"></span><span><b>INVASION</b><small>Classic</small></span></a><a class="mini" href="/play/highrise/"><span class="th" style="background-image:url('/shots/highrise.png')"></span><span><b>HIGHRISE</b><small>Shooter</small></span></a><a class="mini" href="/play/kickback/"><span class="th" style="background-image:url('/shots/kickback.png')"></span><span><b>KICKBACK</b><small>Action</small></span></a></div>
         </div>
         <div id="ad-play-tall"></div>
       </aside>
@@ -114,18 +154,18 @@
       <div class="cols2">
         <div>
           <div class="brand">PLAY<b>PILE</b></div>
-          <p class="blurb">23 browser games, all of them written for this site. No sign-up,
+          <p class="blurb">26 browser games, all of them written for this site. No sign-up,
              no download, and your best scores stay in your own browser.</p>
         </div>
         <div class="fl"><b>Site</b>
           <a href="/">All games</a><a href="/site/about.html">About</a>
-          <a href="/site/advertise.html">Advertise</a></div>
+          <a href="/site/updates.html">Updates</a><a href="/site/advertise.html">Advertise</a></div>
         <div class="fl"><b>Legal</b>
           <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a></div>
         <div class="fl"><b>Play</b>
-          <a href="/#c=Arcade">Arcade</a><a href="/#c=Classic">Classic</a>
-          <a href="/#c=Puzzle">Puzzle</a><a href="/#c=Sport">Sport</a>
-          <a href="/#c=Action">Action</a></div>
+          <a href="/category/arcade/">Arcade</a><a href="/category/classic/">Classic</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
       </div>
       <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
         <span>Made by one person, in a browser.</span></div>
@@ -147,6 +187,7 @@
 <script type="module">
 import { GAMES, bySlug } from '/site/catalogue.js';
 import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
 import { loadAds, slot, interstitial } from '/ads/ads.js';
 
 // THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
@@ -160,21 +201,26 @@ if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
 mountShell({ active: catOf(g) });
 remember(g.slug);
 
-document.title = g.title + ' — ' + catOf(g) + ' game — PLAYPILE';
-document.getElementById('crumbs').innerHTML =
-  '<a href="/">Games</a><i>&rsaquo;</i>'
-  + '<a href="/#c=' + encodeURIComponent(catOf(g)) + '">' + catOf(g) + '</a>'
-  + '<i>&rsaquo;</i><b>' + g.title + '</b>';
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
 
 ttl.textContent = g.title;
 h1.textContent = g.title;
 barttl.textContent = g.title;
 lede.textContent = g.blurb;
 blurb.textContent = g.blurb;
-about.textContent = g.about.replace(/\s+/g, ' ').trim();
+about.innerHTML = aboutHtml(g);
 tip.textContent = g.tips;
 shotbg.src = '/shots/' + g.slug + '.png';
-keys.innerHTML = g.controls.map(([k, w]) => `<li><kbd>${k}</kbd><span>${w}</span></li>`).join('');
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
 tags.innerHTML = [catOf(g), ...(g.tags || [])]
   .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
   .join('');
@@ -247,15 +293,10 @@ addEventListener('keydown', (e) => {
 const others = GAMES.filter((x) => x.slug !== g.slug);
 const same = others.filter((x) => catOf(x) === catOf(g));
 const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
-const rail = [...same, ...rest].slice(0, 5);
-more.innerHTML = rail.map((x) => `
-  <a class="mini" href="/play/${x.slug}">
-    <span class="th" style="background-image:url('/shots/${x.slug}.png')"></span>
-    <span><b>${x.title}</b><small>${catOf(x)}</small></span>
-  </a>`).join('');
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
 
 document.getElementById('alsorows').innerHTML =
-  row('More ' + catOf(g) + ' games', same, { seeAll: '/#c=' + encodeURIComponent(catOf(g)) })
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
   + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
 
 // ---- adverts: every slot that existed before, in the same place -----

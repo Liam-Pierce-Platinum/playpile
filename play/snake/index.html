@@ -4,7 +4,17 @@
 <script>window.__PLAYPILE_WEB=1;</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PLAYPILE</title>
+<title>SNAKE — free classic game in your browser — PLAYPILE</title>
+<meta name="description" content="Every fifth apple leaves a block where you ate it. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/snake/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="SNAKE — PLAYPILE">
+<meta property="og:description" content="Every fifth apple leaves a block where you ate it. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/snake/">
+<meta property="og:image" content="https://playpile.net/shots/snake.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"SNAKE","url":"https://playpile.net/play/snake/","image":"https://playpile.net/shots/snake.png","description":"Every fifth apple leaves a block where you ate it.","genre":"Classic","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Classic","item":"https://playpile.net/category/classic/"},{"@type":"ListItem","position":3,"name":"SNAKE","item":"https://playpile.net/play/snake/"}]}</script>
 <link rel="stylesheet" href="/site/style.css">
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
@@ -40,7 +50,7 @@
   <div class="scrim" id="scrim"></div>
 
   <main id="main">
-    <nav class="crumbs" id="crumbs"></nav>
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/category/classic/">Classic</a><i>&rsaquo;</i><b>SNAKE</b></nav>
     <div id="ad-play-leader"></div>
 
     <div class="play">
@@ -55,15 +65,15 @@
                   allowfullscreen hidden></iframe>
           <div class="curtain" id="curtain">
             <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
-            <h2 id="ttl">GAME</h2>
-            <p id="lede"></p>
+            <h2 id="ttl">SNAKE</h2>
+            <p id="lede">Every fifth apple leave  a block where you ate it.</p>
             <button class="btn" id="start">Play</button>
             <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
           </div>
         </div>
 
         <div class="stagebar">
-          <span class="title" id="barttl"></span>
+          <span class="title" id="barttl">SNAKE</span>
           <span class="where" id="how"></span>
           <span class="sp"></span>
           <button id="full" type="button">
@@ -78,15 +88,47 @@
         </div>
 
         <section class="about">
-          <h1 id="h1">GAME</h1>
-          <p class="lede" id="blurb"></p>
-          <p id="about"></p>
+          <h1 id="h1">SNAKE</h1>
+          <p class="lede" id="blurb">Every fifth apple leave  a block where you ate it.</p>
+          <div id="about"><p>Plain Snake is solved - you learn to fold it into rows and then it is a chore with a timer. So this one fights back: every fifth apple drops a wall block on the square where you ate it, which means the tidy fold stops being safe and the board at apple forty is one you built yourself out of forty decisions. The golden apple is worth five and rots in seven seconds, and the route to it is never the route you would otherwise take.</p></div>
           <h4>Controls</h4>
-          <ul class="keys" id="keys"></ul>
-          <div class="tip" id="tip"></div>
+          <ul class="keys" id="keys"><li><kbd>Arrows / W A S D</kbd><span>turn</span></li><li><kbd>Swipe</kbd><span>turn (mobile)</span></li><li><kbd>P</kbd><span>pause</span></li></ul>
+          <div class="tip" id="tip">Turns are buffered two deep, so left-then-up as one motion works at full speed.</div>
           <h4>Tags</h4>
-          <div class="tagrow" id="tags"></div>
+          <div class="tagrow" id="tags"><a class="chip on" href="/category/classic/">Classic</a><a class="chip" href="/#q=snake">snake</a><a class="chip" href="/#q=retro">retro</a><a class="chip" href="/#q=arcade">arcade</a><a class="chip" href="/#q=mobile">mobile</a><a class="chip" href="/#q=80s">80s</a></div>
         </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>You steer a snake around a walled grid of 25 by 23 squares. It moves forward on its own, and all you choose is when to turn. Each apple you eat makes it two squares longer and is worth 10 points. The run ends the moment the head hits the outer wall, a block or the snake&rsquo;s own body. The snake starts four squares long, in the middle, heading right.</p>
+<p>Two things make this version different from the one you remember. First, every fifth apple leaves a grey block on the square where you ate it. Blocks never go away, so over a long run you fill the board with walls in the places you chose to eat. Second, a golden apple appears alongside the normal one every seventh apple. It is worth 50 points and adds three squares, but it lasts only seven seconds. The ring round it shows how much time is left, and it starts to flash near the end. The snake also speeds up with every apple until about the thirty-third, after which it holds a steady top speed.</p>
+<p>Snake goes back to the arcade game <i>Blockade</i>, made by Gremlin in 1976. It reached most people as the game built into Nokia mobile phones from 1997 onwards.</p>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li>A new block appears right behind your head as you eat the fifth, tenth, fifteenth apple and so on. Before you take one of those, check that it will not seal off the lane you are about to need.</li>
+<li>Try to take your fifth-apple bites near the outer wall or next to blocks you already have. A block in the open middle of the board splits it in two.</li>
+<li>The square your tail is leaving is safe to move into, so you can follow your own tail tightly round a corner. That stops being true for a moment after you eat, because the tail stays put while the snake grows.</li>
+<li>Turns are stored two deep. Press left then up quickly and both will happen, one square apart. You do not have to time each press to the square.</li>
+<li>You cannot reverse straight back into yourself. A press in the opposite direction is ignored, not fatal.</li>
+<li>Only go for a golden apple if you can reach it in about seven seconds without a risky line. Near top speed the snake moves about sixteen squares a second, so a cross-board dash is usually possible. Coming back afterwards is the hard part.</li>
+<li>Golden apples come on the seventh, fourteenth, twenty-first apple and so on. The thirty-fifth apple both drops a block and brings a golden one, so plan for both.</li>
+</ul>
+
+<h2>What's in it</h2>
+<p>One mode, a single life, and a top-ten board for score. The bar at the top shows your score, length, the number of blocks you have left and your best. The end screen tells you how many apples you ate and how many blocks you built. Turn with the arrow keys or <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd>, or swipe on a phone. <kbd>P</kbd> pauses, <kbd>R</kbd> goes back to the home screen and <kbd>F</kbd> goes fullscreen.</p>
+
+<h2>Questions</h2>
+<h3>Do the blocks ever disappear?</h3>
+<p>No. Every block stays until the run ends, and that is where the difficulty comes from.</p>
+<h3>Can I go through the edge and come out the other side?</h3>
+<p>No. The edge of the grid is a wall, and hitting it ends the run.</p>
+<h3>What happens if I fill the whole board?</h3>
+<p>The run ends there with whatever you have scored. There is nowhere left for an apple to go.</p>
+<h3>Why didn't my swipe register?</h3>
+<p>A swipe has to travel a short distance before it counts. A light tap is ignored, so a nudge of the thumb on the screen will not turn you by accident.</p></article>
 
         <div id="ad-play-footer"></div>
 
@@ -99,7 +141,7 @@
         <div id="ad-play-rail"></div>
         <div class="panel">
           <h4>More games</h4>
-          <div id="more"></div>
+          <div id="more"><a class="mini" href="/play/lines/"><span class="th" style="background-image:url('/shots/lines.png')"></span><span><b>LINES</b><small>Classic</small></span></a><a class="mini" href="/play/rally/"><span class="th" style="background-image:url('/shots/rally.png')"></span><span><b>RALLY</b><small>Classic</small></span></a><a class="mini" href="/play/invasion/"><span class="th" style="background-image:url('/shots/invasion.png')"></span><span><b>INVASION</b><small>Classic</small></span></a><a class="mini" href="/play/highrise/"><span class="th" style="background-image:url('/shots/highrise.png')"></span><span><b>HIGHRISE</b><small>Shooter</small></span></a><a class="mini" href="/play/kickback/"><span class="th" style="background-image:url('/shots/kickback.png')"></span><span><b>KICKBACK</b><small>Action</small></span></a></div>
         </div>
         <div id="ad-play-tall"></div>
       </aside>
@@ -114,18 +156,18 @@
       <div class="cols2">
         <div>
           <div class="brand">PLAY<b>PILE</b></div>
-          <p class="blurb">23 browser games, all of them written for this site. No sign-up,
+          <p class="blurb">26 browser games, all of them written for this site. No sign-up,
              no download, and your best scores stay in your own browser.</p>
         </div>
         <div class="fl"><b>Site</b>
           <a href="/">All games</a><a href="/site/about.html">About</a>
-          <a href="/site/advertise.html">Advertise</a></div>
+          <a href="/site/updates.html">Updates</a><a href="/site/advertise.html">Advertise</a></div>
         <div class="fl"><b>Legal</b>
           <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a></div>
         <div class="fl"><b>Play</b>
-          <a href="/#c=Arcade">Arcade</a><a href="/#c=Classic">Classic</a>
-          <a href="/#c=Puzzle">Puzzle</a><a href="/#c=Sport">Sport</a>
-          <a href="/#c=Action">Action</a></div>
+          <a href="/category/arcade/">Arcade</a><a href="/category/classic/">Classic</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
       </div>
       <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
         <span>Made by one person, in a browser.</span></div>
@@ -147,6 +189,7 @@
 <script type="module">
 import { GAMES, bySlug } from '/site/catalogue.js';
 import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
 import { loadAds, slot, interstitial } from '/ads/ads.js';
 
 // THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
@@ -160,21 +203,26 @@ if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
 mountShell({ active: catOf(g) });
 remember(g.slug);
 
-document.title = g.title + ' — ' + catOf(g) + ' game — PLAYPILE';
-document.getElementById('crumbs').innerHTML =
-  '<a href="/">Games</a><i>&rsaquo;</i>'
-  + '<a href="/#c=' + encodeURIComponent(catOf(g)) + '">' + catOf(g) + '</a>'
-  + '<i>&rsaquo;</i><b>' + g.title + '</b>';
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
 
 ttl.textContent = g.title;
 h1.textContent = g.title;
 barttl.textContent = g.title;
 lede.textContent = g.blurb;
 blurb.textContent = g.blurb;
-about.textContent = g.about.replace(/\s+/g, ' ').trim();
+about.innerHTML = aboutHtml(g);
 tip.textContent = g.tips;
 shotbg.src = '/shots/' + g.slug + '.png';
-keys.innerHTML = g.controls.map(([k, w]) => `<li><kbd>${k}</kbd><span>${w}</span></li>`).join('');
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
 tags.innerHTML = [catOf(g), ...(g.tags || [])]
   .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
   .join('');
@@ -247,15 +295,10 @@ addEventListener('keydown', (e) => {
 const others = GAMES.filter((x) => x.slug !== g.slug);
 const same = others.filter((x) => catOf(x) === catOf(g));
 const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
-const rail = [...same, ...rest].slice(0, 5);
-more.innerHTML = rail.map((x) => `
-  <a class="mini" href="/play/${x.slug}">
-    <span class="th" style="background-image:url('/shots/${x.slug}.png')"></span>
-    <span><b>${x.title}</b><small>${catOf(x)}</small></span>
-  </a>`).join('');
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
 
 document.getElementById('alsorows').innerHTML =
-  row('More ' + catOf(g) + ' games', same, { seeAll: '/#c=' + encodeURIComponent(catOf(g)) })
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
   + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
 
 // ---- adverts: every slot that existed before, in the same place -----

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Southpaw</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:,">
+</head>
+<body>
+<div id="stage">
+  <canvas id="screen"></canvas>
+
+  <!-- ============================== HOME ============================== -->
+  <div id="title" class="overlay home">
+    <div class="home-left">
+      <h1 class="logo">SOUTH<span>PAW</span></h1>
+      <p class="tag">arcade boxing</p>
+      <nav class="menu">
+        <button data-go="campaign" class="big hot">CAMPAIGN <em id="home-camp-sub"></em></button>
+        <button data-go="free" class="big">FREE PLAY</button>
+        <button data-go="modes" class="big">SPECIAL MODES <em>wrestling &middot; sumo</em></button>
+        <button data-go="online" class="big">ONLINE</button>
+        <button data-go="gym" class="big">THE GYM <em class="epval">0 EP</em></button>
+        <button data-go="locker" class="big">LOCKER ROOM <em>your look</em></button>
+        <button data-go="howto" class="big">HOW TO BOX</button>
+      </nav>
+      <div class="home-foot">
+        <button id="btn-mute" class="small">SOUND: ON</button>
+        <span>arrows punch &middot; hold SPACE to go low &middot; ESC pause</span>
+      </div>
+    </div>
+    <div class="home-right">
+      <div class="homecard you" data-go="locker" title="customise in the locker room">
+        <span class="lbl">YOUR FIGHTER  -  CLICK TO CUSTOMISE</span>
+        <div class="hc-row">
+          <canvas id="home-you"></canvas>
+          <div class="hc-info">
+            <b id="home-name">YOU</b>
+            <small id="home-record">0 - 0</small>
+            <div id="home-bars" class="hc-bars"></div>
+          </div>
+        </div>
+      </div>
+      <div class="homecard next" id="home-next">
+        <span class="lbl">NEXT UP</span>
+        <div class="hc-row">
+          <canvas id="home-opp"></canvas>
+          <div class="hc-info">
+            <b id="home-opp-name"></b>
+            <small id="home-opp-sub"></small>
+            <small id="home-opp-arena" class="arena"></small>
+            <span id="home-opp-belt" class="belt"></span>
+          </div>
+        </div>
+        <button id="home-fight" class="big hot wide">FIGHT NOW</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ CAMPAIGN ============================ -->
+  <div id="campaign" class="overlay hidden">
+    <div class="plate wide">
+      <div class="topbar">
+        <h2>THE ROAD TO THE GARDEN</h2>
+        <div class="wallet"><span class="epval">0 EP</span><button data-go="gym" class="shopbtn">GYM</button><button data-go="title" class="shopbtn">BACK</button></div>
+      </div>
+      <p class="tag">ten fights, six arenas. beat the champion of each venue to move up. weaknesses show up in the scouting report once you have been in the ring with them.</p>
+      <div id="ladder" class="ladder"></div>
+    </div>
+  </div>
+
+  <!-- ============================ FREE PLAY ============================ -->
+  <div id="free" class="overlay hidden">
+    <div class="plate wide">
+      <div class="topbar">
+        <h2>FREE PLAY</h2>
+        <div class="wallet"><span class="epval">0 EP</span><button data-go="title" class="shopbtn">BACK</button></div>
+      </div>
+      <p class="tag">anyone, anywhere. wins here pay a little EP too.</p>
+      <h3>OPPONENT</h3>
+      <div id="free-opps" class="picker"></div>
+      <h3>ARENA</h3>
+      <div id="free-arenas" class="picker arenas"></div>
+      <div class="row">
+        <h3 style="margin:0">ROUNDS</h3>
+        <div id="free-rounds" class="seg"><button data-r="1">1</button><button data-r="3" class="on">3</button><button data-r="5">5</button></div>
+        <button id="free-go" class="big hot" style="margin-left:auto">FIGHT!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================= ONLINE ============================= -->
+  <div id="online" class="overlay hidden">
+    <div class="plate">
+      <div class="topbar">
+        <h2>ONLINE</h2>
+        <div class="wallet"><button id="online-back" class="shopbtn">BACK</button></div>
+      </div>
+      <p class="tag">your gym stats come with you. win online for 6 EP (8 by knockout).</p>
+      <div class="row" style="margin:0 0 12px"><h3 style="margin:0">SPORT</h3><div id="net-kind" class="seg"><button data-k="box" class="on">BOXING</button><button data-k="wrestle">WRESTLING</button><button data-k="sumo">SUMO</button></div></div>
+      <label class="field">YOUR NAME <input id="net-name" maxlength="12" spellcheck="false"></label>
+      <div class="netbtns">
+        <button id="net-quick" class="big hot">QUICK MATCH</button>
+        <button id="net-create" class="big">CREATE ROOM</button>
+        <div class="joinrow"><input id="net-code" maxlength="4" placeholder="CODE" inputmode="numeric"><button id="net-join" class="big">JOIN</button></div>
+      </div>
+      <div id="net-status" class="netstatus">not connected</div>
+      <p id="net-lan" class="tag small"></p>
+      <div id="inet" class="inet">
+        <h3>PLAY OVER THE INTERNET</h3>
+        <p class="tag small" id="inet-text">open a public link and anyone, anywhere, can load the game from your PC and fight you. it stays open until you close it or stop the server.</p>
+        <div class="netbtns"><button id="inet-go" class="big">OPEN PUBLIC LINK</button><button id="inet-stop" class="big hidden">CLOSE LINK</button></div>
+        <div id="inet-url" class="netstatus hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ SPECIAL MODES ============================ -->
+  <div id="modes" class="overlay hidden">
+    <div class="plate wide">
+      <div class="topbar">
+        <h2>SPECIAL MODES</h2>
+        <div class="wallet"><span class="epval">0 EP</span><button data-go="title" class="shopbtn">BACK</button></div>
+      </div>
+      <p class="tag">same fighter, same gym stats, different sport. wins pay 4 EP, beating the champion pays 7.</p>
+      <div class="modecols">
+        <div class="modecol">
+          <h3>WRESTLING - THE SLAMBOWL</h3>
+          <p class="tag small">one fall. <b>hold E to run</b> - hit the ropes and you bounce back off them. <b>SPACE</b> to lock up, press an arrow when the meter peaks, then suplex, slam, whip or DDT. pin him with <b>SPACE</b> when he's down.</p>
+          <div id="mode-wrestle-opps" class="picker"></div>
+          <div id="mode-wrestle-scout" class="scout modescout"></div>
+          <button id="mode-wrestle-go" class="big hot wide">WRESTLE!</button>
+        </div>
+        <div class="modecol">
+          <h3>SUMO - RYOGOKU HALL</h3>
+          <p class="tag small">best of three bouts. wait for <b>HAKKEYOI</b> then charge. push him out of the circle or put him on the clay. <b>UP</b> thrust, <b>RIGHT</b> grab the belt, <b>DOWN</b> pull-down, hold <b>SPACE</b> to sink low.</p>
+          <div id="mode-sumo-opps" class="picker"></div>
+          <div id="mode-sumo-scout" class="scout modescout"></div>
+          <button id="mode-sumo-go" class="big hot wide">HAKKEYOI!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ LOCKER ROOM ============================ -->
+  <div id="locker" class="overlay hidden">
+    <div class="plate wide">
+      <div class="topbar">
+        <h2>LOCKER ROOM</h2>
+        <div class="wallet"><button id="lock-random" class="shopbtn">RANDOM</button><button id="lock-reset" class="shopbtn">DEFAULT</button><button id="lock-done" class="shopbtn">DONE</button></div>
+      </div>
+      <p class="tag">how you look in the ring, on the VS screen, and to whoever you fight online.</p>
+      <div class="lockrow">
+        <div class="lockprev">
+          <canvas id="lock-canvas"></canvas>
+          <label class="field">NAME <input id="lock-name" maxlength="12" spellcheck="false" placeholder="YOU"></label>
+        </div>
+        <div id="lock-opts" class="lockopts"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =============================== GYM =============================== -->
+  <div id="gym" class="overlay hidden">
+    <div class="plate wide">
+      <div class="topbar">
+        <h2>THE GYM</h2>
+        <div class="wallet"><span class="epval big">0 EP</span><button id="gym-respec" class="shopbtn danger">REFUND ALL</button><button id="gym-back" class="shopbtn">BACK</button></div>
+      </div>
+      <p class="tag">win fights, earn ENERGY POINTS, spend them here. each level costs one more EP than the last.</p>
+      <div class="gymrow">
+        <div class="gymscene"><canvas id="gym-canvas"></canvas><span id="gym-note" class="note">working the bag</span></div>
+        <div id="gym-stats" class="stats"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================== HOW TO ============================== -->
+  <div id="howto" class="overlay hidden">
+    <div class="plate wide">
+      <div class="topbar">
+        <h2>HOW TO BOX</h2>
+        <div class="wallet"><button id="howto-back" class="shopbtn">BACK</button></div>
+      </div>
+      <div class="howto">
+        <div class="col">
+          <h3>moving</h3>
+          <ul>
+            <li><b>A / D</b> step left and right</li>
+            <li><b>W / S</b> step up and back across the ring. <b>punches only land when you are lined up</b> - stepping off the line is a defence, cutting him off is an attack.</li>
+          </ul>
+          <h3>punching - the arrows</h3>
+          <ul>
+            <li><b>&larr;</b> jab &nbsp; <b>&uarr;</b> cross &nbsp; <b>&rarr;</b> lead hook &nbsp; <b>&darr;</b> uppercut</li>
+            <li>a punch that <b>connects</b> can be cancelled straight into the next one. tap in a rhythm for combos: <b>&larr; &uarr;</b> one-two, <b>&larr; &uarr; &rarr;</b> one-two-three, <b>&larr; &uarr; &rarr; &darr;</b> THE FULL FOUR, <b>&rarr; &darr;</b> hook-upper, <b>&uarr; &rarr; &uarr;</b> cross-hook-cross&hellip;</li>
+            <li>every punch in a chain hits harder. a missed punch has to come all the way home - and he can counter it.</li>
+          </ul>
+          <h3>defence</h3>
+          <ul>
+            <li><b>SHIFT</b> hold the guard up. <b>SHIFT + SPACE</b> guard low for body shots - same key as going low yourself. uppercuts come up through the high guard.</li>
+            <li><b>Q</b> SLIP, lean back: beats straights, uppercuts and overhands. hooks wrap round it.</li>
+            <li><b>E</b> DUCK: beats straights and hooks. duck into an uppercut and it does 50% more.</li>
+            <li>dodge a punch and your next one is a <b>COUNTER</b> for 35% extra.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h3>hold SPACE - go low</h3>
+          <ul>
+            <li>hold <b>SPACE</b> and every punch goes to the <b>BODY</b>: <b>&larr;</b> body jab, <b>&uarr;</b> body cross, <b>&rarr;</b> liver hook, <b>&darr;</b> uppercut to the gut.</li>
+            <li>body shots drain his stamina and slow him down, and they go straight under a high guard. he has to drop his guard low to stop them - and then his head is open.</li>
+            <li>combos still chain while you change levels: <b>SPACE+&rarr;</b> then <b>&rarr;</b> is the body-head hook.</li>
+            <li>it works the other way too: when he goes to your body, <b>SHIFT + SPACE</b> blocks low.</li>
+          </ul>
+          <h3>the fight</h3>
+          <ul>
+            <li><b>STARS</b> fill as you land clean. <b>F</b> spends one on a STAR PUNCH.</li>
+            <li><b>STAMINA</b> (yellow) pays for punches. out of gas: slow and weak. body shots drain it.</li>
+            <li>part of every hit is <b>recoverable</b> (the pale bar) - stay clean for a moment and it comes back.</li>
+            <li>knocked down? <b>mash the arrows</b> to beat the count. three knockdowns is a TKO.</li>
+            <li>every fighter has <b>weaknesses</b>: a punch he can't defend, a target that hurts, a habit that leaves him open. watch for <b style="color:#9ce85b">OPEN</b> and the flashing <b style="color:#ffd23d">!</b> wind-up.</li>
+            <li><b>ESC</b> pause</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================= VS SCREEN ============================= -->
+  <div id="vs" class="overlay hidden see">
+    <div class="vsbox">
+      <div class="vsside red"><canvas id="vs-a"></canvas><b id="vs-a-name"></b><small id="vs-a-sub"></small></div>
+      <div class="vsmid"><span class="vsword">VS</span><small id="vs-arena"></small><small id="vs-title" class="titleflag"></small></div>
+      <div class="vsside blue"><canvas id="vs-b"></canvas><b id="vs-b-name"></b><small id="vs-b-sub"></small><div id="vs-scout" class="scout"></div></div>
+    </div>
+    <p class="hint">press any key</p>
+  </div>
+
+  <!-- ============================== RESULTS ============================== -->
+  <div id="results" class="overlay hidden">
+    <div class="plate small">
+      <div id="result-body"></div>
+      <div class="btns" id="result-btns"></div>
+    </div>
+  </div>
+
+  <!-- ============================== PAUSE ============================== -->
+  <div id="pause" class="overlay hidden">
+    <div class="plate small">
+      <h2>PAUSED</h2>
+      <div class="btns col">
+        <button id="resume" class="big hot">RESUME</button>
+        <button id="pause-howto" class="big">HOW TO BOX</button>
+        <button id="quit" class="big">QUIT FIGHT</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -24,8 +24,10 @@ export const GAMES = [
     look back down the well at the floor you just cleared. The plate changes as you
     go up - offices, trading floors, residential conversions, the plant floor on 12,
     the sky lobby on 16, and a penthouse at the top.`,
-    controls: [['W A S D', 'move'], ['Mouse', 'look and fire'], ['Shift', 'sprint'],
-               ['R', 'reload'], ['E', 'pick up'], ['F6', 'editor']],
+    controls: [['W A S D', 'move'], ['Mouse', 'look · click to fire · right-click to strike'],
+               ['Shift', 'sprint'], ['Ctrl', 'crouch'], ['Space', 'slide'],
+               ['Q E', 'lean'], ['R', 'reload'], ['1 - 8 / wheel', 'weapons'],
+               ['H', 'bandage']],
     tips: 'Cover is real - a locker bank stops bullets. Crouch behind a barrier and it covers you.',
   },
   {
@@ -37,8 +39,8 @@ export const GAMES = [
     about: `Six floors of an unfinished tower over the harbour with downtown across
     the water. Fire it at the floor and it throws you; fire it at a man and it is a
     shotgun. Two shells, then a reload you have to find the time for.`,
-    controls: [['A D', 'walk'], ['Mouse', 'swing the gun'], ['Click', 'fire'],
-               ['R', 'reload'], ['1 2 3', 'pick an upgrade at a crate']],
+    controls: [['A D / arrows', 'walk'], ['Mouse', 'swing the gun'], ['Click', 'fire'],
+               ['R', 'reload'], ['1 2 3', 'pick an upgrade at a crate'], ['P', 'pause']],
     tips: 'Down is a jump. Aim under your feet and pull.',
   },
   {
@@ -50,9 +52,11 @@ export const GAMES = [
     about: `You are standing in a dark house holding a torch. There are six light
     switches, and the house does not want you to reach them. The torch throws real
     shadows, the walls have plaster and paper and damp on them, and the thing that
-    lives here is nine feet tall, folded forward, and only ever half seen.`,
-    controls: [['W A S D', 'move'], ['Mouse', 'look'], ['E', 'switch / interact'],
-               ['F', 'torch']],
+    lives here - there are two of them - is nine feet tall, folded forward, and only ever
+    half seen. A blanket thrown over the torch is the other way to live.`,
+    controls: [['W A S D', 'move (torch off)'], ['Mouse / arrows', 'look'],
+               ['F / Space', 'torch'], ['Q', 'throw the blanket'],
+               ['E', 'switch / interact'], ['R', 'restart after a run']],
     tips: 'The torch is a beam, not a lamp. What it is not pointed at is not empty.',
   },
   {
@@ -64,7 +68,9 @@ export const GAMES = [
     about: `Firing lights the room for an instant, and that instant STAYS on the
     screen - cold, grainy and still - while everything in the actual room keeps
     moving in the dark. You are always looking at a photograph of where things were.`,
-    controls: [['Move', 'mouse or arrows'], ['Click', 'fire'], ['R', 'reload']],
+    controls: [['W A S D / arrows', 'move'], ['Mouse', 'aim'],
+               ['Click / Z / Space', 'fire'], ['X / F / right-click', 'strike a match'],
+               ['Shift', 'hold your aim and creep'], ['R', 'restart after a run']],
     tips: 'The photograph is a second old. Shoot where the thing is going, not where it was.',
   },
   {
@@ -88,21 +94,23 @@ export const GAMES = [
     tag: 'Racing', big: true,
     cat: 'Driving', tags: ['new', 'racing', 'f1', 'cars', 'simulation', '3d', 'track',
                            'rain', 'pit stops', 'damage', 'career'],
-    blurb: 'Thirty-three real circuits, twenty-four cars, and a tow worth eighteen km/h.',
+    blurb: 'Thirty-three real circuits, twenty-four cars, and air that decides the overtake.',
     about: `Every circuit on the calendar and a good many that are not, each laid out
     from its real corner sequence and solved until the lap closes to under a metre and
     measures the published distance. The car makes its own grip out of air - about its
     own weight again in downforce by 200 km/h - so it corners harder the faster it is
     going, and the body heaves, pitches and rolls on four real springs rather than on
     a formula. Twelve teams, two cars each, and the air behind them matters: sit in
-    somebody's tow down a straight and you gain eighteen km/h, follow him through the
-    corner and you are the one with seven per cent less grip. Tyres go off and get too
+    somebody's tow down a straight and you gain on him, follow him through a corner
+    and his wake takes downforce off your car. Tyres go off and get too
     hot, it rains and the road reflects it, the car breaks when you hit things, and
-    the crew come over the wall to change four of them while you sit there. A season
-    is run race by race with a championship table at the end of it.`,
+    the crew come over the wall to change four of them while you sit there. Drive on
+    your own, set a time, run a single race, or take on the League, race by race with a
+    championship table at the end of it.`,
     controls: [['W S', 'throttle · brake'], ['A D', 'steer'],
                ['E Q', 'up a gear · down a gear'], ['Space', 'DRS'],
-               ['P', 'call the pits'], ['1 - 5', 'choose tyres'],
+               ['C', 'clutch'], ['P', 'ready the crew, then drive into the pit lane'],
+               ['1 - 5', 'choose tyres'],
                ['V', 'camera'], ['R', 'back on track'], ['Esc', 'pause']],
     tips: 'Get a tow down the straight before you commit to the move - in the corner behind him you have less grip than he does, not more. And a downshift too many will step the back out.',
   },
@@ -124,10 +132,10 @@ export const GAMES = [
     you do, with the same four-speed box and the same wall. Tyres go off in about a
     fuel run, so a stop is a decision rather than a formality, and the crew take
     thirteen seconds over the wall because the fuel man works while the tyres are
-    changed. Run one race, a season of them, or four hundred laps in one sitting.`,
+    changed. Run one race, a season of them, or five hundred laps in one sitting.`,
     controls: [['W S', 'throttle · brake'], ['A D', 'steer'],
-               ['E Q', 'up a gear · down a gear'], ['P', 'call the pits'],
-               ['T', 'tear-off'], ['V', 'camera'],
+               ['E Q', 'up a gear · down a gear'], ['C', 'clutch - restart after a stall'],
+               ['P', 'call the pits'], ['V', 'camera'],
                ['Arrows', 'wedge · track bar'], ['[ ]', 'race speed'],
                ['R', 'back on track'], ['Esc', 'pause']],
     tips: 'Nobody wins a superspeedway race on their own. Stay on the bumper in front, and remember the man behind you is pushing because it suits him, not you.',
@@ -146,7 +154,8 @@ export const GAMES = [
     address and your bank card. Drive, get out, go in, take a different car.`,
     controls: [['W A S D', 'drive · walk'], ['F', 'get out · go in · take a car'],
                ['Shift', 'sprint'], ['Mouse', 'aim'], ['Click', 'fire'],
-               ['R', 'reload'], ['M', 'mask'], ['Esc', 'pause']],
+               ['R', 'reload'], ['M', 'mask'], ['Q', 'down a floor in a stairwell'],
+               ['E', 'eat'], ['Esc', 'pause']],
     tips: 'Change the car and the clothes between jobs. What they cannot describe, they cannot look for.',
   },
   {
@@ -160,13 +169,54 @@ export const GAMES = [
     goes end over end. Because a slow slide only moves your foot and only a real snap
     counts as a flick, you get to choose the trick before you commit to it - and past
     about a sixth of a turn the rotation completes itself, so there is no catch to time
-    and you never wipe out for doing nothing. Free skating scores; money comes out of
-    competitions only.`,
+    and you never wipe out for doing nothing. Competitions pay the most,
+    but the free-roam city has coins lying about and a grab pays a little too.`,
     controls: [['Mouse / arrows', 'your weight on the deck'],
                ['A D', 'push · brake · spin in the air'],
                ['Hold down', 'pump in a transition · manual over a tip'],
-               ['R', 'bail and reset'], ['Esc', 'pause']],
+               ['1 - 0', 'grabs'], ['R', 'bail and reset'], ['Esc', 'pause']],
     tips: 'TRICK SHEETS on the main screen plays every gesture back at you with the real board attached.',
+  },
+  {
+    slug: 'southpaw', title: 'SOUTHPAW', how: 'mounted', port: 8262, url: '/',
+    web: 'southpaw/',
+    tag: 'Sport', big: true,
+    cat: 'Sport', tags: ['new', 'boxing', 'fighting', 'pixel', 'wrestling', 'sumo', 'career', '2d'],
+    blurb: 'Arcade pixel boxing: ten opponents, a gym, and a wrestling bowl and a sumo ring besides.',
+    about: `Ten fighters stand between you and the belt, and every one of them has a
+    strength and a hole you can find - one drops his guard after a flurry, one taunts,
+    one takes body shots badly. The ring is drawn three-quarters on, so you step across
+    it as well as along it, and a punch only lands if you are lined up with him. Hold
+    SPACE and every punch goes to the body, under a high guard. Mash and he will learn
+    it: he covers the spot you keep hitting and counters the gap in your rhythm.
+    Winning pays points to spend in the gym, and the locker room is where you choose
+    what you look like. SPECIAL MODES add a wrestling bowl with ropes to bounce off and
+    a sumo ring where the health bar is your balance.`,
+    controls: [['A D / W S', 'step along and across the ring'],
+               ['← ↑ → ↓', 'jab · cross · hook · uppercut'],
+               ['Hold Space', 'punches go to the body'], ['Shift', 'guard high'],
+               ['Shift + Space', 'guard low'], ['Q / E', 'slip · duck'],
+               ['F', 'star punch'], ['Esc', 'pause']],
+    tips: 'If he keeps blocking high, hold SPACE and go to the body - and if you are guarding high yourself, expect him to wait half a second and go low.',
+  },
+  {
+    slug: 'penguin-dash', title: 'PENGUIN DASH', how: 'mounted', port: 8250, url: '/',
+    web: 'penguin-dash/',
+    tag: 'Arcade', big: true,
+    cat: 'Arcade', tags: ['new', 'penguin', 'fishing', 'pixel', 'underwater', 'side scroller', 'animals'],
+    blurb: 'A penguin, a grey sea, and everything in it that eats penguins.',
+    about: `Swim out from the shore, catch a fish in your beak and bring it back to the
+    pile - while seals, sharks and orcas hunt you. The penguin swims towards the
+    pointer and dashes with a barrel roll, and it carries its speed, so a fast run at
+    the surface throws it into the air. Ice floes are safe to rest on; icebergs are
+    not, and block a breach from underneath. The sea runs two kilometres out, darker
+    and stormier the farther you go, with deep caverns at the bottom guarded by a
+    giant squid and a giant crab. Thirty-six fish for the Fish Book, twenty-two
+    penguins to dress as, and points to spend on speed and strength.`,
+    controls: [['Mouse', 'swim towards the pointer · hop on land and ice'],
+               ['Click / Space', 'dash'], ['Arrows + Enter', 'menus'],
+               ['Esc', 'pause · back'], ['M', 'sound']],
+    tips: 'A shark that sees you calls every predator nearby to where you were - so change direction after it spots you, not before.',
   },
 
   // ---- the ten written for the deck --------------------------------
@@ -176,21 +226,21 @@ export const GAMES = [
     blurb: 'Drop each slab on the one below. What hangs over gets sliced off and falls.',
     about: `One button, seen from the side in real solids: each slab is a lit block with a
     shaded edge, so you can see the overhang before you drop, and the piece that gets cut
-    off tumbles away down the tower. Land one dead flush and you get the width back - three
-    in a row and the slab grows. Every run goes on the board.`,
+    off tumbles away down the tower. Land one dead flush and you win back a sliver of width -
+    and from the third perfect in a row, three times as much. Every run goes on the board.`,
     controls: [['Click / Space', 'drop'], ['Tap', 'drop (mobile)'], ['P', 'pause']],
-    tips: 'Perfect drops give width back. Three in a row and the slab grows.',
+    tips: 'Perfect drops give width back, and from the third in a row they give back three times as much.',
   },
   {
     slug: 'bricks', title: 'BRICKS', how: 'local', tag: 'Arcade',
     cat: 'Arcade', tags: ['breakout', 'paddle', 'retro', 'mobile', 'ball'],
     blurb: 'Breakout, with a paddle that is exactly as wide as your last mistake.',
-    about: `Ten columns, a row of steel that moves down the wall every level, and five
-    drops worth leaving the ball for. The paddle shrinks the longer a wall takes and
+    about: `Ten columns, a row of steel that moves down the wall every level, and four
+    kinds of drop worth leaving the ball for. The paddle shrinks the longer a wall takes and
     comes back to full on every clear. Mouse or arrow keys - whichever you touched last
     is the one driving it.`,
     controls: [['Mouse', 'move the paddle'], ['A D / arrows', 'move the paddle'],
-               ['Click', 'launch'], ['P', 'pause']],
+               ['Click / Space', 'launch'], ['P', 'pause']],
     tips: 'Hitting the paddle off-centre angles the ball. That is the whole game.',
   },
   {
@@ -201,9 +251,9 @@ export const GAMES = [
     tank. Shooting a rock is easy; shooting everything is how you end up drifting into
     one with nothing left to stop with. Fuel comes back slowly while you fly and quickly
     while you sit still - and sitting still is not safe.`,
-    controls: [['A D / arrows', 'turn'], ['W', 'thrust'], ['Space', 'fire'],
-               ['Shift', 'hyperspace']],
-    tips: 'The rocks are quick. Let the small ones go by rather than pay for them.',
+    controls: [['A D / ← →', 'turn'], ['W / ↑', 'thrust'], ['Space / Click', 'fire'],
+               ['Shift', 'hyperspace - tap it, do not hold it']],
+    tips: 'A small rock is worth five times a big one, and the wave does not end until every one of them is gone - so shoot the big ones where they will break up away from you.',
   },
   {
     slug: 'hopper', title: 'HOPPER', how: 'local', tag: 'Endless',
@@ -213,7 +263,7 @@ export const GAMES = [
     neon, water towers and aerials going past in three depths. The jump is analogue -
     how long you hold is how high you go - and there is a dive for landing early.
     Coins arc over the gaps, and they buy what your runner wears.`,
-    controls: [['Space / Click', 'jump (hold for higher)'], ['Down / S', 'dive'],
+    controls: [['Space / Click / ↑ / W', 'jump (hold for higher)'], ['↓ / S / Shift', 'dive'],
                ['P', 'pause']],
     tips: 'Dive to land early. A short hop over a low gap beats a long one every time.',
   },
@@ -236,8 +286,8 @@ export const GAMES = [
     each with its own room and one new idea: pipes bolted down that cannot be turned, and
     crossovers that carry water both ways at once. After those six it generates rooms for
     ever, growing a row or a column every third stage and then tightening the clock.`,
-    controls: [['Click', 'turn a pipe'], ['Space', 'let the water go early (bonus)']],
-    tips: 'Bolted pipes are already correct - build around them. Finishing early pays.',
+    controls: [['Click', 'turn a pipe'], ['Tap', 'turn a pipe (mobile)']],
+    tips: 'Bolted pipes are already correct - build around them. Every second left on the clock is a bonus.',
   },
   {
     slug: 'sweep', title: 'SWEEP', how: 'local', tag: 'Puzzle',
@@ -289,8 +339,8 @@ export const GAMES = [
     Play it on the BLACKTOP, with a chain-link fence, a city block and people hanging over the
     railings, or in an ARENA with a full bowl, a scoreboard and banners. Baskets, steals and
     blocks pay COINS, and coins buy jersey designs, street tees, baggy jeans, shoes, hair and
-    caps - or a bigger stamina tank. And you can PLAY ONLINE: one of you hosts a room, the
-    other types the four-letter code, and you are in the same match.`,
+    caps - or a bigger stamina tank. And you can PLAY ONLINE: one of you hosts a room, up
+    to three friends type the four-letter code, and you are all in the same match.`,
     controls: [['A D', 'back and forward, the way you are attacking'],
                ['W S', 'away from the camera and towards it'],
                ['Drag', 'aim and shoot - let go in the green band for a clean look'],
@@ -308,9 +358,9 @@ export const GAMES = [
     wobble modes across the surface, so they ring and settle instead of snapping back - and
     the ball comes off wherever you meet it. Play the computer, which gets better every
     point it loses, or take the right-hand slime yourself.`,
-    controls: [['A D', 'move'], ['W', 'jump'], ['Arrows', 'player two moves'],
-               ['Up arrow', 'player two jumps']],
-    tips: 'Jump INTO the ball, not under it. Press 2 on the title screen for two players.',
+    controls: [['A D / mouse', 'move'], ['W', 'jump'], ['Click / Space', 'serve'],
+               ['Arrows', 'player two moves'], ['Up arrow', 'player two jumps']],
+    tips: 'Jump INTO the ball, not under it. TWO PLAYER on the home screen puts a friend on the right-hand slime.',
   },
   // DUNK WAS HERE. Liam: "delete dunk". It was a three-a-side game with
   // the camera over your shoulder, and HOOPS now does the same job from
@@ -340,9 +390,9 @@ export const GAMES = [
     right: a landed piece gets half a second in which it can still be slid or spun, the
     next piece comes from a shuffled bag of all seven rather than a dice, a rotation
     that would not fit is retried against the wall before being refused, and a ghost
-    shows where it will land. Four rows at once pays double if you did it last time too.`,
+    shows where it will land. Four rows at once pays half as much again if you did it last time too.`,
     controls: [['← →', 'move'], ['↑ or X', 'spin'], ['Z', 'spin back'],
-               ['↓', 'soft drop'], ['Space', 'hard drop'], ['Shift / C', 'hold']],
+               ['↓ / S', 'soft drop'], ['Space', 'hard drop'], ['Shift / C', 'hold']],
     tips: 'The bag means the longest you can ever wait for the long piece is twelve.',
   },
   {
@@ -354,7 +404,8 @@ export const GAMES = [
     straight back and the end sends it away. Move as you make contact and you cut it
     sideways. The ball speeds up through a rally, and the computer has a reaction delay
     and an aim error rather than being perfect, so it can be wrong-footed.`,
-    controls: [['W S or Mouse', 'move'], ['↑ ↓', 'player two'], ['P', 'pause']],
+    controls: [['W S / ↑ ↓ / mouse', 'move'], ['Drag', 'move (mobile)'],
+               ['↑ ↓', 'player two, in a two-player game'], ['P', 'pause']],
     tips: 'The end of the bat is a weapon. Take the ball early and wide to pull him out of position.',
   },
   {
@@ -366,7 +417,7 @@ export const GAMES = [
     faster, so it starts as a shooting gallery and ends as a panic without any
     difficulty curve existing. One shot at a time, so a miss costs you the wait. The
     bunkers erode block by block - and your own shots eat them from underneath.`,
-    controls: [['← → or Mouse', 'move'], ['Space / Click', 'fire'], ['P', 'pause']],
+    controls: [['← → / A D / mouse', 'move'], ['Space / Click', 'fire'], ['P', 'pause']],
     tips: 'The saucer is worth up to 300. It is also the only time your shot is not defending you.',
   },
   {

@@ -4,7 +4,17 @@
 <script>window.__PLAYPILE_WEB=1;</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PLAYPILE</title>
+<title>HIGHRISE — free shooter game in your browser — PLAYPILE</title>
+<meta name="description" content="Thirty-one storeys of a 2000s Manhattan tower, and you go up all of them. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/highrise/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="HIGHRISE — PLAYPILE">
+<meta property="og:description" content="Thirty-one storeys of a 2000s Manhattan tower, and you go up all of them. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/highrise/">
+<meta property="og:image" content="https://playpile.net/shots/highrise.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"HIGHRISE","url":"https://playpile.net/play/highrise/","image":"https://playpile.net/shots/highrise.png","description":"Thirty-one storeys of a 2000s Manhattan tower, and you go up all of them.","genre":"Shooter","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Shooter","item":"https://playpile.net/category/shooter/"},{"@type":"ListItem","position":3,"name":"HIGHRISE","item":"https://playpile.net/play/highrise/"}]}</script>
 <link rel="stylesheet" href="/site/style.css">
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
@@ -40,7 +50,7 @@
   <div class="scrim" id="scrim"></div>
 
   <main id="main">
-    <nav class="crumbs" id="crumbs"></nav>
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/category/shooter/">Shooter</a><i>&rsaquo;</i><b>HIGHRISE</b></nav>
     <div id="ad-play-leader"></div>
 
     <div class="play">
@@ -55,15 +65,15 @@
                   allowfullscreen hidden></iframe>
           <div class="curtain" id="curtain">
             <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
-            <h2 id="ttl">GAME</h2>
-            <p id="lede"></p>
+            <h2 id="ttl">HIGHRISE</h2>
+            <p id="lede">Thirty-one  torey  of a 2000  Manhattan tower, and you go up all of them.</p>
             <button class="btn" id="start">Play</button>
             <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
           </div>
         </div>
 
         <div class="stagebar">
-          <span class="title" id="barttl"></span>
+          <span class="title" id="barttl">HIGHRISE</span>
           <span class="where" id="how"></span>
           <span class="sp"></span>
           <button id="full" type="button">
@@ -78,15 +88,52 @@
         </div>
 
         <section class="about">
-          <h1 id="h1">GAME</h1>
-          <p class="lede" id="blurb"></p>
-          <p id="about"></p>
+          <h1 id="h1">HIGHRISE</h1>
+          <p class="lede" id="blurb">Thirty-one  torey  of a 2000  Manhattan tower, and you go up all of them.</p>
+          <div id="about"><p>One building, not thirty-one levels: every floor exists at its real height in the same world at the same time, so you climb actual stairs and can look back down the well at the floor you just cleared. The plate changes as you go up - offices, trading floors, residential conversions, the plant floor on 12, the sky lobby on 16, and a penthouse at the top.</p></div>
           <h4>Controls</h4>
-          <ul class="keys" id="keys"></ul>
-          <div class="tip" id="tip"></div>
+          <ul class="keys" id="keys"><li><kbd>W A S D</kbd><span>move</span></li><li><kbd>Mouse</kbd><span>look · click to fire · right-click to strike</span></li><li><kbd>Shift</kbd><span>sprint</span></li><li><kbd>Ctrl</kbd><span>crouch</span></li><li><kbd>Space</kbd><span>slide</span></li><li><kbd>Q E</kbd><span>lean</span></li><li><kbd>R</kbd><span>reload</span></li><li><kbd>1 - 8 / wheel</kbd><span>weapons</span></li><li><kbd>H</kbd><span>bandage</span></li></ul>
+          <div class="tip" id="tip">Cover is real - a locker bank stops bullets. Crouch behind a barrier and it covers you.</div>
           <h4>Tags</h4>
-          <div class="tagrow" id="tags"></div>
+          <div class="tagrow" id="tags"><a class="chip on" href="/category/shooter/">Shooter</a><a class="chip" href="/#q=fps">fps</a><a class="chip" href="/#q=guns">guns</a><a class="chip" href="/#q=3d">3d</a><a class="chip" href="/#q=tower">tower</a><a class="chip" href="/#q=singleplayer">singleplayer</a><a class="chip" href="/#q=first%20person">first person</a></div>
         </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>You start on the ground floor of a 31-storey tower with a Glock, a machete and your fists. Every floor is full of armed men, and the stairs up are somewhere across it. There is no lift and no loading screen: you climb real stairs, and the floor below stays as you left it. You can walk back down.</p>
+<p>You do not have to clear a floor to leave it. Fighting through every room and sprinting for the stairwell with men behind you are both fair ways up, and that choice is most of the game. The men on the next floor are already in place before you arrive, so you often hear the fight before you see it.</p>
+<p>You have 100 health and two bandages. Go down and a click restarts the run from floor 1 with every man back. The building itself stays the same, so each climb teaches you the layout.</p>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li><b>Ammunition is short on purpose.</b> You start with 34 Glock rounds and floor 1 has ten men. A body drops only part of a magazine, so plan to finish fights up close.</li>
+<li><b>Dodge and slide make you untouchable.</b> Double-tap a movement key to dive that way; nothing hurts you for just over a second. A slide (<kbd>Space</kbd> while running) covers you for 1.3 seconds. Three slides empty the stamina bar and a dodge costs about a third of one.</li>
+<li><b>Get behind people.</b> A blade, the axe or bare fists kill outright if the man has not seen you or you are behind him.</li>
+<li><b>Aim high.</b> A bullet to the head does 2.8 times its damage, a leg shot 0.7. With a melee weapon, swinging while looking slightly up goes for the head.</li>
+<li><b>Fists combo.</b> Punches chain right, left, then an elbow that does just over double damage, as long as you keep swinging within about a second.</li>
+<li><b>Use cover properly.</b> Counters, lockers and shut doors stop bullets. A waist-high barrier only covers you crouched (<kbd>Ctrl</kbd>). Lean with <kbd>Q</kbd> and <kbd>E</kbd>, but leaning shows your head to whoever can now see you.</li>
+<li><b>Bandage out of sight.</b> <kbd>H</kbd> heals 34 health over about two seconds, and being shot stops it partway.</li>
+<li><b>Open the glass cases.</b> Every floor has four to seven, and the first two are always a fire axe and a flare gun. Shoot or swing to smash one, or walk up and take what is inside.</li>
+</ul>
+
+<h2>What's in it</h2>
+<p>Nine weapons: fists, machete, Louisville bat, fire axe, Glock 17 (17 rounds), AK-47 (30, automatic), Remington pump shotgun (five shells loaded one at a time, nine pellets), a fire extinguisher you swing, and a single-shot flare gun that nearly always kills and lights up the room it lands in.</p>
+<p>Six kinds of enemy: guards, riflemen, men in suits, runners with knives and bats, heavies with 110 health and usually a shotgun, and unarmed brawlers. Most hold a position and lean out of cover to shoot; a few push. Floor 1 has ten men, each floor adds roughly one more up to 34, and higher floors bring more riflemen, heavies and brawlers.</p>
+<p>The floors change as you climb: open-plan and cellular offices, trading floors, residential conversions, gutted floors and executive suites, with three landmarks - the plant floor on 12 and 24, the sky lobby on 16 and the penthouse on 31.</p>
+
+<h2>Questions</h2>
+<h3>How do I pick things up?</h3>
+<p>Walk over them. Dropped items sit in a glowing ring, and the name and round count show as you get near. A new weapon goes straight into your hands; one you already have just adds its ammunition.</p>
+<h3>How do I get to the flare gun?</h3>
+<p><kbd>1</kbd> to <kbd>8</kbd> select fists through extinguisher. The flare gun is ninth, so use the mouse wheel. Dark slots on the weapon strip are ones you have not found.</p>
+<h3>Does it save my progress?</h3>
+<p>No. A run lasts until you go down, then starts again from the ground floor.</p>
+<h3>Can I play on a phone or with a controller?</h3>
+<p>No. It needs a keyboard and mouse.</p>
+<h3>What does right-click do?</h3>
+<p>A quick strike, as does <kbd>F</kbd>. With a gun out you hit with your fist and keep the gun, which is the answer to a man who gets inside your aim.</p></article>
 
         <div id="ad-play-footer"></div>
 
@@ -99,7 +146,7 @@
         <div id="ad-play-rail"></div>
         <div class="panel">
           <h4>More games</h4>
-          <div id="more"></div>
+          <div id="more"><a class="mini" href="/play/quickdraw/"><span class="th" style="background-image:url('/shots/quickdraw.png')"></span><span><b>QUICKDRAW</b><small>Shooter</small></span></a><a class="mini" href="/play/kickback/"><span class="th" style="background-image:url('/shots/kickback.png')"></span><span><b>KICKBACK</b><small>Action</small></span></a><a class="mini" href="/play/lightsout/"><span class="th" style="background-image:url('/shots/lightsout.png')"></span><span><b>LIGHTS OUT</b><small>Horror</small></span></a><a class="mini" href="/play/exposure/"><span class="th" style="background-image:url('/shots/exposure.png')"></span><span><b>EXPOSURE</b><small>Horror</small></span></a><a class="mini" href="/play/dungeon-quest/"><span class="th" style="background-image:url('/shots/dungeon-quest.png')"></span><span><b>DUNGEON QUEST</b><small>Adventure</small></span></a></div>
         </div>
         <div id="ad-play-tall"></div>
       </aside>
@@ -114,18 +161,18 @@
       <div class="cols2">
         <div>
           <div class="brand">PLAY<b>PILE</b></div>
-          <p class="blurb">23 browser games, all of them written for this site. No sign-up,
+          <p class="blurb">26 browser games, all of them written for this site. No sign-up,
              no download, and your best scores stay in your own browser.</p>
         </div>
         <div class="fl"><b>Site</b>
           <a href="/">All games</a><a href="/site/about.html">About</a>
-          <a href="/site/advertise.html">Advertise</a></div>
+          <a href="/site/updates.html">Updates</a><a href="/site/advertise.html">Advertise</a></div>
         <div class="fl"><b>Legal</b>
           <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a></div>
         <div class="fl"><b>Play</b>
-          <a href="/#c=Arcade">Arcade</a><a href="/#c=Classic">Classic</a>
-          <a href="/#c=Puzzle">Puzzle</a><a href="/#c=Sport">Sport</a>
-          <a href="/#c=Action">Action</a></div>
+          <a href="/category/arcade/">Arcade</a><a href="/category/classic/">Classic</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
       </div>
       <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
         <span>Made by one person, in a browser.</span></div>
@@ -147,6 +194,7 @@
 <script type="module">
 import { GAMES, bySlug } from '/site/catalogue.js';
 import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
 import { loadAds, slot, interstitial } from '/ads/ads.js';
 
 // THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
@@ -160,21 +208,26 @@ if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
 mountShell({ active: catOf(g) });
 remember(g.slug);
 
-document.title = g.title + ' — ' + catOf(g) + ' game — PLAYPILE';
-document.getElementById('crumbs').innerHTML =
-  '<a href="/">Games</a><i>&rsaquo;</i>'
-  + '<a href="/#c=' + encodeURIComponent(catOf(g)) + '">' + catOf(g) + '</a>'
-  + '<i>&rsaquo;</i><b>' + g.title + '</b>';
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
 
 ttl.textContent = g.title;
 h1.textContent = g.title;
 barttl.textContent = g.title;
 lede.textContent = g.blurb;
 blurb.textContent = g.blurb;
-about.textContent = g.about.replace(/\s+/g, ' ').trim();
+about.innerHTML = aboutHtml(g);
 tip.textContent = g.tips;
 shotbg.src = '/shots/' + g.slug + '.png';
-keys.innerHTML = g.controls.map(([k, w]) => `<li><kbd>${k}</kbd><span>${w}</span></li>`).join('');
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
 tags.innerHTML = [catOf(g), ...(g.tags || [])]
   .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
   .join('');
@@ -247,15 +300,10 @@ addEventListener('keydown', (e) => {
 const others = GAMES.filter((x) => x.slug !== g.slug);
 const same = others.filter((x) => catOf(x) === catOf(g));
 const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
-const rail = [...same, ...rest].slice(0, 5);
-more.innerHTML = rail.map((x) => `
-  <a class="mini" href="/play/${x.slug}">
-    <span class="th" style="background-image:url('/shots/${x.slug}.png')"></span>
-    <span><b>${x.title}</b><small>${catOf(x)}</small></span>
-  </a>`).join('');
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
 
 document.getElementById('alsorows').innerHTML =
-  row('More ' + catOf(g) + ' games', same, { seeAll: '/#c=' + encodeURIComponent(catOf(g)) })
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
   + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
 
 // ---- adverts: every slot that existed before, in the same place -----

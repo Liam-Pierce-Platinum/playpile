@@ -4,7 +4,17 @@
 <script>window.__PLAYPILE_WEB=1;</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PLAYPILE</title>
+<title>LIGHTS OUT — free horror game in your browser — PLAYPILE</title>
+<meta name="description" content="A dark house, a torch, six switches, and something nine feet tall. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/lightsout/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="LIGHTS OUT — PLAYPILE">
+<meta property="og:description" content="A dark house, a torch, six switches, and something nine feet tall. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/lightsout/">
+<meta property="og:image" content="https://playpile.net/shots/lightsout.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"LIGHTS OUT","url":"https://playpile.net/play/lightsout/","image":"https://playpile.net/shots/lightsout.png","description":"A dark house, a torch, six switches, and something nine feet tall.","genre":"Horror","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Horror","item":"https://playpile.net/category/horror/"},{"@type":"ListItem","position":3,"name":"LIGHTS OUT","item":"https://playpile.net/play/lightsout/"}]}</script>
 <link rel="stylesheet" href="/site/style.css">
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
@@ -40,7 +50,7 @@
   <div class="scrim" id="scrim"></div>
 
   <main id="main">
-    <nav class="crumbs" id="crumbs"></nav>
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/category/horror/">Horror</a><i>&rsaquo;</i><b>LIGHTS OUT</b></nav>
     <div id="ad-play-leader"></div>
 
     <div class="play">
@@ -55,15 +65,15 @@
                   allowfullscreen hidden></iframe>
           <div class="curtain" id="curtain">
             <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
-            <h2 id="ttl">GAME</h2>
-            <p id="lede"></p>
+            <h2 id="ttl">LIGHTS OUT</h2>
+            <p id="lede">A dark hou e, a torch,  ix  witche , and  omething nine feet tall.</p>
             <button class="btn" id="start">Play</button>
             <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
           </div>
         </div>
 
         <div class="stagebar">
-          <span class="title" id="barttl"></span>
+          <span class="title" id="barttl">LIGHTS OUT</span>
           <span class="where" id="how"></span>
           <span class="sp"></span>
           <button id="full" type="button">
@@ -78,15 +88,57 @@
         </div>
 
         <section class="about">
-          <h1 id="h1">GAME</h1>
-          <p class="lede" id="blurb"></p>
-          <p id="about"></p>
+          <h1 id="h1">LIGHTS OUT</h1>
+          <p class="lede" id="blurb">A dark hou e, a torch,  ix  witche , and  omething nine feet tall.</p>
+          <div id="about"><p>You are standing in a dark house holding a torch. There are six light switches, and the house does not want you to reach them. The torch throws real shadows, the walls have plaster and paper and damp on them, and the thing that lives here - there are two of them - is nine feet tall, folded forward, and only ever half seen. A blanket thrown over the torch is the other way to live.</p></div>
           <h4>Controls</h4>
-          <ul class="keys" id="keys"></ul>
-          <div class="tip" id="tip"></div>
+          <ul class="keys" id="keys"><li><kbd>W A S D</kbd><span>move (torch off)</span></li><li><kbd>Mouse / arrows</kbd><span>look</span></li><li><kbd>F / Space</kbd><span>torch</span></li><li><kbd>Q</kbd><span>throw the blanket</span></li><li><kbd>E</kbd><span>switch / interact</span></li><li><kbd>R</kbd><span>restart after a run</span></li></ul>
+          <div class="tip" id="tip">The torch is a beam, not a lamp. What it is not pointed at is not empty.</div>
           <h4>Tags</h4>
-          <div class="tagrow" id="tags"></div>
+          <div class="tagrow" id="tags"><a class="chip on" href="/category/horror/">Horror</a><a class="chip" href="/#q=dark">dark</a><a class="chip" href="/#q=torch">torch</a><a class="chip" href="/#q=3d">3d</a><a class="chip" href="/#q=survival">survival</a><a class="chip" href="/#q=scary">scary</a><a class="chip" href="/#q=first%20person">first person</a></div>
         </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>You start in the long hallway in the middle of a dark house. Six rooms open off it, and the house has six light switches spread between them. Find every switch and turn it on with <kbd>E</kbd>, and you get out. If one of the things in the house reaches you first, the run is over and the screen tells you how many lights you managed.</p>
+<p>Everything turns on the torch. With it on, you cannot take a single step. You can turn, and anything in the beam freezes for as long as you hold it there. With the torch off you can run, but so can they, and you cannot see where they are. Every switch has to be paid for in seconds of darkness.</p>
+<p>A room whose switch you have flipped stays lit for the rest of the run, and the things will not walk into a lit room from outside it. The house does not get kinder. It gets smaller.</p>
+<p>There is one mode: a single house, one run at a time. Click <b>GO IN</b> on the home screen to start, and press <kbd>R</kbd> after a death or an escape to go again.</p>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li>The beam is narrower than it looks. Only something roughly in the middle of your view, with no wall between you and it, is pinned. The reticle in the centre of the screen is your aim.</li>
+<li>Turning the torch on still helps when nothing is in the beam. Anything you are not pointing at keeps coming, but at a little over half the speed it moves in the dark.</li>
+<li>They move in lurches: a burst of fast steps lasting around a second, then a stall of under a second. Cross open floor during the stall and check again before the next burst.</li>
+<li>They head straight for you rather than finding a way round. A wall between you and one of them holds it up, so put walls in its way.</li>
+<li>A blanket is the only thing that works in the dark. Press <kbd>Q</kbd> and it goes over the nearest thing roughly in front of you, if it is fairly close. A covered thing is out for four seconds and cannot hurt you, even if you walk right past it. If nothing is in front of you, the blanket is wasted.</li>
+<li>You start with two blankets. Two more lie in the hallway, one towards each end; walk over them to pick them up.</li>
+<li>Listen. A breathing sound starts when something is getting near and speeds up as it closes in. A screech means one is very close and your torch is off. Turn round and switch on.</li>
+<li>Both things start in the two rooms along the bottom of the house. The three rooms across the top have nothing in them at the start, so they are the cheapest switches to take first.</li>
+</ul>
+
+<h2>What's in it</h2>
+<ul>
+<li>One house: a central hallway with three rooms along the top, a small room at the bottom left and a large room at the bottom right. The hallway has no switch, so it is never lit.</li>
+<li>Six switches. The bottom-right room has two of them. The other four rooms each have one.</li>
+<li>Two creatures, each nine feet tall, faceless and nearly black.</li>
+<li>Four blankets in all: the two you carry in and the two in the hallway.</li>
+<li>A top-ten leaderboard on the home screen.</li>
+</ul>
+
+<h2>Questions</h2>
+<h3>What does the leaderboard measure?</h3>
+<p>Seconds spent running in the dark on a run where you got out. Lower is better. Time standing still does not count, whether the torch is on or off, so careful play is never punished.</p>
+<h3>Does it save my scores?</h3>
+<p>Yes. The top ten escapes and your initials are kept in this browser on this device. The board is not shared online, and clearing your site data wipes it.</p>
+<h3>Can I play it on a phone or with a controller?</h3>
+<p>No. It needs a keyboard and mouse. The left and right arrow keys can turn instead of the mouse, and <kbd>Space</kbd> also works the torch.</p>
+<h3>Why can't I walk?</h3>
+<p>Your torch is on. The bottom of the screen says <b>TORCH ON - YOU CANNOT MOVE</b>. Press <kbd>F</kbd> or click to turn it off, and <kbd>W A S D</kbd> will work again.</p>
+<h3>I pressed E and nothing happened.</h3>
+<p>You need to be standing right up against the switch. When you are close enough, <b>E - TURN IT ON</b> appears on screen.</p></article>
 
         <div id="ad-play-footer"></div>
 
@@ -99,7 +151,7 @@
         <div id="ad-play-rail"></div>
         <div class="panel">
           <h4>More games</h4>
-          <div id="more"></div>
+          <div id="more"><a class="mini" href="/play/exposure/"><span class="th" style="background-image:url('/shots/exposure.png')"></span><span><b>EXPOSURE</b><small>Horror</small></span></a><a class="mini" href="/play/highrise/"><span class="th" style="background-image:url('/shots/highrise.png')"></span><span><b>HIGHRISE</b><small>Shooter</small></span></a><a class="mini" href="/play/kickback/"><span class="th" style="background-image:url('/shots/kickback.png')"></span><span><b>KICKBACK</b><small>Action</small></span></a><a class="mini" href="/play/dungeon-quest/"><span class="th" style="background-image:url('/shots/dungeon-quest.png')"></span><span><b>DUNGEON QUEST</b><small>Adventure</small></span></a><a class="mini" href="/play/apex/"><span class="th" style="background-image:url('/shots/apex.png')"></span><span><b>APEX</b><small>Driving</small></span></a></div>
         </div>
         <div id="ad-play-tall"></div>
       </aside>
@@ -114,18 +166,18 @@
       <div class="cols2">
         <div>
           <div class="brand">PLAY<b>PILE</b></div>
-          <p class="blurb">23 browser games, all of them written for this site. No sign-up,
+          <p class="blurb">26 browser games, all of them written for this site. No sign-up,
              no download, and your best scores stay in your own browser.</p>
         </div>
         <div class="fl"><b>Site</b>
           <a href="/">All games</a><a href="/site/about.html">About</a>
-          <a href="/site/advertise.html">Advertise</a></div>
+          <a href="/site/updates.html">Updates</a><a href="/site/advertise.html">Advertise</a></div>
         <div class="fl"><b>Legal</b>
           <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a></div>
         <div class="fl"><b>Play</b>
-          <a href="/#c=Arcade">Arcade</a><a href="/#c=Classic">Classic</a>
-          <a href="/#c=Puzzle">Puzzle</a><a href="/#c=Sport">Sport</a>
-          <a href="/#c=Action">Action</a></div>
+          <a href="/category/arcade/">Arcade</a><a href="/category/classic/">Classic</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
       </div>
       <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
         <span>Made by one person, in a browser.</span></div>
@@ -147,6 +199,7 @@
 <script type="module">
 import { GAMES, bySlug } from '/site/catalogue.js';
 import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
 import { loadAds, slot, interstitial } from '/ads/ads.js';
 
 // THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
@@ -160,21 +213,26 @@ if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
 mountShell({ active: catOf(g) });
 remember(g.slug);
 
-document.title = g.title + ' — ' + catOf(g) + ' game — PLAYPILE';
-document.getElementById('crumbs').innerHTML =
-  '<a href="/">Games</a><i>&rsaquo;</i>'
-  + '<a href="/#c=' + encodeURIComponent(catOf(g)) + '">' + catOf(g) + '</a>'
-  + '<i>&rsaquo;</i><b>' + g.title + '</b>';
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
 
 ttl.textContent = g.title;
 h1.textContent = g.title;
 barttl.textContent = g.title;
 lede.textContent = g.blurb;
 blurb.textContent = g.blurb;
-about.textContent = g.about.replace(/\s+/g, ' ').trim();
+about.innerHTML = aboutHtml(g);
 tip.textContent = g.tips;
 shotbg.src = '/shots/' + g.slug + '.png';
-keys.innerHTML = g.controls.map(([k, w]) => `<li><kbd>${k}</kbd><span>${w}</span></li>`).join('');
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
 tags.innerHTML = [catOf(g), ...(g.tags || [])]
   .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
   .join('');
@@ -247,15 +305,10 @@ addEventListener('keydown', (e) => {
 const others = GAMES.filter((x) => x.slug !== g.slug);
 const same = others.filter((x) => catOf(x) === catOf(g));
 const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
-const rail = [...same, ...rest].slice(0, 5);
-more.innerHTML = rail.map((x) => `
-  <a class="mini" href="/play/${x.slug}">
-    <span class="th" style="background-image:url('/shots/${x.slug}.png')"></span>
-    <span><b>${x.title}</b><small>${catOf(x)}</small></span>
-  </a>`).join('');
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
 
 document.getElementById('alsorows').innerHTML =
-  row('More ' + catOf(g) + ' games', same, { seeAll: '/#c=' + encodeURIComponent(catOf(g)) })
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
   + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
 
 // ---- adverts: every slot that existed before, in the same place -----

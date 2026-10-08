@@ -589,3 +589,47 @@ body > main.wrap > .hero p{margin:0;color:var(--dim);max-width:62ch}
 .sec h2{margin:0;font:600 17px/1 var(--sans)}
 .sec span{font:11px/1 var(--mono);color:var(--faint);letter-spacing:.18em;text-transform:uppercase}
 .sec .rule{flex:1;height:1px;background:var(--edge)}
+
+/* ---- the written guide under a game, category pages, home copy --------
+   Added 2026-10-07 with the pre-rendered text (see site/pages.js). Plain
+   reading type: these are the paragraphs an ad reviewer and a player both
+   actually read, so they get a measure and a line height, not a card. */
+.guide{max-width:78ch;margin:28px 0 8px;padding-top:22px;border-top:1px solid var(--edge);
+  color:var(--dim);font-size:15px;line-height:1.65}
+.guide:empty{display:none}
+.guide h2{margin:26px 0 10px;color:var(--text);font:700 15px/1.2 var(--mono);letter-spacing:.14em;
+  text-transform:uppercase}
+.guide h2:first-child{margin-top:0}
+.guide h3{margin:18px 0 4px;color:var(--text);font:600 15px/1.35 var(--sans)}
+.guide p{margin:0 0 12px}
+.guide ul{margin:0 0 14px;padding-left:20px}
+.guide li{margin:0 0 8px}
+.guide b{color:var(--text)}
+.guide kbd,.updates kbd{font:12px/1 var(--mono);padding:2px 6px;border:1px solid var(--edge);
+  border-radius:4px;color:var(--text)}
+.about #about p{margin:0 0 12px}
+
+.catpage{padding-bottom:20px}
+.cathero{padding:28px 0 20px}
+.cathero h1{margin:0 0 12px;font:700 34px/1.1 var(--sans)}
+.cathero p{max-width:70ch;color:var(--dim);line-height:1.6}
+.catpage .strip{margin-bottom:28px}
+.catlist{display:grid;gap:18px;max-width:900px}
+.catlist article{padding:16px 0;border-top:1px solid var(--edge)}
+.catlist h2{margin:0 0 6px;font:700 18px/1.2 var(--mono);letter-spacing:.12em}
+.catlist h2 a{color:var(--text);text-decoration:none}
+.catlist p{margin:0 0 8px;color:var(--dim);line-height:1.6}
+.catlist .lede{color:var(--text)}
+.catlist .more a{color:var(--accent)}
+
+.sitecopy{margin:36px 0 10px;padding-top:24px;border-top:1px solid var(--edge)}
+.sitecopy p{color:var(--dim);line-height:1.65;max-width:72ch}
+.sitecopy a{color:var(--accent)}
+.sitecopy h3{margin:20px 0 6px;font:700 13px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase}
+.sitecopy ul{margin:0;padding-left:18px;color:var(--dim);line-height:1.6}
+.sitecopy li a{color:var(--text);text-decoration:none}
+
+.updates article{padding:18px 0;border-top:1px solid var(--edge)}
+.updates h2{font-size:17px;line-height:1.35}
+.updates li{margin:0 0 8px;color:var(--dim);line-height:1.6}
+.updates a{color:var(--accent)}

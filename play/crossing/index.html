@@ -4,7 +4,17 @@
 <script>window.__PLAYPILE_WEB=1;</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PLAYPILE</title>
+<title>CROSSING — free arcade game in your browser — PLAYPILE</title>
+<meta name="description" content="It never ends, and the bottom of the screen is rising. How far did you get? Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/crossing/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="CROSSING — PLAYPILE">
+<meta property="og:description" content="It never ends, and the bottom of the screen is rising. How far did you get? Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/crossing/">
+<meta property="og:image" content="https://playpile.net/shots/crossing.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"CROSSING","url":"https://playpile.net/play/crossing/","image":"https://playpile.net/shots/crossing.png","description":"It never ends, and the bottom of the screen is rising. How far did you get?","genre":"Arcade","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Arcade","item":"https://playpile.net/category/arcade/"},{"@type":"ListItem","position":3,"name":"CROSSING","item":"https://playpile.net/play/crossing/"}]}</script>
 <link rel="stylesheet" href="/site/style.css">
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
@@ -40,7 +50,7 @@
   <div class="scrim" id="scrim"></div>
 
   <main id="main">
-    <nav class="crumbs" id="crumbs"></nav>
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/category/arcade/">Arcade</a><i>&rsaquo;</i><b>CROSSING</b></nav>
     <div id="ad-play-leader"></div>
 
     <div class="play">
@@ -55,15 +65,15 @@
                   allowfullscreen hidden></iframe>
           <div class="curtain" id="curtain">
             <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
-            <h2 id="ttl">GAME</h2>
-            <p id="lede"></p>
+            <h2 id="ttl">CROSSING</h2>
+            <p id="lede">It never end , and the bottom of the  creen i  ri ing. How far did you get?</p>
             <button class="btn" id="start">Play</button>
             <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
           </div>
         </div>
 
         <div class="stagebar">
-          <span class="title" id="barttl"></span>
+          <span class="title" id="barttl">CROSSING</span>
           <span class="where" id="how"></span>
           <span class="sp"></span>
           <button id="full" type="button">
@@ -78,15 +88,46 @@
         </div>
 
         <section class="about">
-          <h1 id="h1">GAME</h1>
-          <p class="lede" id="blurb"></p>
-          <p id="about"></p>
+          <h1 id="h1">CROSSING</h1>
+          <p class="lede" id="blurb">It never end , and the bottom of the  creen i  ri ing. How far did you get?</p>
+          <div id="about"><p>Road and river, generated forever as they come into view, and they play as opposites - on the road touching anything kills you, on the river touching NOTHING does. The river carries you along with the log, so the far bank is about where you WILL be rather than where you are, and the turtles dive. What makes it a game is the camera: it creeps up from the bottom of the screen, faster the further you get, and the edge is lethal. You are never allowed to wait for a gap, only to pick one. One life, and your score is the row you reached.</p></div>
           <h4>Controls</h4>
-          <ul class="keys" id="keys"></ul>
-          <div class="tip" id="tip"></div>
+          <ul class="keys" id="keys"><li><kbd>Arrows / W A S D</kbd><span>hop</span></li><li><kbd>Swipe</kbd><span>hop (mobile)</span></li><li><kbd>P</kbd><span>pause</span></li></ul>
+          <div class="tip" id="tip">A diving turtle will not hold you - but you cannot wait for it either. Take the gap you have.</div>
           <h4>Tags</h4>
-          <div class="tagrow" id="tags"></div>
+          <div class="tagrow" id="tags"><a class="chip on" href="/category/arcade/">Arcade</a><a class="chip" href="/#q=new">new</a><a class="chip" href="/#q=endless">endless</a><a class="chip" href="/#q=hopping">hopping</a><a class="chip" href="/#q=traffic">traffic</a><a class="chip" href="/#q=mobile">mobile</a><a class="chip" href="/#q=one%20life">one life</a></div>
         </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>You are a frog hopping up an endless strip of land, road and river. Each press is one hop of one square. A hop is quick and cannot be cancelled once it starts. Your score is the furthest row you have reached, so stepping back and forward again earns nothing. You have one life, and the run ends when you are hit by traffic, land in the water, get carried off the edge of the screen on a log or turtle, or fall off the bottom of the screen.</p>
+<p>The bottom of the screen is what pushes you on. It stays still until your first hop. After that it creeps up the world on its own and gets steadily faster the further you have gone. It starts at about a third of a row per second and tops out at about 1.7 rows a second. If it passes you, the run is over. It also never lets you get more than six rows above the bottom edge, so you cannot rush ahead and then wait.</p>
+<p>The road and the river work in opposite ways. On the road, touching a car or lorry kills you. On the river, touching nothing kills you, and you have to land on a log or a turtle. While you ride one, it carries you sideways. The game comes from Konami&rsquo;s 1981 arcade game <i>Frogger</i>, but here the world is new and different on every run.</p>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li>Turtles dive. Each group spends about one and a half seconds of every six under the water, each on its own timing. A diving turtle will not hold you, so only land on one that has just come up.</li>
+<li>Logs and turtles move you, so line up your next hop with where you will be, not where you are now. Ride too long and the river carries you off the side.</li>
+<li>Every lane runs one way at one speed. Each road lane has either cars or lorries, never both. Lorries are longer but slower, so a lorry lane has bigger gaps that open more slowly.</li>
+<li>Trees on the grass block your hop. Plan a route round them before you reach the bank, because a blocked hop wastes time you may not have.</li>
+<li>Hopping sideways and backwards is allowed. A step back onto safe grass to wait for a better gap is fine, as long as the bottom edge is not close.</li>
+<li>Further out, everything gets harder at once. Traffic and river speeds rise steadily to over two and a half times their starting pace, rivers become more common, and patches of grass to rest on become rarer.</li>
+</ul>
+
+<h2>What's in it</h2>
+<p>One endless mode with one life, and a top-ten board measured in rows. The first few rows are always grass, so you can start calmly. After that, roads and rivers come in bands of two to four lanes, with grass verges between them. Hop with the arrow keys or <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd>. On a phone, swipe in a direction or tap to hop forward. <kbd>P</kbd> pauses and <kbd>R</kbd> goes back to the home screen.</p>
+
+<h2>Questions</h2>
+<h3>Does it ever end?</h3>
+<p>No. New rows are made as they come into view, and there is no finish line and no level counter.</p>
+<h3>What counts as my score?</h3>
+<p>The highest row you stood on during the run. Going back down does not lose points, and going back up the same rows does not add any.</p>
+<h3>Can I stand still?</h3>
+<p>Only until your first hop, while the screen is not moving. After that, standing still lets the bottom edge catch you.</p>
+<h3>Why did I die on a log I was standing on?</h3>
+<p>Either the log carried you off the side of the screen, or it was a turtle that had just dived.</p></article>
 
         <div id="ad-play-footer"></div>
 
@@ -99,7 +140,7 @@
         <div id="ad-play-rail"></div>
         <div class="panel">
           <h4>More games</h4>
-          <div id="more"></div>
+          <div id="more"><a class="mini" href="/play/penguin-dash/"><span class="th" style="background-image:url('/shots/penguin-dash.png')"></span><span><b>PENGUIN DASH</b><small>Arcade</small></span></a><a class="mini" href="/play/stack/"><span class="th" style="background-image:url('/shots/stack.png')"></span><span><b>STACK</b><small>Arcade</small></span></a><a class="mini" href="/play/bricks/"><span class="th" style="background-image:url('/shots/bricks.png')"></span><span><b>BRICKS</b><small>Arcade</small></span></a><a class="mini" href="/play/drifter/"><span class="th" style="background-image:url('/shots/drifter.png')"></span><span><b>DRIFTER</b><small>Arcade</small></span></a><a class="mini" href="/play/hopper/"><span class="th" style="background-image:url('/shots/hopper.png')"></span><span><b>HOPPER</b><small>Arcade</small></span></a></div>
         </div>
         <div id="ad-play-tall"></div>
       </aside>
@@ -114,18 +155,18 @@
       <div class="cols2">
         <div>
           <div class="brand">PLAY<b>PILE</b></div>
-          <p class="blurb">23 browser games, all of them written for this site. No sign-up,
+          <p class="blurb">26 browser games, all of them written for this site. No sign-up,
              no download, and your best scores stay in your own browser.</p>
         </div>
         <div class="fl"><b>Site</b>
           <a href="/">All games</a><a href="/site/about.html">About</a>
-          <a href="/site/advertise.html">Advertise</a></div>
+          <a href="/site/updates.html">Updates</a><a href="/site/advertise.html">Advertise</a></div>
         <div class="fl"><b>Legal</b>
           <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a></div>
         <div class="fl"><b>Play</b>
-          <a href="/#c=Arcade">Arcade</a><a href="/#c=Classic">Classic</a>
-          <a href="/#c=Puzzle">Puzzle</a><a href="/#c=Sport">Sport</a>
-          <a href="/#c=Action">Action</a></div>
+          <a href="/category/arcade/">Arcade</a><a href="/category/classic/">Classic</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
       </div>
       <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
         <span>Made by one person, in a browser.</span></div>
@@ -147,6 +188,7 @@
 <script type="module">
 import { GAMES, bySlug } from '/site/catalogue.js';
 import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
 import { loadAds, slot, interstitial } from '/ads/ads.js';
 
 // THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
@@ -160,21 +202,26 @@ if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
 mountShell({ active: catOf(g) });
 remember(g.slug);
 
-document.title = g.title + ' — ' + catOf(g) + ' game — PLAYPILE';
-document.getElementById('crumbs').innerHTML =
-  '<a href="/">Games</a><i>&rsaquo;</i>'
-  + '<a href="/#c=' + encodeURIComponent(catOf(g)) + '">' + catOf(g) + '</a>'
-  + '<i>&rsaquo;</i><b>' + g.title + '</b>';
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
 
 ttl.textContent = g.title;
 h1.textContent = g.title;
 barttl.textContent = g.title;
 lede.textContent = g.blurb;
 blurb.textContent = g.blurb;
-about.textContent = g.about.replace(/\s+/g, ' ').trim();
+about.innerHTML = aboutHtml(g);
 tip.textContent = g.tips;
 shotbg.src = '/shots/' + g.slug + '.png';
-keys.innerHTML = g.controls.map(([k, w]) => `<li><kbd>${k}</kbd><span>${w}</span></li>`).join('');
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
 tags.innerHTML = [catOf(g), ...(g.tags || [])]
   .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
   .join('');
@@ -247,15 +294,10 @@ addEventListener('keydown', (e) => {
 const others = GAMES.filter((x) => x.slug !== g.slug);
 const same = others.filter((x) => catOf(x) === catOf(g));
 const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
-const rail = [...same, ...rest].slice(0, 5);
-more.innerHTML = rail.map((x) => `
-  <a class="mini" href="/play/${x.slug}">
-    <span class="th" style="background-image:url('/shots/${x.slug}.png')"></span>
-    <span><b>${x.title}</b><small>${catOf(x)}</small></span>
-  </a>`).join('');
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
 
 document.getElementById('alsorows').innerHTML =
-  row('More ' + catOf(g) + ' games', same, { seeAll: '/#c=' + encodeURIComponent(catOf(g)) })
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
   + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
 
 // ---- adverts: every slot that existed before, in the same place -----

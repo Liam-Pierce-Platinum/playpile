@@ -4,7 +4,17 @@
 <script>window.__PLAYPILE_WEB=1;</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PLAYPILE</title>
+<title>MERGE — free puzzle game in your browser — PLAYPILE</title>
+<meta name="description" content="Drop the fruit in, match two, get a bigger one. A thousand stages of it. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/merge/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="MERGE — PLAYPILE">
+<meta property="og:description" content="Drop the fruit in, match two, get a bigger one. A thousand stages of it. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/merge/">
+<meta property="og:image" content="https://playpile.net/shots/merge.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"MERGE","url":"https://playpile.net/play/merge/","image":"https://playpile.net/shots/merge.png","description":"Drop the fruit in, match two, get a bigger one. A thousand stages of it.","genre":"Puzzle","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Puzzle","item":"https://playpile.net/category/puzzle/"},{"@type":"ListItem","position":3,"name":"MERGE","item":"https://playpile.net/play/merge/"}]}</script>
 <link rel="stylesheet" href="/site/style.css">
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
@@ -40,7 +50,7 @@
   <div class="scrim" id="scrim"></div>
 
   <main id="main">
-    <nav class="crumbs" id="crumbs"></nav>
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/category/puzzle/">Puzzle</a><i>&rsaquo;</i><b>MERGE</b></nav>
     <div id="ad-play-leader"></div>
 
     <div class="play">
@@ -55,15 +65,15 @@
                   allowfullscreen hidden></iframe>
           <div class="curtain" id="curtain">
             <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
-            <h2 id="ttl">GAME</h2>
-            <p id="lede"></p>
+            <h2 id="ttl">MERGE</h2>
+            <p id="lede">Drop the fruit in, match two, get a bigger one. A thou and  tage  of it.</p>
             <button class="btn" id="start">Play</button>
             <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
           </div>
         </div>
 
         <div class="stagebar">
-          <span class="title" id="barttl"></span>
+          <span class="title" id="barttl">MERGE</span>
           <span class="where" id="how"></span>
           <span class="sp"></span>
           <button id="full" type="button">
@@ -78,15 +88,48 @@
         </div>
 
         <section class="about">
-          <h1 id="h1">GAME</h1>
-          <p class="lede" id="blurb"></p>
-          <p id="about"></p>
+          <h1 id="h1">MERGE</h1>
+          <p class="lede" id="blurb">Drop the fruit in, match two, get a bigger one. A thou and  tage  of it.</p>
+          <div id="about"><p>Real rolling physics in a glass jar. Two of the same touch and become the next one up - a thousand stages of it. Past the eleventh the sizes start again and the pieces wear rings and pips instead, so a small one can be worth thousands. The jar is narrow and the grace over the line is short.</p></div>
           <h4>Controls</h4>
-          <ul class="keys" id="keys"></ul>
-          <div class="tip" id="tip"></div>
+          <ul class="keys" id="keys"><li><kbd>Mouse</kbd><span>aim</span></li><li><kbd>Click</kbd><span>drop</span></li><li><kbd>Tap</kbd><span>drop (mobile)</span></li></ul>
+          <div class="tip" id="tip">Keep the big ones at the bottom. A large one stranded on top is a dead jar.</div>
           <h4>Tags</h4>
-          <div class="tagrow" id="tags"></div>
+          <div class="tagrow" id="tags"><a class="chip on" href="/category/puzzle/">Puzzle</a><a class="chip" href="/#q=merge">merge</a><a class="chip" href="/#q=physics">physics</a><a class="chip" href="/#q=fruit">fruit</a><a class="chip" href="/#q=mobile">mobile</a><a class="chip" href="/#q=relaxing">relaxing</a><a class="chip" href="/#q=match">match</a></div>
         </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>MERGE is played in a glass jar. Move the pointer to aim, then click, tap or press <kbd>Space</kbd> to drop a piece of fruit in. The fruit rolls, stacks and settles with real physics. When two identical pieces touch, they join into one piece of the next size up, and that new piece can in turn join another of its own kind. Chains of merges can set each other off.</p>
+<p>Every merge scores the value of the piece it creates, and bigger pieces are worth far more: the eleventh fruit is worth 100 points for a single merge. There is a dashed line near the top of the jar. If any settled piece stays over that line for more than 1.2 seconds, the jar is full and the run is over. The line turns red as the grace period runs out, so you can see it coming.</p>
+<p>The end card shows your score and the highest stage you reached during the run.</p>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li><b>Look two ahead.</b> The piece in your hand hangs over the jar, and the one after it is shown beside <i>NEXT</i> in the corner. Plan where both will go.</li>
+<li><b>Keep the big ones low.</b> A large piece stuck on top of small ones blocks everything beneath it and eats the headroom you need.</li>
+<li><b>Build a slope of sizes.</b> Pieces that sit beside the next size up merge into it naturally as the chain grows.</li>
+<li><b>Be ready for the big one.</b> Most drops are one of the four smallest fruit, but roughly one in eleven is the fifth size. Leave yourself somewhere to put it.</li>
+<li><b>Newly dropped pieces are safe.</b> A piece that has just gone in, or is still falling, does not count against the line. Only a settled piece does.</li>
+<li><b>Take your time.</b> There is no clock, only a short pause of under a third of a second between drops.</li>
+<li><b>The biggest merge makes room.</b> Two of the eleventh fruit become the twelfth stage, which is cherry-sized again. Pulling that off empties a huge part of the jar in one go.</li>
+</ul>
+
+<h2>What's in it</h2>
+<p>Eleven hand-drawn fruit form the first cycle, from a small cherry to a large melon. Past that, the chain keeps going for a thousand stages in all. Every eleven stages the sizes start again from the smallest, in a new colour, and the pieces are marked to show which cycle they belong to: a ring round the rim, then pips above it, then more rings and pips as the cycles mount. From stage 12 upwards, the stage number is printed on every piece large enough to carry it.</p>
+<p>Points climb steeply with each cycle &ndash; each one pays about two and a half times the last &ndash; so a small piece late in a run can be worth more than everything you scored in the first cycle.</p>
+
+<h2>Questions</h2>
+<h3>Does it save my score?</h3>
+<p>Yes, on this device. The home screen shows a top-ten table, and a qualifying run asks for three initials.</p>
+<h3>Can I play it on a phone?</h3>
+<p>Yes. Tap where you want the fruit to go and it drops from there.</p>
+<h3>How does it get harder?</h3>
+<p>The rules never change, but the jar fills up. The jar is narrow, so the bigger pieces take up a large share of the width, and space runs out sooner than you expect.</p>
+<h3>Is there a time limit?</h3>
+<p>No. The only way to lose is to let the jar fill past the line.</p></article>
 
         <div id="ad-play-footer"></div>
 
@@ -99,7 +142,7 @@
         <div id="ad-play-rail"></div>
         <div class="panel">
           <h4>More games</h4>
-          <div id="more"></div>
+          <div id="more"><a class="mini" href="/play/pipeworks/"><span class="th" style="background-image:url('/shots/pipeworks.png')"></span><span><b>PIPEWORKS</b><small>Puzzle</small></span></a><a class="mini" href="/play/sweep/"><span class="th" style="background-image:url('/shots/sweep.png')"></span><span><b>SWEEP</b><small>Puzzle</small></span></a><a class="mini" href="/play/highrise/"><span class="th" style="background-image:url('/shots/highrise.png')"></span><span><b>HIGHRISE</b><small>Shooter</small></span></a><a class="mini" href="/play/kickback/"><span class="th" style="background-image:url('/shots/kickback.png')"></span><span><b>KICKBACK</b><small>Action</small></span></a><a class="mini" href="/play/lightsout/"><span class="th" style="background-image:url('/shots/lightsout.png')"></span><span><b>LIGHTS OUT</b><small>Horror</small></span></a></div>
         </div>
         <div id="ad-play-tall"></div>
       </aside>
@@ -114,18 +157,18 @@
       <div class="cols2">
         <div>
           <div class="brand">PLAY<b>PILE</b></div>
-          <p class="blurb">23 browser games, all of them written for this site. No sign-up,
+          <p class="blurb">26 browser games, all of them written for this site. No sign-up,
              no download, and your best scores stay in your own browser.</p>
         </div>
         <div class="fl"><b>Site</b>
           <a href="/">All games</a><a href="/site/about.html">About</a>
-          <a href="/site/advertise.html">Advertise</a></div>
+          <a href="/site/updates.html">Updates</a><a href="/site/advertise.html">Advertise</a></div>
         <div class="fl"><b>Legal</b>
           <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a></div>
         <div class="fl"><b>Play</b>
-          <a href="/#c=Arcade">Arcade</a><a href="/#c=Classic">Classic</a>
-          <a href="/#c=Puzzle">Puzzle</a><a href="/#c=Sport">Sport</a>
-          <a href="/#c=Action">Action</a></div>
+          <a href="/category/arcade/">Arcade</a><a href="/category/classic/">Classic</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
       </div>
       <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
         <span>Made by one person, in a browser.</span></div>
@@ -147,6 +190,7 @@
 <script type="module">
 import { GAMES, bySlug } from '/site/catalogue.js';
 import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
 import { loadAds, slot, interstitial } from '/ads/ads.js';
 
 // THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
@@ -160,21 +204,26 @@ if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
 mountShell({ active: catOf(g) });
 remember(g.slug);
 
-document.title = g.title + ' — ' + catOf(g) + ' game — PLAYPILE';
-document.getElementById('crumbs').innerHTML =
-  '<a href="/">Games</a><i>&rsaquo;</i>'
-  + '<a href="/#c=' + encodeURIComponent(catOf(g)) + '">' + catOf(g) + '</a>'
-  + '<i>&rsaquo;</i><b>' + g.title + '</b>';
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
 
 ttl.textContent = g.title;
 h1.textContent = g.title;
 barttl.textContent = g.title;
 lede.textContent = g.blurb;
 blurb.textContent = g.blurb;
-about.textContent = g.about.replace(/\s+/g, ' ').trim();
+about.innerHTML = aboutHtml(g);
 tip.textContent = g.tips;
 shotbg.src = '/shots/' + g.slug + '.png';
-keys.innerHTML = g.controls.map(([k, w]) => `<li><kbd>${k}</kbd><span>${w}</span></li>`).join('');
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
 tags.innerHTML = [catOf(g), ...(g.tags || [])]
   .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
   .join('');
@@ -247,15 +296,10 @@ addEventListener('keydown', (e) => {
 const others = GAMES.filter((x) => x.slug !== g.slug);
 const same = others.filter((x) => catOf(x) === catOf(g));
 const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
-const rail = [...same, ...rest].slice(0, 5);
-more.innerHTML = rail.map((x) => `
-  <a class="mini" href="/play/${x.slug}">
-    <span class="th" style="background-image:url('/shots/${x.slug}.png')"></span>
-    <span><b>${x.title}</b><small>${catOf(x)}</small></span>
-  </a>`).join('');
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
 
 document.getElementById('alsorows').innerHTML =
-  row('More ' + catOf(g) + ' games', same, { seeAll: '/#c=' + encodeURIComponent(catOf(g)) })
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
   + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
 
 // ---- adverts: every slot that existed before, in the same place -----

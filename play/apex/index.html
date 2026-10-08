@@ -4,7 +4,17 @@
 <script>window.__PLAYPILE_WEB=1;</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PLAYPILE</title>
+<title>APEX — free driving game in your browser — PLAYPILE</title>
+<meta name="description" content="Thirty-three real circuits, twenty-four cars, and air that decides the overtake. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/apex/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="APEX — PLAYPILE">
+<meta property="og:description" content="Thirty-three real circuits, twenty-four cars, and air that decides the overtake. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/apex/">
+<meta property="og:image" content="https://playpile.net/shots/apex.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"APEX","url":"https://playpile.net/play/apex/","image":"https://playpile.net/shots/apex.png","description":"Thirty-three real circuits, twenty-four cars, and air that decides the overtake.","genre":"Driving","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Driving","item":"https://playpile.net/category/driving/"},{"@type":"ListItem","position":3,"name":"APEX","item":"https://playpile.net/play/apex/"}]}</script>
 <link rel="stylesheet" href="/site/style.css">
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
@@ -40,7 +50,7 @@
   <div class="scrim" id="scrim"></div>
 
   <main id="main">
-    <nav class="crumbs" id="crumbs"></nav>
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/category/driving/">Driving</a><i>&rsaquo;</i><b>APEX</b></nav>
     <div id="ad-play-leader"></div>
 
     <div class="play">
@@ -55,15 +65,15 @@
                   allowfullscreen hidden></iframe>
           <div class="curtain" id="curtain">
             <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
-            <h2 id="ttl">GAME</h2>
-            <p id="lede"></p>
+            <h2 id="ttl">APEX</h2>
+            <p id="lede">Thirty-three real circuit , twenty-four car , and air that decide  the overtake.</p>
             <button class="btn" id="start">Play</button>
             <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
           </div>
         </div>
 
         <div class="stagebar">
-          <span class="title" id="barttl"></span>
+          <span class="title" id="barttl">APEX</span>
           <span class="where" id="how"></span>
           <span class="sp"></span>
           <button id="full" type="button">
@@ -78,15 +88,48 @@
         </div>
 
         <section class="about">
-          <h1 id="h1">GAME</h1>
-          <p class="lede" id="blurb"></p>
-          <p id="about"></p>
+          <h1 id="h1">APEX</h1>
+          <p class="lede" id="blurb">Thirty-three real circuit , twenty-four car , and air that decide  the overtake.</p>
+          <div id="about"><p>Every circuit on the calendar and a good many that are not, each laid out from its real corner sequence and solved until the lap closes to under a metre and measures the published distance. The car makes its own grip out of air - about its own weight again in downforce by 200 km/h - so it corners harder the faster it is going, and the body heaves, pitches and rolls on four real springs rather than on a formula. Twelve teams, two cars each, and the air behind them matters: sit in somebody's tow down a straight and you gain on him, follow him through a corner and his wake takes downforce off your car. Tyres go off and get too hot, it rains and the road reflects it, the car breaks when you hit things, and the crew come over the wall to change four of them while you sit there. Drive on your own, set a time, run a single race, or take on the League, race by race with a championship table at the end of it.</p></div>
           <h4>Controls</h4>
-          <ul class="keys" id="keys"></ul>
-          <div class="tip" id="tip"></div>
+          <ul class="keys" id="keys"><li><kbd>W S</kbd><span>throttle · brake</span></li><li><kbd>A D</kbd><span>steer</span></li><li><kbd>E Q</kbd><span>up a gear · down a gear</span></li><li><kbd>Space</kbd><span>DRS</span></li><li><kbd>C</kbd><span>clutch</span></li><li><kbd>P</kbd><span>ready the crew, then drive into the pit lane</span></li><li><kbd>1 - 5</kbd><span>choose tyres</span></li><li><kbd>V</kbd><span>camera</span></li><li><kbd>R</kbd><span>back on track</span></li><li><kbd>Esc</kbd><span>pause</span></li></ul>
+          <div class="tip" id="tip">Get a tow down the straight before you commit to the move - in the corner behind him you have less grip than he does, not more. And a downshift too many will step the back out.</div>
           <h4>Tags</h4>
-          <div class="tagrow" id="tags"></div>
+          <div class="tagrow" id="tags"><a class="chip on" href="/category/driving/">Driving</a><a class="chip" href="/#q=new">new</a><a class="chip" href="/#q=racing">racing</a><a class="chip" href="/#q=f1">f1</a><a class="chip" href="/#q=cars">cars</a><a class="chip" href="/#q=simulation">simulation</a><a class="chip" href="/#q=3d">3d</a><a class="chip" href="/#q=track">track</a><a class="chip" href="/#q=rain">rain</a><a class="chip" href="/#q=pit%20stops">pit stops</a><a class="chip" href="/#q=damage">damage</a><a class="chip" href="/#q=career">career</a></div>
         </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>Pick a mode, a circuit and the weather, and go. Every car on the grid is the same car you drive, on the same physics. The other drivers get no extra grip and no catch-up help. They differ only in how close to the limit they drive.</p>
+<p><b>Free Drive</b> is the circuit to yourself. <b>Time Attack</b> starts you about 500 m before the line, already at speed, so every lap is a flying lap. It is split into three sectors: purple for a personal best, green for your session best, amber for slower. Put all four wheels over the white line, or press <kbd>R</kbd>, and the lap is struck off.</p>
+<p><b>Race</b> lets you choose 2, 3, 5 or 10 laps, 10, 16, 20 or 24 cars, easy, medium or hard opposition, and a start from the front, middle or back. Five red lights come on one a second and go out after a random wait. Moving before they go out adds five seconds to your finishing time. <b>League</b> is a season of 5, 10, 16 or 22 rounds on circuits drawn at random. At each round you get one qualifying lap to set your grid slot, then a 16-car race. Points go 25-18-15-12-10-8-6-4-2-1, plus one for the fastest lap if you finish in the top ten. There are drivers' and constructors' tables.</p>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li>The tow works when a car is within 55 m ahead of you and less than 4.5 m to one side. Right on his gearbox it takes up to a third of your drag away. The same air costs you downforce, so pass on the straight, not in the corner behind him.</li>
+<li>In a race, DRS opens only from lap 2, within a second of the car ahead, and on a straight. Watch for the DRS light before you press <kbd>Space</kbd>.</li>
+<li>League qualifying is one lap, and an invalid lap counts as no time, which puts you at the back. A tidy lap beats a fast one off the road.</li>
+<li>Grass keeps 55% of your grip and gravel 42%, and gravel drags hard too. Cutting the infield costs time.</li>
+<li>The pit limiter cuts power above 80 km/h, and speeding in a race costs five seconds. Stop in the yellow box. If you drive past it, the stop becomes a drive-through.</li>
+<li><kbd>P</kbd> warns the crew and <kbd>1</kbd> to <kbd>5</kbd> pick soft, medium, hard, inter or wet. Tyres take about 2.3 seconds plus the jacks. A front wing takes 5 seconds and a rear wing 7.</li>
+<li>A medium lasts about six laps of Monza. Soft has more grip and a shorter life, and hard the opposite. On standing water, slicks aquaplane first.</li>
+<li><kbd>R</kbd> puts you back on track but does not mend the car. Only a pit stop does.</li>
+</ul>
+
+<h2>What's in it</h2>
+<p>There are 33 circuits: the 24 on the 2026 calendar in race order, plus nine former venues, among them Imola, Mugello, Sepang and Hockenheim. Suzuka keeps its real crossover bridge. Twelve invented teams run two cars each, and each team has its own pace, so the same teams are quick every week. You drive number 7 for APEX, with a team mate who races you like anyone else. There are five tyre compounds and four kinds of weather: dry, changeable (dry, then a shower, then clearing), light rain and heavy rain. Damage is physical: wings and endplates break off, tyres go flat and then down to the rim, and a hard enough hit takes a wheel off. There are four cameras: chase, cockpit, T-cam and trackside.</p>
+
+<h2>Questions</h2>
+<h3>Does it save my times and my season?</h3>
+<p>Yes, in this browser. Time Attack keeps your five best laps for each circuit and races you against your best lap as a ghost. A League season is saved after every session, so closing the tab loses nothing.</p>
+<h3>Is the gearbox automatic?</h3>
+<p>No. It is an eight-speed manual: <kbd>E</kbd> or <kbd>Shift</kbd> to change up, <kbd>Q</kbd> or <kbd>Ctrl</kbd> to change down, and <kbd>C</kbd> for the clutch.</p>
+<h3>Can I play with a controller or on a phone?</h3>
+<p>No. APEX is played on a keyboard.</p>
+<h3>Why are lap times slower than real poles?</h3>
+<p>The handling is tuned for feel, not for real grip figures. Every rival has the same car, so the racing is still fair.</p></article>
 
         <div id="ad-play-footer"></div>
 
@@ -99,7 +142,7 @@
         <div id="ad-play-rail"></div>
         <div class="panel">
           <h4>More games</h4>
-          <div id="more"></div>
+          <div id="more"><a class="mini" href="/play/nascar/"><span class="th" style="background-image:url('/shots/nascar.png')"></span><span><b>NASCAR</b><small>Driving</small></span></a><a class="mini" href="/play/highrise/"><span class="th" style="background-image:url('/shots/highrise.png')"></span><span><b>HIGHRISE</b><small>Shooter</small></span></a><a class="mini" href="/play/kickback/"><span class="th" style="background-image:url('/shots/kickback.png')"></span><span><b>KICKBACK</b><small>Action</small></span></a><a class="mini" href="/play/lightsout/"><span class="th" style="background-image:url('/shots/lightsout.png')"></span><span><b>LIGHTS OUT</b><small>Horror</small></span></a><a class="mini" href="/play/exposure/"><span class="th" style="background-image:url('/shots/exposure.png')"></span><span><b>EXPOSURE</b><small>Horror</small></span></a></div>
         </div>
         <div id="ad-play-tall"></div>
       </aside>
@@ -114,18 +157,18 @@
       <div class="cols2">
         <div>
           <div class="brand">PLAY<b>PILE</b></div>
-          <p class="blurb">23 browser games, all of them written for this site. No sign-up,
+          <p class="blurb">26 browser games, all of them written for this site. No sign-up,
              no download, and your best scores stay in your own browser.</p>
         </div>
         <div class="fl"><b>Site</b>
           <a href="/">All games</a><a href="/site/about.html">About</a>
-          <a href="/site/advertise.html">Advertise</a></div>
+          <a href="/site/updates.html">Updates</a><a href="/site/advertise.html">Advertise</a></div>
         <div class="fl"><b>Legal</b>
           <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a></div>
         <div class="fl"><b>Play</b>
-          <a href="/#c=Arcade">Arcade</a><a href="/#c=Classic">Classic</a>
-          <a href="/#c=Puzzle">Puzzle</a><a href="/#c=Sport">Sport</a>
-          <a href="/#c=Action">Action</a></div>
+          <a href="/category/arcade/">Arcade</a><a href="/category/classic/">Classic</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
       </div>
       <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
         <span>Made by one person, in a browser.</span></div>
@@ -147,6 +190,7 @@
 <script type="module">
 import { GAMES, bySlug } from '/site/catalogue.js';
 import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
 import { loadAds, slot, interstitial } from '/ads/ads.js';
 
 // THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
@@ -160,21 +204,26 @@ if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
 mountShell({ active: catOf(g) });
 remember(g.slug);
 
-document.title = g.title + ' — ' + catOf(g) + ' game — PLAYPILE';
-document.getElementById('crumbs').innerHTML =
-  '<a href="/">Games</a><i>&rsaquo;</i>'
-  + '<a href="/#c=' + encodeURIComponent(catOf(g)) + '">' + catOf(g) + '</a>'
-  + '<i>&rsaquo;</i><b>' + g.title + '</b>';
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
 
 ttl.textContent = g.title;
 h1.textContent = g.title;
 barttl.textContent = g.title;
 lede.textContent = g.blurb;
 blurb.textContent = g.blurb;
-about.textContent = g.about.replace(/\s+/g, ' ').trim();
+about.innerHTML = aboutHtml(g);
 tip.textContent = g.tips;
 shotbg.src = '/shots/' + g.slug + '.png';
-keys.innerHTML = g.controls.map(([k, w]) => `<li><kbd>${k}</kbd><span>${w}</span></li>`).join('');
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
 tags.innerHTML = [catOf(g), ...(g.tags || [])]
   .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
   .join('');
@@ -247,15 +296,10 @@ addEventListener('keydown', (e) => {
 const others = GAMES.filter((x) => x.slug !== g.slug);
 const same = others.filter((x) => catOf(x) === catOf(g));
 const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
-const rail = [...same, ...rest].slice(0, 5);
-more.innerHTML = rail.map((x) => `
-  <a class="mini" href="/play/${x.slug}">
-    <span class="th" style="background-image:url('/shots/${x.slug}.png')"></span>
-    <span><b>${x.title}</b><small>${catOf(x)}</small></span>
-  </a>`).join('');
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
 
 document.getElementById('alsorows').innerHTML =
-  row('More ' + catOf(g) + ' games', same, { seeAll: '/#c=' + encodeURIComponent(catOf(g)) })
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
   + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
 
 // ---- adverts: every slot that existed before, in the same place -----

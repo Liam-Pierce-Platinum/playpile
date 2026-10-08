@@ -28,8 +28,7 @@ export const INTROS = {
     stops; NASCAR does the same for twenty ovals, where banking and the draft decide
     the race. Both can be raced one
     event at a time or as a whole season.`,
-  Horror: `Two games about not being able to see. LIGHTS OUT gives you a torch in a dark
-    house and something tall that freezes in the beam; EXPOSURE leaves you with nothing
+  Horror: `A game about not being able to see. EXPOSURE leaves you with nothing
     but your own muzzle flash, which lights the room for a moment and then stays on the
     screen as a photograph of where everything was.`,
   Puzzle: `Games you think your way through. A pipe-laying puzzle with six hand-made

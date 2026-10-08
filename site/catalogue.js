@@ -44,22 +44,6 @@ export const GAMES = [
     tips: 'Down is a jump. Aim under your feet and pull.',
   },
   {
-    slug: 'lightsout', title: 'LIGHTS OUT', how: 'mounted', port: 8154, url: '/',
-    web: 'lightsout/',
-    tag: 'Horror', big: true,
-    cat: 'Horror', tags: ['dark', 'torch', '3d', 'survival', 'scary', 'first person'],
-    blurb: 'A dark house, a torch, six switches, and something nine feet tall.',
-    about: `You are standing in a dark house holding a torch. There are six light
-    switches, and the house does not want you to reach them. The torch throws real
-    shadows, the walls have plaster and paper and damp on them, and the thing that
-    lives here - there are two of them - is nine feet tall, folded forward, and only ever
-    half seen. A blanket thrown over the torch is the other way to live.`,
-    controls: [['W A S D', 'move (torch off)'], ['Mouse / arrows', 'look'],
-               ['F / Space', 'torch'], ['Q', 'throw the blanket'],
-               ['E', 'switch / interact'], ['R', 'restart after a run']],
-    tips: 'The torch is a beam, not a lamp. What it is not pointed at is not empty.',
-  },
-  {
     slug: 'exposure', title: 'EXPOSURE', how: 'mounted', port: 8151, url: '/',
     web: 'exposure/',
     tag: 'Horror', big: true,
@@ -232,18 +216,6 @@ export const GAMES = [
     tips: 'Perfect drops give width back, and from the third in a row they give back three times as much.',
   },
   {
-    slug: 'bricks', title: 'BRICKS', how: 'local', tag: 'Arcade',
-    cat: 'Arcade', tags: ['breakout', 'paddle', 'retro', 'mobile', 'ball'],
-    blurb: 'Breakout, with a paddle that is exactly as wide as your last mistake.',
-    about: `Ten columns, a row of steel that moves down the wall every level, and four
-    kinds of drop worth leaving the ball for. The paddle shrinks the longer a wall takes and
-    comes back to full on every clear. Mouse or arrow keys - whichever you touched last
-    is the one driving it.`,
-    controls: [['Mouse', 'move the paddle'], ['A D / arrows', 'move the paddle'],
-               ['Click / Space', 'launch'], ['P', 'pause']],
-    tips: 'Hitting the paddle off-centre angles the ball. That is the whole game.',
-  },
-  {
     slug: 'drifter', title: 'DRIFTER', how: 'local', tag: 'Arcade',
     cat: 'Arcade', tags: ['asteroids', 'space', 'shooting', 'retro', 'ship'],
     blurb: 'Rocks, a small ship, and bullets that cost the fuel you steer with.',
@@ -254,18 +226,6 @@ export const GAMES = [
     controls: [['A D / ← →', 'turn'], ['W / ↑', 'thrust'], ['Space / Click', 'fire'],
                ['Shift', 'hyperspace - tap it, do not hold it']],
     tips: 'A small rock is worth five times a big one, and the wave does not end until every one of them is gone - so shoot the big ones where they will break up away from you.',
-  },
-  {
-    slug: 'hopper', title: 'HOPPER', how: 'local', tag: 'Endless',
-    cat: 'Arcade', tags: ['endless', 'runner', 'pixel', 'one button', 'mobile', 'jumping'],
-    blurb: 'One button, one long night on the rooftops, and a jump as high as you hold it.',
-    about: `An endless runner in pixel art, back on the rooftops at night: lit windows,
-    neon, water towers and aerials going past in three depths. The jump is analogue -
-    how long you hold is how high you go - and there is a dive for landing early.
-    Coins arc over the gaps, and they buy what your runner wears.`,
-    controls: [['Space / Click / ↑ / W', 'jump (hold for higher)'], ['↓ / S / Shift', 'dive'],
-               ['P', 'pause']],
-    tips: 'Dive to land early. A short hop over a low gap beats a long one every time.',
   },
   {
     slug: 'merge', title: 'MERGE', how: 'local', tag: 'Puzzle',
@@ -369,57 +329,6 @@ export const GAMES = [
   // worked on. Its folder, its card and its test went with this entry.
 
   // ---- the classics ------------------------------------------------
-  {
-    slug: 'snake', title: 'SNAKE', how: 'local', tag: 'Classic',
-    cat: 'Classic', tags: ['snake', 'retro', 'arcade', 'mobile', '80s'],
-    blurb: 'Every fifth apple leaves a block where you ate it.',
-    about: `Plain Snake is solved - you learn to fold it into rows and then it is a
-    chore with a timer. So this one fights back: every fifth apple drops a wall block
-    on the square where you ate it, which means the tidy fold stops being safe and the
-    board at apple forty is one you built yourself out of forty decisions. The golden
-    apple is worth five and rots in seven seconds, and the route to it is never the
-    route you would otherwise take.`,
-    controls: [['Arrows / W A S D', 'turn'], ['Swipe', 'turn (mobile)'], ['P', 'pause']],
-    tips: 'Turns are buffered two deep, so left-then-up as one motion works at full speed.',
-  },
-  {
-    slug: 'lines', title: 'LINES', how: 'local', tag: 'Classic',
-    cat: 'Classic', tags: ['blocks', 'falling', 'retro', 'puzzle', '80s'],
-    blurb: 'Seven shapes, ten columns, and a piece that lands still has half a second.',
-    about: `The falling-block game with the four details that decide whether it feels
-    right: a landed piece gets half a second in which it can still be slid or spun, the
-    next piece comes from a shuffled bag of all seven rather than a dice, a rotation
-    that would not fit is retried against the wall before being refused, and a ghost
-    shows where it will land. Four rows at once pays half as much again if you did it last time too.`,
-    controls: [['← →', 'move'], ['↑ or X', 'spin'], ['Z', 'spin back'],
-               ['↓ / S', 'soft drop'], ['Space', 'hard drop'], ['Shift / C', 'hold']],
-    tips: 'The bag means the longest you can ever wait for the long piece is twelve.',
-  },
-  {
-    slug: 'rally', title: 'RALLY', how: 'local', tag: 'Classic',
-    cat: 'Classic', tags: ['pong', 'bat and ball', 'retro', '2 player', '70s'],
-    blurb: 'Two bats and a ball. Where it hits the bat is where it goes.',
-    about: `The oldest one there is, with the rule most copies get wrong left in: the
-    ball leaves at an angle set by WHERE on the bat it struck, so the middle sends it
-    straight back and the end sends it away. Move as you make contact and you cut it
-    sideways. The ball speeds up through a rally, and the computer has a reaction delay
-    and an aim error rather than being perfect, so it can be wrong-footed.`,
-    controls: [['W S / ↑ ↓ / mouse', 'move'], ['Drag', 'move (mobile)'],
-               ['↑ ↓', 'player two, in a two-player game'], ['P', 'pause']],
-    tips: 'The end of the bat is a weapon. Take the ball early and wide to pull him out of position.',
-  },
-  {
-    slug: 'invasion', title: 'INVASION', how: 'local', tag: 'Classic',
-    cat: 'Classic', tags: ['space', 'shooting', 'retro', 'aliens', '70s'],
-    blurb: 'Five rows of them, and they march faster the fewer are left.',
-    about: `The 1978 one. The whole arc of it is an accident of the original hardware
-    that turned out to be the design: with fewer aliens on screen the machine redrew
-    faster, so it starts as a shooting gallery and ends as a panic without any
-    difficulty curve existing. One shot at a time, so a miss costs you the wait. The
-    bunkers erode block by block - and your own shots eat them from underneath.`,
-    controls: [['← → / A D / mouse', 'move'], ['Space / Click', 'fire'], ['P', 'pause']],
-    tips: 'The saucer is worth up to 300. It is also the only time your shot is not defending you.',
-  },
   {
     slug: 'crossing', title: 'CROSSING', how: 'local', tag: 'Endless',
     cat: 'Arcade', tags: ['new', 'endless', 'hopping', 'traffic', 'mobile', 'one life'],

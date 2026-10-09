@@ -13,13 +13,17 @@
 <meta property="og:description" content="Twenty ovals, forty cars, and a draft that decides it on the last lap. Free to play in your browser - no download, no sign-up.">
 <meta property="og:url" content="https://playpile.net/play/nascar/">
 <meta property="og:image" content="https://playpile.net/shots/nascar.png">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"NASCAR","url":"https://playpile.net/play/nascar/","image":"https://playpile.net/shots/nascar.png","description":"Twenty ovals, forty cars, and a draft that decides it on the last lap.","genre":"Driving","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"NASCAR","url":"https://playpile.net/play/nascar/","image":"https://playpile.net/shots/nascar.png","description":"Twenty ovals, forty cars, and a draft that decides it on the last lap.","genre":"Driving","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"contentRating":"Motor racing on ovals. Cars crash and spin; no people are shown hurt.","publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Driving","item":"https://playpile.net/category/driving/"},{"@type":"ListItem","position":3,"name":"NASCAR","item":"https://playpile.net/play/nascar/"}]}</script>
 <link rel="stylesheet" href="/site/style.css">
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
 <script type="module" src="/site/account.js"></script>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>🕹️</text></svg>">
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#0b0f14">
 <!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
      this is the tag Google looks for when it verifies the site, so it
      is pasted rather than generated. ads/ads.js notices it is already
@@ -93,7 +97,9 @@
         <section class="about">
           <h1 id="h1">NASCAR</h1>
           <p class="lede" id="blurb">Twenty oval , forty car , and a draft that decide  it on the la t lap.</p>
-          <div id="about"><p>Twenty speedways, each solved from its published lap distance, banking and corner radius until the shape closes - Daytona's tri-oval, Bristol's concrete bowl, Martinsville's paperclip, Darlington with its two different ends, Pocono's three corners and Indianapolis with its straights dead flat. The banking is real arithmetic: at thirty-one degrees the corner takes the tyres out of the argument entirely, which is why nobody lifts at Daytona and everybody does at Phoenix. The air is the other half of the race - a car on its own is slower than two cars nose to tail, so the pack forms itself. The other thirty-nine drive the same car you do, with the same four-speed box and the same wall. Tyres go off in about a fuel run, so a stop is a decision rather than a formality, and the crew take thirteen seconds over the wall because the fuel man works while the tyres are changed. Run one race, a season of them, or five hundred laps in one sitting.</p></div>
+          <div id="about"><p>Twenty speedways, each solved from its published lap distance, banking and corner radius until the shape closes - Daytona's tri-oval, Bristol's concrete bowl, Martinsville's paperclip, Darlington with its two different ends, Pocono's three corners and Indianapolis with its straights dead flat. The banking is real arithmetic: at thirty-one degrees the corner takes the tyres out of the argument entirely, which is why nobody lifts at Daytona and everybody does at Phoenix. The air is the other half of the race - a car on its own is slower than two cars nose to tail, so the pack forms itself. The other thirty-nine drive the same car you do, with the same four-speed box and the same wall. Tyres go off in about a fuel run, so a stop is a decision rather than a formality, and the crew take thirteen seconds over the wall because the fuel man works while the tyres are changed. Run one race, a season of them, or five hundred laps in one sitting.</p>
+<p class="advisory"><b>What is in it:</b> Motor racing on ovals. Cars crash and spin; no people are shown hurt. <a href="/site/parents.html">More for parents</a></p>
+<p class="report"><a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20problem%20with%20NASCAR">Report a problem with this game</a></p></div>
           <h4>Controls</h4>
           <ul class="keys" id="keys"><li><kbd>W S</kbd><span>throttle · brake</span></li><li><kbd>A D</kbd><span>steer</span></li><li><kbd>E Q</kbd><span>up a gear · down a gear</span></li><li><kbd>C</kbd><span>clutch - restart after a stall</span></li><li><kbd>P</kbd><span>call the pits</span></li><li><kbd>V</kbd><span>camera</span></li><li><kbd>Arrows</kbd><span>wedge · track bar</span></li><li><kbd>[ ]</kbd><span>race speed</span></li><li><kbd>R</kbd><span>back on track</span></li><li><kbd>Esc</kbd><span>pause</span></li></ul>
           <div class="tip" id="tip">Nobody wins a superspeedway race on their own. Stay on the bumper in front, and remember the man behind you is pushing because it suits him, not you.</div>
@@ -166,9 +172,13 @@
         </div>
         <div class="fl"><b>Site</b>
           <a href="/">All games</a><a href="/site/about.html">About</a>
-          <a href="/site/updates.html">Updates</a><a href="/site/advertise.html">Advertise</a></div>
+          <a href="/site/updates.html">Updates</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
         <div class="fl"><b>Legal</b>
-          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a></div>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
         <div class="fl"><b>Play</b>
           <a href="/category/arcade/">Arcade</a>
           <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>

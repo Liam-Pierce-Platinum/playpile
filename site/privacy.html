@@ -7,7 +7,11 @@
 <link rel="stylesheet" href="/site/style.css">
 <link rel="stylesheet" href="/site/account.css">
 <script type="module" src="/site/account.js"></script>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>🕹️</text></svg>">
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#0b0f14">
 <!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
      this is the tag Google looks for when it verifies the site, so it
      is pasted rather than generated. ads/ads.js notices it is already
@@ -93,6 +97,27 @@
     <p>We do not pass anything to advertisers ourselves: no names, email addresses or
        other personal information are ever sent to Google in an ad request.</p>
 
+    <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px" id="online">Playing online with a friend</h2>
+    <p>HOOPS and INKVALE can be played by two people over the internet using a four-letter room
+       code. To connect the two browsers, both briefly contact a free public matchmaking server run by
+       the PeerJS project, which sees the room code and each browser's IP address. After that the game
+       goes directly between the two browsers, which means <b>each player's browser can see the other's
+       IP address</b>, as with any direct video call or online game. Nothing is stored about the game,
+       there is no chat, and nobody can join without the code. Only share a code with people you know.</p>
+    <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Your choices and rights</h2>
+    <ul>
+      <li>On the <a href="/site/settings.html" style="color:var(--accent)">privacy settings page</a> you can
+          switch to non-personalised adverts, see everything the site has saved in your browser,
+          download it and delete it.</li>
+      <li>Choosing non-personalised adverts is how you opt out of the "sale" or "sharing" of personal
+          information for targeted advertising under US state laws such as the CCPA.</li>
+      <li>If you are in the UK, the EU or another place with similar laws, you have the right to ask what
+          data is held about you, to have it corrected or deleted, and to object to its use. For an
+          account, email the address below; for adverts, Google's own tools are linked above. You can
+          also complain to your local data protection authority.</li>
+      <li>An account's saved progress is kept until you ask for it to be deleted. Data in your browser
+          stays until you delete it.</li>
+    </ul>
     <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Analytics</h2>
     <p>None. There is no analytics script on this site.</p>
 
@@ -105,14 +130,15 @@
     <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Getting in touch</h2>
     <p>If you want anything on this page explained or removed, email <a href="mailto:liamlikescows@gmail.com">liamlikescows@gmail.com</a>.</p>
 
-    <div class="tip">Last updated 7 October 2026. If this page ever stops matching what the site actually does, the site is wrong, not the page &mdash; tell us and it gets fixed.</div>
+    <div class="tip">Last updated 8 October 2026. If this page ever stops matching what the site actually does, the site is wrong, not the page &mdash; tell us and it gets fixed.</div>
   </section>
 </main>
 
 <footer class="foot"><div class="wrap"><div class="row">
   <span>PLAYPILE</span><span class="sp"></span>
-  <a href="/">All games</a><a href="/site/about.html">About</a>
-  <a href="/site/cookies.html">Cookies</a><a href="/site/advertise.html">Advertise</a>
+  <a href="/">All games</a><a href="/site/about.html">About</a><a href="/site/contact.html">Contact</a>
+  <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a><a href="/site/settings.html">Privacy settings</a>
+  <a href="/site/terms.html">Terms</a><a href="/site/parents.html">Parents</a><a href="/site/advertise.html">Advertise</a>
 </div></div></footer>
 
 <!-- no ad slots on this page, but it does load the ad script, so it owes

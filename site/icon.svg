@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- PLAYPILE: a pile of three game cards, the top one with a play mark -->
+  <rect width="64" height="64" rx="14" fill="#0b0f14"/>
+  <rect x="12" y="36" width="40" height="14" rx="4" fill="#3d4f68" transform="rotate(-6 32 43)"/>
+  <rect x="11" y="26" width="42" height="15" rx="4" fill="#5d7189" transform="rotate(4 32 33)"/>
+  <rect x="10" y="12" width="44" height="20" rx="5" fill="#ff9f43"/>
+  <path d="M28 16.5 L38 22 L28 27.5 Z" fill="#0b0f14"/>
+</svg>

@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Not found — PLAYPILE</title>
+<title>Contact — PLAYPILE</title>
+<meta name="description" content="How to reach PLAYPILE: bug reports, questions about privacy and your data, advertising, and anything else.">
+<link rel="canonical" href="https://playpile.net/site/contact.html">
 <link rel="stylesheet" href="/site/style.css">
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
@@ -13,12 +15,15 @@
 <link rel="apple-touch-icon" href="/site/icon-180.png">
 <link rel="manifest" href="/site/manifest.webmanifest">
 <meta name="theme-color" content="#0b0f14">
-<!-- NO AD CODE ON THIS PAGE, on purpose: AdSense policy forbids ads on
-     screens without publisher content, and with Auto ads switched on in the
-     account Google may place one anywhere its script is loaded. -->
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
 </head>
 <body>
-<a class="skip" href="#main">Skip to the games</a>
+<a class="skip" href="#main">Skip to the content</a>
 
 <header class="top"><div class="bar">
   <button class="burger" id="burger" type="button" aria-label="Categories">
@@ -40,19 +45,35 @@
   <div class="scrim" id="scrim"></div>
 
   <main id="main">
-    <div class="prose" style="max-width:none">
+    <div class="prose">
       <section class="hero">
-        <h1>There is nothing here</h1>
-        <p>That page does not exist. It may have been a game that moved, or a link with
-           a typo in it. Everything that does exist is one click away.</p>
-        <p style="margin-top:18px"><a class="btn" href="/" id="allbtn">All games</a></p>
+        <h1>Contact</h1>
+        <p id="lede">PLAYPILE is made by one person, and every message is read by that person.</p>
       </section>
+      <h2>Email</h2>
+      <p style="font-size:18px"><a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20Hello" style="color:var(--accent)">liamlikescows@gmail.com</a></p>
+      <p>There is no form and no ticket system. Write as you would to anyone, and use one of the
+         subjects below if it fits, so the message lands in the right place.</p>
+      <h2>A game is broken</h2>
+      <p>Every game page has a <b>Report a problem with this game</b> link under the game, which fills
+         in the subject for you. It helps to say which game, what you were doing when it went wrong,
+         and which browser and device you were on (for example "Chrome on an Android phone"). A
+         screenshot helps more than anything.</p>
+      <h2>Your data and privacy</h2>
+      <p>To have an account and its saved progress deleted, to ask what is held about you, or to ask
+         anything about the <a href="/site/privacy.html" style="color:var(--accent)">privacy policy</a>: <a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20Privacy%20request" style="color:var(--accent)">email with the subject "Privacy request"</a>.
+         Progress saved only in your browser can be seen and deleted by you, any time, on the
+         <a href="/site/settings.html" style="color:var(--accent)">privacy settings page</a>.</p>
+      <h2>Parents</h2>
+      <p>Questions about what is in a game, or about a child's use of the site, are welcome. The
+         <a href="/site/parents.html" style="color:var(--accent)">page for parents</a> answers the usual ones.</p>
+      <h2>Advertising and business</h2>
+      <p>See the <a href="/site/advertise.html" style="color:var(--accent)">advertising page</a>, or <a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20Advertising" style="color:var(--accent)">email with the subject "Advertising"</a>.</p>
+      <h2>Something we have got wrong</h2>
+      <p>If you think something on PLAYPILE belongs to you, is credited wrongly, or breaks a rule, say
+         so and it will be looked at straight away. The <a href="/site/credits.html" style="color:var(--accent)">credits page</a>
+         lists the software and fonts the games are built with.</p>
     </div>
-
-    <!-- A DEAD END SHOULD STILL OFFER SOMETHING. A 404 that only
-         apologises sends the visitor back to the tab bar; a shelf of
-         games sends some of them into one, which is the whole point. -->
-    <div id="picks"></div>
     <!-- THE FOOTER IS REAL HTML, not something a script draws.
          An AdSense reviewer and a search engine both read the page
          before any module runs, and "privacy and cookies are linked
@@ -62,7 +83,7 @@
       <div class="cols2">
         <div>
           <div class="brand">PLAY<b>PILE</b></div>
-          <p class="blurb">26 browser games, all of them written for this site. No sign-up,
+          <p class="blurb">20 browser games, all of them written for this site. No sign-up,
              no download, and your best scores stay in your own browser.</p>
         </div>
         <div class="fl"><b>Site</b>
@@ -86,13 +107,11 @@
 </div>
 
 <script type="module">
-import { GAMES, mountShell, row } from '/site/shell.js';
-mountShell({});
-document.getElementById('allbtn').textContent = 'All ' + GAMES.length + ' games';
-document.getElementById('picks').innerHTML =
-  row('Try one of these', GAMES.slice().sort(() => Math.random() - 0.5).slice(0, 12), { seeAll: '/' });
-// no ad slots on this page, but it does load the ad script, so it owes
-// the visitor the same cookie notice as everywhere else
+import { GAMES, mountShell } from '/site/shell.js';
+import { loadAds } from '/ads/ads.js';
+mountShell({ active: 'contact' });
+loadAds();
+
 </script>
 </body>
 </html>

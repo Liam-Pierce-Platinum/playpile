@@ -642,3 +642,17 @@ body > main.wrap > .hero p{margin:0;color:var(--dim);max-width:62ch}
 .ad{position:relative}
 .ad:has(> ins.adsbygoogle):not(.ad-unfilled)::before{content:'Advertisements';position:absolute;
   top:-15px;left:0;font:10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#5d7189}
+
+/* trust pages, 2026-10-08 */
+.prose ul.plain{color:var(--dim);padding-left:20px}
+.prose ul.plain li{margin:6px 0}
+.setting{display:flex;flex-direction:column;gap:8px;margin:12px 0;padding:14px 16px;border:1px solid var(--edge);border-radius:10px}
+.setting label{display:flex;gap:10px;align-items:center;cursor:pointer}
+.saved{color:var(--accent);min-height:1.2em;margin:4px 0}
+.datalist table{width:100%;border-collapse:collapse;font-size:14px}
+.datalist th,.datalist td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--edge);vertical-align:top}
+.datalist small{color:var(--dim);word-break:break-all}
+.btn.small{padding:6px 12px;font-size:12px}
+.advisory{font-size:14px;border-left:3px solid var(--accent);padding:6px 12px;background:rgba(255,255,255,.03)}
+.advisory a,.report a{color:var(--accent)}
+.report{font-size:13px}

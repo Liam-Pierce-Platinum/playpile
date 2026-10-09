@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Not found — PLAYPILE</title>
+<title>Credits and licences — PLAYPILE</title>
+<meta name="description" content="The open-source software and fonts PLAYPILE&#39;s games are built with, and their licences.">
+<link rel="canonical" href="https://playpile.net/site/credits.html">
 <link rel="stylesheet" href="/site/style.css">
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
@@ -13,12 +15,15 @@
 <link rel="apple-touch-icon" href="/site/icon-180.png">
 <link rel="manifest" href="/site/manifest.webmanifest">
 <meta name="theme-color" content="#0b0f14">
-<!-- NO AD CODE ON THIS PAGE, on purpose: AdSense policy forbids ads on
-     screens without publisher content, and with Auto ads switched on in the
-     account Google may place one anywhere its script is loaded. -->
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
 </head>
 <body>
-<a class="skip" href="#main">Skip to the games</a>
+<a class="skip" href="#main">Skip to the content</a>
 
 <header class="top"><div class="bar">
   <button class="burger" id="burger" type="button" aria-label="Categories">
@@ -40,19 +45,32 @@
   <div class="scrim" id="scrim"></div>
 
   <main id="main">
-    <div class="prose" style="max-width:none">
+    <div class="prose">
       <section class="hero">
-        <h1>There is nothing here</h1>
-        <p>That page does not exist. It may have been a game that moved, or a link with
-           a typo in it. Everything that does exist is one click away.</p>
-        <p style="margin-top:18px"><a class="btn" href="/" id="allbtn">All games</a></p>
+        <h1>Credits and licences</h1>
+        <p id="lede">The games on PLAYPILE are made here, but they stand on some excellent free software. Thank you to the people who wrote it.</p>
       </section>
+      <h2>Software</h2>
+      <ul class="plain">
+        <li><b>three.js</b> (release 169), the 3D engine behind APEX, NASCAR, HIGHRISE, DUNGEON QUEST,
+            KICKBACK and several of the small games. Copyright 2010-2024 three.js authors.
+            <a href="https://github.com/mrdoob/three.js/blob/dev/LICENSE" style="color:var(--accent)">MIT licence</a>.</li>
+        <li><b>PeerJS</b>, which connects two browsers for online play in HOOPS and INKVALE. Copyright
+            Michelle Bu and Eric Zhang. <a href="https://github.com/peers/peerjs/blob/master/LICENSE" style="color:var(--accent)">MIT licence</a>.
+            Online games are introduced through the free public PeerJS server.</li>
+      </ul>
+      <h2>Fonts</h2>
+      <ul class="plain">
+        <li><b>IM FELL English SC</b> by Igino Marini, used in INKVALE.
+            <a href="https://openfontlicense.org" style="color:var(--accent)">SIL Open Font License</a>.</li>
+        <li><b>Patrick Hand</b> by Patrick Wagesreiter, used in INKVALE.
+            <a href="https://openfontlicense.org" style="color:var(--accent)">SIL Open Font License</a>.</li>
+      </ul>
+      <h2>Everything else</h2>
+      <p>The games themselves - their code, art, music, sound and writing - are made for PLAYPILE.
+         Most of the art is drawn by the games' own code as they load. If you believe something here is
+         yours and is not credited properly, <a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20Credits" style="color:var(--accent)">tell us</a> and it will be put right.</p>
     </div>
-
-    <!-- A DEAD END SHOULD STILL OFFER SOMETHING. A 404 that only
-         apologises sends the visitor back to the tab bar; a shelf of
-         games sends some of them into one, which is the whole point. -->
-    <div id="picks"></div>
     <!-- THE FOOTER IS REAL HTML, not something a script draws.
          An AdSense reviewer and a search engine both read the page
          before any module runs, and "privacy and cookies are linked
@@ -62,7 +80,7 @@
       <div class="cols2">
         <div>
           <div class="brand">PLAY<b>PILE</b></div>
-          <p class="blurb">26 browser games, all of them written for this site. No sign-up,
+          <p class="blurb">20 browser games, all of them written for this site. No sign-up,
              no download, and your best scores stay in your own browser.</p>
         </div>
         <div class="fl"><b>Site</b>
@@ -86,13 +104,11 @@
 </div>
 
 <script type="module">
-import { GAMES, mountShell, row } from '/site/shell.js';
-mountShell({});
-document.getElementById('allbtn').textContent = 'All ' + GAMES.length + ' games';
-document.getElementById('picks').innerHTML =
-  row('Try one of these', GAMES.slice().sort(() => Math.random() - 0.5).slice(0, 12), { seeAll: '/' });
-// no ad slots on this page, but it does load the ad script, so it owes
-// the visitor the same cookie notice as everywhere else
+import { GAMES, mountShell } from '/site/shell.js';
+import { loadAds } from '/ads/ads.js';
+mountShell({ active: 'credits' });
+loadAds();
+
 </script>
 </body>
 </html>

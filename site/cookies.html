@@ -7,7 +7,11 @@
 <link rel="stylesheet" href="/site/style.css">
 <link rel="stylesheet" href="/site/account.css">
 <script type="module" src="/site/account.js"></script>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>🕹️</text></svg>">
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#0b0f14">
 <!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
      this is the tag Google looks for when it verifies the site, so it
      is pasted rather than generated. ads/ads.js notices it is already
@@ -37,7 +41,9 @@
       <tr><td><code>pd.name</code></td><td>the three letters you enter for a qualifying run.</td></tr>
       <tr><td><code>pd.&lt;game&gt;.*</code></td><td>a few games remember what you have bought or
         unlocked — QUICKDRAW's shop, HOOPS's wardrobe, SWEEP's board size.</td></tr>
-    </table>
+   
+        <tr><td><code>pd.adpref</code></td><td>Your choice of personalised or non-personalised adverts, from the <a href="/site/settings.html">privacy settings page</a>.</td></tr>
+        <tr><td><code>inkvale.save.v1</code> and similar</td><td>the bigger games keep their whole save - progress, unlocks, settings - under their own name. All of it is listed, and can be deleted, on the <a href="/site/settings.html#data">privacy settings page</a>.</td></tr> </table>
     <p>All of the above is local storage. It stays on your machine, we cannot read it,
        and clearing your browsing data removes it.</p>
 
@@ -59,8 +65,8 @@
 
 <footer class="foot"><div class="wrap"><div class="row">
   <span>PLAYPILE</span><span class="sp"></span>
-  <a href="/">All games</a><a href="/site/about.html">About</a>
-  <a href="/site/privacy.html">Privacy</a><a href="/site/advertise.html">Advertise</a>
+  <a href="/">All games</a><a href="/site/about.html">About</a><a href="/site/contact.html">Contact</a>
+  <a href="/site/privacy.html">Privacy</a><a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms</a><a href="/site/parents.html">Parents</a><a href="/site/advertise.html">Advertise</a>
 </div></div></footer>
 
 <!-- no ad slots on this page, but it does load the ad script, so it owes

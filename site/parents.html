@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>For parents — PLAYPILE</title>
+<meta name="description" content="What is in each PLAYPILE game, how the site handles children&#39;s privacy, online play, adverts and screen time.">
+<link rel="canonical" href="https://playpile.net/site/parents.html">
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#0b0f14">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <div class="prose">
+      <section class="hero">
+        <h1>For parents</h1>
+        <p id="lede">What your child will find on PLAYPILE, game by game, and how the site works behind the scenes.</p>
+      </section>
+      <h2>The short version</h2>
+      <ul class="plain">
+        <li>Every game is free and plays in the browser. Nothing to download, nothing to buy, no in-game purchases.</li>
+        <li>No account is needed for anything, and the site never asks for a name, age or email to play.</li>
+        <li>There is no chat and no way to message other players.</li>
+        <li>Two games, HOOPS and INKVALE, can be played online with a friend who has been given a
+            four-letter room code. Nobody can join without that code.</li>
+        <li>The site shows adverts from Google. They are never placed over a game while it is being played.</li>
+        <li>PLAYPILE is made for a general audience, not specifically for children under 13. Some games
+            contain violence, listed below.</li>
+      </ul>
+      <h2>What is in each game</h2>
+      <p>Written by the person who made them, to describe what is actually on screen.</p>
+      <div class="catlist">
+        <article><h2><a href="/play/highrise/">HIGHRISE</a></h2><p><b>Shooter.</b> Realistic gun and melee violence in first person, with blood. Enemies are shot and killed. Not for young children.</p></article>
+        <article><h2><a href="/play/kickback/">KICKBACK</a></h2><p><b>Action.</b> Cartoon pixel-art gun violence: enemies are shot and fall. No blood close up.</p></article>
+        <article><h2><a href="/play/exposure/">EXPOSURE</a></h2><p><b>Horror.</b> Horror. A dark ship, creatures in the dark and sudden scares, with a gun you fire to see. Bright flashes.</p></article>
+        <article><h2><a href="/play/dungeon-quest/">DUNGEON QUEST</a></h2><p><b>Adventure.</b> Fantasy combat with swords, bows and magic against monsters and a dragon, in a blocky retro style.</p></article>
+        <article><h2><a href="/play/apex/">APEX</a></h2><p><b>Driving.</b> Motor racing. Cars crash and lose wheels; no people are shown hurt.</p></article>
+        <article><h2><a href="/play/nascar/">NASCAR</a></h2><p><b>Driving.</b> Motor racing on ovals. Cars crash and spin; no people are shown hurt.</p></article>
+        <article><h2><a href="/play/night-shift/">NIGHT SHIFT</a></h2><p><b>Action.</b> A crime story seen from above: robberies, police chases and gunfights with the police. Small figures, no blood close up.</p></article>
+        <article><h2><a href="/play/grind-city/">GRIND CITY</a></h2><p><b>Sport.</b> Skateboarding in the street. Falls, but nothing violent.</p></article>
+        <article><h2><a href="/play/southpaw/">SOUTHPAW</a></h2><p><b>Sport.</b> Cartoon pixel-art boxing, plus wrestling and sumo. Fighters are knocked down; no blood.</p></article>
+        <article><h2><a href="/play/inkvale/">INKVALE</a></h2><p><b>Strategy.</b> Storybook fantasy battles: archers, knights and wizards against ink monsters, which splash into ink when beaten. No blood.</p></article>
+        <article><h2><a href="/play/penguin-dash/">PENGUIN DASH</a></h2><p><b>Arcade.</b> A cartoon penguin fishing while seals, sharks and orcas try to catch it. Nothing graphic.</p></article>
+        <article><h2><a href="/play/stack/">STACK</a></h2><p><b>Arcade.</b> A stacking game. Nothing of concern.</p></article>
+        <article><h2><a href="/play/drifter/">DRIFTER</a></h2><p><b>Arcade.</b> A spaceship shooting at asteroids. Nothing of concern.</p></article>
+        <article><h2><a href="/play/merge/">MERGE</a></h2><p><b>Puzzle.</b> A fruit-merging puzzle. Nothing of concern.</p></article>
+        <article><h2><a href="/play/pipeworks/">PIPEWORKS</a></h2><p><b>Puzzle.</b> A pipe puzzle. Nothing of concern.</p></article>
+        <article><h2><a href="/play/sweep/">SWEEP</a></h2><p><b>Puzzle.</b> Minesweeper. Nothing of concern.</p></article>
+        <article><h2><a href="/play/quickdraw/">QUICKDRAW</a></h2><p><b>Shooter.</b> Cartoon western gunfights between two cowboys, with hits counted by limb. Bright muzzle flashes; no blood.</p></article>
+        <article><h2><a href="/play/hoops/">HOOPS</a></h2><p><b>Sport.</b> Basketball. Can be played online with a friend using a room code; there is no chat.</p></article>
+        <article><h2><a href="/play/spike/">SPIKE</a></h2><p><b>Sport.</b> Volleyball between two jelly blobs. Nothing of concern.</p></article>
+        <article><h2><a href="/play/crossing/">CROSSING</a></h2><p><b>Arcade.</b> A pixel-art frog crossing roads and rivers. The frog can be run over or fall in the water, cartoon style.</p></article>
+      </div>
+      <h2>Privacy and children</h2>
+      <p>Scores and progress are kept in the browser on your own device. A child can play every game
+         without an account. If an account was made by a child under 13, <a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20Delete%20a%20child's%20account" style="color:var(--accent)">email us</a> and it will
+         be deleted. You can see and delete everything the site has saved in a browser on the
+         <a href="/site/settings.html" style="color:var(--accent)">privacy settings page</a>, and choose non-personalised adverts there too.</p>
+      <h2>Screen time and wellbeing</h2>
+      <p>Every game can be paused, and none of them punish you for stopping. None use daily login
+         rewards, timers that make you come back, or anything to buy. Some games have bright flashes; the
+         <a href="/site/accessibility.html#flashing" style="color:var(--accent)">accessibility page</a> lists them.</p>
+      <h2>Questions</h2>
+      <p><a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20Parent%20question" style="color:var(--accent)">Email us</a> with anything at all.</p>
+    </div>
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">20 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<script type="module">
+import { GAMES, mountShell } from '/site/shell.js';
+import { loadAds } from '/ads/ads.js';
+mountShell({ active: 'parents' });
+loadAds();
+
+</script>
+</body>
+</html>

@@ -202,9 +202,12 @@ export function mountShell({ active = '', onSearch = null } = {}) {
       + '<nav>' + link('/site/about.html', 'info', 'About', '', active === 'about')
       + link('/site/updates.html', 'clock', 'Updates', '', active === 'updates') + '</nav>'
       + '<div class="navsmall">'
-      + '<a href="/site/advertise.html">Advertise</a>'
+      + '<a href="/site/contact.html">Contact</a>'
+      + '<a href="/site/parents.html">Parents</a>'
       + '<a href="/site/privacy.html">Privacy</a>'
-      + '<a href="/site/cookies.html">Cookies</a>'
+      + '<a href="/site/settings.html">Privacy settings</a>'
+      + '<a href="/site/terms.html">Terms</a>'
+      + '<a href="/site/advertise.html">Advertise</a>'
       + '</div>'
       + '<p class="navfoot">&copy; 2026 PLAYPILE</p>';
     nav.innerHTML = html;

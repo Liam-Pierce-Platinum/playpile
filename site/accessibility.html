@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Not found — PLAYPILE</title>
+<title>Accessibility — PLAYPILE</title>
+<meta name="description" content="How PLAYPILE works with keyboards, screen readers and touch screens, a warning about flashing lights, and how to report a problem.">
+<link rel="canonical" href="https://playpile.net/site/accessibility.html">
 <link rel="stylesheet" href="/site/style.css">
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
@@ -13,12 +15,15 @@
 <link rel="apple-touch-icon" href="/site/icon-180.png">
 <link rel="manifest" href="/site/manifest.webmanifest">
 <meta name="theme-color" content="#0b0f14">
-<!-- NO AD CODE ON THIS PAGE, on purpose: AdSense policy forbids ads on
-     screens without publisher content, and with Auto ads switched on in the
-     account Google may place one anywhere its script is loaded. -->
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
 </head>
 <body>
-<a class="skip" href="#main">Skip to the games</a>
+<a class="skip" href="#main">Skip to the content</a>
 
 <header class="top"><div class="bar">
   <button class="burger" id="burger" type="button" aria-label="Categories">
@@ -40,19 +45,36 @@
   <div class="scrim" id="scrim"></div>
 
   <main id="main">
-    <div class="prose" style="max-width:none">
+    <div class="prose">
       <section class="hero">
-        <h1>There is nothing here</h1>
-        <p>That page does not exist. It may have been a game that moved, or a link with
-           a typo in it. Everything that does exist is one click away.</p>
-        <p style="margin-top:18px"><a class="btn" href="/" id="allbtn">All games</a></p>
+        <h1>Accessibility</h1>
+        <p id="lede">What the site does to be usable by as many people as possible, and where it still falls short.</p>
       </section>
+      <h2>The site</h2>
+      <ul class="plain">
+        <li>Every page can be used with a keyboard, and starts with a "Skip to the content" link.</li>
+        <li>Pages are written as real text, with headings and descriptions for every game, so screen readers can read them.</li>
+        <li>Text sizes follow your browser's zoom, and pages fit phone screens without scrolling sideways.</li>
+        <li>Adverts never play sound and never cover a game while it is being played.</li>
+      </ul>
+      <h2>The games</h2>
+      <ul class="plain">
+        <li>Every game can be paused, usually with <kbd>P</kbd> or <kbd>Esc</kbd>.</li>
+        <li>The controls for each game are listed on its page, under the game, before you start.</li>
+        <li>Most of the small games work with a single button, a mouse or a touch screen.</li>
+        <li>Games are visual and most need sight to play. The bigger 3D games need a reasonably recent
+            computer; on slower machines they lower their own detail.</li>
+      </ul>
+      <h2 id="flashing">Flashing lights</h2>
+      <p><b>A warning for people with photosensitive epilepsy.</b> Some games contain bright flashes and
+         rapidly changing light, which can trigger seizures in a small number of people. In particular:
+         EXPOSURE (the screen lights up white with every shot), HIGHRISE, KICKBACK and QUICKDRAW (muzzle
+         flashes), and the explosions in INKVALE, APEX and NASCAR. If you or anyone in your family has
+         epilepsy or has had a seizure, talk to a doctor before playing. Stop at once if you feel dizzy,
+         have blurred vision, twitching or any loss of awareness.</p>
+      <h2>Something does not work for you</h2>
+      <p><a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20Accessibility" style="color:var(--accent)">Email us</a> with the page or game and what got in the way. It will be fixed if it can be.</p>
     </div>
-
-    <!-- A DEAD END SHOULD STILL OFFER SOMETHING. A 404 that only
-         apologises sends the visitor back to the tab bar; a shelf of
-         games sends some of them into one, which is the whole point. -->
-    <div id="picks"></div>
     <!-- THE FOOTER IS REAL HTML, not something a script draws.
          An AdSense reviewer and a search engine both read the page
          before any module runs, and "privacy and cookies are linked
@@ -62,7 +84,7 @@
       <div class="cols2">
         <div>
           <div class="brand">PLAY<b>PILE</b></div>
-          <p class="blurb">26 browser games, all of them written for this site. No sign-up,
+          <p class="blurb">20 browser games, all of them written for this site. No sign-up,
              no download, and your best scores stay in your own browser.</p>
         </div>
         <div class="fl"><b>Site</b>
@@ -86,13 +108,11 @@
 </div>
 
 <script type="module">
-import { GAMES, mountShell, row } from '/site/shell.js';
-mountShell({});
-document.getElementById('allbtn').textContent = 'All ' + GAMES.length + ' games';
-document.getElementById('picks').innerHTML =
-  row('Try one of these', GAMES.slice().sort(() => Math.random() - 0.5).slice(0, 12), { seeAll: '/' });
-// no ad slots on this page, but it does load the ad script, so it owes
-// the visitor the same cookie notice as everywhere else
+import { GAMES, mountShell } from '/site/shell.js';
+import { loadAds } from '/ads/ads.js';
+mountShell({ active: 'accessibility' });
+loadAds();
+
 </script>
 </body>
 </html>

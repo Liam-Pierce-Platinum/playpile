@@ -15,6 +15,7 @@ export const GAMES = [
   // ---- the big ones ------------------------------------------------
   {
     slug: 'highrise', title: 'HIGHRISE', how: 'mounted', port: 8141, url: '/?play',
+    content: 'Realistic gun and melee violence in first person, with blood. Enemies are shot and killed. Not for young children.',
     web: 'highrise/?play',
     tag: 'Shooter', big: true,
     cat: 'Shooter', tags: ['fps', 'guns', '3d', 'tower', 'singleplayer', 'first person'],
@@ -32,6 +33,7 @@ export const GAMES = [
   },
   {
     slug: 'kickback', title: 'KICKBACK', how: 'mounted', port: 8157, url: '/',
+    content: 'Cartoon pixel-art gun violence: enemies are shot and fall. No blood close up.',
     web: 'kickback/',
     tag: 'Action', big: true,
     cat: 'Action', tags: ['shotgun', 'platformer', 'physics', '2d', 'guns'],
@@ -45,6 +47,7 @@ export const GAMES = [
   },
   {
     slug: 'exposure', title: 'EXPOSURE', how: 'mounted', port: 8151, url: '/',
+    content: 'Horror. A dark ship, creatures in the dark and sudden scares, with a gun you fire to see. Bright flashes.',
     web: 'exposure/',
     tag: 'Horror', big: true,
     cat: 'Horror', tags: ['dark', 'shooting', 'atmospheric', '2d', 'scary'],
@@ -59,6 +62,7 @@ export const GAMES = [
   },
   {
     slug: 'dungeon-quest', title: 'DUNGEON QUEST', how: 'mounted', port: 8124, url: '/',
+    content: 'Fantasy combat with swords, bows and magic against monsters and a dragon, in a blocky retro style.',
     web: 'dungeon-quest/',
     tag: 'Adventure', big: true,
     cat: 'Adventure', tags: ['rpg', 'dungeon', 'retro', '3d', 'dragon', 'n64'],
@@ -74,6 +78,7 @@ export const GAMES = [
   },
   {
     slug: 'apex', title: 'APEX', how: 'mounted', port: 8201, url: '/',
+    content: 'Motor racing. Cars crash and lose wheels; no people are shown hurt.',
     web: 'apex/',
     tag: 'Racing', big: true,
     cat: 'Driving', tags: ['new', 'racing', 'f1', 'cars', 'simulation', '3d', 'track',
@@ -100,6 +105,7 @@ export const GAMES = [
   },
   {
     slug: 'nascar', title: 'NASCAR', how: 'mounted', port: 8220, url: '/',
+    content: 'Motor racing on ovals. Cars crash and spin; no people are shown hurt.',
     web: 'nascar/',
     tag: 'Racing', big: true,
     cat: 'Driving', tags: ['new', 'racing', 'nascar', 'stock cars', 'oval', 'cars',
@@ -126,6 +132,7 @@ export const GAMES = [
   },
   {
     slug: 'night-shift', title: 'NIGHT SHIFT', how: 'mounted', port: 8130, url: '/',
+    content: 'A crime story seen from above: robberies, police chases and gunfights with the police. Small figures, no blood close up.',
     web: 'night-shift/',
     tag: 'Crime', big: true,
     cat: 'Action', tags: ['new', 'crime', 'driving', 'stealth', 'top down', 'cars', 'open world'],
@@ -144,6 +151,7 @@ export const GAMES = [
   },
   {
     slug: 'grind-city', title: 'GRIND CITY', how: 'mounted', port: 8126, url: '/',
+    content: 'Skateboarding in the street. Falls, but nothing violent.',
     web: 'grind-city/',
     tag: 'Sport', big: true,
     cat: 'Sport', tags: ['new', 'skateboard', 'pixel', 'tricks', '2d', 'street'],
@@ -163,6 +171,7 @@ export const GAMES = [
   },
   {
     slug: 'southpaw', title: 'SOUTHPAW', how: 'mounted', port: 8262, url: '/',
+    content: 'Cartoon pixel-art boxing, plus wrestling and sumo. Fighters are knocked down; no blood.',
     web: 'southpaw/',
     tag: 'Sport', big: true,
     cat: 'Sport', tags: ['new', 'boxing', 'fighting', 'pixel', 'wrestling', 'sumo', 'career', '2d'],
@@ -185,6 +194,7 @@ export const GAMES = [
   },
   {
     slug: 'inkvale', title: 'INKVALE', how: 'mounted', port: 8285, url: '/',
+    content: 'Storybook fantasy battles: archers, knights and wizards against ink monsters, which splash into ink when beaten. No blood.',
     web: 'inkvale/',
     tag: 'Strategy', big: true,
     cat: 'Strategy', tags: ['new', 'tower defence', 'watercolour', 'co-op', 'online', 'heroes', 'story', '2 player'],
@@ -208,6 +218,7 @@ export const GAMES = [
   },
   {
     slug: 'penguin-dash', title: 'PENGUIN DASH', how: 'mounted', port: 8250, url: '/',
+    content: 'A cartoon penguin fishing while seals, sharks and orcas try to catch it. Nothing graphic.',
     web: 'penguin-dash/',
     tag: 'Arcade', big: true,
     cat: 'Arcade', tags: ['new', 'penguin', 'fishing', 'pixel', 'underwater', 'side scroller', 'animals'],
@@ -229,6 +240,7 @@ export const GAMES = [
   // ---- the ten written for the deck --------------------------------
   {
     slug: 'stack', title: 'STACK', how: 'local', tag: 'Skill',
+    content: 'A stacking game. Nothing of concern.',
     cat: 'Arcade', tags: ['one button', 'tower', 'skill', 'mobile', 'timing'],
     blurb: 'Drop each slab on the one below. What hangs over gets sliced off and falls.',
     about: `One button, seen from the side in real solids: each slab is a lit block with a
@@ -240,6 +252,7 @@ export const GAMES = [
   },
   {
     slug: 'drifter', title: 'DRIFTER', how: 'local', tag: 'Arcade',
+    content: 'A spaceship shooting at asteroids. Nothing of concern.',
     cat: 'Arcade', tags: ['asteroids', 'space', 'shooting', 'retro', 'ship'],
     blurb: 'Rocks, a small ship, and bullets that cost the fuel you steer with.',
     about: `Asteroids with one rule changed: the gun and the engine come out of the same
@@ -252,6 +265,7 @@ export const GAMES = [
   },
   {
     slug: 'merge', title: 'MERGE', how: 'local', tag: 'Puzzle',
+    content: 'A fruit-merging puzzle. Nothing of concern.',
     cat: 'Puzzle', tags: ['merge', 'physics', 'fruit', 'mobile', 'relaxing', 'match'],
     blurb: 'Drop the fruit in, match two, get a bigger one. A thousand stages of it.',
     about: `Real rolling physics in a glass jar. Two of the same touch and become the next
@@ -263,6 +277,7 @@ export const GAMES = [
   },
   {
     slug: 'pipeworks', title: 'PIPEWORKS', how: 'local', tag: 'Puzzle',
+    content: 'A pipe puzzle. Nothing of concern.',
     cat: 'Puzzle', tags: ['pipes', 'water', 'logic', 'levels', 'tiles'],
     blurb: 'Six rooms of pipe by hand, then it generates them for ever.',
     about: `The cellar, the waterworks, the boiler, the roof, the foundry and the deep -
@@ -274,6 +289,7 @@ export const GAMES = [
   },
   {
     slug: 'sweep', title: 'SWEEP', how: 'local', tag: 'Puzzle',
+    content: 'Minesweeper. Nothing of concern.',
     cat: 'Puzzle', tags: ['minesweeper', 'logic', 'mines', 'timed', 'board'],
     blurb: 'Minesweeper on a clock, at whatever size and difficulty you can stand.',
     about: `Four board sizes and four difficulties, from an 11% board with room to think
@@ -285,6 +301,7 @@ export const GAMES = [
   },
   {
     slug: 'quickdraw', title: 'QUICKDRAW', how: 'local', tag: 'Reaction',
+    content: 'Cartoon western gunfights between two cowboys, with hits counted by limb. Bright muzzle flashes; no blood.',
     cat: 'Shooter', tags: ['reaction', 'western', 'duel', '2 player', 'aim'],
     blurb: 'Hand on the holster. One shot each, then hands down, until one of you drops.',
     about: `Keep the pointer on your holster through the wait. Leaving early is a re-do
@@ -305,6 +322,7 @@ export const GAMES = [
   },
   {
     slug: 'hoops', title: 'HOOPS', how: 'local', tag: 'Sport',
+    content: 'Basketball. Can be played online with a friend using a room code; there is no chat.',
     cat: 'Sport', tags: ['new', 'basketball', 'multiplayer', 'online', '2 player', 'ball'],
     blurb: 'Streetball on the blacktop or a full game in the arena - alone, or online with a friend.',
     about: `Three games on one side-on court. HALF COURT is streetball: one ring, both teams
@@ -334,6 +352,7 @@ export const GAMES = [
   },
   {
     slug: 'spike', title: 'SPIKE', how: 'local', tag: 'Sport',
+    content: 'Volleyball between two jelly blobs. Nothing of concern.',
     cat: 'Sport', tags: ['volleyball', 'physics', '2 player', 'ball', 'jelly'],
     blurb: 'Two jelly slimes, one ball, one net, first to eleven. Bring a friend.',
     about: `Volleyball with the rules taken out: no touch limit, no positions, just a ball that
@@ -354,6 +373,7 @@ export const GAMES = [
   // ---- the classics ------------------------------------------------
   {
     slug: 'crossing', title: 'CROSSING', how: 'local', tag: 'Endless',
+    content: 'A pixel-art frog crossing roads and rivers. The frog can be run over or fall in the water, cartoon style.',
     cat: 'Arcade', tags: ['new', 'endless', 'hopping', 'traffic', 'mobile', 'one life'],
     blurb: 'It never ends, and the bottom of the screen is rising. How far did you get?',
     about: `Road and river, generated forever as they come into view, and they play as

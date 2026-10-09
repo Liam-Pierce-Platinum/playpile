@@ -24,7 +24,11 @@ const clean = (s) => String(s || '').replace(/\s+/g, ' ').trim();
 
 // a catalogue `about` may hold several paragraphs, split by a blank line
 export const aboutHtml = (g) => String(g.about || '').split(/\n\s*\n/).map(clean)
-  .filter(Boolean).map((p) => '<p>' + esc(p) + '</p>').join('\n');
+  .filter(Boolean).map((p) => '<p>' + esc(p) + '</p>').join('\n')
+  + (g.content ? '\n<p class="advisory"><b>What is in it:</b> ' + esc(g.content)
+    + ' <a href="/site/parents.html">More for parents</a></p>' : '')
+  + '\n<p class="report"><a href="mailto:liamlikescows@gmail.com?subject='
+  + encodeURIComponent('PLAYPILE: problem with ' + g.title) + '">Report a problem with this game</a></p>';
 
 export const keysHtml = (g) => (g.controls || [])
   .map(([k, w]) => '<li><kbd>' + esc(k) + '</kbd><span>' + esc(w) + '</span></li>').join('');
@@ -63,6 +67,7 @@ export function gameHead(g) {
     name: g.title, url, image: img, description: clean(g.blurb),
     genre: catOf(g), gamePlatform: 'Web browser', operatingSystem: 'Any',
     applicationCategory: 'Game', isAccessibleForFree: true,
+    ...(g.content ? { contentRating: g.content } : {}),
     publisher: { '@type': 'Organization', name: 'PLAYPILE', url: SITE },
   };
   const crumbs = {

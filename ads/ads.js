@@ -69,7 +69,11 @@ const SIZES = {
   endcard:      { w: 300, h: 250, cls: 'ad-rail',   label: 'rectangle' },
 };
 
+/** 'p' (personalised, the default) or 'np', from the privacy settings page */
+export function adPref() { try { return localStorage.getItem('pd.adpref') || 'p'; } catch (e) { return 'p'; } }
+
 export async function loadAds() {
+  if (adPref() === 'np') { const q = (window.adsbygoogle = window.adsbygoogle || []); q.requestNonPersonalizedAds = 1; }
   if (CFG) return CFG;
   try {
     const r = await fetch('/ads/ads.json', { cache: 'no-store' });
@@ -126,8 +130,8 @@ function notice() {
   const bar = document.createElement('div');
   bar.className = 'notice';
   bar.innerHTML = '<span>PLAYPILE keeps your scores in this browser. '
-    + 'Adverts on this site may set cookies to count how often one is shown &mdash; '
-    + '<a href="/site/cookies.html">what that means</a>.</span>'
+    + 'Adverts from Google use cookies and may be personalised to you &mdash; '
+    + '<a href="/site/settings.html">choose in privacy settings</a> or <a href="/site/cookies.html">read more</a>.</span>'
     + '<button type="button">Got it</button>';
   bar.querySelector('button').addEventListener('click', () => {
     try { localStorage.setItem('pd.notice', '1'); } catch (e) {}
@@ -175,7 +179,13 @@ export function slot(el, name) {
     }
     el.innerHTML = '';
     el.appendChild(ins);
-    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+    try {
+      const q = (window.adsbygoogle = window.adsbygoogle || []);
+      // the visitor's choice on /site/settings.html: non-personalised only.
+      // Google reads this flag off the queue before it fills a slot.
+      if (adPref() === 'np') q.requestNonPersonalizedAds = 1;
+      q.push({});
+    } catch (e) {}
     whenUnfilled(el, ins, sz, cfg);
     return;
   }

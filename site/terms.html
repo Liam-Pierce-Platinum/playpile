@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<!--PRE:head--><title>Games — PLAYPILE</title><!--/PRE:head-->
+<title>Terms of use — PLAYPILE</title>
+<meta name="description" content="The rules for using PLAYPILE: what you can do with the games, what we promise, and what we cannot.">
+<link rel="canonical" href="https://playpile.net/site/terms.html">
 <link rel="stylesheet" href="/site/style.css">
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
@@ -21,7 +23,7 @@
      crossorigin="anonymous"></script>
 </head>
 <body>
-<a class="skip" href="#main">Skip to the games</a>
+<a class="skip" href="#main">Skip to the content</a>
 
 <header class="top"><div class="bar">
   <button class="burger" id="burger" type="button" aria-label="Categories">
@@ -43,7 +45,50 @@
   <div class="scrim" id="scrim"></div>
 
   <main id="main">
-    <div class="catpage" id="catpage"><!--PRE:body--><!--/PRE:body--></div>
+    <div class="prose">
+      <section class="hero">
+        <h1>Terms of use</h1>
+        <p id="lede">Short, and in plain words. By using PLAYPILE you agree to these terms.</p>
+      </section>
+      <h2>What PLAYPILE is</h2>
+      <p>PLAYPILE is a free website of browser games. Every game on it was made for this site. You do
+         not need an account to play, and nothing on the site costs money.</p>
+      <h2>Using the games</h2>
+      <p>You may play the games as much as you like, link to them, and share screenshots and videos
+         of yourself playing them, including on streams and in videos that earn you money. You may not
+         copy the games or their code, art or music onto another website, sell them, or pass them off
+         as your own.</p>
+      <h2>Playing with other people</h2>
+      <p>Some games can be played online with a friend using a room code (HOOPS and INKVALE). There
+         is no chat. Only share a room code with people you know, and do not try to cheat, crash or
+         disrupt another player's game. See the <a href="/site/privacy.html#online" style="color:var(--accent)">privacy page</a> for
+         what an online game shares between the two browsers.</p>
+      <h2>Your saved progress</h2>
+      <p>Scores and progress are kept in your own browser. They can be lost if you clear your browser
+         data, use a private window or switch device. We do our best to keep saves working when a game
+         is updated, but we cannot promise that an update will never reset one. Save codes and
+         profiles, from the Sign in button, are there to help you keep a copy.</p>
+      <h2>Advertising</h2>
+      <p>PLAYPILE is paid for by advertising from Google AdSense. Adverts are never placed over a
+         game while it is being played. You can choose whether adverts are personalised on the
+         <a href="/site/settings.html" style="color:var(--accent)">privacy settings page</a>.</p>
+      <h2>No guarantees</h2>
+      <p>The games are provided as they are, for fun. We fix bugs when we find them, but we cannot
+         promise that every game will work on every device or browser, or that the site will always be
+         online. Games can be changed, improved or taken off the site; the
+         <a href="/site/updates.html" style="color:var(--accent)">updates page</a> keeps a dated record of what changes. Take breaks,
+         and see the <a href="/site/accessibility.html#flashing" style="color:var(--accent)">note on flashing lights</a> before
+         playing if that affects you.</p>
+      <h2>Other websites</h2>
+      <p>Links to other websites, and the adverts, lead to places we do not run. Their own terms and
+         privacy policies apply there.</p>
+      <h2>Changes to these terms</h2>
+      <p>If these terms change, this page changes and its date changes with it. Using the site after a
+         change means you accept the new version.</p>
+      <h2>Questions</h2>
+      <p><a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20Terms%20of%20use" style="color:var(--accent)">liamlikescows@gmail.com</a>. Our <a href="/site/contact.html" style="color:var(--accent)">contact page</a> lists what to include so we can help quickly.</p>
+      <p style="font-size:13px">Last updated 8 October 2026.</p>
+    </div>
     <!-- THE FOOTER IS REAL HTML, not something a script draws.
          An AdSense reviewer and a search engine both read the page
          before any module runs, and "privacy and cookies are linked
@@ -77,24 +122,11 @@
 </div>
 
 <script type="module">
-// /category/<name>/ - the slug is read off the PATH, the same way the game
-// page reads its own. tools/deploy.mjs writes this page out once per
-// category with the text already in it; locally it is filled in here.
 import { GAMES, mountShell } from '/site/shell.js';
-import { catOf, catSlug, categoryBody } from '/site/pages.js';
-import { introFor } from '/site/categories.js';
 import { loadAds } from '/ads/ads.js';
-const slug = location.pathname.split('/').filter(Boolean).pop();
-const cat = [...new Set(GAMES.map(catOf))].find((c) => catSlug(c) === slug);
-if (!cat) { location.replace('/'); throw new Error('no such category: ' + slug); }
-mountShell({ active: cat });
-const list = GAMES.filter((g) => catOf(g) === cat);
-const box = document.getElementById('catpage');
-if (!box.querySelector('h1')) {
-  box.innerHTML = categoryBody(cat, list, introFor(cat));
-  document.title = cat + ' games — play free in your browser — PLAYPILE';
-}
+mountShell({ active: '' });
 loadAds();
+
 </script>
 </body>
 </html>

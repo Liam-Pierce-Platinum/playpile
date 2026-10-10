@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BOMB SQUAD — free puzzle game in your browser — PLAYPILE</title>
+<meta name="description" content="A ticking bomb, a paper manual and three strikes to spare: snip, flip, read, don't panic. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/bomb-squad/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="BOMB SQUAD — PLAYPILE">
+<meta property="og:description" content="A ticking bomb, a paper manual and three strikes to spare: snip, flip, read, don't panic. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/bomb-squad/">
+<meta property="og:image" content="https://playpile.net/shots/bomb-squad.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"BOMB SQUAD","url":"https://playpile.net/play/bomb-squad/","image":"https://playpile.net/shots/bomb-squad.png","description":"A ticking bomb, a paper manual and three strikes to spare: snip, flip, read, don't panic.","genre":"Puzzle","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"contentRating":"A cartoon bomb that goes BOOM with a comic-book explosion, a bright white flash and a sooty pair of eyes when you fail. A strike tints the screen red and shakes it. Nobody is hurt and there is no blood.","publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Puzzle","item":"https://playpile.net/category/puzzle/"},{"@type":"ListItem","position":3,"name":"BOMB SQUAD","item":"https://playpile.net/play/bomb-squad/"}]}</script>
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#0b0f14">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+<a class="skip" href="#stage">Skip to the game</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/category/puzzle/">Puzzle</a><i>&rsaquo;</i><b>BOMB SQUAD</b></nav>
+    <!-- NO ADVERT ABOVE THE GAME (removed 2026-10-07). It sat 16px over the
+         stage and its Play button - AdSense's "ads interfering" policy bars
+         ads beside action items where they draw accidental clicks, and a
+         click near the top edge of a running game could land on it. -->
+
+    <div class="play">
+      <div>
+        <!-- THE GAME DOES NOT LOAD UNTIL IT IS ASKED FOR.
+             Several of these are heavy, and a page that starts
+             downloading a game the moment it opens costs the player the
+             whole download for a click they might not make. The iframe
+             has no src until START. -->
+        <div class="stage" id="stage">
+          <iframe id="frame" title="game" allow="autoplay; fullscreen; gamepad; pointer-lock"
+                  allowfullscreen hidden></iframe>
+          <div class="curtain" id="curtain">
+            <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
+            <h2 id="ttl">BOMB SQUAD</h2>
+            <p id="lede">A ticking bomb, a paper manual and three  trike  to  pare:  nip, flip, read, don't panic.</p>
+            <button class="btn" id="start">Play</button>
+            <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
+          </div>
+        </div>
+
+        <div class="stagebar">
+          <span class="title" id="barttl">BOMB SQUAD</span>
+          <span class="where" id="how"></span>
+          <span class="sp"></span>
+          <button id="full" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
+            Fullscreen <kbd>F</kbd></button>
+          <button id="reload" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+            Restart <kbd>R</kbd></button>
+          <a class="lnk" href="/">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>
+            All games</a>
+        </div>
+
+        <section class="about">
+          <h1 id="h1">BOMB SQUAD</h1>
+          <p class="lede" id="blurb">A ticking bomb, a paper manual and three  trike  to  pare:  nip, flip, read, don't panic.</p>
+          <div id="about"><p>A bomb sits on your desk under the lamp, with a manual open beside it. Pick a module and the booklet flips to its page: cut the right one of three to six wires, tap or hold the button and let go on the right digit, set five switches by their cap colours, press four symbol keys in column order, answer Simon with the mapped colour, steer through a maze whose walls you cannot see, or spin four letter wheels to the one word that fits. Almost every rule depends on the serial number, the batteries and the lights along the top.</p>
+<p>Every wrong move is a strike and makes the clock run a quarter faster, and three strikes is BOOM. The campaign is twenty bombs that bring in the modules one at a time, until four modules and a hissing Vent share one clock. Endless keeps them coming until one goes off, and the Daily is one new bomb a day.</p>
+<p class="advisory"><b>What is in it:</b> A cartoon bomb that goes BOOM with a comic-book explosion, a bright white flash and a sooty pair of eyes when you fail. A strike tints the screen red and shakes it. Nobody is hurt and there is no blood. <a href="/site/parents.html">More for parents</a></p>
+<p class="report"><a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20problem%20with%20BOMB%20SQUAD">Report a problem with this game</a></p></div>
+          <h4>Controls</h4>
+          <ul class="keys" id="keys"><li><kbd>Click</kbd><span>pick a module · cut, press, flip, spin</span></li><li><kbd>Tab</kbd><span>next module</span></li><li><kbd>1 - 6</kbd><span>cut a wire · flip a switch · press a key</span></li><li><kbd>Space (hold)</kbd><span>hold the button, let go to release</span></li><li><kbd>Arrows</kbd><span>Simon pads · steer the maze · code wheels</span></li><li><kbd>Z X C</kbd><span>Vent valves, from anywhere</span></li><li><kbd>Esc / M / R</kbd><span>pause · manual · retry</span></li><li><kbd>Tap</kbd><span>everything on touch; the manual is a drawer</span></li></ul>
+          <div class="tip" id="tip">Read the serial, the batteries and the lights before you touch anything: nearly every rule asks about them, and each strike makes the clock run 25 per cent faster.</div>
+          <h4>Tags</h4>
+          <div class="tagrow" id="tags"><a class="chip on" href="/category/puzzle/">Puzzle</a><a class="chip" href="/#q=new">new</a><a class="chip" href="/#q=bomb">bomb</a><a class="chip" href="/#q=defusal">defusal</a><a class="chip" href="/#q=puzzle">puzzle</a><a class="chip" href="/#q=manual">manual</a><a class="chip" href="/#q=timer">timer</a><a class="chip" href="/#q=daily">daily</a><a class="chip" href="/#q=endless">endless</a></div>
+        </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>BOMB SQUAD puts a ticking bomb on your desk under a lamp and a paper manual beside it. It has a timer and one to four <b>modules</b>, small puzzles to solve. Click or tap a module to pick it, and the manual flips to that module's page. Do what the rule says and the module's corner light turns green. Clear every module and the bomb is <b>defused</b>.</p>
+<p>The rules lean on the outside of the bomb, so look at the top rail first. It shows a <b>serial number</b>, <b>batteries</b> and up to two <b>indicator lights</b>. What counts is the serial's last digit (odd or even), whether it has a vowel (only A, E and U are used), the battery count and which indicators are lit.</p>
+<p>A wrong move is a <b>strike</b>. The clock runs 25 per cent faster for every strike, so a slow right answer beats a fast guess. Three strikes, or the clock reaching 0:00, and it goes <b>BOOM</b>. The card that follows tells you the right answer, and <kbd>R</kbd> tries again.</p>
+<p>There are seven modules and one needy one:</p>
+<ul>
+<li><b>Wires</b> (3 to 6 wires). Cut one. Use the manual section for your wire count; the first true line names the wire.</li>
+<li><b>The Button</b>. The manual says TAP or HOLD (a press under 0.45 seconds is a tap). Held, a coloured strip lights up; let go when the clock's last digit matches the strip: red 2, blue 7, yellow 5, white 0.</li>
+<li><b>Switches</b>. Set five switches up or down by cap colour, then press SET.</li>
+<li><b>Keypad</b>. Four symbol keys. Exactly one of the manual's five columns holds all four; press them in that column's order, top to bottom.</li>
+<li><b>Simon</b>. Pads flash a sequence and you press the mapped colour, not the one that flashed. An even or odd battery count picks the table. Three rounds, four on the last three campaign bombs and from bomb 10 in Endless.</li>
+<li><b>Dial Maze</b>. Steer a white square to a red triangle. The walls are hidden; the green ring tells you which of six mazes in the manual it is. Bumping a wall is a strike.</li>
+<li><b>Code Wheel</b>. Spin four letter wheels until they spell the one word from the manual's list of 24 that can be made, then SUBMIT.</li>
+<li><b>Vent</b> (needy). It never clears. Now and then it hisses and gives you 14 seconds to open the valve for its lamp colour: red left, green middle, blue right, or one to the right if the lamp blinks (blue blinking wraps round to the left). Too slow, or the wrong valve, is a strike.</li>
+</ul>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li><b>Read the rail before you touch anything.</b> Note "odd, vowel, two batteries" once and you will not need the Info page mid-module.</li>
+<li><b>Wires: always read from the top of the section.</b> Several lines can be true at once; only the first counts.</li>
+<li><b>Hold the button early.</b> Each digit comes round every ten seconds, so press as soon as you know it is a HOLD and watch the clock.</li>
+<li><b>Simon repeats the whole sequence.</b> Each round adds one flash, and you answer every flash from the first. A wrong pad starts that round's input over.</li>
+<li><b>Code Wheel: work from the first wheel.</b> Cross off every word that does not start with a letter on wheel 1, then do the same for wheel 2.</li>
+<li><b>Keep a hand free for the Vent.</b> On a keyboard, <kbd>Z</kbd> <kbd>X</kbd> <kbd>C</kbd> open the left, middle and right valves from anywhere, without leaving the module you are on.</li>
+</ul>
+
+<h2>What's in it</h2>
+<p><b>Campaign</b> is 20 bombs. It brings in the modules one at a time, starting with three wires on 40 seconds, adds the Vent on bomb 15, and ends with four modules plus the Vent on 70 to 85 seconds. Each bomb earns up to three stars: one for defusing it, one for no strikes, and one for finishing with a third of the clock left. Defusing a bomb unlocks the next one. Every attempt is a fresh random bomb, so you learn rules, not answers: bombs 1 to 15 keep the same modules each time, while bombs 16 to 20 draw a new set of modules on every try.</p>
+<p><b>Endless</b> keeps the bombs coming. They grow from one module up to four plus the Vent, the Vent joins from bomb 7, and from bomb 10 Simon plays four rounds and mazes get longer. Clocks top out at 80 seconds; from bomb 18 each one is 1.5 seconds shorter, down to 30. One boom ends the run, and your score is the number of bombs defused.</p>
+<p><b>Daily</b> is one bomb a day, the same for everyone on that date: three modules plus the Vent on 75 seconds. Your best time left for the day is kept.</p>
+
+<h2>Questions</h2>
+<h3>Do I need a second player?</h3>
+<p>No. It borrows the idea of games where one person defuses and another reads the manual, but here you do both, with the manual on screen beside the bomb.</p>
+<h3>Can I play on a phone?</h3>
+<p>Yes. On a phone the manual is a drawer at the bottom of the screen. A tap slightly off a wire, key, switch or valve snaps to the nearest one, though Simon and the Button need a real hit.</p>
+<h3>Can I play with the keyboard?</h3>
+<p>Yes. <kbd>Tab</kbd> picks the next module, number keys cut wires, flip switches and press keys, <kbd>Space</kbd> holds the button, the arrows play Simon and steer the maze, and <kbd>Enter</kbd> presses SET or SUBMIT. Press <kbd>H</kbd> in a game for the full list.</p>
+<h3>Does it save?</h3>
+<p>Yes, in your own browser: which campaign bombs are unlocked, your stars and best times, your best Endless run, today's Daily best and your sound settings.</p></article>
+
+        <div id="ad-play-footer"></div>
+
+        <!-- the rail that keeps a session going: a player who finishes
+             one game and sees eight more is worth several page views -->
+        <div id="alsorows"></div>
+      </div>
+
+      <aside class="side">
+        <div id="ad-play-rail"></div>
+        <div class="panel">
+          <h4>More games</h4>
+          <div id="more"><a class="mini" href="/play/one-tile/"><span class="th" style="background-image:url('/shots/one-tile.png')"></span><span><b>ONE TILE</b><small>Puzzle</small></span></a><a class="mini" href="/play/merge/"><span class="th" style="background-image:url('/shots/merge.png')"></span><span><b>MERGE</b><small>Puzzle</small></span></a><a class="mini" href="/play/pipeworks/"><span class="th" style="background-image:url('/shots/pipeworks.png')"></span><span><b>PIPEWORKS</b><small>Puzzle</small></span></a><a class="mini" href="/play/sweep/"><span class="th" style="background-image:url('/shots/sweep.png')"></span><span><b>SWEEP</b><small>Puzzle</small></span></a><a class="mini" href="/play/highrise/"><span class="th" style="background-image:url('/shots/highrise.png')"></span><span><b>HIGHRISE</b><small>Shooter</small></span></a></div>
+        </div>
+        <div id="ad-play-tall"></div>
+      </aside>
+    </div>
+
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">33 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<!-- the loading interstitial: over a game that is LOADING, never one
+     that is being played, and it always has a skip -->
+<div class="gate" id="gate">
+  <div class="box">
+    <h3>Advertisement</h3>
+    <div data-ad></div>
+    <div class="count">your game starts in 5</div>
+    <button class="btn ghost" type="button">Skip</button>
+  </div>
+</div>
+
+<script type="module">
+import { GAMES, bySlug } from '/site/catalogue.js';
+import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
+import { loadAds, slot, interstitial } from '/ads/ads.js';
+
+// THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
+// server.js rewrites /play/<slug> to this file, and tools/deploy.mjs
+// writes this same file out to /play/<slug>/index.html for the static
+// host. Both leave the slug exactly where this line looks for it.
+const slug = location.pathname.split('/').filter(Boolean).pop();
+const g = bySlug(slug);
+if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
+
+mountShell({ active: catOf(g) });
+remember(g.slug);
+
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
+
+ttl.textContent = g.title;
+h1.textContent = g.title;
+barttl.textContent = g.title;
+lede.textContent = g.blurb;
+blurb.textContent = g.blurb;
+about.innerHTML = aboutHtml(g);
+tip.textContent = g.tips;
+shotbg.src = '/shots/' + g.slug + '.png';
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
+tags.innerHTML = [catOf(g), ...(g.tags || [])]
+  .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
+  .join('');
+
+// ---- where does this game actually come from? -----------------------
+//
+// ON THE WEB, NOWHERE BUT HERE. Every game is a folder under /games/,
+// the big ones included, which is why they now ask for their own files
+// by relative path rather than off the web root.
+//
+// ON THIS MACHINE they are still separate servers on separate ports,
+// because that is where they are developed and nothing about that should
+// have to change to suit a website. A port that is not answering shows
+// the browser's own error page inside the frame, which reads as the site
+// being broken - so that case asks first and says so plainly.
+//
+// WHICH OF THE TWO is decided at BUILD time rather than by sniffing the
+// hostname: tools/deploy.mjs stamps this flag into the copy it writes.
+const WEB = !!window.__PLAYPILE_WEB;
+let src = null, note = '';
+if (g.how === 'mounted' && WEB && g.web) {
+  src = '/games/' + g.web;
+  note = 'runs here';
+} else if (g.how === 'local') {
+  src = '/games/' + g.slug + '/';
+  note = 'runs here';
+} else if (g.how === 'unity') {
+  src = '/games/' + g.slug + '/build/index.html';
+  note = 'unity webgl · 83 mb first load';
+  warn.textContent = 'First load is a big download. It is cached after that.';
+} else {
+  src = 'http://localhost:' + g.port + (g.url || '/');
+  note = 'localhost:' + g.port;
+  try {
+    const list = await (await fetch('/api/mounted')).json();
+    const m = list.find((x) => x.slug === g.slug);
+    if (!m || m.state !== 'up') {
+      warn.innerHTML = 'This one runs from its own folder and is not up. '
+        + 'Start PLAYPILE with <code>node server.js</code> and it boots with the site.';
+    }
+  } catch (e) {}
+}
+how.textContent = note;
+
+start.addEventListener('click', async () => {
+  start.disabled = true;
+  await interstitial();          // the ad slot that pays, while it loads
+  frame.src = src;
+  frame.hidden = false;
+  curtain.style.display = 'none';
+  setTimeout(() => { try { frame.focus(); } catch (e) {} }, 400);
+});
+full.addEventListener('click', () => {
+  const el = document.getElementById('stage');
+  if (document.fullscreenElement) document.exitFullscreen();
+  else el.requestFullscreen && el.requestFullscreen();
+});
+reload.addEventListener('click', () => { if (frame.src) frame.src = frame.src; });
+// the two shortcuts the stage bar advertises, so they are not a lie
+addEventListener('keydown', (e) => {
+  if (e.target.matches('input,textarea')) return;
+  if (e.key === 'f' || e.key === 'F') full.click();
+  if (e.key === 'r' || e.key === 'R') reload.click();
+});
+
+// ---- more games, which is the other half of running a portal --------
+// Somebody who finishes a game and closes the tab is worth one page
+// view. The rail beside the game is five, chosen from the same category
+// first, and the row below it is everything else.
+const others = GAMES.filter((x) => x.slug !== g.slug);
+const same = others.filter((x) => catOf(x) === catOf(g));
+const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
+
+document.getElementById('alsorows').innerHTML =
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
+  + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
+
+// ---- adverts: every slot that existed before, in the same place -----
+await loadAds();
+slot(document.getElementById('ad-play-rail'), 'play_rail');
+slot(document.getElementById('ad-play-tall'), 'play_tall');
+slot(document.getElementById('ad-play-footer'), 'play_footer');
+</script>
+</body>
+</html>

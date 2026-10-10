@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PARRY — free arcade game in your browser — PLAYPILE</title>
+<meta name="description" content="You only block, and every arrow, axe and fireball lands on the beat. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/parry/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="PARRY — PLAYPILE">
+<meta property="og:description" content="You only block, and every arrow, axe and fireball lands on the beat. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/parry/">
+<meta property="og:image" content="https://playpile.net/shots/parry.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"PARRY","url":"https://playpile.net/play/parry/","image":"https://playpile.net/shots/parry.png","description":"You only block, and every arrow, axe and fireball lands on the beat.","genre":"Arcade","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"contentRating":"Cartoon fantasy fighters (bandits, knights, ninjas, ogres, pirates) are knocked flying or puff away with a KO when you block them back. Small cartoon explosions from bombs and fireballs. No blood.","publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Arcade","item":"https://playpile.net/category/arcade/"},{"@type":"ListItem","position":3,"name":"PARRY","item":"https://playpile.net/play/parry/"}]}</script>
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#0b0f14">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+<a class="skip" href="#stage">Skip to the game</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/category/arcade/">Arcade</a><i>&rsaquo;</i><b>PARRY</b></nav>
+    <!-- NO ADVERT ABOVE THE GAME (removed 2026-10-07). It sat 16px over the
+         stage and its Play button - AdSense's "ads interfering" policy bars
+         ads beside action items where they draw accidental clicks, and a
+         click near the top edge of a running game could land on it. -->
+
+    <div class="play">
+      <div>
+        <!-- THE GAME DOES NOT LOAD UNTIL IT IS ASKED FOR.
+             Several of these are heavy, and a page that starts
+             downloading a game the moment it opens costs the player the
+             whole download for a click they might not make. The iframe
+             has no src until START. -->
+        <div class="stage" id="stage">
+          <iframe id="frame" title="game" allow="autoplay; fullscreen; gamepad; pointer-lock"
+                  allowfullscreen hidden></iframe>
+          <div class="curtain" id="curtain">
+            <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
+            <h2 id="ttl">PARRY</h2>
+            <p id="lede">You only block, and every arrow, axe and fireball land  on the beat.</p>
+            <button class="btn" id="start">Play</button>
+            <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
+          </div>
+        </div>
+
+        <div class="stagebar">
+          <span class="title" id="barttl">PARRY</span>
+          <span class="where" id="how"></span>
+          <span class="sp"></span>
+          <button id="full" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
+            Fullscreen <kbd>F</kbd></button>
+          <button id="reload" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+            Restart <kbd>R</kbd></button>
+          <a class="lnk" href="/">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>
+            All games</a>
+        </div>
+
+        <section class="about">
+          <h1 id="h1">PARRY</h1>
+          <p class="lede" id="blurb">You only block, and every arrow, axe and fireball land  on the beat.</p>
+          <div id="about"><p>You stand at a crossroads and attacks come down all four roads, each landing on the beat of a drum and bass loop that speeds up through the round. A ring closes on the target in each lane: block as it lands. A perfect, inside 45 milliseconds, sends the arrow or fireball straight back and knocks out whoever threw it. A good just bounces it off, and a miss costs one of your three hearts. Rogues fake a swing and strike a beat later. Ninjas throw two daggers down the same road, half a beat apart. Boulders have to be held, and bombs must not be blocked at all.</p>
+<p>There are eight stages, from Forest Road to the Storm Citadel. Each round lasts about a minute and ends with a boss whose attacks are a short song, from the Bandit Brute to the Black King. Perfects in a row build a multiplier up to x8. Every stage has three stars, for surviving, for the score target and for perfecting the boss. Clear stage 4 and Endless opens, starting at 108 beats a minute and climbing to 168.</p>
+<p class="advisory"><b>What is in it:</b> Cartoon fantasy fighters (bandits, knights, ninjas, ogres, pirates) are knocked flying or puff away with a KO when you block them back. Small cartoon explosions from bombs and fireballs. No blood. <a href="/site/parents.html">More for parents</a></p>
+<p class="report"><a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20problem%20with%20PARRY">Report a problem with this game</a></p></div>
+          <h4>Controls</h4>
+          <ul class="keys" id="keys"><li><kbd>Arrows / W A S D</kbd><span>block up, right, down, left</span></li><li><kbd>Hold the key</kbd><span>hold against a boulder (purple ring)</span></li><li><kbd>Do nothing</kbd><span>let a bomb (red X) fly over</span></li><li><kbd>Esc / P</kbd><span>pause</span></li><li><kbd>R</kbd><span>retry straight away</span></li><li><kbd>Enter / Space</kbd><span>menu button</span></li><li><kbd>Tap a side</kbd><span>block on a phone (swipe in settings)</span></li></ul>
+          <div class="tip" id="tip">On a dashed cyan ring, count &quot;one&quot; on the fake swing and block on &quot;two&quot;: the rogue always strikes exactly one beat later.</div>
+          <h4>Tags</h4>
+          <div class="tagrow" id="tags"><a class="chip on" href="/category/arcade/">Arcade</a><a class="chip" href="/#q=new">new</a><a class="chip" href="/#q=rhythm">rhythm</a><a class="chip" href="/#q=music">music</a><a class="chip" href="/#q=blocking">blocking</a><a class="chip" href="/#q=boss%20fights">boss fights</a><a class="chip" href="/#q=reflex">reflex</a><a class="chip" href="/#q=endless">endless</a><a class="chip" href="/#q=2d">2d</a></div>
+        </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>PARRY is a rhythm game where you only ever block. You stand at a crossroads and attacks come down the four roads, each one landing on the beat of a drum and bass loop that speeds up through the round. Block with the arrow keys or <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd>, one key for each road. On a phone you tap the side of the screen the attack comes from.</p>
+<p>Each road has a target circle next to your hero, and a ring closes on it as an attack comes in. Block when the ring lands. Inside 45 milliseconds either side is a <b>PERFECT</b>: the arrow, axe or fireball flies straight back and knocks out whoever threw it, and a swordsman is cut down where he stands. Inside 135 milliseconds is a <b>GOOD</b>, which stops the attack but only bounces it away. Anything later and you lose one of your three hearts. Blocking at nothing breaks your streak, so mashing does not work.</p>
+<p>Some attacks change the rules, and the colour of the ring tells you which:</p>
+<ul>
+<li><b>Dashed cyan ring, "WAIT...":</b> a purple rogue fakes a swing, then really strikes one beat later. Block the fake and it counts as blocking at nothing.</li>
+<li><b>Two in a row:</b> ninjas throw two daggers down the same road half a beat apart. Tap twice.</li>
+<li><b>Purple ring, "HOLD":</b> an ogre rolls a boulder. Block on the beat and keep the key held until the meter around the target fills. Let go early and you are crushed.</li>
+<li><b>Red ring with an X, "DON'T BLOCK":</b> a goblin's bomb. Do nothing, and it sails over you and blows up behind you for 50 points. Block it and it blows up on your shield, costing a heart.</li>
+</ul>
+<p>Every round lasts about a minute. After a short count-in and about 42 seconds of waves, the stage boss walks in, roars, and plays its own short song of attacks. Its health bar drains with each block. The song ends with one big, slow finishing strike, and if you are still standing after it the boss is knocked out.</p>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li><b>Listen more than you look.</b> Every attack lands on the music, so once you feel the beat the rings only tell you which road. Forest Road climbs from 100 to 112 beats a minute; Storm Citadel from 124 to 142.</li>
+<li><b>Protect the streak.</b> Every five perfects in a row raises your multiplier by one, up to x8, which takes 35 perfects in a row. A perfect is worth 300 times the multiplier, so one perfect at x8 is 2,400 points, while a good is always 100 and resets you to x1.</li>
+<li><b>Treat feints as a count.</b> When you see the dashed cyan ring, say "one" on the fake and block on "two". The rogue always strikes exactly one beat after the fake.</li>
+<li><b>Hold through the whole boulder.</b> The hold lasts one beat after the block. Keep the key down until the meter is full.</li>
+<li><b>If the music feels off, fix the offset.</b> The settings have an audio offset of up to 150 milliseconds either way. If the music feels late against the rings, lower it; if early, raise it.</li>
+<li><b>Learn the charts.</b> Each stage is built from a fixed seed, so it plays exactly the same every time, like a song.</li>
+</ul>
+
+<h2>What's in it</h2>
+<p>Eight stages, each with its own place, enemy and boss: Forest Road (archers and swordsmen, the Bandit Brute), Castle Gate (axe throwers, the Iron Knight), Desert Road (fire mages and feints, the Dune Ogre), Night Dojo (ninjas, the Shadow Sensei), Frozen Pass (boulders, the Frost Giant), Pirate Docks (bombs, Captain Powder), Volcano (everything at once, the Magma Ogre) and Storm Citadel (everything, faster, the Black King). From Volcano on, some attacks come in pairs from opposite roads at the same moment.</p>
+<p>Each stage has three stars: one for surviving, one for beating the score target, and one for a perfect on every boss attack. The target assumes 80 per cent perfects and a boss knockout: it is 24,400 on Forest Road and 72,100 on Storm Citadel. Knocking out the boss is worth 2,000 points, a boss fight with nothing but perfects is worth 3,000 more, and every heart left at the end is worth 500.</p>
+<p><b>Endless mode</b> unlocks when you clear stage 4. It starts at 108 beats a minute and keeps climbing to 168, adding a new kind of enemy every few bars. The scenery changes, and you get a heart back, every 64 beats.</p>
+
+<h2>Questions</h2>
+<h3>What counts as a perfect?</h3>
+<p>Blocking within 45 milliseconds of the beat, so the window is 90 milliseconds wide. A good is anything within 135 milliseconds.</p>
+<h3>How do I unlock the next stage?</h3>
+<p>Survive the stage before it. You only need the first star; the score and boss stars are for coming back. Clearing stage 4 also opens Endless.</p>
+<h3>Can I play on a phone?</h3>
+<p>Yes. Tap the side of the screen the attack comes from, or switch to swipes in the settings. A mouse click works like a tap.</p>
+<h3>Does it save?</h3>
+<p>Yes, in your own browser: your stars, best score on each stage, which stages are open, your Endless best, and your sound, touch and offset settings. Clearing your browser's site data clears the save.</p>
+<h3>Are there quick keys?</h3>
+<p><kbd>Esc</kbd> or <kbd>P</kbd> pauses. <kbd>R</kbd> retries at once, during a round or on the results screen. <kbd>Enter</kbd> or <kbd>Space</kbd> presses the main button on any menu.</p></article>
+
+        <div id="ad-play-footer"></div>
+
+        <!-- the rail that keeps a session going: a player who finishes
+             one game and sees eight more is worth several page views -->
+        <div id="alsorows"></div>
+      </div>
+
+      <aside class="side">
+        <div id="ad-play-rail"></div>
+        <div class="panel">
+          <h4>More games</h4>
+          <div id="more"><a class="mini" href="/play/penguin-dash/"><span class="th" style="background-image:url('/shots/penguin-dash.png')"></span><span><b>PENGUIN DASH</b><small>Arcade</small></span></a><a class="mini" href="/play/stack-attack/"><span class="th" style="background-image:url('/shots/stack-attack.png')"></span><span><b>STACK ATTACK</b><small>Arcade</small></span></a><a class="mini" href="/play/wrecking-ball/"><span class="th" style="background-image:url('/shots/wrecking-ball.png')"></span><span><b>WRECKING BALL</b><small>Arcade</small></span></a><a class="mini" href="/play/sushi-conveyor/"><span class="th" style="background-image:url('/shots/sushi-conveyor.png')"></span><span><b>SUSHI CONVEYOR</b><small>Arcade</small></span></a><a class="mini" href="/play/grapple-goblin/"><span class="th" style="background-image:url('/shots/grapple-goblin.png')"></span><span><b>GRAPPLE GOBLIN</b><small>Arcade</small></span></a></div>
+        </div>
+        <div id="ad-play-tall"></div>
+      </aside>
+    </div>
+
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">33 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<!-- the loading interstitial: over a game that is LOADING, never one
+     that is being played, and it always has a skip -->
+<div class="gate" id="gate">
+  <div class="box">
+    <h3>Advertisement</h3>
+    <div data-ad></div>
+    <div class="count">your game starts in 5</div>
+    <button class="btn ghost" type="button">Skip</button>
+  </div>
+</div>
+
+<script type="module">
+import { GAMES, bySlug } from '/site/catalogue.js';
+import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
+import { loadAds, slot, interstitial } from '/ads/ads.js';
+
+// THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
+// server.js rewrites /play/<slug> to this file, and tools/deploy.mjs
+// writes this same file out to /play/<slug>/index.html for the static
+// host. Both leave the slug exactly where this line looks for it.
+const slug = location.pathname.split('/').filter(Boolean).pop();
+const g = bySlug(slug);
+if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
+
+mountShell({ active: catOf(g) });
+remember(g.slug);
+
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
+
+ttl.textContent = g.title;
+h1.textContent = g.title;
+barttl.textContent = g.title;
+lede.textContent = g.blurb;
+blurb.textContent = g.blurb;
+about.innerHTML = aboutHtml(g);
+tip.textContent = g.tips;
+shotbg.src = '/shots/' + g.slug + '.png';
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
+tags.innerHTML = [catOf(g), ...(g.tags || [])]
+  .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
+  .join('');
+
+// ---- where does this game actually come from? -----------------------
+//
+// ON THE WEB, NOWHERE BUT HERE. Every game is a folder under /games/,
+// the big ones included, which is why they now ask for their own files
+// by relative path rather than off the web root.
+//
+// ON THIS MACHINE they are still separate servers on separate ports,
+// because that is where they are developed and nothing about that should
+// have to change to suit a website. A port that is not answering shows
+// the browser's own error page inside the frame, which reads as the site
+// being broken - so that case asks first and says so plainly.
+//
+// WHICH OF THE TWO is decided at BUILD time rather than by sniffing the
+// hostname: tools/deploy.mjs stamps this flag into the copy it writes.
+const WEB = !!window.__PLAYPILE_WEB;
+let src = null, note = '';
+if (g.how === 'mounted' && WEB && g.web) {
+  src = '/games/' + g.web;
+  note = 'runs here';
+} else if (g.how === 'local') {
+  src = '/games/' + g.slug + '/';
+  note = 'runs here';
+} else if (g.how === 'unity') {
+  src = '/games/' + g.slug + '/build/index.html';
+  note = 'unity webgl · 83 mb first load';
+  warn.textContent = 'First load is a big download. It is cached after that.';
+} else {
+  src = 'http://localhost:' + g.port + (g.url || '/');
+  note = 'localhost:' + g.port;
+  try {
+    const list = await (await fetch('/api/mounted')).json();
+    const m = list.find((x) => x.slug === g.slug);
+    if (!m || m.state !== 'up') {
+      warn.innerHTML = 'This one runs from its own folder and is not up. '
+        + 'Start PLAYPILE with <code>node server.js</code> and it boots with the site.';
+    }
+  } catch (e) {}
+}
+how.textContent = note;
+
+start.addEventListener('click', async () => {
+  start.disabled = true;
+  await interstitial();          // the ad slot that pays, while it loads
+  frame.src = src;
+  frame.hidden = false;
+  curtain.style.display = 'none';
+  setTimeout(() => { try { frame.focus(); } catch (e) {} }, 400);
+});
+full.addEventListener('click', () => {
+  const el = document.getElementById('stage');
+  if (document.fullscreenElement) document.exitFullscreen();
+  else el.requestFullscreen && el.requestFullscreen();
+});
+reload.addEventListener('click', () => { if (frame.src) frame.src = frame.src; });
+// the two shortcuts the stage bar advertises, so they are not a lie
+addEventListener('keydown', (e) => {
+  if (e.target.matches('input,textarea')) return;
+  if (e.key === 'f' || e.key === 'F') full.click();
+  if (e.key === 'r' || e.key === 'R') reload.click();
+});
+
+// ---- more games, which is the other half of running a portal --------
+// Somebody who finishes a game and closes the tab is worth one page
+// view. The rail beside the game is five, chosen from the same category
+// first, and the row below it is everything else.
+const others = GAMES.filter((x) => x.slug !== g.slug);
+const same = others.filter((x) => catOf(x) === catOf(g));
+const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
+
+document.getElementById('alsorows').innerHTML =
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
+  + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
+
+// ---- adverts: every slot that existed before, in the same place -----
+await loadAds();
+slot(document.getElementById('ad-play-rail'), 'play_rail');
+slot(document.getElementById('ad-play-tall'), 'play_tall');
+slot(document.getElementById('ad-play-footer'), 'play_footer');
+</script>
+</body>
+</html>

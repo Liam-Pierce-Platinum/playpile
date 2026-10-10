@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SNOWBALL ROYALE — free action game in your browser — PLAYPILE</title>
+<meta name="description" content="A snowball fight at dusk: duck behind snow walls, lob over them, and roll a giant one to flatten everybody. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/snowball-royale/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="SNOWBALL ROYALE — PLAYPILE">
+<meta property="og:description" content="A snowball fight at dusk: duck behind snow walls, lob over them, and roll a giant one to flatten everybody. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/snowball-royale/">
+<meta property="og:image" content="https://playpile.net/shots/snowball-royale.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"SNOWBALL ROYALE","url":"https://playpile.net/play/snowball-royale/","image":"https://playpile.net/shots/snowball-royale.png","description":"A snowball fight at dusk: duck behind snow walls, lob over them, and roll a giant one to flatten everybody.","genre":"Action","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"contentRating":"Cartoon kids throw snowballs at each other; three hits knock a kid out to the sidelines and they come back a few seconds later. A dog runs through and knocks kids over. The screen shakes and its edges briefly go red when you are hit. Nothing graphic.","publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Action","item":"https://playpile.net/category/action/"},{"@type":"ListItem","position":3,"name":"SNOWBALL ROYALE","item":"https://playpile.net/play/snowball-royale/"}]}</script>
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#0b0f14">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+<a class="skip" href="#stage">Skip to the game</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/category/action/">Action</a><i>&rsaquo;</i><b>SNOWBALL ROYALE</b></nav>
+    <!-- NO ADVERT ABOVE THE GAME (removed 2026-10-07). It sat 16px over the
+         stage and its Play button - AdSense's "ads interfering" policy bars
+         ads beside action items where they draw accidental clicks, and a
+         click near the top edge of a running game could land on it. -->
+
+    <div class="play">
+      <div>
+        <!-- THE GAME DOES NOT LOAD UNTIL IT IS ASKED FOR.
+             Several of these are heavy, and a page that starts
+             downloading a game the moment it opens costs the player the
+             whole download for a click they might not make. The iframe
+             has no src until START. -->
+        <div class="stage" id="stage">
+          <iframe id="frame" title="game" allow="autoplay; fullscreen; gamepad; pointer-lock"
+                  allowfullscreen hidden></iframe>
+          <div class="curtain" id="curtain">
+            <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
+            <h2 id="ttl">SNOWBALL ROYALE</h2>
+            <p id="lede">A  nowball fight at du k: duck behind  now wall , lob over them, and roll a giant one to flatten everybody.</p>
+            <button class="btn" id="start">Play</button>
+            <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
+          </div>
+        </div>
+
+        <div class="stagebar">
+          <span class="title" id="barttl">SNOWBALL ROYALE</span>
+          <span class="where" id="how"></span>
+          <span class="sp"></span>
+          <button id="full" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
+            Fullscreen <kbd>F</kbd></button>
+          <button id="reload" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+            Restart <kbd>R</kbd></button>
+          <a class="lnk" href="/">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>
+            All games</a>
+        </div>
+
+        <section class="about">
+          <h1 id="h1">SNOWBALL ROYALE</h1>
+          <p class="lede" id="blurb">A  nowball fight at du k: duck behind  now wall , lob over them, and roll a giant one to flatten everybody.</p>
+          <div id="about"><p>Up to six kids, one snowy garden, ninety seconds. A click throws a fast flat snowball that a wall will stop; hold it and you lob one over the wall instead, and a red ring on the ground shows you where theirs are coming down. Scoop fresh snow to reload and you dig the ground bare, so nobody can camp. Build your own walls, belly-dive under throws and tackle people, or hold R and roll a snowball until it is big enough to flatten anyone in its way.</p>
+<p>Four modes - free-for-all, 2 v 2, 3 v 3 and King of the Fort - across eight maps, from a frozen pond where dives slide forever to a sledging hill where big balls run away downhill. The AI kids are snipers, rushers, builders and cowards, and they get sharper on every map you unlock. Every round pays coins for hats and scarves.</p>
+<p class="advisory"><b>What is in it:</b> Cartoon kids throw snowballs at each other; three hits knock a kid out to the sidelines and they come back a few seconds later. A dog runs through and knocks kids over. The screen shakes and its edges briefly go red when you are hit. Nothing graphic. <a href="/site/parents.html">More for parents</a></p>
+<p class="report"><a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20problem%20with%20SNOWBALL%20ROYALE">Report a problem with this game</a></p></div>
+          <h4>Controls</h4>
+          <ul class="keys" id="keys"><li><kbd>WASD / arrows</kbd><span>move</span></li><li><kbd>Mouse + click</kbd><span>aim · fast flat throw</span></li><li><kbd>Hold click</kbd><span>charge a lob over walls</span></li><li><kbd>Space / Shift / right click</kbd><span>dive · tackle</span></li><li><kbd>E (or stand still)</kbd><span>scoop snow</span></li><li><kbd>Q</kbd><span>build a snow wall (3 snowballs)</span></li><li><kbd>Hold R</kbd><span>roll a big snowball</span></li><li><kbd>Touch</kbd><span>left thumb moves, right thumb aims · DIVE WALL ROLL SCOOP buttons</span></li></ul>
+          <div class="tip" id="tip">Hit a snowy tree when enemies are standing under it: the whole load drops on them for a hit each and a long stun, but it hits your own side too, and the tree needs about 8 seconds to load up again.</div>
+          <h4>Tags</h4>
+          <div class="tagrow" id="tags"><a class="chip on" href="/category/action/">Action</a><a class="chip" href="/#q=new">new</a><a class="chip" href="/#q=snowball%20fight">snowball fight</a><a class="chip" href="/#q=top%20down">top down</a><a class="chip" href="/#q=battle%20royale">battle royale</a><a class="chip" href="/#q=teams">teams</a><a class="chip" href="/#q=winter">winter</a><a class="chip" href="/#q=mobile">mobile</a></div>
+        </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>SNOWBALL ROYALE is a top-down snowball fight in snowy gardens and parks at dusk. You are the kid with the yellow ring. Move with <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or the arrows and aim with the mouse. A <b>click</b> throws a fast, flat snowball that stops at the first wall. <b>Hold</b> the button to charge a <b>lob</b>: it arcs over walls, hedges and snowmen and lands on the yellow ring on the ground, and a full charge reaches nearly three times as far as a barely charged lob. Every lob in the air shows a dashed ring where it will land, red for an enemy's, and the ring closes in as it drops. A red ring under your feet means move.</p>
+<p>You start with 4 snowballs and carry up to 8. To get more, <b>stand still</b> on fresh snow for a moment or hold <kbd>E</kbd>, and you scoop 2. Each scoop digs a patch down to the grass, so you have to keep moving to find more. Three hits knock you out to the sidelines for a few seconds. Go six seconds without being hit and your health comes back, one point every three and a half seconds.</p>
+<p><kbd>Q</kbd> builds a snow wall in front of you for 3 snowballs. You can have three up at once; a fourth knocks down your oldest. <kbd>Space</kbd>, <kbd>Shift</kbd> or right click is a <b>dive</b>, a fast belly-slide that ducks under flat throws and tackles anyone you hit. Hold <kbd>R</kbd> and walk to <b>roll</b> a snowball. It grows over snow and slows you down as it gets heavier; let go and it keeps rolling. A big one flattens any kid it runs into and slowly crushes walls.</p>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li><b>Flat throws for open ground, lobs for cover.</b> A kid behind a wall is safe from clicks but not from a lob. Walls also get lower as they are hit, and a battered one lets flat throws sail over.</li>
+<li><b>Dive through a flat throw.</b> A dive is your dodge and your way in at once. On the Frozen Pond dives slide twice as long, and a belly-slide through deep snow picks up a snowball.</li>
+<li><b>Never stand under a loaded tree.</b> Hit a snowy tree and it dumps its load on everyone underneath: a hit each and a long stun. It needs about 8 seconds to load up enough snow to drop again, and 14 to fill completely. The dump hits your own side too.</li>
+<li><b>Roll big balls downhill.</b> On Sledging Hill a big snowball runs away down the slope by itself. You can grab any free ball with <kbd>R</kbd>, even one an enemy left behind.</li>
+<li><b>Watch for the dog.</b> Every 15 to 25 seconds a dog runs through and knocks over anyone in its way. Hit it and it bolts.</li>
+</ul>
+
+<h2>What's in it</h2>
+<p><b>Four modes</b>, each a 90-second round. <b>Free-for-all</b> is you and five AI kids with three lives each; the last one standing wins, or whoever has the most lives at the whistle. <b>2 v 2</b> is first to 8 knockouts and <b>3 v 3</b> first to 12, with you on blue. In <b>King of the Fort</b> a ring of walls stands in the middle; stand in it alone to score a point a second, and the first to 25 wins.</p>
+<p><b>Eight maps</b>, each with its own trick: Back Garden, School Playground (no snow on the tarmac, only in the drifts), Frozen Pond (sliding ice), Sledging Hill, Allotments, Bandstand Park, Hedge Maze (tall hedges to lob over) and Fort Park, where two big forts are already built. You unlock the next map by finishing top three in free-for-all, winning a team match, or coming first or second in King of the Fort. The kids get sharper on each new map and a little sharper with every win.</p>
+<p>The AI kids come in four kinds. <b>Snipers</b> keep their distance, lob over cover and knock trees onto people. <b>Rushers</b> close in, dive and roll big balls at you. <b>Builders</b> put up walls when caught in the open. <b>Cowards</b> hang back and run for cover on their last hit.</p>
+<p>Points: 10 for a hit, 50 for a knockout, 60 for flattening someone with a big ball, 20 for a tree dump, and 5 for a tackle or a wall knocked down, plus a bonus for where you finish. Your score divided by 20 comes back as coins, plus 5 for a win. Coins buy hats and scarves: there are nine hats (two free from the start), up to a 400-coin Snow Crown, and seven scarves (two free), up to a 200-coin Rainbow one. Coat colour is free.</p>
+
+<h2>Questions</h2>
+<h3>How do I earn coins faster?</h3>
+<p>Coins are your score divided by 20, so big plays pay. Flattening someone beats a knockout, and first place in free-for-all adds 300 points.</p>
+<h3>Why can't I pick up snow?</h3>
+<p>Either you already carry 8, or the ground under you is dug bare. Look for untouched white snow. The School Playground tarmac has none, so head for the drifts.</p>
+<h3>How hard is it?</h3>
+<p>The first map is gentle, and there the AI kids go after each other more than you. On each later map they aim better, react faster and throw more often.</p>
+<h3>Does it save?</h3>
+<p>Yes, in your own browser: coins, hats and scarves, unlocked maps, your best score in each mode, your wins and the sound settings. Clearing your browser's site data clears the save.</p>
+<h3>Can I play on a phone?</h3>
+<p>Yes, held either way up. Your left thumb on the left half moves, your right thumb aims. A quick tap throws at the nearest kid, and holding charges a lob that goes as far as you drag. There are buttons for dive, wall, roll and scoop.</p></article>
+
+        <div id="ad-play-footer"></div>
+
+        <!-- the rail that keeps a session going: a player who finishes
+             one game and sees eight more is worth several page views -->
+        <div id="alsorows"></div>
+      </div>
+
+      <aside class="side">
+        <div id="ad-play-rail"></div>
+        <div class="panel">
+          <h4>More games</h4>
+          <div id="more"><a class="mini" href="/play/kickback/"><span class="th" style="background-image:url('/shots/kickback.png')"></span><span><b>KICKBACK</b><small>Action</small></span></a><a class="mini" href="/play/night-shift/"><span class="th" style="background-image:url('/shots/night-shift.png')"></span><span><b>NIGHT SHIFT</b><small>Action</small></span></a><a class="mini" href="/play/blade-dash/"><span class="th" style="background-image:url('/shots/blade-dash.png')"></span><span><b>BLADE DASH</b><small>Action</small></span></a><a class="mini" href="/play/highrise/"><span class="th" style="background-image:url('/shots/highrise.png')"></span><span><b>HIGHRISE</b><small>Shooter</small></span></a><a class="mini" href="/play/exposure/"><span class="th" style="background-image:url('/shots/exposure.png')"></span><span><b>EXPOSURE</b><small>Horror</small></span></a></div>
+        </div>
+        <div id="ad-play-tall"></div>
+      </aside>
+    </div>
+
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">33 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<!-- the loading interstitial: over a game that is LOADING, never one
+     that is being played, and it always has a skip -->
+<div class="gate" id="gate">
+  <div class="box">
+    <h3>Advertisement</h3>
+    <div data-ad></div>
+    <div class="count">your game starts in 5</div>
+    <button class="btn ghost" type="button">Skip</button>
+  </div>
+</div>
+
+<script type="module">
+import { GAMES, bySlug } from '/site/catalogue.js';
+import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
+import { loadAds, slot, interstitial } from '/ads/ads.js';
+
+// THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
+// server.js rewrites /play/<slug> to this file, and tools/deploy.mjs
+// writes this same file out to /play/<slug>/index.html for the static
+// host. Both leave the slug exactly where this line looks for it.
+const slug = location.pathname.split('/').filter(Boolean).pop();
+const g = bySlug(slug);
+if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
+
+mountShell({ active: catOf(g) });
+remember(g.slug);
+
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
+
+ttl.textContent = g.title;
+h1.textContent = g.title;
+barttl.textContent = g.title;
+lede.textContent = g.blurb;
+blurb.textContent = g.blurb;
+about.innerHTML = aboutHtml(g);
+tip.textContent = g.tips;
+shotbg.src = '/shots/' + g.slug + '.png';
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
+tags.innerHTML = [catOf(g), ...(g.tags || [])]
+  .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
+  .join('');
+
+// ---- where does this game actually come from? -----------------------
+//
+// ON THE WEB, NOWHERE BUT HERE. Every game is a folder under /games/,
+// the big ones included, which is why they now ask for their own files
+// by relative path rather than off the web root.
+//
+// ON THIS MACHINE they are still separate servers on separate ports,
+// because that is where they are developed and nothing about that should
+// have to change to suit a website. A port that is not answering shows
+// the browser's own error page inside the frame, which reads as the site
+// being broken - so that case asks first and says so plainly.
+//
+// WHICH OF THE TWO is decided at BUILD time rather than by sniffing the
+// hostname: tools/deploy.mjs stamps this flag into the copy it writes.
+const WEB = !!window.__PLAYPILE_WEB;
+let src = null, note = '';
+if (g.how === 'mounted' && WEB && g.web) {
+  src = '/games/' + g.web;
+  note = 'runs here';
+} else if (g.how === 'local') {
+  src = '/games/' + g.slug + '/';
+  note = 'runs here';
+} else if (g.how === 'unity') {
+  src = '/games/' + g.slug + '/build/index.html';
+  note = 'unity webgl · 83 mb first load';
+  warn.textContent = 'First load is a big download. It is cached after that.';
+} else {
+  src = 'http://localhost:' + g.port + (g.url || '/');
+  note = 'localhost:' + g.port;
+  try {
+    const list = await (await fetch('/api/mounted')).json();
+    const m = list.find((x) => x.slug === g.slug);
+    if (!m || m.state !== 'up') {
+      warn.innerHTML = 'This one runs from its own folder and is not up. '
+        + 'Start PLAYPILE with <code>node server.js</code> and it boots with the site.';
+    }
+  } catch (e) {}
+}
+how.textContent = note;
+
+start.addEventListener('click', async () => {
+  start.disabled = true;
+  await interstitial();          // the ad slot that pays, while it loads
+  frame.src = src;
+  frame.hidden = false;
+  curtain.style.display = 'none';
+  setTimeout(() => { try { frame.focus(); } catch (e) {} }, 400);
+});
+full.addEventListener('click', () => {
+  const el = document.getElementById('stage');
+  if (document.fullscreenElement) document.exitFullscreen();
+  else el.requestFullscreen && el.requestFullscreen();
+});
+reload.addEventListener('click', () => { if (frame.src) frame.src = frame.src; });
+// the two shortcuts the stage bar advertises, so they are not a lie
+addEventListener('keydown', (e) => {
+  if (e.target.matches('input,textarea')) return;
+  if (e.key === 'f' || e.key === 'F') full.click();
+  if (e.key === 'r' || e.key === 'R') reload.click();
+});
+
+// ---- more games, which is the other half of running a portal --------
+// Somebody who finishes a game and closes the tab is worth one page
+// view. The rail beside the game is five, chosen from the same category
+// first, and the row below it is everything else.
+const others = GAMES.filter((x) => x.slug !== g.slug);
+const same = others.filter((x) => catOf(x) === catOf(g));
+const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
+
+document.getElementById('alsorows').innerHTML =
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
+  + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
+
+// ---- adverts: every slot that existed before, in the same place -----
+await loadAds();
+slot(document.getElementById('ad-play-rail'), 'play_rail');
+slot(document.getElementById('ad-play-tall'), 'play_tall');
+slot(document.getElementById('ad-play-footer'), 'play_footer');
+</script>
+</body>
+</html>

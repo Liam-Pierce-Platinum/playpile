@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SUSHI CONVEYOR — free arcade game in your browser — PLAYPILE</title>
+<meta name="description" content="Grab the right plate off three speeding belts and get it to the right face before they storm out. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/sushi-conveyor/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="SUSHI CONVEYOR — PLAYPILE">
+<meta property="og:description" content="Grab the right plate off three speeding belts and get it to the right face before they storm out. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/sushi-conveyor/">
+<meta property="og:image" content="https://playpile.net/shots/sushi-conveyor.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"SUSHI CONVEYOR","url":"https://playpile.net/play/sushi-conveyor/","image":"https://playpile.net/shots/sushi-conveyor.png","description":"Grab the right plate off three speeding belts and get it to the right face before they storm out.","genre":"Arcade","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"contentRating":"Cartoon customers in a sushi bar get grumpy and storm out if kept waiting, and a cat steals plates. No violence.","publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Arcade","item":"https://playpile.net/category/arcade/"},{"@type":"ListItem","position":3,"name":"SUSHI CONVEYOR","item":"https://playpile.net/play/sushi-conveyor/"}]}</script>
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#0b0f14">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+<a class="skip" href="#stage">Skip to the game</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/category/arcade/">Arcade</a><i>&rsaquo;</i><b>SUSHI CONVEYOR</b></nav>
+    <!-- NO ADVERT ABOVE THE GAME (removed 2026-10-07). It sat 16px over the
+         stage and its Play button - AdSense's "ads interfering" policy bars
+         ads beside action items where they draw accidental clicks, and a
+         click near the top edge of a running game could land on it. -->
+
+    <div class="play">
+      <div>
+        <!-- THE GAME DOES NOT LOAD UNTIL IT IS ASKED FOR.
+             Several of these are heavy, and a page that starts
+             downloading a game the moment it opens costs the player the
+             whole download for a click they might not make. The iframe
+             has no src until START. -->
+        <div class="stage" id="stage">
+          <iframe id="frame" title="game" allow="autoplay; fullscreen; gamepad; pointer-lock"
+                  allowfullscreen hidden></iframe>
+          <div class="curtain" id="curtain">
+            <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
+            <h2 id="ttl">SUSHI CONVEYOR</h2>
+            <p id="lede">Grab the right plate off three  peeding belt  and get it to the right face before they  torm out.</p>
+            <button class="btn" id="start">Play</button>
+            <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
+          </div>
+        </div>
+
+        <div class="stagebar">
+          <span class="title" id="barttl">SUSHI CONVEYOR</span>
+          <span class="where" id="how"></span>
+          <span class="sp"></span>
+          <button id="full" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
+            Fullscreen <kbd>F</kbd></button>
+          <button id="reload" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+            Restart <kbd>R</kbd></button>
+          <a class="lnk" href="/">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>
+            All games</a>
+        </div>
+
+        <section class="about">
+          <h1 id="h1">SUSHI CONVEYOR</h1>
+          <p class="lede" id="blurb">Grab the right plate off three  peeding belt  and get it to the right face before they  torm out.</p>
+          <div id="about"><p>Customers line the back of the counter, each with a bubble that says what they want: a dish, any plate of a colour, a colour under a price, or just &quot;something hot&quot;. Drag, flick or tap the right plate up to them before their patience bar runs red. Serve fast for bigger tips and a growing combo; serve wrong and they shove it back. Three walkouts and the shop closes.</p>
+<p>Twelve short days at four restaurants, from a Tiny Tokyo Stall to a Floating River at sunset. A second belt arrives on day 4 and a third on day 8, and along the way come gold plates, a five-dish sumo, a VIP critic and a cat that steals plates. Every tip goes in your wallet for the shop: extra hands, a faster chef, a better SLOW lever, a tip jar and decorations that keep customers calm.</p>
+<p class="advisory"><b>What is in it:</b> Cartoon customers in a sushi bar get grumpy and storm out if kept waiting, and a cat steals plates. No violence. <a href="/site/parents.html">More for parents</a></p>
+<p class="report"><a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20problem%20with%20SUSHI%20CONVEYOR">Report a problem with this game</a></p></div>
+          <h4>Controls</h4>
+          <ul class="keys" id="keys"><li><kbd>Drag / flick a plate</kbd><span>serve it to a customer</span></li><li><kbd>Click plate, then customer</kbd><span>hold a plate and serve it</span></li><li><kbd>1 - 5</kbd><span>serve the held plate to that seat</span></li><li><kbd>C or click the chef</kbd><span>cook for the most impatient customer</span></li><li><kbd>Space or the SLOW lever</kbd><span>slow the belts</span></li><li><kbd>Click the cat</kbd><span>shoo it and save the plate</span></li><li><kbd>R / Esc or P</kbd><span>restart day / pause</span></li><li><kbd>Touch</kbd><span>drag, flick or tap plates and customers</span></li></ul>
+          <div class="tip" id="tip">Tips grow by 5 per cent for every serve in a row up to x1.5, and one wrong plate wipes it, so if you are not sure a plate is under the price in the bubble, wait for the next one.</div>
+          <h4>Tags</h4>
+          <div class="tagrow" id="tags"><a class="chip on" href="/category/arcade/">Arcade</a><a class="chip" href="/#q=new">new</a><a class="chip" href="/#q=sushi">sushi</a><a class="chip" href="/#q=cooking">cooking</a><a class="chip" href="/#q=serving">serving</a><a class="chip" href="/#q=time%20management">time management</a><a class="chip" href="/#q=cute">cute</a><a class="chip" href="/#q=touch">touch</a><a class="chip" href="/#q=2d">2d</a></div>
+        </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>SUSHI CONVEYOR puts you behind a busy sushi counter. Customers sit along the back, each with a thought bubble showing what they want and a patience bar that drains from green to yellow to red. Your job is to get the right plate off the belts to the right face before that bar runs out.</p>
+<p>There are four ways to serve, by mouse or finger. Drag a plate off the belt and drop it on the customer. Flick it upwards at them and it flies to whoever you aimed at. Tap a plate to pick it up into your hand, then tap the customer. Or tap the customer first and then tap the plate. On a keyboard, <kbd>1</kbd> to <kbd>5</kbd> pick a seat.</p>
+<p>Some want a named dish. Some want <b>any plate of a colour</b>. Some want a colour <b>under a price</b>: every plate carries a coin with its price on it, from 1 for tamago, edamame and cucumber roll up to 4 for ramen, and the plate has to cost less than the number in the bubble. Later customers ask for "any roll", "something hot", "any fish" or "any veggie". From day 6 some people want two things.</p>
+<p>Serve the wrong thing and they shout "YUCK!", lose a quarter of their patience and shove the plate back onto the belt. Let the bar run out and they storm out; three walkouts closes the shop and the day is lost. Each day runs 60 to 90 seconds, and the belts get faster as it goes, with a SPEED UP! warning at half time.</p>
+<p>Two buttons help. Tap the <b>chef</b> (or <kbd>C</kbd>) and he cooks for whoever is closest to snapping and drops it on the front belt; he needs 4.5 seconds before he can cook again. The <b>SLOW</b> lever (or <kbd>Space</kbd>) drops the belts to 38 per cent speed for 3.5 seconds; it recharges in 18 seconds. <kbd>R</kbd> restarts the day and <kbd>Esc</kbd> or <kbd>P</kbd> pauses.</p>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li><b>Serve fast, not just right.</b> A tip is the plate's price plus up to 3 extra coins for speed. Over 72 per cent patience left is a PERFECT, over 42 per cent a GREAT.</li>
+<li><b>Protect the combo.</b> Every serve in a row adds 5 per cent to your tips, up to times 1.5 from the eleventh serve in a row. One wrong plate or one walkout resets it to nothing, so when unsure, wait for the next plate.</li>
+<li><b>Read the coin.</b> "Under 3" means a 1 or a 2, not a 3.</li>
+<li><b>Use the chef on the reddest bar.</b> He cooks for whoever has the least patience left, so tap him the moment someone turns red.</li>
+<li><b>Hold a plate in reserve.</b> Tapping a plate puts it in your hand, and you can then tap any seat. With the Extra Hand upgrade you can hold two or three. If your hand is full, the oldest plate goes back on the belt.</li>
+<li><b>Watch the front rail.</b> From day 4 a cat walks along the front belt, stops at a plate (a red "!") and runs off with it. Tap it to shoo it for 3 coins, or tap it while it runs to get the plate back.</li>
+</ul>
+
+<h2>What's in it</h2>
+<ul>
+<li>Twelve days at four restaurants: the Tiny Tokyo Stall, the Neon City Bar, the Cherry Blossom Garden with falling petals, and the Floating River at sunset.</li>
+<li>Nine dishes: salmon nigiri, tuna roll, tamago, edamame, ramen, ebi nigiri, cucumber roll, gyoza and dango, on pink, green, blue and purple plates.</li>
+<li>A second belt arrives partway through day 4 and a third partway through day 8.</li>
+<li>Gold plates from day 3: anyone will take one, for 8 extra coins.</li>
+<li>The sumo from day 5, who wants five dishes, has more than twice the usual patience and adds 10 coins when he is full. From day 9 he can visit twice in a day.</li>
+<li>The VIP food critic from day 6, who orders one dish and waits less than anyone. Feed them for a doubled tip plus 8; let them leave and it is a BAD REVIEW and minus 20.</li>
+<li>Three stars a day, 36 in all, and a shop with five upgrades: Extra Hand, Slow Lever, Speedy Chef, Decorations and a Tip Jar.</li>
+</ul>
+
+<h2>Questions</h2>
+<h3>How do I unlock the next day?</h3>
+<p>Earn one star. Each day has three tip targets; day 1 asks for 50, 90 and 130, and the last day asks for 150, 290 and 445. Missing the first target, or losing three customers, means trying again.</p>
+<h3>What does the shop sell?</h3>
+<p>Extra Hand lets you hold two plates (90 coins), then three (240). Slow Lever makes it last 5 seconds (70), then recharge in 9 (180). Speedy Chef cuts his wait to 3.2 seconds (80), then 2.2 (200). Decorations give every customer 10 per cent more patience each and appear in the restaurant: a lucky cat, bunting, a bonsai and a koi tank (60, 130, 210, 320). The Tip Jar adds 15, then 30 per cent to every tip (150, 340). The whole shop costs 2,070 coins.</p>
+<h3>Do I keep coins from a bad day?</h3>
+<p>Yes. Every tip you earn goes into your wallet, even on days that close early.</p>
+<h3>Does it work on a phone?</h3>
+<p>Yes. Upright, it shows three bigger seats and larger plates; landscape has five seats. You can turn the phone mid-day.</p>
+<h3>Does it save?</h3>
+<p>Yes. Your unlocked days, stars, best tips, wallet, upgrades and sound settings are kept in your browser.</p></article>
+
+        <div id="ad-play-footer"></div>
+
+        <!-- the rail that keeps a session going: a player who finishes
+             one game and sees eight more is worth several page views -->
+        <div id="alsorows"></div>
+      </div>
+
+      <aside class="side">
+        <div id="ad-play-rail"></div>
+        <div class="panel">
+          <h4>More games</h4>
+          <div id="more"><a class="mini" href="/play/penguin-dash/"><span class="th" style="background-image:url('/shots/penguin-dash.png')"></span><span><b>PENGUIN DASH</b><small>Arcade</small></span></a><a class="mini" href="/play/stack-attack/"><span class="th" style="background-image:url('/shots/stack-attack.png')"></span><span><b>STACK ATTACK</b><small>Arcade</small></span></a><a class="mini" href="/play/wrecking-ball/"><span class="th" style="background-image:url('/shots/wrecking-ball.png')"></span><span><b>WRECKING BALL</b><small>Arcade</small></span></a><a class="mini" href="/play/grapple-goblin/"><span class="th" style="background-image:url('/shots/grapple-goblin.png')"></span><span><b>GRAPPLE GOBLIN</b><small>Arcade</small></span></a><a class="mini" href="/play/parry/"><span class="th" style="background-image:url('/shots/parry.png')"></span><span><b>PARRY</b><small>Arcade</small></span></a></div>
+        </div>
+        <div id="ad-play-tall"></div>
+      </aside>
+    </div>
+
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">33 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<!-- the loading interstitial: over a game that is LOADING, never one
+     that is being played, and it always has a skip -->
+<div class="gate" id="gate">
+  <div class="box">
+    <h3>Advertisement</h3>
+    <div data-ad></div>
+    <div class="count">your game starts in 5</div>
+    <button class="btn ghost" type="button">Skip</button>
+  </div>
+</div>
+
+<script type="module">
+import { GAMES, bySlug } from '/site/catalogue.js';
+import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
+import { loadAds, slot, interstitial } from '/ads/ads.js';
+
+// THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
+// server.js rewrites /play/<slug> to this file, and tools/deploy.mjs
+// writes this same file out to /play/<slug>/index.html for the static
+// host. Both leave the slug exactly where this line looks for it.
+const slug = location.pathname.split('/').filter(Boolean).pop();
+const g = bySlug(slug);
+if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
+
+mountShell({ active: catOf(g) });
+remember(g.slug);
+
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
+
+ttl.textContent = g.title;
+h1.textContent = g.title;
+barttl.textContent = g.title;
+lede.textContent = g.blurb;
+blurb.textContent = g.blurb;
+about.innerHTML = aboutHtml(g);
+tip.textContent = g.tips;
+shotbg.src = '/shots/' + g.slug + '.png';
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
+tags.innerHTML = [catOf(g), ...(g.tags || [])]
+  .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
+  .join('');
+
+// ---- where does this game actually come from? -----------------------
+//
+// ON THE WEB, NOWHERE BUT HERE. Every game is a folder under /games/,
+// the big ones included, which is why they now ask for their own files
+// by relative path rather than off the web root.
+//
+// ON THIS MACHINE they are still separate servers on separate ports,
+// because that is where they are developed and nothing about that should
+// have to change to suit a website. A port that is not answering shows
+// the browser's own error page inside the frame, which reads as the site
+// being broken - so that case asks first and says so plainly.
+//
+// WHICH OF THE TWO is decided at BUILD time rather than by sniffing the
+// hostname: tools/deploy.mjs stamps this flag into the copy it writes.
+const WEB = !!window.__PLAYPILE_WEB;
+let src = null, note = '';
+if (g.how === 'mounted' && WEB && g.web) {
+  src = '/games/' + g.web;
+  note = 'runs here';
+} else if (g.how === 'local') {
+  src = '/games/' + g.slug + '/';
+  note = 'runs here';
+} else if (g.how === 'unity') {
+  src = '/games/' + g.slug + '/build/index.html';
+  note = 'unity webgl · 83 mb first load';
+  warn.textContent = 'First load is a big download. It is cached after that.';
+} else {
+  src = 'http://localhost:' + g.port + (g.url || '/');
+  note = 'localhost:' + g.port;
+  try {
+    const list = await (await fetch('/api/mounted')).json();
+    const m = list.find((x) => x.slug === g.slug);
+    if (!m || m.state !== 'up') {
+      warn.innerHTML = 'This one runs from its own folder and is not up. '
+        + 'Start PLAYPILE with <code>node server.js</code> and it boots with the site.';
+    }
+  } catch (e) {}
+}
+how.textContent = note;
+
+start.addEventListener('click', async () => {
+  start.disabled = true;
+  await interstitial();          // the ad slot that pays, while it loads
+  frame.src = src;
+  frame.hidden = false;
+  curtain.style.display = 'none';
+  setTimeout(() => { try { frame.focus(); } catch (e) {} }, 400);
+});
+full.addEventListener('click', () => {
+  const el = document.getElementById('stage');
+  if (document.fullscreenElement) document.exitFullscreen();
+  else el.requestFullscreen && el.requestFullscreen();
+});
+reload.addEventListener('click', () => { if (frame.src) frame.src = frame.src; });
+// the two shortcuts the stage bar advertises, so they are not a lie
+addEventListener('keydown', (e) => {
+  if (e.target.matches('input,textarea')) return;
+  if (e.key === 'f' || e.key === 'F') full.click();
+  if (e.key === 'r' || e.key === 'R') reload.click();
+});
+
+// ---- more games, which is the other half of running a portal --------
+// Somebody who finishes a game and closes the tab is worth one page
+// view. The rail beside the game is five, chosen from the same category
+// first, and the row below it is everything else.
+const others = GAMES.filter((x) => x.slug !== g.slug);
+const same = others.filter((x) => catOf(x) === catOf(g));
+const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
+
+document.getElementById('alsorows').innerHTML =
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
+  + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
+
+// ---- adverts: every slot that existed before, in the same place -----
+await loadAds();
+slot(document.getElementById('ad-play-rail'), 'play_rail');
+slot(document.getElementById('ad-play-tall'), 'play_tall');
+slot(document.getElementById('ad-play-footer'), 'play_footer');
+</script>
+</body>
+</html>

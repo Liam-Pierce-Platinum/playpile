@@ -237,6 +237,177 @@ export const GAMES = [
     tips: 'A shark that sees you calls every predator nearby to where you were - so change direction after it spots you, not before.',
   },
 
+  // ---- thirteen from the 2026-10-08/09 games session (session hub) ----
+  {
+    slug: "stack-attack", title: "STACK ATTACK", how: 'mounted', port: 8306, url: "/",
+    content: "Cartoon food falls and stacks up. A seagull steals bits of burger, and customers gag and walk out when you catch a boot, a fish or a sock. No violence.",
+    web: "stack-attack/",
+    tag: "Arcade", big: true,
+    cat: "Arcade", tags: ["new","burger","stacking","cooking","physics","cartoon","mobile","endless"],
+    blurb: "Catch the order on a wobbly bun, in the right order, before the tower falls over.",
+    about: `Food rains down on a cartoon diner and you catch it on a sliding bottom bun, in the order the ticket says, then grab the top bun to serve. Every piece stays exactly where it lands and hangs off the one below on a springy hinge, so an off-centre catch makes the tower lean and a jerk of the bun makes it sway. Wrong slices cost pay and tip. Catch a boot, a fish or a sock and the customer walks out.
+
+Ten shifts of 60 to 90 seconds add wind, a seagull that dives for the top of your stack, slippery sauce and double drops, up to The Monster's nine-layer orders. Cash earns stars, stars unlock shifts and six bun skins, and a star on shift 2 opens Rush Hour: endless, getting harder, three plates and you are done.`,
+    controls: [["Mouse","slide the bun"],["A D / ← →","slide the bun"],["Esc / P","pause"],["R","restart the shift"],["Space / Enter","main button on menus"],["Drag anywhere","slide the bun (touch)"]],
+    tips: "When the tower leans one way, catch the next piece a little off-centre on the other side. And if the top piece is a wrong ingredient, let the seagull steal it: that takes the mistake off your order.",
+  },
+  {
+    slug: "snowball-royale", title: "SNOWBALL ROYALE", how: 'mounted', port: 8307, url: "/",
+    content: "Cartoon kids throw snowballs at each other; three hits knock a kid out to the sidelines and they come back a few seconds later. A dog runs through and knocks kids over. The screen shakes and its edges briefly go red when you are hit. Nothing graphic.",
+    web: "snowball-royale/",
+    tag: "Arcade", big: true,
+    cat: "Action", tags: ["new","snowball fight","top down","battle royale","teams","winter","mobile"],
+    blurb: "A snowball fight at dusk: duck behind snow walls, lob over them, and roll a giant one to flatten everybody.",
+    about: `Up to six kids, one snowy garden, ninety seconds. A click throws a fast flat snowball that a wall will stop; hold it and you lob one over the wall instead, and a red ring on the ground shows you where theirs are coming down. Scoop fresh snow to reload and you dig the ground bare, so nobody can camp. Build your own walls, belly-dive under throws and tackle people, or hold R and roll a snowball until it is big enough to flatten anyone in its way.
+
+Four modes - free-for-all, 2 v 2, 3 v 3 and King of the Fort - across eight maps, from a frozen pond where dives slide forever to a sledging hill where big balls run away downhill. The AI kids are snipers, rushers, builders and cowards, and they get sharper on every map you unlock. Every round pays coins for hats and scarves.`,
+    controls: [["WASD / arrows","move"],["Mouse + click","aim · fast flat throw"],["Hold click","charge a lob over walls"],["Space / Shift / right click","dive · tackle"],["E (or stand still)","scoop snow"],["Q","build a snow wall (3 snowballs)"],["Hold R","roll a big snowball"],["Touch","left thumb moves, right thumb aims · DIVE WALL ROLL SCOOP buttons"]],
+    tips: "Hit a snowy tree when enemies are standing under it: the whole load drops on them for a hit each and a long stun, but it hits your own side too, and the tree needs about 8 seconds to load up again.",
+  },
+  {
+    slug: "wrecking-ball", title: "WRECKING BALL", how: 'mounted', port: 8308, url: "/",
+    content: "Cartoon buildings, cars and gas tanks get smashed, crumple and explode into dust and fireballs. There are no people in it and nobody gets hurt.",
+    web: "wrecking-ball/",
+    tag: "Arcade", big: true,
+    cat: "Arcade", tags: ["new","physics","destruction","crane","city","upgrades","mobile","2d"],
+    blurb: "One crane, one wrecking ball, 30 seconds: knock the whole block down.",
+    about: `You do not throw the ball. You drive the trolley it hangs from, and the trolley is slow on purpose, so the big hits come from rocking it in time with the swing until the ball is flying. Every building is made of physics blocks welded together. Snap the columns low down and the floors above pancake into the street, and every brick, window and car that falls pays. Gas tanks explode and set each other off, water towers burst, cars crumple and set off their alarms, and a big enough collapse drops the game into slow motion.
+
+There are fifteen blocks in three districts: Old Town brick and timber, Downtown glass towers and Industrial steel, smokestacks and tank farms. Each block has a target to beat and three stars to earn. Every dollar of damage goes into the bank, pass or fail, and the Garage spends it on a heavier ball, a longer cable, spikes and a second ball on a chain.`,
+    controls: [["A D / ← →","move the trolley along the jib"],["W S / ↑ ↓ / wheel","wind the cable up and down"],["Drag","the trolley chases the pointer"],["R","instant retry"],["Esc / P","pause"],["Enter / Space","menu button"],["Touch: drag","move the trolley"],["Touch: slider","cable up and down"]],
+    tips: "Drive the trolley against the ball's swing, left as it swings right and back again, and four or five pumps will build more speed than holding one key ever will.",
+  },
+  {
+    slug: "mower-madness", title: "MOWER MADNESS", how: 'mounted', port: 8309, url: "/",
+    content: "Cartoon garden chaos: gnomes and toys get knocked flying and shatter, a dog chases the mower and bumps into it, and cats leap away hissing. No animals are hurt and there is no blood.",
+    web: "mower-madness/",
+    tag: "Arcade", big: true,
+    cat: "Driving", tags: ["new","mowing","lawn","stripes","garden","time trial","cartoon","top down"],
+    blurb: "A ride-on mower, a ticking clock, and a lawn full of gnomes that will not get out of the way.",
+    about: `Fifteen gardens to cut against the clock, from a tidy front lawn on Number 12 to a royal garden party with the corgis loose. The mower drives the way you press and spins on the spot, the grass turns light or dark by the way you mowed it, and every straight pass you lay right beside the last one grows a STRIPE CHAIN that multiplies everything you cut, up to five times.
+
+Gnomes, a dog that chases, sleeping cats, toys that clog the blades, pop-up sprinklers that leave slippery mud, bunkers, slopes and a hedge maze all stand between you and the target. Each garden has three stars, for time, stripes and untouched flowers, and the stars unlock four more mowers in the Garage, from the sliding Zippy to the Monster Mower that chews toys for points.`,
+    controls: [["WASD / arrows","drive the way you press"],["Space / Shift","boost (burns fuel)"],["Esc / P","pause"],["R","restart the garden"],["Enter / Space","next garden on the results screen"],["Drag anywhere","steer on a phone"],["BOOST button","boost on a phone"]],
+    tips: "Mow in lanes along the long side of the lawn and tap straight back next to your last pass: the chain multiplier is worth far more than cutting corners past a gnome.",
+  },
+  {
+    slug: "sushi-conveyor", title: "SUSHI CONVEYOR", how: 'mounted', port: 8310, url: "/",
+    content: "Cartoon customers in a sushi bar get grumpy and storm out if kept waiting, and a cat steals plates. No violence.",
+    web: "sushi-conveyor/",
+    tag: "Arcade", big: true,
+    cat: "Arcade", tags: ["new","sushi","cooking","serving","time management","cute","touch","2d"],
+    blurb: "Grab the right plate off three speeding belts and get it to the right face before they storm out.",
+    about: `Customers line the back of the counter, each with a bubble that says what they want: a dish, any plate of a colour, a colour under a price, or just "something hot". Drag, flick or tap the right plate up to them before their patience bar runs red. Serve fast for bigger tips and a growing combo; serve wrong and they shove it back. Three walkouts and the shop closes.
+
+Twelve short days at four restaurants, from a Tiny Tokyo Stall to a Floating River at sunset. A second belt arrives on day 4 and a third on day 8, and along the way come gold plates, a five-dish sumo, a VIP critic and a cat that steals plates. Every tip goes in your wallet for the shop: extra hands, a faster chef, a better SLOW lever, a tip jar and decorations that keep customers calm.`,
+    controls: [["Drag / flick a plate","serve it to a customer"],["Click plate, then customer","hold a plate and serve it"],["1 - 5","serve the held plate to that seat"],["C or click the chef","cook for the most impatient customer"],["Space or the SLOW lever","slow the belts"],["Click the cat","shoo it and save the plate"],["R / Esc or P","restart day / pause"],["Touch","drag, flick or tap plates and customers"]],
+    tips: "Tips grow by 5 per cent for every serve in a row up to x1.5, and one wrong plate wipes it, so if you are not sure a plate is under the price in the bubble, wait for the next one.",
+  },
+  {
+    slug: "bomb-squad", title: "BOMB SQUAD", how: 'mounted', port: 8311, url: "/",
+    content: "A cartoon bomb that goes BOOM with a comic-book explosion, a bright white flash and a sooty pair of eyes when you fail. A strike tints the screen red and shakes it. Nobody is hurt and there is no blood.",
+    web: "bomb-squad/",
+    tag: "Puzzle", big: true,
+    cat: "Puzzle", tags: ["new","bomb","defusal","puzzle","manual","timer","daily","endless"],
+    blurb: "A ticking bomb, a paper manual and three strikes to spare: snip, flip, read, don't panic.",
+    about: `A bomb sits on your desk under the lamp, with a manual open beside it. Pick a module and the booklet flips to its page: cut the right one of three to six wires, tap or hold the button and let go on the right digit, set five switches by their cap colours, press four symbol keys in column order, answer Simon with the mapped colour, steer through a maze whose walls you cannot see, or spin four letter wheels to the one word that fits. Almost every rule depends on the serial number, the batteries and the lights along the top.
+
+Every wrong move is a strike and makes the clock run a quarter faster, and three strikes is BOOM. The campaign is twenty bombs that bring in the modules one at a time, until four modules and a hissing Vent share one clock. Endless keeps them coming until one goes off, and the Daily is one new bomb a day.`,
+    controls: [["Click","pick a module · cut, press, flip, spin"],["Tab","next module"],["1 - 6","cut a wire · flip a switch · press a key"],["Space (hold)","hold the button, let go to release"],["Arrows","Simon pads · steer the maze · code wheels"],["Z X C","Vent valves, from anywhere"],["Esc / M / R","pause · manual · retry"],["Tap","everything on touch; the manual is a drawer"]],
+    tips: "Read the serial, the batteries and the lights before you touch anything: nearly every rule asks about them, and each strike makes the clock run 25 per cent faster.",
+  },
+  {
+    slug: "grapple-goblin", title: "GRAPPLE GOBLIN", how: 'mounted', port: 8305, url: "/",
+    content: "A cartoon goblin swings over spikes, lava and icy water and dodges bats. A fall is a puff of smoke and a restart at the last flag. Nothing graphic.",
+    web: "grapple-goblin/",
+    tag: "Arcade", big: true,
+    cat: "Arcade", tags: ["new","one button","swinging","grappling hook","mobile","caves","endless","2d"],
+    blurb: "Hold to hook, let go to fling: one button, one goblin, and twenty caves full of gold.",
+    about: `Hold and the hook fires at the next anchor; let go and the goblin flies off with everything the swing gave him. That is the whole game, and it is enough. The rope is a real pendulum, faint dots show where a release right now would send you, and a release on the upswing at just the right angle is a PERFECT - faster, and it pulls in the gold around you. Spikes, lava, pits and bats send you back to the last flag, but the coins you took stay taken.
+
+Twenty caves in four places - the Mossy Cave, the Crystal Cavern, the Lava Mine and the Frozen Grotto - bring crumbling anchors, anchors on rails, bouncy mushrooms, updrafts, mine carts that launch you off a bumper and icy gusts that shove you backwards. Every cave has three stars, one of them a big gem hidden behind the rocks in front. Deep Dive is the endless run: one life, harder the deeper you go, and your score in metres.`,
+    controls: [["Hold mouse / Space","fire the hook and swing"],["Release","let go and fling"],["Enter / Up / W / Z / X / J","also hold to hook"],["R","restart the cave"],["Esc / P","pause"],["Touch: hold anywhere","hook · lift to fling"]],
+    tips: "Let go while you are swinging up with the rope leaning well forward - when the preview dots turn gold, the release is a PERFECT and flings you 10 per cent faster.",
+  },
+  {
+    slug: "parry", title: "PARRY", how: 'mounted', port: 8304, url: "/",
+    content: "Cartoon fantasy fighters (bandits, knights, ninjas, ogres, pirates) are knocked flying or puff away with a KO when you block them back. Small cartoon explosions from bombs and fireballs. No blood.",
+    web: "parry/",
+    tag: "Rhythm", big: true,
+    cat: "Arcade", tags: ["new","rhythm","music","blocking","boss fights","reflex","endless","2d"],
+    blurb: "You only block, and every arrow, axe and fireball lands on the beat.",
+    about: `You stand at a crossroads and attacks come down all four roads, each landing on the beat of a drum and bass loop that speeds up through the round. A ring closes on the target in each lane: block as it lands. A perfect, inside 45 milliseconds, sends the arrow or fireball straight back and knocks out whoever threw it. A good just bounces it off, and a miss costs one of your three hearts. Rogues fake a swing and strike a beat later. Ninjas throw two daggers down the same road, half a beat apart. Boulders have to be held, and bombs must not be blocked at all.
+
+There are eight stages, from Forest Road to the Storm Citadel. Each round lasts about a minute and ends with a boss whose attacks are a short song, from the Bandit Brute to the Black King. Perfects in a row build a multiplier up to x8. Every stage has three stars, for surviving, for the score target and for perfecting the boss. Clear stage 4 and Endless opens, starting at 108 beats a minute and climbing to 168.`,
+    controls: [["Arrows / W A S D","block up, right, down, left"],["Hold the key","hold against a boulder (purple ring)"],["Do nothing","let a bomb (red X) fly over"],["Esc / P","pause"],["R","retry straight away"],["Enter / Space","menu button"],["Tap a side","block on a phone (swipe in settings)"]],
+    tips: "On a dashed cyan ring, count \"one\" on the fake swing and block on \"two\": the rogue always strikes exactly one beat later.",
+  },
+  {
+    slug: "one-tile", title: "ONE TILE", how: 'mounted', port: 8303, url: "/",
+    content: "A cartoon pixel thief sneaks past guards, cameras and lasers. Being spotted sets off an alarm and a soft red pulse over the room, then the level restarts. Nobody is hurt.",
+    web: "one-tile/",
+    tag: "Puzzle", big: true,
+    cat: "Puzzle", tags: ["new","heist","stealth","pixel","guards","real time","puzzle","2d"],
+    blurb: "Crack the safe, grab the gold and get out before the guard turns round.",
+    about: `Twenty-four rooms across a bank, a museum, a casino and a penthouse, each one a single screen seen from above. Hold WASD and the thief dashes tile to tile, more than twice as fast as a guard. Stand next to the safe until it clicks open three times, then run for the EXIT, which stays padlocked until you do. Guards, cameras and lasers run their loops whether you move or not, and each one throws a cone showing exactly what it can see.
+
+Walk one tile behind a guard and he never knows. Duck into a potted fern or a locker and no cone can find you. Glass cases stop your feet but not his eyes, and the tile under a camera is always watched. Get caught and any key puts you back at the door: no lives, no step limits. Three stars a level for escaping, picking up every gold coin and taking the cash bag or the gem.`,
+    controls: [["W A S D / arrows","hold to run tile to tile"],["Stand by the safe","crack it (progress is kept)"],["Any key","try again after being caught"],["R","restart the level"],["Esc / P","pause, how to play, music and sound"],["Enter / N","next job after an escape"],["Hold a finger","run towards that side of the thief (phone, sideways)"]],
+    tips: "Every patrol repeats exactly, so watch one loop before you move, and the safest spot in the room is often one tile behind a walking guard, since he only looks ahead.",
+  },
+  {
+    slug: "derby", title: "DEMOLITION DERBY", how: 'mounted', port: 8302, url: "/",
+    content: "Cartoon top-down cars ram each other, lose panels, smoke and catch fire. There are no people shown and nobody is hurt.",
+    web: "derby/",
+    tag: "Driving", big: true,
+    cat: "Driving", tags: ["new","demolition derby","cars","crashing","top down","arena","destruction","physics"],
+    blurb: "Eight cars, one dirt bowl, and the last one still running wins.",
+    about: `Seven AI drivers and you, boxed into a walled arena with nowhere to go but into each other. Your front bumper is armoured and the sides crumple, so the hit that counts is the T-bone: nose into a door at full boost. Panels dent where they are struck, bumpers, bonnets and doors fall off and stay on the dirt, and engines go from grey smoke to black smoke to fire before they stall for good. At 75 seconds a ring of fire starts closing in, so nobody hides forever.
+
+Every round pays coins by place, by damage dealt and by wrecks caused, to spend on five cars from a light hatchback to an enormous school bus, and on paint. Win at the County Fair Bowl to open the Mud Field, with its grip-killing puddles, then win there to open the Figure-8, where the two loops only meet in the middle.`,
+    controls: [["W / S or Up / Down","gas · brake and reverse"],["A / D or Left / Right","steer"],["Space","handbrake"],["Shift","boost (1.4 s, refills in 8 s)"],["R","restart"],["Esc / P","pause"],["Touch: drag left side","steer, gas is automatic"],["Touch: BOOST / REV","boost · reverse"]],
+    tips: "Never take a hit on the door: your front takes 0.45x damage and your sides 1.25x, so turn your nose to anything coming at you and save boost for your own T-bone.",
+  },
+  {
+    slug: "touge-drift", title: "TOUGE DRIFT", how: 'mounted', port: 8297, url: "/",
+    content: "Cartoon cars racing and drifting on a mountain road. They scrape the guardrail and bump each other, with sparks and tyre smoke. No crashes that hurt anyone and no people shown.",
+    web: "touge-drift/",
+    tag: "Driving", big: true,
+    cat: "Driving", tags: ["new","drifting","racing","touge","eurobeat","top down","cars","time attack"],
+    blurb: "Slide an 80s hatchback down an endless Japanese mountain pass at dusk, one long drift at a time.",
+    about: `A white-and-black hatchback with pop-up headlights, a mountain road that never ends, and eurobeat playing. Turn hard at speed and the back steps out; hold the slide and the points climb, faster and wider worth more. Hold it long enough and the multiplier ticks up to x10, and drifting right next to the guardrail doubles everything. Slam the rail hard, though, and you lose the drift you have not banked yet. Banked points fill the nitro.
+
+Race puts you on a grid with three rivals, Kenta, Shin and Mika, for an eighty-second sprint down to the finish banner. Time Attack gives you 45 seconds, and every chequered strip across the road adds more. Free Run has no clock. The road is built as you drive: sweepers, S-bends and hairpins through cedar forest, lit by street lamps and your own headlights, and it gets narrower and tighter the further down you go.`,
+    controls: [["W / ↑","gas"],["S / ↓","brake"],["A D / ← →","steer (turn hard at speed to drift)"],["Space","handbrake"],["Shift","nitro"],["R","restart"],["Esc / P","pause"],["Touch","hold left or right half to steer, both = handbrake (gas is automatic)"]],
+    tips: "Start your next drift within 2.2 seconds of banking the last one and you keep the multiplier, so on S-bends flick straight from one slide into the next.",
+  },
+  {
+    slug: "blade-dash", title: "BLADE DASH", how: 'mounted', port: 8296, url: "/",
+    content: "Stylised ink stick-figure samurai fights: enemies split in two when cut, barrels explode, and hits leave red ink splats on the paper. No realistic blood or gore.",
+    web: "blade-dash/",
+    tag: "Action", big: true,
+    cat: "Action", tags: ["new","samurai","ink","slash","combo","one touch","endless","mobile"],
+    blurb: "Tap to dash-slash. Every kill refills your dash, so the whole room can be one unbroken chain.",
+    about: `Every stage is one room drawn in ink on paper, full of enemies, and you clear it with a tap. Your samurai dashes wherever you point, the aim snaps onto anyone close to your line, and a kill refills both of your dash charges, so you can go from enemy to enemy without touching the ground. Landing breaks the chain. Swordsmen flash a red ! before they swing, archers draw a line at you before they loose, shield guards block from the front, barrel carriers blow up everyone near them, and generals take three hits.
+
+Thirty stages in three chapters, the Bamboo Forest, the Red Castle and the Night Temple, with three stars on each: clear it, beat the par time, and kill every enemy in one chain. Hold Space for a few seconds of slow motion when you need to line up a hard jump. Endless is an open arena where the waves keep coming, and a kill scores 100 times your current chain.`,
+    controls: [["Click / tap","dash-slash that way"],["J / K / Enter","dash towards the pointer"],["Arrows / WASD + J","dash in that direction"],["Hold Space","slow motion (focus)"],["R","restart the room"],["Esc / P","pause"],["Touch: tap","dash-slash"],["Touch: hold 集中","slow motion"]],
+    tips: "Cut a barrel carrier while others are standing near him: his blast kills everyone within 170 pixels, and every one of those kills counts towards your chain.",
+  },
+  {
+    slug: "tiny-harbor", title: "TINY HARBOR", how: 'mounted', port: 8290, url: "/",
+    content: "A peaceful island game. Nobody gets hurt and you cannot die. You chop trees and catch, cook and eat fish; storms bring rain, thunder and lightning.",
+    web: "tiny-harbor/",
+    tag: "Cosy", big: true,
+    cat: "Adventure", tags: ["new","cosy","island","fishing","lighthouse","building","3d","sailing"],
+    blurb: "Keep a tiny island: tie up the trading boats, light them in at night, and grow a leaky tent into a cottage.",
+    about: `You keep a small island with a campfire, a wooden dock and a striped lighthouse out on its own islet. Chop trees for wood, fish off the dock for supper, and pick up clams and shells off the wet sand when the tide goes out - it comes back twice a day and takes whatever you left. Three trading boats sail in by day, and each one pays extra for something: fish, shells or wood. At night they wait out at sea, and you climb the lighthouse and lead them past the rocks with the beam.
+
+The tent becomes a shack, a cabin, then a two-floor cottage that you paint and fill with furniture you make yourself. Eleven fish bite by depth, tide, time of day and weather, and storms flood the beach. Build a sailboat and you can sail to three far islands, each with a village and a trader who pays double.`,
+    controls: [["W A S D / arrows","walk · steer the sailboat · move the lamp beam"],["E / Space / click","use · cast · hook · hold to reel"],["F","eat"],["Q","go in and out of your home"],["B","make furniture (indoors) · R rotates"],["J","journal"],["Esc","pause · back"],["Touch","stick to walk, USE button to act"]],
+    tips: "Save your fish for the Puffin and your wood for Old Oak - each boat pays half as much again for the one thing it wants.",
+  },
+
   // ---- the ten written for the deck --------------------------------
   {
     slug: 'stack', title: 'STACK', how: 'local', tag: 'Skill',

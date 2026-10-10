@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TINY HARBOR — free adventure game in your browser — PLAYPILE</title>
+<meta name="description" content="Keep a tiny island: tie up the trading boats, light them in at night, and grow a leaky tent into a cottage. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/tiny-harbor/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="TINY HARBOR — PLAYPILE">
+<meta property="og:description" content="Keep a tiny island: tie up the trading boats, light them in at night, and grow a leaky tent into a cottage. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/tiny-harbor/">
+<meta property="og:image" content="https://playpile.net/shots/tiny-harbor.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"TINY HARBOR","url":"https://playpile.net/play/tiny-harbor/","image":"https://playpile.net/shots/tiny-harbor.png","description":"Keep a tiny island: tie up the trading boats, light them in at night, and grow a leaky tent into a cottage.","genre":"Adventure","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"contentRating":"A peaceful island game. Nobody gets hurt and you cannot die. You chop trees and catch, cook and eat fish; storms bring rain, thunder and lightning.","publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Adventure","item":"https://playpile.net/category/adventure/"},{"@type":"ListItem","position":3,"name":"TINY HARBOR","item":"https://playpile.net/play/tiny-harbor/"}]}</script>
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#0b0f14">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+<a class="skip" href="#stage">Skip to the game</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/category/adventure/">Adventure</a><i>&rsaquo;</i><b>TINY HARBOR</b></nav>
+    <!-- NO ADVERT ABOVE THE GAME (removed 2026-10-07). It sat 16px over the
+         stage and its Play button - AdSense's "ads interfering" policy bars
+         ads beside action items where they draw accidental clicks, and a
+         click near the top edge of a running game could land on it. -->
+
+    <div class="play">
+      <div>
+        <!-- THE GAME DOES NOT LOAD UNTIL IT IS ASKED FOR.
+             Several of these are heavy, and a page that starts
+             downloading a game the moment it opens costs the player the
+             whole download for a click they might not make. The iframe
+             has no src until START. -->
+        <div class="stage" id="stage">
+          <iframe id="frame" title="game" allow="autoplay; fullscreen; gamepad; pointer-lock"
+                  allowfullscreen hidden></iframe>
+          <div class="curtain" id="curtain">
+            <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
+            <h2 id="ttl">TINY HARBOR</h2>
+            <p id="lede">Keep a tiny i land: tie up the trading boat , light them in at night, and grow a leaky tent into a cottage.</p>
+            <button class="btn" id="start">Play</button>
+            <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
+          </div>
+        </div>
+
+        <div class="stagebar">
+          <span class="title" id="barttl">TINY HARBOR</span>
+          <span class="where" id="how"></span>
+          <span class="sp"></span>
+          <button id="full" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
+            Fullscreen <kbd>F</kbd></button>
+          <button id="reload" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+            Restart <kbd>R</kbd></button>
+          <a class="lnk" href="/">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>
+            All games</a>
+        </div>
+
+        <section class="about">
+          <h1 id="h1">TINY HARBOR</h1>
+          <p class="lede" id="blurb">Keep a tiny i land: tie up the trading boat , light them in at night, and grow a leaky tent into a cottage.</p>
+          <div id="about"><p>You keep a small island with a campfire, a wooden dock and a striped lighthouse out on its own islet. Chop trees for wood, fish off the dock for supper, and pick up clams and shells off the wet sand when the tide goes out - it comes back twice a day and takes whatever you left. Three trading boats sail in by day, and each one pays extra for something: fish, shells or wood. At night they wait out at sea, and you climb the lighthouse and lead them past the rocks with the beam.</p>
+<p>The tent becomes a shack, a cabin, then a two-floor cottage that you paint and fill with furniture you make yourself. Eleven fish bite by depth, tide, time of day and weather, and storms flood the beach. Build a sailboat and you can sail to three far islands, each with a village and a trader who pays double.</p>
+<p class="advisory"><b>What is in it:</b> A peaceful island game. Nobody gets hurt and you cannot die. You chop trees and catch, cook and eat fish; storms bring rain, thunder and lightning. <a href="/site/parents.html">More for parents</a></p>
+<p class="report"><a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20problem%20with%20TINY%20HARBOR">Report a problem with this game</a></p></div>
+          <h4>Controls</h4>
+          <ul class="keys" id="keys"><li><kbd>W A S D / arrows</kbd><span>walk · steer the sailboat · move the lamp beam</span></li><li><kbd>E / Space / click</kbd><span>use · cast · hook · hold to reel</span></li><li><kbd>F</kbd><span>eat</span></li><li><kbd>Q</kbd><span>go in and out of your home</span></li><li><kbd>B</kbd><span>make furniture (indoors) · R rotates</span></li><li><kbd>J</kbd><span>journal</span></li><li><kbd>Esc</kbd><span>pause · back</span></li><li><kbd>Touch</kbd><span>stick to walk, USE button to act</span></li></ul>
+          <div class="tip" id="tip">Save your fish for the Puffin and your wood for Old Oak - each boat pays half as much again for the one thing it wants.</div>
+          <h4>Tags</h4>
+          <div class="tagrow" id="tags"><a class="chip on" href="/category/adventure/">Adventure</a><a class="chip" href="/#q=new">new</a><a class="chip" href="/#q=cosy">cosy</a><a class="chip" href="/#q=island">island</a><a class="chip" href="/#q=fishing">fishing</a><a class="chip" href="/#q=lighthouse">lighthouse</a><a class="chip" href="/#q=building">building</a><a class="chip" href="/#q=3d">3d</a><a class="chip" href="/#q=sailing">sailing</a></div>
+        </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>TINY HARBOR is a cosy island game in low-poly 3D. You keep a small island with a campfire, a wooden dock, a striped lighthouse on its own islet and a canvas tent that leaks. Walk with <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or the arrows and press <kbd>E</kbd> (or click) to use whatever you are next to. <kbd>F</kbd> eats, <kbd>J</kbd> opens the journal, <kbd>Q</kbd> goes in and out of your home and <kbd>Esc</kbd> pauses. A day lasts seven minutes, and the tide comes in and goes out twice in that time.</p>
+<p><b>Wood</b> comes from trees: four chops fell one, it drops three logs, and the stump grows back in under two minutes. <b>Food</b> matters too. Your belly empties in about five and a half minutes; a raw fish fills it by 15, a clam by 10 and a fish cooked at the campfire by 35. Nobody starves, but an empty belly makes you walk and chop slowly.</p>
+<p>To <b>fish</b>, face deep enough water and press <kbd>E</kbd> to cast. When the bobber dives, press <kbd>E</kbd> to hook it, then hold the button to lift the green zone and let go to drop it. Keep the fish inside the zone until the bar fills, or it gets away.</p>
+<p>Boats are your shops. Three trading boats sail in by day and pull up at the end of your dock. Tie one up at the bollard within 45 seconds and it stays for 110 seconds while you trade. At night they wait out at sea instead. Climb the stairs inside the lighthouse to take over the lamp, steer the beam with the mouse or <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd>, and lead a waiting boat between the rocks to the harbour mouth. Getting it there pays 15 coins; three hits on the rocks and it turns back.</p>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li><b>Sell to the boat that wants it.</b> Each boat pays half as much again for one thing: the Puffin for fish, Marigold for shells and clams, Old Oak for wood. Hold your fish until the Puffin comes in.</li>
+<li><b>Beachcomb at low tide.</b> The falling water leaves clams, shells and driftwood on the wet sand, and you collect them by walking over them. When the tide comes back, whatever is left washes away.</li>
+<li><b>Fish by place and time.</b> There are eleven kinds. Cod want deep water like the end of the dock, flounder the shallows at low tide, sea bass high tide, salmon dawn and dusk, and the octopus only bites at night.</li>
+<li><b>Fish in the rain.</b> Fish bite faster in rain, and the Storm Eel, worth 30 coins, only bites in a storm. Bait from the Puffin halves the wait for your next five casts.</li>
+<li><b>Buy the Sturdy Rod early.</b> For 60 coins the green zone gets much bigger and you get a little longer to strike after a bite.</li>
+<li><b>Watch for storms.</b> A storm lifts the sea, so a storm at high tide floods the beach and washes over the dock. No new boats come, and arriving boats need the lamp even by day. Afterwards the beach fills with driftwood and shells.</li>
+</ul>
+
+<h2>What's in it</h2>
+<p>Your home grows from the Tent to a Shack (12 wood), a Cabin (30 wood) and a two-floor Cottage (60 wood and 50 coins). Walls, roof, door and trim each take a paint: four are free, Marigold sells eight and three are only sold on Coral Cove. There are ten outdoor extras, from flower boxes and a shell path to a porch lantern and a weathervane. Inside, <kbd>B</kbd> makes furniture: sixteen pieces, from a bed and a stove to a fish tank, placed on a grid, plus six more bought on the islands.</p>
+<p>A bridge to the lighthouse costs 20 wood; before that you wade a sandbar at low tide. A sailboat from the boatyard costs 40 wood and 30 coins and takes you to three far islands, each with a village, villagers to chat to and a trader who pays double or more: Old Mae on Pebble Isle for fish, Fennick on Driftwood Cay for wood and Miss Opal on Coral Cove for shells and clams. The journal holds sixteen goals with coin rewards and a fish book.</p>
+
+<h2>Questions</h2>
+<h3>Can I lose?</h3>
+<p>No. Nobody dies and nothing is taken away. The worst is a slow walk on an empty belly, a boat that leaves before you tie it up, or shells lost to the tide.</p>
+<h3>How do I catch the Lantern Fish?</h3>
+<p>It is the rarest fish, worth 60 coins, and the last goal in the journal. It only bites in deep water, at night, at high tide. The Puffin's Golden Lure makes rare fish turn up far more often.</p>
+<h3>How do I skip the night?</h3>
+<p>After dark, sleep from the Home menu at your front door or in a bed you have made. You wake at dawn the next morning, a little hungrier.</p>
+<h3>My sailboat is stuck. What do I do?</h3>
+<p>Use "Bring the boat home" in the pause menu. The boat also returns to your dock every time the game loads.</p>
+<h3>Does it save?</h3>
+<p>Yes, in your own browser: house, paints, furniture, tools, coins, fish book and goals. Clearing your browser's site data clears it.</p>
+<h3>Can I play on a phone?</h3>
+<p>Yes. An on-screen stick walks or steers, a USE button does what <kbd>E</kbd> does, and there are buttons for eating, the journal, pausing and furniture.</p></article>
+
+        <div id="ad-play-footer"></div>
+
+        <!-- the rail that keeps a session going: a player who finishes
+             one game and sees eight more is worth several page views -->
+        <div id="alsorows"></div>
+      </div>
+
+      <aside class="side">
+        <div id="ad-play-rail"></div>
+        <div class="panel">
+          <h4>More games</h4>
+          <div id="more"><a class="mini" href="/play/dungeon-quest/"><span class="th" style="background-image:url('/shots/dungeon-quest.png')"></span><span><b>DUNGEON QUEST</b><small>Adventure</small></span></a><a class="mini" href="/play/highrise/"><span class="th" style="background-image:url('/shots/highrise.png')"></span><span><b>HIGHRISE</b><small>Shooter</small></span></a><a class="mini" href="/play/kickback/"><span class="th" style="background-image:url('/shots/kickback.png')"></span><span><b>KICKBACK</b><small>Action</small></span></a><a class="mini" href="/play/exposure/"><span class="th" style="background-image:url('/shots/exposure.png')"></span><span><b>EXPOSURE</b><small>Horror</small></span></a><a class="mini" href="/play/apex/"><span class="th" style="background-image:url('/shots/apex.png')"></span><span><b>APEX</b><small>Driving</small></span></a></div>
+        </div>
+        <div id="ad-play-tall"></div>
+      </aside>
+    </div>
+
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">33 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<!-- the loading interstitial: over a game that is LOADING, never one
+     that is being played, and it always has a skip -->
+<div class="gate" id="gate">
+  <div class="box">
+    <h3>Advertisement</h3>
+    <div data-ad></div>
+    <div class="count">your game starts in 5</div>
+    <button class="btn ghost" type="button">Skip</button>
+  </div>
+</div>
+
+<script type="module">
+import { GAMES, bySlug } from '/site/catalogue.js';
+import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
+import { loadAds, slot, interstitial } from '/ads/ads.js';
+
+// THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
+// server.js rewrites /play/<slug> to this file, and tools/deploy.mjs
+// writes this same file out to /play/<slug>/index.html for the static
+// host. Both leave the slug exactly where this line looks for it.
+const slug = location.pathname.split('/').filter(Boolean).pop();
+const g = bySlug(slug);
+if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
+
+mountShell({ active: catOf(g) });
+remember(g.slug);
+
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
+
+ttl.textContent = g.title;
+h1.textContent = g.title;
+barttl.textContent = g.title;
+lede.textContent = g.blurb;
+blurb.textContent = g.blurb;
+about.innerHTML = aboutHtml(g);
+tip.textContent = g.tips;
+shotbg.src = '/shots/' + g.slug + '.png';
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
+tags.innerHTML = [catOf(g), ...(g.tags || [])]
+  .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
+  .join('');
+
+// ---- where does this game actually come from? -----------------------
+//
+// ON THE WEB, NOWHERE BUT HERE. Every game is a folder under /games/,
+// the big ones included, which is why they now ask for their own files
+// by relative path rather than off the web root.
+//
+// ON THIS MACHINE they are still separate servers on separate ports,
+// because that is where they are developed and nothing about that should
+// have to change to suit a website. A port that is not answering shows
+// the browser's own error page inside the frame, which reads as the site
+// being broken - so that case asks first and says so plainly.
+//
+// WHICH OF THE TWO is decided at BUILD time rather than by sniffing the
+// hostname: tools/deploy.mjs stamps this flag into the copy it writes.
+const WEB = !!window.__PLAYPILE_WEB;
+let src = null, note = '';
+if (g.how === 'mounted' && WEB && g.web) {
+  src = '/games/' + g.web;
+  note = 'runs here';
+} else if (g.how === 'local') {
+  src = '/games/' + g.slug + '/';
+  note = 'runs here';
+} else if (g.how === 'unity') {
+  src = '/games/' + g.slug + '/build/index.html';
+  note = 'unity webgl · 83 mb first load';
+  warn.textContent = 'First load is a big download. It is cached after that.';
+} else {
+  src = 'http://localhost:' + g.port + (g.url || '/');
+  note = 'localhost:' + g.port;
+  try {
+    const list = await (await fetch('/api/mounted')).json();
+    const m = list.find((x) => x.slug === g.slug);
+    if (!m || m.state !== 'up') {
+      warn.innerHTML = 'This one runs from its own folder and is not up. '
+        + 'Start PLAYPILE with <code>node server.js</code> and it boots with the site.';
+    }
+  } catch (e) {}
+}
+how.textContent = note;
+
+start.addEventListener('click', async () => {
+  start.disabled = true;
+  await interstitial();          // the ad slot that pays, while it loads
+  frame.src = src;
+  frame.hidden = false;
+  curtain.style.display = 'none';
+  setTimeout(() => { try { frame.focus(); } catch (e) {} }, 400);
+});
+full.addEventListener('click', () => {
+  const el = document.getElementById('stage');
+  if (document.fullscreenElement) document.exitFullscreen();
+  else el.requestFullscreen && el.requestFullscreen();
+});
+reload.addEventListener('click', () => { if (frame.src) frame.src = frame.src; });
+// the two shortcuts the stage bar advertises, so they are not a lie
+addEventListener('keydown', (e) => {
+  if (e.target.matches('input,textarea')) return;
+  if (e.key === 'f' || e.key === 'F') full.click();
+  if (e.key === 'r' || e.key === 'R') reload.click();
+});
+
+// ---- more games, which is the other half of running a portal --------
+// Somebody who finishes a game and closes the tab is worth one page
+// view. The rail beside the game is five, chosen from the same category
+// first, and the row below it is everything else.
+const others = GAMES.filter((x) => x.slug !== g.slug);
+const same = others.filter((x) => catOf(x) === catOf(g));
+const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
+
+document.getElementById('alsorows').innerHTML =
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
+  + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
+
+// ---- adverts: every slot that existed before, in the same place -----
+await loadAds();
+slot(document.getElementById('ad-play-rail'), 'play_rail');
+slot(document.getElementById('ad-play-tall'), 'play_tall');
+slot(document.getElementById('ad-play-footer'), 'play_footer');
+</script>
+</body>
+</html>

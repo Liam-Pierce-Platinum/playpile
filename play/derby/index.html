@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DEMOLITION DERBY — free driving game in your browser — PLAYPILE</title>
+<meta name="description" content="Eight cars, one dirt bowl, and the last one still running wins. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/derby/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="DEMOLITION DERBY — PLAYPILE">
+<meta property="og:description" content="Eight cars, one dirt bowl, and the last one still running wins. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/derby/">
+<meta property="og:image" content="https://playpile.net/shots/derby.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"DEMOLITION DERBY","url":"https://playpile.net/play/derby/","image":"https://playpile.net/shots/derby.png","description":"Eight cars, one dirt bowl, and the last one still running wins.","genre":"Driving","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"contentRating":"Cartoon top-down cars ram each other, lose panels, smoke and catch fire. There are no people shown and nobody is hurt.","publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Driving","item":"https://playpile.net/category/driving/"},{"@type":"ListItem","position":3,"name":"DEMOLITION DERBY","item":"https://playpile.net/play/derby/"}]}</script>
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#0b0f14">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+<a class="skip" href="#stage">Skip to the game</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/category/driving/">Driving</a><i>&rsaquo;</i><b>DEMOLITION DERBY</b></nav>
+    <!-- NO ADVERT ABOVE THE GAME (removed 2026-10-07). It sat 16px over the
+         stage and its Play button - AdSense's "ads interfering" policy bars
+         ads beside action items where they draw accidental clicks, and a
+         click near the top edge of a running game could land on it. -->
+
+    <div class="play">
+      <div>
+        <!-- THE GAME DOES NOT LOAD UNTIL IT IS ASKED FOR.
+             Several of these are heavy, and a page that starts
+             downloading a game the moment it opens costs the player the
+             whole download for a click they might not make. The iframe
+             has no src until START. -->
+        <div class="stage" id="stage">
+          <iframe id="frame" title="game" allow="autoplay; fullscreen; gamepad; pointer-lock"
+                  allowfullscreen hidden></iframe>
+          <div class="curtain" id="curtain">
+            <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
+            <h2 id="ttl">DEMOLITION DERBY</h2>
+            <p id="lede">Eight car , one dirt bowl, and the la t one  till running win .</p>
+            <button class="btn" id="start">Play</button>
+            <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
+          </div>
+        </div>
+
+        <div class="stagebar">
+          <span class="title" id="barttl">DEMOLITION DERBY</span>
+          <span class="where" id="how"></span>
+          <span class="sp"></span>
+          <button id="full" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
+            Fullscreen <kbd>F</kbd></button>
+          <button id="reload" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+            Restart <kbd>R</kbd></button>
+          <a class="lnk" href="/">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>
+            All games</a>
+        </div>
+
+        <section class="about">
+          <h1 id="h1">DEMOLITION DERBY</h1>
+          <p class="lede" id="blurb">Eight car , one dirt bowl, and the la t one  till running win .</p>
+          <div id="about"><p>Seven AI drivers and you, boxed into a walled arena with nowhere to go but into each other. Your front bumper is armoured and the sides crumple, so the hit that counts is the T-bone: nose into a door at full boost. Panels dent where they are struck, bumpers, bonnets and doors fall off and stay on the dirt, and engines go from grey smoke to black smoke to fire before they stall for good. At 75 seconds a ring of fire starts closing in, so nobody hides forever.</p>
+<p>Every round pays coins by place, by damage dealt and by wrecks caused, to spend on five cars from a light hatchback to an enormous school bus, and on paint. Win at the County Fair Bowl to open the Mud Field, with its grip-killing puddles, then win there to open the Figure-8, where the two loops only meet in the middle.</p>
+<p class="advisory"><b>What is in it:</b> Cartoon top-down cars ram each other, lose panels, smoke and catch fire. There are no people shown and nobody is hurt. <a href="/site/parents.html">More for parents</a></p>
+<p class="report"><a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20problem%20with%20DEMOLITION%20DERBY">Report a problem with this game</a></p></div>
+          <h4>Controls</h4>
+          <ul class="keys" id="keys"><li><kbd>W / S or Up / Down</kbd><span>gas · brake and reverse</span></li><li><kbd>A / D or Left / Right</kbd><span>steer</span></li><li><kbd>Space</kbd><span>handbrake</span></li><li><kbd>Shift</kbd><span>boost (1.4 s, refills in 8 s)</span></li><li><kbd>R</kbd><span>restart</span></li><li><kbd>Esc / P</kbd><span>pause</span></li><li><kbd>Touch: drag left side</kbd><span>steer, gas is automatic</span></li><li><kbd>Touch: BOOST / REV</kbd><span>boost · reverse</span></li></ul>
+          <div class="tip" id="tip">Never take a hit on the door: your front takes 0.45x damage and your sides 1.25x, so turn your nose to anything coming at you and save boost for your own T-bone.</div>
+          <h4>Tags</h4>
+          <div class="tagrow" id="tags"><a class="chip on" href="/category/driving/">Driving</a><a class="chip" href="/#q=new">new</a><a class="chip" href="/#q=demolition%20derby">demolition derby</a><a class="chip" href="/#q=cars">cars</a><a class="chip" href="/#q=crashing">crashing</a><a class="chip" href="/#q=top%20down">top down</a><a class="chip" href="/#q=arena">arena</a><a class="chip" href="/#q=destruction">destruction</a><a class="chip" href="/#q=physics">physics</a></div>
+        </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>DEMOLITION DERBY is a top-down smash-up for eight cars in a walled dirt arena. You drive one; seven AI drivers drive the rest. Wreck the others, keep your own engine alive, and the last car still running wins the round. A round starts with a 3-2-1 countdown, and sudden death (below) makes sure it never drags on.</p>
+<p>Drive with <kbd>W</kbd> for gas, <kbd>S</kbd> to brake and then reverse, and <kbd>A</kbd> <kbd>D</kbd> to steer (the arrow keys work too). <kbd>Space</kbd> is the handbrake. <kbd>Shift</kbd> is boost: it gives you 1.4 seconds of extra speed and power, only while you hold the gas, and the bar refills over 8 seconds. <kbd>R</kbd> restarts and <kbd>Esc</kbd> or <kbd>P</kbd> pauses.</p>
+<p>Where you hit matters more than how often. Every car has four damage zones, front, rear, left and right, plus an engine. The front bumper is armoured and takes less than half the normal damage. The sides take the most, a quarter more than normal, and the rear is close behind. So the hit you want is a <b>T-bone</b>, your nose into someone's door. A car that has just been hit also loses most of its grip for a moment, so a T-bone shoves it sideways across the dirt.</p>
+<p>You can watch the damage happen. Bodies dent where they are struck, bumpers, bonnets, boots and doors fall off, glass cracks, and the bits stay in the arena. The engine tells you how close a car is to the end: grey smoke, then black smoke, then fire. A burning engine keeps losing health on its own. When it hits zero the car stalls and becomes a smoking wreck that others can push around.</p>
+<p>At 75 seconds <b>sudden death</b> begins. A ring of fire starts closing in from the arena edge over 40 seconds. Outside it your engine cooks fast. After 115 seconds every engine starts to cook, wherever it is, so every round has an ending.</p>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li><b>Lead with your nose.</b> Your front takes 0.45 times normal damage; your sides take 1.25 times. Never let a car line up on your door.</li>
+<li><b>Save boost for the hit.</b> Boost gives more speed and much harder acceleration, and damage grows with closing speed. A boosted T-bone from a short run-up is the biggest blow you can land.</li>
+<li><b>Watch the smoke.</b> Black smoke means a car is under 40 per cent engine, and a fire means under 18 per cent. A burning car is one solid hit from the end, and the wreck bonus goes to the last car to hit it within 6 seconds.</li>
+<li><b>Grab pickups when you are hurt.</b> Pickups appear in the open every 9 to 14 seconds. The green <b>wrench</b> repairs your worst zone and some of your engine. The blue <b>nitro</b> fills your boost. The red <b>spikes</b> make your front-end hits do 1.7 times the damage for 10 seconds.</li>
+<li><b>Mind the mud.</b> In the Mud Field the puddles cut your grip to about a third, so slide through them.</li>
+<li><b>Know your rivals.</b> BRUTUS and TANK are bullies, LUCKY runs from anyone aimed at it, SLY hunts the weakest car and DUSTY holds grudges. No more than two AIs hunt you at once.</li>
+<li><b>Get inside the ring early.</b> When sudden death starts, the middle is the only safe place, which means it is also where everyone meets.</li>
+</ul>
+
+<h2>What's in it</h2>
+<p><b>Five cars:</b> the free Hatchback (light, quick, fragile), the Station Wagon (600 coins), the Muscle Car, the fastest car here (1,200), the heavy Pickup (2,000) and, for laughs, the enormous School Bus (3,500). <b>Eight paints:</b> four free, four more for 150 to 400 coins.</p>
+<p><b>Three arenas.</b> The <b>County Fair Bowl</b> is an oval ringed with tyres, with fixed tyre stacks to dodge, hay bales you can shove around and grandstands on every side. Win there to open the <b>Mud Field</b>, a soaked farm field with a hay-bale wall and eight puddles. Win there to open the <b>Figure-8</b>, a concrete stadium with two infields where the loops only meet at a central crossover.</p>
+<p>Every round pays coins: 300 for first place down to 25 for eighth, plus coins for the damage you deal, 60 for every wreck you cause and one for each second you survive. If you are knocked out early you can watch the rest of the round at 2.5 times speed, and the final wreck plays in slow motion.</p>
+
+<h2>Questions</h2>
+<h3>How do I unlock the other arenas?</h3>
+<p>Win a round at the County Fair Bowl to open the Mud Field, then win a round in the Mud Field to open the Figure-8.</p>
+<h3>Does it save?</h3>
+<p>Yes, in your own browser: your coins, cars, paints, unlocked arenas, wins, volume and the car and arena you used last. Clearing your browser's site data clears the save.</p>
+<h3>Can I play on a phone?</h3>
+<p>Yes. Drag anywhere on the left of the screen and a stick appears; the car turns to face where you point, and the gas is automatic. The BOOST and REV buttons sit at the bottom right.</p>
+<h3>Is hiding a good way to win?</h3>
+<p>Sometimes, but not often. The AI drivers go looking for cars that sit still, and the closing ring of fire drags everyone into the middle in the end. You also earn far fewer coins for a round where you never hit anyone.</p>
+<h3>Which car should I buy first?</h3>
+<p>The Station Wagon: it is the cheapest step up, and tougher and more forgiving than the Hatchback.</p></article>
+
+        <div id="ad-play-footer"></div>
+
+        <!-- the rail that keeps a session going: a player who finishes
+             one game and sees eight more is worth several page views -->
+        <div id="alsorows"></div>
+      </div>
+
+      <aside class="side">
+        <div id="ad-play-rail"></div>
+        <div class="panel">
+          <h4>More games</h4>
+          <div id="more"><a class="mini" href="/play/apex/"><span class="th" style="background-image:url('/shots/apex.png')"></span><span><b>APEX</b><small>Driving</small></span></a><a class="mini" href="/play/nascar/"><span class="th" style="background-image:url('/shots/nascar.png')"></span><span><b>NASCAR</b><small>Driving</small></span></a><a class="mini" href="/play/mower-madness/"><span class="th" style="background-image:url('/shots/mower-madness.png')"></span><span><b>MOWER MADNESS</b><small>Driving</small></span></a><a class="mini" href="/play/touge-drift/"><span class="th" style="background-image:url('/shots/touge-drift.png')"></span><span><b>TOUGE DRIFT</b><small>Driving</small></span></a><a class="mini" href="/play/highrise/"><span class="th" style="background-image:url('/shots/highrise.png')"></span><span><b>HIGHRISE</b><small>Shooter</small></span></a></div>
+        </div>
+        <div id="ad-play-tall"></div>
+      </aside>
+    </div>
+
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">33 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<!-- the loading interstitial: over a game that is LOADING, never one
+     that is being played, and it always has a skip -->
+<div class="gate" id="gate">
+  <div class="box">
+    <h3>Advertisement</h3>
+    <div data-ad></div>
+    <div class="count">your game starts in 5</div>
+    <button class="btn ghost" type="button">Skip</button>
+  </div>
+</div>
+
+<script type="module">
+import { GAMES, bySlug } from '/site/catalogue.js';
+import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
+import { loadAds, slot, interstitial } from '/ads/ads.js';
+
+// THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
+// server.js rewrites /play/<slug> to this file, and tools/deploy.mjs
+// writes this same file out to /play/<slug>/index.html for the static
+// host. Both leave the slug exactly where this line looks for it.
+const slug = location.pathname.split('/').filter(Boolean).pop();
+const g = bySlug(slug);
+if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
+
+mountShell({ active: catOf(g) });
+remember(g.slug);
+
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
+
+ttl.textContent = g.title;
+h1.textContent = g.title;
+barttl.textContent = g.title;
+lede.textContent = g.blurb;
+blurb.textContent = g.blurb;
+about.innerHTML = aboutHtml(g);
+tip.textContent = g.tips;
+shotbg.src = '/shots/' + g.slug + '.png';
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
+tags.innerHTML = [catOf(g), ...(g.tags || [])]
+  .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
+  .join('');
+
+// ---- where does this game actually come from? -----------------------
+//
+// ON THE WEB, NOWHERE BUT HERE. Every game is a folder under /games/,
+// the big ones included, which is why they now ask for their own files
+// by relative path rather than off the web root.
+//
+// ON THIS MACHINE they are still separate servers on separate ports,
+// because that is where they are developed and nothing about that should
+// have to change to suit a website. A port that is not answering shows
+// the browser's own error page inside the frame, which reads as the site
+// being broken - so that case asks first and says so plainly.
+//
+// WHICH OF THE TWO is decided at BUILD time rather than by sniffing the
+// hostname: tools/deploy.mjs stamps this flag into the copy it writes.
+const WEB = !!window.__PLAYPILE_WEB;
+let src = null, note = '';
+if (g.how === 'mounted' && WEB && g.web) {
+  src = '/games/' + g.web;
+  note = 'runs here';
+} else if (g.how === 'local') {
+  src = '/games/' + g.slug + '/';
+  note = 'runs here';
+} else if (g.how === 'unity') {
+  src = '/games/' + g.slug + '/build/index.html';
+  note = 'unity webgl · 83 mb first load';
+  warn.textContent = 'First load is a big download. It is cached after that.';
+} else {
+  src = 'http://localhost:' + g.port + (g.url || '/');
+  note = 'localhost:' + g.port;
+  try {
+    const list = await (await fetch('/api/mounted')).json();
+    const m = list.find((x) => x.slug === g.slug);
+    if (!m || m.state !== 'up') {
+      warn.innerHTML = 'This one runs from its own folder and is not up. '
+        + 'Start PLAYPILE with <code>node server.js</code> and it boots with the site.';
+    }
+  } catch (e) {}
+}
+how.textContent = note;
+
+start.addEventListener('click', async () => {
+  start.disabled = true;
+  await interstitial();          // the ad slot that pays, while it loads
+  frame.src = src;
+  frame.hidden = false;
+  curtain.style.display = 'none';
+  setTimeout(() => { try { frame.focus(); } catch (e) {} }, 400);
+});
+full.addEventListener('click', () => {
+  const el = document.getElementById('stage');
+  if (document.fullscreenElement) document.exitFullscreen();
+  else el.requestFullscreen && el.requestFullscreen();
+});
+reload.addEventListener('click', () => { if (frame.src) frame.src = frame.src; });
+// the two shortcuts the stage bar advertises, so they are not a lie
+addEventListener('keydown', (e) => {
+  if (e.target.matches('input,textarea')) return;
+  if (e.key === 'f' || e.key === 'F') full.click();
+  if (e.key === 'r' || e.key === 'R') reload.click();
+});
+
+// ---- more games, which is the other half of running a portal --------
+// Somebody who finishes a game and closes the tab is worth one page
+// view. The rail beside the game is five, chosen from the same category
+// first, and the row below it is everything else.
+const others = GAMES.filter((x) => x.slug !== g.slug);
+const same = others.filter((x) => catOf(x) === catOf(g));
+const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
+
+document.getElementById('alsorows').innerHTML =
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
+  + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
+
+// ---- adverts: every slot that existed before, in the same place -----
+await loadAds();
+slot(document.getElementById('ad-play-rail'), 'play_rail');
+slot(document.getElementById('ad-play-tall'), 'play_tall');
+slot(document.getElementById('ad-play-footer'), 'play_footer');
+</script>
+</body>
+</html>

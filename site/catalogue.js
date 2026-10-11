@@ -12,6 +12,83 @@
 //                     port. The page frames http://localhost:<port>.
 //         'unity'   - a Unity WebGL build under games/<slug>/build.
 export const GAMES = [
+  // ---- NEWEST FIRST: six from the 2026-10-10/11 session hub ----
+  {
+    slug: "graze", title: "GRAZE", how: 'mounted', port: 8340, url: "/",
+    content: "Abstract neon arrow dodging walls, spikes and saws. Crashes are a burst of sparks, and there are brief white screen flashes when you crash, use Phase, speed up or finish a level. No people and no violence.",
+    web: "graze/",
+    tag: "Arcade", big: false, added: '2026-10-11',
+    cat: "Arcade", tags: ["new","one button","neon","wave","reflex","daily","endless","mobile"],
+    blurb: "Hold to climb, let go to dive. Scrape past the walls to build your combo, then ghost straight through one.",
+    about: `A one-button neon dodger. Your arrow only ever flies at 45 degrees, up while you hold and down when you let go, through tunnels of walls, spikes and spinning saws, all to a beat-driven soundtrack. Flying close past anything without touching it is a graze: it scores ten times your multiplier, builds a combo up to x10 and fills your Phase meter. With a full meter your next crash does not kill you - time slows and for just over half a second you pass straight through anything.
+
+PLAY is an endless run that speeds up a tier every 30 seconds. DAILY is one 90-second course a day, the same for everyone, with a copyable share line. WORLDS has 24 levels in four worlds, with gravity flips, mini size, speed and mirror portals, three stars on each level and a practice mode with checkpoints. Every graze earns a Spark to spend on arrows, trails and crash effects, and three missions are always running.`,
+    controls: [["Hold mouse / Space / Up / W","climb"],["Let go","dive"],["R / Enter","restart"],["Esc / P","pause"],["Touch: hold anywhere","climb, lift to dive"]],
+    tips: "The graze zone is far wider than your hitbox, so fly along the faint strip inside each wall on purpose - staying in it scrapes a new graze about every quarter of a second.",
+  },
+  {
+    slug: "lanternfall", title: "LANTERNFALL", how: 'mounted', port: 8341, url: "/",
+    content: "Cartoon forest creatures (moths, wolves, walking trees, ghostly wraiths) catch fire and fade away in your lantern light; no blood or gore. The dark is spooky, with glowing eyes and a big shadowy boss, and there are bright flashes when weapons evolve, when the boss arrives and at sunrise.",
+    web: "lanternfall/",
+    tag: "Survivor", big: false, added: '2026-10-11',
+    cat: "Action", tags: ["new","survivor","roguelite","horde","lantern","night","daily","mobile"],
+    blurb: "Carry the last lantern through a haunted forest. Anything that steps into your light burns. Last five minutes until dawn.",
+    about: `You only move: everything fires on its own. Out in the dark the forest is pairs of glowing eyes, and anything that wanders into your lantern's circle slows down, catches fire and drops an ember. Collect embers to level up and pick one of three gifts - twenty-three in all, from orbiting wisps and firefly bolts to thorn hedges, shield moths and a sweeping lighthouse beam. Max a weapon, own its partner charm and open a chest, and it evolves into one of nine bigger forms.
+
+The night lasts five minutes and gets worse as the moon crosses the sky: wolves that dash, slow hollow trees, wraiths that lunge through the light, the Grey Stag at 2:30 and the Night Warden at 4:30. Reach sunrise and it burns everything away. The embers you gather turn into Oil for the Lamplighter's Shed, achievements unlock four more lantern bearers, the Fogmarsh map and Moonless mode, and there is a Daily run with the same seed for everyone.`,
+    controls: [["W A S D / arrows","walk"],["Hold mouse button","walk towards the pointer"],["1 / 2 / 3","pick a gift"],["R","reroll the gifts · restart after a run"],["X","skip the gift"],["Space","start · take the chest"],["P / Esc","pause"],["Touch","drag anywhere to walk, tap a card to pick"]],
+    tips: "Max a weapon and grab its partner charm (Orbiting Wisps + Kindling, Firefly Bolts + Glass Lens, Thorn Hedge + Ironbark...), then burn the golden moth that turns up: its chest evolves the weapon.",
+  },
+  {
+    slug: "bailout", title: "BAILOUT", how: 'mounted', port: 8342, url: "/",
+    content: "Cartoon stunt-bike crashes: the rider flops off as a ragdoll, slides on his face and gets singed by lava, but there is no blood and he is always straight back on the bike. TNT explosions give a bright flash and a screen shake.",
+    web: "bailout/",
+    tag: "Stunts", big: false, added: '2026-10-11',
+    cat: "Driving", tags: ["new","stunt","bike","ragdoll","flips","physics","daily","mobile"],
+    blurb: "Two buttons, forty courses: flip for time, stick the landing, and land on your head to send the rider flying.",
+    about: `A side-on stunt-bike race against the clock, with gas, brake and nothing else. Hold gas up the ramp, let go over the lip, then tap gas for a backflip or brake for a frontflip. Every full flip you land takes a second off your time and a clean landing gives you a speed boost. Touch anything with the rider's head or chest and he bails: he flies over the bars as a floppy ragdoll in slow motion, and you are back at the last checkpoint a moment later.
+
+Forty levels in five worlds - the Canyon, the Junkyard, the Glacier, the Volcano and Neon City - with boulders, TNT, see-saws, ice, loops, fans, lava and drawbridges, and bronze, silver, gold and platinum medals on each. There is a new Daily Gauntlet every day with a streak, an endless downhill on Freefall Mountain, six bikes and a pile of helmets and suits to buy with coins, and a gallery of your best crashes with 20 trophies.`,
+    controls: [["Right / D / Up / W","gas · in the air, tap again to backflip"],["Left / A / Down / S","brake and reverse · in the air, tap to frontflip"],["R","restart the level"],["Enter","back to the last checkpoint"],["Esc / P","pause"],["Touch: right half","gas"],["Touch: left half","brake"]],
+    tips: "Let go of gas as you leave the ramp and tap it again in the air: a pedal you were already holding does nothing up there, and every flip you land is a second off your time.",
+  },
+  {
+    slug: "twister-io", title: "TWISTER.IO", how: 'mounted', port: 8343, url: "/",
+    content: "Cartoon tornadoes suck up toy cars, cows, houses and little people, who float away unharmed; rival storms swallow each other. No blood or injuries. Bigger storms throw small lightning bolts that flash brightly.",
+    web: "twister-io/",
+    tag: "Arena", big: true, added: '2026-10-11',
+    cat: "Action", tags: ["new","tornado","io","grow","3d","arena","bots","mobile"],
+    blurb: "Be a tornado in a toy town: suck up cones, then cars, then houses, and be the biggest storm when the clock runs out.",
+    about: `Every round is two minutes in a bright toy town against nine rival storms, and the biggest one at the end wins. Steer over anything your size or smaller and it rips loose, spirals up and joins the ring of debris circling you. You start on cones and bins and climb through seven categories: people, cars and cows, trees and vans, houses, towers and the lighthouse, and finally the stadium.
+
+Your debris ring is your armour. Fling pieces at rivals to knock their rings apart, dash when you need speed (it costs mass), and run when your ground ring turns red, because a bigger storm will strip you and swallow you. Classic is the two-minute fight, Daily Town is the same map for everyone each day, and Storm Chase is a solo race to flatten a whole village. Stars from every round unlock six skins and three perks.`,
+    controls: [["Mouse","the storm heads for the pointer"],["WASD / arrows","steer"],["Click / E / J / F / Enter","fling debris at a rival"],["Shift / Space","dash (costs mass)"],["Esc / P","pause"],["R","restart the round"],["Touch","drag to steer, FLING and DASH buttons"]],
+    tips: "When your ground ring pulses red, run: a bigger storm only swallows you once your debris ring is empty, and half of what it strips off you drops on the ground for you to pick back up.",
+  },
+  {
+    slug: "block-royale", title: "BLOCK ROYALE", how: 'mounted', port: 8344, url: "/",
+    content: "A gentle block puzzle with no violence or scares. Clears set off sparkles, short glows along the cleared lines and a small screen shake (a bigger one for the Bomb glyph).",
+    web: "block-royale/",
+    tag: "Puzzle", big: false, added: '2026-10-11',
+    cat: "Puzzle", tags: ["new","blocks","8x8","roguelike","charms","daily","zen","mobile"],
+    blurb: "The 8x8 block puzzle scored like a poker hand: clears earn Chips, streaks build Mult, and charms break the rules.",
+    about: `Drag pieces onto an 8x8 board and fill rows and columns to clear them. Every clear scores Chips x Mult: 10 Chips per block cleared, and Mult grows with lines cleared at once and with your streak of clears in a row. Each round gives you a target and 20 placements. A run is 8 antes of a Small, a Big and a Boss round, and the bosses bend the rules: one stops columns clearing, one shrinks the board, one deals pieces one at a time.\n\nBetween rounds the shop sells charms, which fire left to right on every clear, and one-shot glyphs like Bomb, Undo and Redeal. There are 60 charms and 8 glyphs to build with. Daily gives everyone the same seed with a shareable result card, Zen is endless classic play, and runs earn XP that unlocks 5 more decks (6 in all), with 8 stakes each.`,
+    controls: [["Drag","move a piece onto the board"],["Tap piece, tap board","place it"],["1 / 2 / 3","select a piece"],["Arrows / WASD","move it"],["Space / Enter","place"],["Q / E","rotate (with Rotate)"],["4 / 5","use a glyph"],["Z","undo (with Undo)"],["Esc","pause"],["Shop: Enter / R","next round / reroll"]],
+    tips: "Charms fire left to right, so put flat +Mult charms first and the x-Mult ones at the end, where they multiply the biggest number.",
+  },
+  {
+    slug: "bannerfall", title: "BANNERFALL", how: 'mounted', port: 8320, url: "/",
+    content: "Medieval battles between toy-like armies with swords, bows, cavalry and siege engines: soldiers fall when beaten and villages can be burned, but there is no blood, and hits show as small sparks and dust.",
+    web: "bannerfall/",
+    tag: "Strategy", big: true, added: '2026-10-11',
+    cat: "Strategy", tags: ["new","strategy","medieval","rts","castles","siege","3d","war"],
+    blurb: "Dig trenches, raise walls, then lead your army in real time to storm every rival capital.",
+    about: `Found a kingdom with a royal grant of 50,000 gold. While time is stopped you dig trenches, raise palisades and stone walls, and recruit your first squads. Then raise the banners and the war runs in real time on a generated map 2, 3 or 4 km across, against 1 to 3 rival kingdoms that also fight each other. Take villages and pillage them or tax them, raid forts, claim land, and break into castles with rams and mangonels. A kingdom falls when its capital is taken, its ruler is slain or it surrenders. Space pauses whenever you need to think.
+
+Recruit from 25 kinds of troops, from militia and longbowmen to knights, siege towers and trebuchets, and send builders out to dig in during the war. Millbrook Ford is a single five-wave defence of a river crossing with three stars to earn, and the Long War is a realm of provinces fought over season by season, where you can fight any battle yourself on the 3D field.`,
+    controls: [["Left click / drag","select squads"],["Right click","move · attack"],["Right drag","draw a battle line"],["Space","pause (orders still work)"],["W A S D / arrows, Q E, wheel","pan, rotate, zoom"],["Z X C · H G K","formation · stance"],["F / R","ability / retreat"],["F1 · Esc","controls · menu"],["Touch","tap to select and move, pinch to zoom"]],
+    tips: "Taking a village pauses the game and asks you to choose. Pillage pays 6,000-16,000 gold once, but protecting and taxing it pays 150-400 gold every minute for as long as you hold it.",
+  },
   // ---- NEWEST FIRST: thirteen from the 2026-10-08/09 games session (session hub) ----
   {
     slug: "stack-attack", title: "STACK ATTACK", how: 'mounted', port: 8306, url: "/",

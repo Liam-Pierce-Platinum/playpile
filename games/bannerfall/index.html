@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Bannerfall</title>
+<meta name="description" content="Dig trenches, raise palisades, recruit archers, healers and spears, then command them in real time against the kingdom of Varkhal. A 3D medieval strategy game.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Alegreya+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="vignette"></div>
+<div id="hud">
+  <div id="top"></div>
+  <div id="toasts"></div>
+  <div id="tip" class="parch"></div>
+  <div id="left"></div>
+  <div id="right"></div>
+  <div id="bottom"></div>
+  <div id="mini"><canvas id="minimap" width="200" height="200"></canvas></div>
+  <div id="cursorTip"></div>
+  <div id="selbox"></div>
+  <div id="pauseFrame"><b>PAUSED</b><span>Give orders, then press Space</span></div>
+</div>
+<div id="screens"></div>
+<div id="rotate"><b>Turn your phone sideways</b><span>Bannerfall plays in landscape</span></div>
+<noscript>Bannerfall needs JavaScript and WebGL.</noscript>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

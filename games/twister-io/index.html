@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Twister.io</title>
+<meta name="description" content="You are a tornado in a toy town. Suck up cones, cars, houses and towers, fling debris at rival storms, and be the biggest storm when the 2-minute round ends.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js" } }</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="tags"></div>
+<div id="pops"></div>
+<div id="hud" class="hidden">
+  <div id="timer" class="card timer"><span id="tLabel">TIME</span><b id="tVal">2:00</b></div>
+  <div id="board" class="card board"></div>
+  <div class="mecard card">
+    <svg viewBox="0 0 100 100" class="tring"><circle cx="50" cy="50" r="46" class="bg"/><circle id="ringProg" cx="50" cy="50" r="46" class="fg"/></svg>
+    <div class="mtxt"><b id="mass">0</b><span>MASS</span></div>
+    <div class="side"><div class="catrow"><span id="cat" class="catpill">CAT 1</span><div id="nextTxt"></div></div><div class="debris"><span>DEBRIS</span><div id="debris"></div><em id="debrisN">0/6</em></div></div>
+  </div>
+  <button id="pauseBtn" class="pausebtn" aria-label="Pause">❚❚</button>
+  <div id="joy"><i></i></div>
+  <button id="dashBtn" class="tbtn dash">DASH</button>
+  <button id="flingBtn" class="tbtn fling">FLING<b id="ammo">0</b></button>
+  <div id="banner"></div>
+  <div id="toasts"></div>
+  <div id="dead"></div>
+  <div id="arrow" style="display:none"><i></i><span></span></div>
+  <div id="reticle" style="display:none"></div>
+</div>
+<div id="ui"></div>
+<noscript>Twister.io needs JavaScript turned on.</noscript>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#090514">
+<title>STRIKE - neon swipe bowling</title>
+<meta name="description" content="Swipe to bowl in a glossy neon alley. Curve your swipe to hook, real pin physics, 10-frame scoring and split challenges.">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23ff2bd6'/%3E%3Ccircle cx='24' cy='22' r='5' fill='%23130620'/%3E%3Ccircle cx='36' cy='20' r='5' fill='%23130620'/%3E%3Ccircle cx='30' cy='34' r='6' fill='%23130620'/%3E%3C/svg%3E">
+</head>
+<body>
+<div id="app">
+  <div id="gl"></div>
+  <canvas id="fx"></canvas>
+
+  <div id="hud" class="hidden">
+    <div id="board" class="board"></div>
+    <div id="splitbar" class="hidden"><span id="splitname"></span><span id="splitballs"></span></div>
+    <div id="topbtns">
+      <button id="btnMute" class="ibtn" aria-label="mute">&#9835;</button>
+      <button id="btnHome" class="ibtn" aria-label="menu">&#8962;</button>
+    </div>
+    <div id="speed"></div>
+    <div id="hint">SWIPE <b>UP</b> TO BOWL &middot; <b>CURVE</b> IT TO HOOK<span class="wide"><span class="dot"> &middot; </span>DRAG <b>&larr; &rarr;</b> TO MOVE</span><span class="kbonly"> &middot; OR HOLD <b>SPACE</b></span></div>
+    <div id="ghost" class="hidden"><div class="f"></div><div class="gl">SWIPE UP</div></div>
+    <div id="banner"></div>
+    <div id="sub"></div>
+  </div>
+
+  <div id="title" class="panel">
+    <div class="logo"><span>STR</span><span class="bolt">I</span><span>KE</span></div>
+    <div class="tag">neon swipe bowling</div>
+    <button id="btnPlay" class="big">PLAY</button>
+    <button id="btnSplits" class="mid">SPLIT CHALLENGES <span id="starsTotal"></span></button>
+    <div id="balls"></div>
+    <div id="ballname"></div>
+    <div id="bestline"></div>
+  </div>
+
+  <div id="splits" class="panel hidden">
+    <h2>SPLIT CHALLENGES</h2>
+    <div class="sub2">One rack, three balls. Clear it on ball 1 for three stars.</div>
+    <div id="splitgrid"></div>
+    <button id="btnSplitsBack" class="mid">BACK</button>
+  </div>
+
+  <div id="results" class="panel hidden">
+    <div id="resTitle">GAME OVER</div>
+    <div id="resScore">0</div>
+    <div id="resBest"></div>
+    <div id="resStats"></div>
+    <div id="resBoard"></div>
+    <div class="row resbtns"><button id="btnAgain" class="big">PLAY AGAIN</button><button id="btnNext" class="mid hidden">NEXT</button><button id="btnMenu" class="mid">MENU</button></div>
+  </div>
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#2b1fd1">
+<title>Word Blitz</title>
+<meta name="description" content="90-second word hunts on a 4x4 letter grid. Drag through touching letters, chain long words for huge points, and beat the daily board.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<button id="bQuit" class="iconbtn hide" aria-label="Back to menu"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+<button id="bMute" class="iconbtn" aria-label="Mute"><svg viewBox="0 0 24 24"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16 9c1.5 1.5 1.5 4.5 0 6M18.5 6.5c3 3 3 8 0 11"/><path class="off" d="M16 9l5 6M21 9l-5 6"/></svg></button>
+<button id="bRot" class="iconbtn round hide" aria-label="Rotate board"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v5h-5"/></svg></button>
+
+<div id="title" class="screen">
+  <div class="logo" id="logo"></div>
+  <div class="lvcard"><div class="lvtop"><span id="tLv">LV 1</span><span id="tRank">Rookie</span></div><div class="bar"><i id="tXp"></i></div></div>
+  <button id="bPlay" class="big">PLAY</button>
+  <button id="bDaily" class="daily"><b>DAILY BOARD</b><span id="tDaily">-</span></button>
+  <div class="stats" id="tStats"></div>
+  <div class="tip">Drag across touching letters. 3+ letters. Long words = huge points.</div>
+</div>
+
+<div id="results" class="screen hide">
+  <div class="rcard">
+    <div class="rmode" id="rMode">CLASSIC</div>
+    <div class="rscore"><span id="rScore">0</span><em id="rBest" class="hide">NEW BEST!</em></div>
+    <div class="stars" id="rStars"><i></i><i></i><i></i></div>
+    <div class="rtarget" id="rTarget"></div>
+    <div class="rstats" id="rStats"></div>
+    <div class="lvcard small"><div class="lvtop"><span id="rLv">LV 1</span><span id="rXpGain">+0 XP</span></div><div class="bar"><i id="rXp"></i></div></div>
+    <div class="rbtns"><button id="bAgain" class="big">PLAY AGAIN</button><button id="bMenu" class="ghost">MENU</button></div>
+    <div class="lists">
+      <div><h3>YOUR WORDS <span id="rFoundN"></span></h3><div class="chips" id="rFound"></div></div>
+      <div><h3>MISSED <span id="rMissN"></span></h3><div class="minirow"><div class="mini" id="rMini"></div><span>Tap a missed word to see where it was.</span></div><div class="chips miss" id="rMiss"></div></div>
+    </div>
+  </div>
+</div>
+<button id="bAgain2" class="floatagain hide" aria-label="Play again">PLAY AGAIN</button>
+
+<div id="loading" class="hide">Loading words...</div>
+<noscript>Word Blitz needs JavaScript turned on.</noscript>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

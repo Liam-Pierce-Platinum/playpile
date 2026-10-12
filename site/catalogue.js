@@ -12,6 +12,202 @@
 //                     port. The page frames http://localhost:<port>.
 //         'unity'   - a Unity WebGL build under games/<slug>/build.
 export const GAMES = [
+  // ---- NEWEST FIRST: fifteen from the 2026-10-11 game batch ----
+  {
+    slug: "curveball", title: "CURVEBALL", how: 'mounted', port: 8360, url: "/",
+    content: "Football free kicks in a floodlit stadium with cartoon players. Nobody gets hurt: the keeper dives and the wall jumps. A short bright glow appears when the ball is kicked and when it hits the post, keeper, wall or net. Small camera flashes twinkle in the crowd the whole time, and there are many more after a goal.",
+    web: "curveball/",
+    tag: "Sport", big: false, added: '2026-10-11',
+    cat: "Sport", tags: ["new","football","free kick","swipe","curl","3d","one touch","mobile"],
+    blurb: "Swipe from the ball to bend free kicks round the wall, past a diving keeper and into the top corner.",
+    about: `A free-kick game in a floodlit 3D stadium, played with one swipe. Swipe up from the ball. The direction picks left or right, the length picks the height, the speed sets the power from 16 to 34 metres per second, and bending the swipe curls the ball the same way. The wall jumps, the keeper dives, and a goal brings confetti, a bulging net and a roar from the crowd. A goal is worth 100, with bonuses on top: rings in the goal, TOP BINS, CURLER, ROCKET, OFF THE POST and UNDER THE WALL.
+
+There are thirty challenges of three to five balls each, with three stars on every one. They start with an empty net, then add a keeper, curl, walls, wide angles, small targets, wind, sliding walls and a dancing keeper, ending with The Final. Sudden Death is endless and one miss ends it. Every goal moves the ball further out and makes the wall and keeper tougher, and goals in a row build a streak multiplier.`,
+    controls: [["Swipe up from the ball","shoot (direction = aim, length = height, speed = power)"],["Bend the swipe","curl the ball"],["Tap","skip to the next ball"],["R","retry"],["Esc / P","pause"],["M","sound on/off"],["Enter / Space","continue on the results screen"],["Touch","swipe with your thumb"]],
+    tips: "The keeper cannot read curl or wind, so a shot that bends late into the far corner beats even the best keeper in the game.",
+  },
+  {
+    slug: "helix-drop", title: "HELIX DROP", how: 'mounted', port: 8361, url: "/",
+    content: "A bouncing ball and a tower of candy rings. Nobody gets hurt: the ball just goes splat in paint. The screen brightens briefly when the fireball smashes a ring and when a level is cleared.",
+    web: "helix-drop/",
+    tag: "Arcade", big: false, added: '2026-10-11',
+    cat: "Arcade", tags: ["new","one finger","tower","fireball","3d","endless","mobile","casual"],
+    blurb: "Spin the candy tower, drop the ball through the gaps and stay off the red. Fall three rings in a row and you smash the next one.",
+    about: `A ball bounces on top of a tall tower of candy rings and never moves sideways. You drag to spin the tower, and the tower follows your finger exactly, so you line a gap up underneath the ball and it drops to the next ring. Coloured parts are safe to bounce on, red ones splat you and restart the level. Fall through three rings without a bounce and the ball catches fire: the next ring it touches shatters, red or not, and a smash is worth double.
+
+Levels are built from fixed seeds, so every player gets the same towers. They start at 11 rings and grow to 40, with fewer and narrower gaps, more red and, from level 5, rings that turn by themselves; the colour theme changes every level and the next one starts on its own. Endless is one random tower that never stops, getting harder the deeper you fall, with its own best score.`,
+    controls: [["Drag left / right","spin the tower"],["Left / Right or A / D","spin the tower"],["Space / Enter","play · retry · next level"],["Tap","retry after a splat"],["R","restart the level"],["Esc / P","pause"],["M","mute"]],
+    tips: "Once the ball is on fire you do not need a gap at all: if the next gap is a long way round, let the ball hit the ring and smash it for double points.",
+  },
+  {
+    slug: "axe-throw", title: "AXE THROW", how: 'mounted', port: 8362, url: "/",
+    content: "Cartoon axes thrown into wooden logs, which burst into pieces; boss logs have angry carved faces. Nobody is hurt and there are no scares.",
+    web: "axe-throw/",
+    tag: "Arcade", big: false, added: '2026-10-11',
+    cat: "Arcade", tags: ["new","one touch","axes","timing","endless","bosses","mobile"],
+    blurb: "Tap to throw axes into a spinning log. Hit an axe that is already stuck and the run is over.",
+    about: `A log spins at the top of the screen and your axe waits at the bottom. Tap and it flies up and sticks. Land every axe the log needs and it splits apart with a TIMBER!, but every axe you land keeps turning with the log, and hitting one that is already stuck is a CLANG! that ends the run. Logs speed up, slow down, flip and whip about, and from stage 3 some arrive with old rusty axes already in them.
+
+Every fifth stage is a boss log with a carved angry face: Old Gnarl, Iron Bark, Frost Stump, Ember Heart, Moss Titan and Golden Burl, and after stage 30 they come round again faster. Quick throws build a SWIFT combo worth double points, a near miss scores a CLOSE! bonus, and slicing the apples on the rim earns coins for 13 axes, six of them trophies from beating each boss.`,
+    controls: [["Click / tap","throw"],["Space / Enter / Up / W","throw"],["R","restart the run"],["Esc / P","pause"],["M","sound on / off"],["Touch: tap","throw"]],
+    tips: "Throw your first few axes in quick succession while the log is empty: from SWIFT x3 every axe scores 2, then slow down and wait for the gaps once the log fills up.",
+  },
+  {
+    slug: "car-soccer", title: "TURBO GOAL", how: 'mounted', port: 8363, url: "/",
+    content: "Cartoon cars play football with a giant ball. Cars can be rammed and blown up (demolished) and come straight back; nobody is shown hurt. Every goal sets off a big explosion with a bright coloured flash.",
+    web: "car-soccer/",
+    tag: "Sport", big: false, added: '2026-10-11',
+    cat: "Sport", tags: ["new","football","cars","boost","2 players","bots","versus","mobile"],
+    blurb: "Rocket-car football from the side: boost, double jump and flip into a giant ball to smash it into the net.",
+    about: `Two cars, one huge glowing ball and two minutes on the clock. You drive the blue car and attack the orange goal on the right. Jump, jump again in the air for a double jump, or hold a direction to flip, which hits the ball far harder. Boost until you go supersonic and you can demolish the other car by ramming it. Your wheels stick to the walls and ceiling, and a tied match goes to golden-goal overtime.
+
+Play a bot at Rookie, Pro or All-Star, or two players on one keyboard. Every goal gets a slow-motion explosion and a replay. Every match earns XP, and each level from 2 to 20 unlocks paints, three car bodies, boost trails or goal explosions for your garage.`,
+    controls: [["A / D or ← / →","drive and turn round"],["W / S or ↑ / ↓","tilt the nose in the air"],["Space / J / Z","jump · again in the air = double jump or flip"],["Shift / K / X","boost"],["Esc / P","pause"],["M","mute"],["2 players","P1 WASD + Space + Left Shift · P2 arrows + Enter + Right Shift"],["Touch","left thumb = joystick, JUMP and BOOST buttons"]],
+    tips: "Flip into the ball instead of just driving into it - jump, then press jump again while holding towards it. A flip shot flies far harder and can score from midfield.",
+  },
+  {
+    slug: "tank-duel", title: "TANK DUEL", how: 'mounted', port: 8364, url: "/",
+    content: "Cartoon tanks shell each other across hills; hits make big cartoon fireballs, craters and damage numbers, and a beaten tank blows up with a KO! No people are shown and there is no blood. Explosions give a soft screen flash and screen shake.",
+    web: "tank-duel/",
+    tag: "Strategy", big: false, added: '2026-10-11',
+    cat: "Strategy", tags: ["new","artillery","tanks","turn based","2 players","wind","weapons","mobile"],
+    blurb: "Pull back, let go, and lob a shell over the hill through the wind. First to three rounds wins.",
+    about: `Two cartoon tanks on rolling hills take turns shooting at each other. Press on the battlefield and pull back like a slingshot: the direction is the angle, the length of the pull is the power, and a short dotted line shows where the shell starts to go. The wind changes every turn and pushes every shell sideways, and every blast digs a crater that tanks drop into, with fall damage if the drop is big. Each tank has 100 health, and the first to win three rounds takes the match.
+
+There are twelve weapons, from the unlimited Shell to the Cluster, the MIRV that splits at the top of its arc, the Roller, the hill-tunnelling Digger, Napalm that runs downhill, the Skipper, the wind-proof Sniper and one Nuke, and the ammo has to last the whole match. Beat four bot ranks in turn, Rookie, Gunner, Ace and General, or play a friend on the same device. Every round rolls a new landscape: meadow, desert, snowfield or dusk.`,
+    controls: [["Press + pull back","aim (direction = angle, length = power), let go to fire"],["← →","angle"],["↑ ↓","power (hold Shift for fine)"],["Space / Enter","fire"],["Q / E / Tab","change weapon"],["W","weapon picker"],["A / D","drive (2 moves a round)"],["M","mute"],["Esc / P","pause"],["Touch","pull back on the battlefield; bottom bar for weapon, move and FIRE"]],
+    tips: "Ammo lasts the whole match, not one round: you get one Nuke and one Volcano for the whole match, and the bot gets more accurate with every shot it takes in a round, so finish rounds quickly.",
+  },
+  {
+    slug: "sumo-slam", title: "SUMO SLAM", how: 'mounted', port: 8365, url: "/",
+    content: "Cartoon toy sumo blobs bump each other off a floating ring and fall away into the clouds with a slide-whistle; nobody is hurt and there is no blood. Blobs flash white for a moment when hit, and the screen shakes on big hits.",
+    web: "sumo-slam/",
+    tag: "Party", big: false, added: '2026-10-11',
+    cat: "Action", tags: ["new","sumo","party","brawler","physics","2 player","3d","mobile"],
+    blurb: "Hold to charge, let go to dash. Slam the other blobs off a shrinking, tilting ring and be the last one standing.",
+    about: `Four glossy sumo blobs on a ring floating in the sky, and one rule: be the last one on it. Hold to charge a dash, let go to launch, and a dash that connects throws the other blob hard. One that hits nothing can carry you straight off the edge. From 4 seconds the edge crumbles and the ring shrinks, from 6 seconds it tilts and keeps swinging round so everyone slides downhill, and at 48 seconds it starts collapsing fast, so no round reaches a minute. First to three rounds wins the match.
+
+Power-up orbs drop in: GIANT makes you bigger and heavier, HEAVY gives you an iron body that hits barely move, and SPRING turns your next dash into a leap that lands with a shockwave. Beat four bot leagues, ROOKIE, CONTENDER, CHAMPION and YOKOZUNA, to unlock the next, win solo matches to unlock four more blob colours, and beat YOKOZUNA for a gold crown. Two players can share one keyboard against two bots.`,
+    controls: [["WASD / arrows","move"],["Hold Space / Enter / mouse","charge a dash"],["Let go","dash (SLAM)"],["2 players","P1 WASD + Space · P2 arrows + Enter"],["Esc / P","pause"],["M","sound on / off"],["R","play again (results)"],["Touch","drag left side to move, hold SLAM and let go"]],
+    tips: "When the ring tilts, dash so your target is between you and the low side - the slope finishes the throw for you. And never dash at someone standing right on the edge with nothing behind you: if they step aside, you go over instead.",
+  },
+  {
+    slug: "prism", title: "PRISM", how: 'mounted', port: 8366, url: "/",
+    content: "Abstract neon shapes and a glowing ball; nobody gets hurt. When the ball breaks it shatters into coloured pieces with a short white screen flash, and a smaller flash marks every tenth star.",
+    web: "prism/",
+    tag: "Arcade", big: false, added: '2026-10-11',
+    cat: "Arcade", tags: ["new","colour","neon","one touch","endless","tap","reflex","mobile"],
+    blurb: "Tap to hop a glowing ball up a neon tower, but you can only pass through the colour that matches it.",
+    about: `Each tap hops your ball up a little and gravity pulls it back down. Every obstacle in the endless tower is split into cyan, pink, yellow and violet, and you may only pass through the part that matches your ball. Touch any other colour and it shatters. A star sits in the middle of every obstacle, and a four-colour switch orb in the gap above it gives you a new colour for the next one.
+
+There are eight kinds of obstacle: rings, squares and sliding bars to start, then windmills and triangles from the third, dotted rings and double counter-spinning rings from the sixth, and twin windmills from the tenth, each turning a little faster than the last. CLASSIC starts gently; RUSH has every shape from the start and runs 25 per cent faster, with its own best score. Stars are banked when you die and buy five new ball styles, from COMET at 25 stars to PULSE at 350.`,
+    controls: [["Click / tap","hop"],["Space / Up / W","hop"],["R / Enter","retry"],["P / Esc","pause"],["M","sound on / off"],["Touch: tap anywhere","hop"]],
+    tips: "Small, even taps keep the ball floating in place under an obstacle. Hover there until your colour swings round, then tap quickly to go through.",
+  },
+  {
+    slug: "home-run", title: "MOONSHOT SLUGGER", how: 'mounted', port: 8367, url: "/",
+    content: "A cartoon baseball home run derby at night. Nobody gets hurt and there is no violence; perfect hits give a brief white screen flash and home runs set off fireworks.",
+    web: "home-run/",
+    tag: "Sport", big: false, added: '2026-10-11',
+    cat: "Sport", tags: ["new","baseball","home run","timing","3d","stadium","one button","mobile"],
+    blurb: "Put the circle on the pitch, time the swing, and send it into the night. Ten outs, only home runs count.",
+    about: `A home run derby under the stadium lights. The pitcher winds up, the pitch is called with its type and speed, and you put the aim circle on the ball and swing as it arrives. Timing decides how hard you hit it and where it goes - early pulls it to left, late pushes it to right - and aim decides the launch: centred is a bomb, too high is a grounder, too low is a pop-up. Only home runs count. Everything else is an out, and ten outs (or 30 pitches) ends the round.
+
+Eight stages run from SANDLOT to MYTHIC, adding the changeup, curveball and slider and getting faster, from about 90 to 140 km/h. Each asks for more home runs, from 3 up to 10, with three stars per stage. Back-to-back home runs multiply your score up to x5, golden balls are worth double, glowing rings in the stands give +300 and a 160 m moonshot adds +100.`,
+    controls: [["Mouse","move the aim circle"],["Click / Space","swing"],["R","restart the round"],["M","mute"],["Esc / P","pause"],["Touch: tap the ball","aim and swing in one go"]],
+    tips: "Click a fraction before the ball reaches the batter, not when it arrives, and aim a little low on curveballs - they still have some drop to make when you swing.",
+  },
+  {
+    slug: "air-hockey", title: "PUCK BLITZ", how: 'mounted', port: 8368, url: "/",
+    content: "Neon air hockey with no violence or scares. Goals flash the goal mouth in colour with a screen shake, and hard hits throw sparks.",
+    web: "air-hockey/",
+    tag: "Sport", big: false, added: '2026-10-11',
+    cat: "Sport", tags: ["new","air hockey","neon","2 players","one screen","vs bot","quick","mobile"],
+    blurb: "Neon air hockey where your mouse or finger is the mallet. Beat the bot or a friend on one phone. First to 7.",
+    about: `Your mallet is a glowing ring that sits right under your mouse or finger and stays in your half of the table. Swipe through the puck to fire it down the table, bank it off the rails round a defender, and score in the goal at the far end. After a goal the puck is put back, sitting still, in the half of whoever let it in. First to 7 wins, and a match takes a minute or two.
+
+Play the bot on Easy, Medium or Hard. The bots get faster, react quicker and aim better as you go up, and only Hard reads bank shots. Each difficulty you beat lights a star. Or hand one phone or tablet to a friend for 2 PLAYERS, where each of you drags on your own half at the same time. The game saves your wins and losses, your best win streak and your hardest shot. The puck tops out at about 112 km/h.`,
+    controls: [["Move the mouse","move your mallet (no click needed)"],["Arrows / WASD","move your mallet"],["Esc / P","pause"],["R","restart the match"],["M","sound on / off"],["Space / Enter","play from the title · rematch"],["Touch: drag","move your mallet on your half"],["Touch: 2 players","each finger plays the half it touched first"]],
+    tips: "Bank it off a side rail. A straight shot runs into the bot's mallet in front of its goal, and the Easy and Medium bots cannot see a bank shot coming.",
+  },
+  {
+    slug: "strike", title: "STRIKE", how: 'mounted', port: 8369, url: "/",
+    content: "Bowling in a neon alley. Pins crash and fly with sparks and confetti; nobody is shown and nothing violent happens.",
+    web: "strike/",
+    tag: "Sport", big: false, added: '2026-10-11',
+    cat: "Sport", tags: ["new","bowling","swipe","neon","3d","physics","puzzle","mobile"],
+    blurb: "Swipe up to bowl, curve the swipe to hook it, and send the pins flying in a glossy neon alley.",
+    about: `One swipe throws the ball. Swipe direction is your aim, swipe speed is the ball speed, and a curved swipe is a hook: bow it out like a ) and the ball goes out right and curls back left. Drag sideways first to move your starting spot. The front of the lane is oiled, so the ball skids straight and only bites on the dry end near the pins, where real pin physics decide what falls. The camera rides the ball, then swings round to the pins for the crash.
+
+The 10-frame game uses real scoring, bonus balls in the tenth and a 300 perfect game, and strikes in a row earn DOUBLE, TURKEY, HAMBONE and beyond. Split Challenges are twelve set-up racks, from the lone 10 pin to the Big Four, with three balls each and up to three stars. Six ball finishes to pick from: one from the start, the rest unlocked with strikes and split stars.`,
+    controls: [["Swipe up","bowl (speed = how fast you swipe)"],["Curved swipe","hook the ball"],["Drag left / right","move your starting spot"],["← →","move the ball"],["A D","aim"],["Q E","hook"],["Hold Space","power, release to throw"],["Tap / Space","speed up the pinfall"],["M","mute"]],
+    tips: "Start a little right of centre and give your swipe a gentle ) curve: the ball skids on the oil, then hooks left into the pocket between the 1 and 3 pins, which is where most strikes come from.",
+  },
+  {
+    slug: "word-blitz", title: "WORD BLITZ", how: 'mounted', port: 8370, url: "/",
+    content: "A word-finding game on a grid of letter tiles. No violence, no scares and no bright flashes, just confetti, a small screen shake on long words and a soft red glow at the screen edge in the last ten seconds. A blocklist removes rude words from the word list.",
+    web: "word-blitz/",
+    tag: "Word", big: false, added: '2026-10-11',
+    cat: "Puzzle", tags: ["new","words","spelling","boggle","daily","90 seconds","brain","mobile"],
+    blurb: "Ninety seconds, sixteen letters. Drag through touching tiles to spell words, and the long ones score huge.",
+    about: `A 4x4 grid of letter tiles and a 90-second clock. Press on a letter and drag through the ones touching it, diagonals included, then let go: green means a new word, yellow means you already found it, red means it is not a word. Every tile shows its points, from 1 for common letters up to 9 for J and Z, and the word's total is multiplied by its length, up to x4 for eight letters or more. Each board has two 2L tiles that double a letter and one 3W tile that triples the whole word. Words found within four seconds of each other build a combo of up to x2.
+
+Classic deals a new board every round, and the Daily Board is the same board for everyone that day, with your daily best and a day streak. Each board has three stars to earn. When the clock runs out you see the common words you missed, longest first, and you can tap one to see where it was. Your score becomes XP, and the ranks run from Rookie to Lexicon Legend.`,
+    controls: [["Press + drag","spell a word through touching letters"],["Let go","submit the word"],["Drag back one tile","undo the last letter"],["Type letters","spell on the keyboard (Q types Qu)"],["Enter / Backspace / Esc","submit · delete a letter · clear"],["Tab / 1 / Shift+R / ↻ button","rotate the board"],["Space / Enter","play again on the results"],["M","mute (title and results screens)"],["Touch: drag","spell a word"]],
+    tips: "Look for a long word through the 3W tile. It triples the whole word, and on top of the x4 length bonus for eight letters, that one word can outscore the rest of your round.",
+  },
+  {
+    slug: "beat-dash", title: "BEAT DASH", how: 'mounted', port: 8371, url: "/",
+    content: "A neon cube that shatters into squares when it hits a spike, then restarts straight away. No people, no blood. Bright colour flashes when you finish a level and go through gravity portals, and the background pulses on the beat.",
+    web: "beat-dash/",
+    tag: "Rhythm", big: false, added: '2026-10-11',
+    cat: "Arcade", tags: ["new","rhythm","music","one button","runner","neon","jump","mobile"],
+    blurb: "Tap to jump. A neon cube runs a course built on the beat, and one touch of a spike sends you back to the start.",
+    about: `A glowing cube runs right on its own across a course built on the beat of a synth track, and your only button is jump. Clear spikes, land on blocks, bounce off yellow pads, tap orbs for a jump in mid-air, hit blue orbs to flip gravity and go through portals to run along the ceiling. Hold to keep jumping every time you land. One touch of a hazard and the cube shatters, and the next attempt starts in under a second.
+
+Six hand-built levels go from First Light at 128 BPM to Event Horizon at 170, and every one is open from the start. Each has its own track, made in your browser, and the speed is locked to the tempo so every jump lands on the beat. A progress bar keeps your best, practice mode puts down checkpoints for you or wherever you press Z, and beating levels unlocks five more cube colours.`,
+    controls: [["Click / Space / Up / W / Enter","jump (hold to keep jumping)"],["Esc / P","pause"],["R","restart"],["M","mute"],["Z / X","practice: place / remove checkpoint"],["Level select: arrows / A D","choose a level · Space plays · P practice"],["Touch: tap or hold","jump"]],
+    tips: "When in doubt, press early: every jump has some leeway and the safe side is almost always early. A press made just before an orb still counts if you are holding it when you touch the orb.",
+  },
+  {
+    slug: "neon-swarm", title: "NEON SWARM", how: 'mounted', port: 8372, url: "/",
+    content: "Abstract glowing shapes burst into neon sparks when shot; there are no people and no blood. Explosions shake the screen, and bombs and deaths give a bright full-screen flash.",
+    web: "neon-swarm/",
+    tag: "Shooter", big: false, added: '2026-10-11',
+    cat: "Shooter", tags: ["new","twin stick","neon","arena","shooter","high score","endless","mobile"],
+    blurb: "Shred waves of neon shapes on a warping grid, and grab every green shard to send your multiplier through the roof.",
+    about: `A twin-stick arena shooter on a glowing grid that bends under every explosion. Your little white ship fires on its own, so you just steer and aim. Every shape you destroy drops green shards, and each one you collect adds 1 to your multiplier, so a long life is worth far more than a fast one. Die and the screen clears, and the multiplier drops back to x1. A bomb wipes out everything on the screen.
+
+Purple pinwheels drift, cyan diamonds chase, green squares sidestep your bullets, pink splitters break into three, yellow snakes block shots with their tails, and red black holes swallow everything nearby once you shoot them, then burst into sparks if they eat too much. SURGE gives you three lives and three bombs, a scripted wave every 15 seconds or less, and a gun that grows from two streams to a five-way fan. BLITZ is exactly three minutes with unlimited lives and no bombs.`,
+    controls: [["W A S D","move"],["Mouse / arrow keys","aim (fire is automatic)"],["Space / right click","bomb"],["Esc / P","pause"],["R","restart"],["M","sound on/off"],["Gamepad","left stick move, right stick aim, A / triggers / bumpers bomb, Start pause"],["Touch","left half moves, right half aims (no right thumb = auto-aim), BOMB button"]],
+    tips: "Your multiplier only resets when you die, so spend a bomb rather than a life: a hit on x400 costs you far more than the bomb does.",
+  },
+{
+    slug: "pinball", title: "STARLANE PINBALL", how: 'mounted', port: 8373, url: "/",
+    content: "A neon space-themed pinball table with no people and no violence. Jackpots, multiball, mission completes, skill shots, extra balls and tilts briefly wash the screen in a bright colour.",
+    web: "pinball/",
+    tag: "Arcade", big: false, added: '2026-10-11',
+    cat: "Arcade", tags: ["new","pinball","neon","multiball","physics","high score","retro","mobile"],
+    blurb: "A full neon pinball table: lock two balls in the Black Hole for multiball, then hit the ramp for jackpots.",
+    about: `One full pinball table in bright neon, seen from above, with real ball physics. Pull the plunger, keep the ball alive with the flippers, and shoot whatever the orange dot-matrix display asks for. Hold a flipper up to catch the ball and aim. Tip shots are hard, base shots soft. There are three pop bumpers, slingshots, a wire ramp, a left orbit with a spinner, three drop targets, three STAR targets, three top lanes and the Black Hole.
+
+Eight missions, from Bumper Storm to Ramp Race, promote you one rank each, from Cadet to Fleet Admiral, and each pays more than the last. Sink the Black Hole twice to start 3-ball multiball, where every ramp is a jackpot worth 250,000 or more. Light the stars for an extra ball, roll the top lanes for up to 6x bonus, chain big shots into combos, and nudge the table - but nudge too hard and it tilts. Three balls, a ball save and a top-five high score table.`,
+    controls: [["Z / Left Shift / ←","left flipper"],["M / / / Right Shift / →","right flipper"],["Hold Space / ↓ / Enter","pull the plunger, let go to launch"],["X / . / ↑","nudge from the left / right / front"],["P / Esc","pause"],["S","sound on / off"],["Touch","hold left or right half to flip, hold right half to launch, NUDGE button"]],
+    tips: "Your first multiball of each game has LOCK already lit, so two shots into the Black Hole start it - then aim every shot at the ramp for 250,000-point jackpots.",
+  },
+  {
+    slug: "mini-golf", title: "PUTT PARK", how: 'mounted', port: 8374, url: "/",
+    content: "Cartoon mini golf with no violence and no scares. The worst that happens is your ball splashes into a pond, and the 'ghost golfers' you race are just coloured balls.",
+    web: "mini-golf/",
+    tag: "Sport", big: false, added: '2026-10-11',
+    cat: "Sport", tags: ["new","golf","mini golf","putting","race","physics","casual","mobile"],
+    blurb: "Pull back, let go, watch it roll. Eighteen holes of windmills, portals and conveyor belts, plus races against three ghost golfers.",
+    about: `Bright top-down mini golf where the whole hole fits on the screen. Press anywhere, drag away from where you want the ball to go and let go: a dotted line shows the path and the first bounce, and the power ring goes from green to red. A slow ball drops into the cup, but a fast one rattles round the lip and spins out. Water costs a stroke and puts you back where you shot from, sand stops the ball hard, hills push it downhill, belts carry it, matching portals throw it out the other side at the same speed, and windmill blades, sliding walls and pink bumpers knock it about.
+
+PLAY is the career round of eighteen holes, par 48, with up to three stars on each: under par, par, or within two over. A hole stops at par plus four so nobody gets stuck. RACE is five random holes against Pip, Dot and Ace, three ghost golfers playing the same hole at the same time, scoring 3, 2, 1 and 0 points a hole. Stars unlock eight ball skins, the last one at 50.`,
+    controls: [["Drag back + release","putt (further = harder)"],["Drag back to the start","cancel"],["Arrows / WASD","aim and power"],["Shift","fine aim"],["Space / Enter","putt"],["R","restart the hole (not in a race)"],["M","mute"],["Esc","pause menu"],["Touch: drag back","putt"]],
+    tips: "The cup only grabs a slow ball. Hit your last putt so it is dying as it reaches the hole - a fast one rattles round the lip and spins back out.",
+  },
   // ---- NEWEST FIRST: six from the 2026-10-10/11 session hub ----
   {
     slug: "graze", title: "GRAZE", how: 'mounted', port: 8340, url: "/",

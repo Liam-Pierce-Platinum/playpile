@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0b1028">
+<title>Moonshot Slugger</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="flash"></div>
+
+<div id="hud" class="hidden">
+  <div class="hud-left">
+    <div id="stageName">SANDLOT</div>
+    <div id="score">0</div>
+  </div>
+  <div class="hud-center">
+    <div id="hrBox"><span id="hr">0</span><small>HR</small></div>
+    <div id="outs"></div>
+    <div id="need"></div>
+  </div>
+  <div class="hud-right">
+    <button id="muteBtn" class="icon" aria-label="Mute">&#128266;</button>
+    <button id="pauseBtn" class="icon" aria-label="Pause">&#10074;&#10074;</button>
+  </div>
+  <div id="streak" class="hidden"></div>
+  <div id="pitchLabel"></div>
+  <div id="pop"></div>
+  <div id="sub"></div>
+  <div id="dist"></div>
+  <div id="hint"></div>
+</div>
+
+<div id="title" class="overlay">
+  <div class="logo"><span class="l1">MOONSHOT</span><span class="l2">SLUGGER</span></div>
+  <div class="tag">Time it. Crush it. Under the lights.</div>
+  <button id="playBtn" class="big">PLAY</button>
+  <div id="playSub"></div>
+  <div id="stages"></div>
+  <div id="records"></div>
+  <div class="howto"><b>Circle on the ball</b> &middot; <b>click</b> or <b>Space</b> as it arrives &middot; on phones, <b>tap the ball</b></div>
+  <button id="muteBtn2" class="icon corner" aria-label="Mute">&#128266;</button>
+</div>
+
+<div id="results" class="overlay hidden">
+  <div class="rtitle" id="rTitle">ROUND OVER</div>
+  <div id="rStars"></div>
+  <div class="rgrid">
+    <div><b id="rHR">0</b><span>HOME RUNS</span></div>
+    <div><b id="rScore">0</b><span>SCORE</span></div>
+    <div><b id="rLong">0</b><span>LONGEST (m)</span></div>
+    <div><b id="rStreak">0</b><span>BEST STREAK</span></div>
+  </div>
+  <div id="rNote"></div>
+  <div class="rbtns">
+    <button id="retryBtn" class="big">RETRY</button>
+    <button id="nextBtn" class="big alt hidden">NEXT STAGE</button>
+  </div>
+  <button id="menuBtn" class="small">MENU</button>
+</div>
+
+<div id="pause" class="overlay hidden">
+  <div class="rtitle">PAUSED</div>
+  <button id="resumeBtn" class="big">RESUME</button>
+  <button id="quitBtn" class="small">QUIT TO MENU</button>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#06040c">
+<title>PRISM</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="cv"></canvas>
+
+<div id="hud" class="hidden">
+  <div id="score">0</div>
+  <div id="hbest">BEST 0</div>
+  <button id="pauseBtn" class="icon" aria-label="Pause"><svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+</div>
+
+<div id="title" class="ov">
+  <h1 class="logo"><span class="c0">P</span><span class="c1">R</span><span class="c2">I</span><span class="c3">S</span><span class="c0">M</span></h1>
+  <button id="play" class="playbtn" aria-label="Play">
+    <svg viewBox="0 0 120 120" class="spin">
+      <circle cx="60" cy="60" r="50" class="halo"/>
+      <circle cx="60" cy="60" r="50" stroke="#28f0ff" stroke-dasharray="78.5 235.6" stroke-dashoffset="0"/>
+      <circle cx="60" cy="60" r="50" stroke="#ff2e93" stroke-dasharray="78.5 235.6" stroke-dashoffset="-78.5"/>
+      <circle cx="60" cy="60" r="50" stroke="#ffe53b" stroke-dasharray="78.5 235.6" stroke-dashoffset="-157"/>
+      <circle cx="60" cy="60" r="50" stroke="#9d5cff" stroke-dasharray="78.5 235.6" stroke-dashoffset="-235.6"/>
+    </svg>
+    <svg viewBox="0 0 120 120" class="tri"><path d="M48 38 L84 60 L48 82 Z"/></svg>
+  </button>
+  <div class="modes">
+    <button data-mode="classic" class="mode on">CLASSIC</button>
+    <button data-mode="rush" class="mode">RUSH</button>
+  </div>
+  <div id="tbest">BEST 0</div>
+  <div class="skins">
+    <button id="skPrev" class="arrow" aria-label="Previous ball">&#8249;</button>
+    <div id="skBox"><canvas id="skCv" width="112" height="112"></canvas><div id="skName">CLASSIC</div><div id="skCost"></div></div>
+    <button id="skNext" class="arrow" aria-label="Next ball">&#8250;</button>
+  </div>
+  <div id="bank"><span class="st">&#9733;</span> <b id="bankN">0</b></div>
+</div>
+
+<div id="over" class="ov hidden">
+  <div class="olabel">SCORE</div>
+  <div id="oscore">0</div>
+  <div id="newbest" class="hidden">NEW BEST!</div>
+  <div id="obest">BEST 0</div>
+  <div id="obank"></div>
+  <div id="onext"></div>
+  <button id="retry" class="big">RETRY</button>
+  <button id="menu" class="small">MENU</button>
+  <div class="hint">Space / R to retry</div>
+</div>
+
+<div id="pause" class="ov hidden">
+  <div class="olabel">PAUSED</div>
+  <button id="resume" class="big">RESUME</button>
+  <button id="quit" class="small">MENU</button>
+</div>
+
+<div id="corner">
+  <button id="snd" class="icon" aria-label="Sound"></button>
+  <button id="mus" class="icon" aria-label="Music"></button>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

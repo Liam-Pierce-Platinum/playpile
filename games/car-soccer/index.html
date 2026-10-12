@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#06070f">
+<title>Turbo Goal</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="title" class="screen">
+  <div class="logo"><span class="l1">TURBO</span><span class="l2">GOAL</span></div>
+  <div class="tag">drive · jump · flip · boost · score</div>
+  <button id="play" class="big">PLAY</button>
+  <div class="row seg" id="modes">
+    <button data-mode="bot">VS BOT</button><button data-mode="2p">2 PLAYERS</button>
+  </div>
+  <div class="row seg" id="diffs">
+    <button data-diff="rookie">ROOKIE</button><button data-diff="pro">PRO</button><button data-diff="allstar">ALL-STAR</button>
+  </div>
+  <div class="row">
+    <button id="garageBtn" class="mid">GARAGE</button><button id="howBtn" class="mid">CONTROLS</button>
+  </div>
+  <div class="lvl"><b id="lvlNum">LV 1</b><div class="bar"><i id="lvlBar"></i></div><span id="lvlNext"></span></div>
+  <div class="recs" id="recs"></div>
+</div>
+
+<div id="garage" class="screen hidden">
+  <h2>GARAGE</h2>
+  <canvas id="preview" width="440" height="220"></canvas>
+  <div class="row seg tabs" id="gtabs">
+    <button data-tab="paint">PAINT</button><button data-tab="body">BODY</button><button data-tab="trail">BOOST</button><button data-tab="goalfx">GOAL FX</button>
+  </div>
+  <div id="grid" class="grid"></div>
+  <button id="garageBack" class="mid">DONE</button>
+</div>
+
+<div id="how" class="screen hidden">
+  <h2>CONTROLS</h2>
+  <div class="how">
+    <div><b>Solo</b> A/D or ←/→ drive · W/S or ↑/↓ aim the nose in the air<br>Space / J / Z jump (again in the air: double jump, or flip with a direction)<br>Shift / K / X boost · Esc pause · M mute</div>
+    <div><b>2 players</b> <span class="blue">P1</span> WASD · Space jump · Left Shift boost<br><span class="orange">P2</span> Arrows · Enter jump · Right Shift boost</div>
+    <div><b>Touch</b> left thumb anywhere = joystick · right buttons = JUMP / BOOST</div>
+    <div><b>Gamepad</b> stick · A jump · B / RT boost</div>
+    <div class="tip">Flip into the ball for a power shot. Hit an opponent at full speed (white streak) to demolish them.</div>
+  </div>
+  <button id="howBack" class="mid">GOT IT</button>
+</div>
+
+<div id="pause" class="screen hidden">
+  <h2>PAUSED</h2>
+  <button id="resume" class="big">RESUME</button>
+  <div class="row"><button id="restart" class="mid">RESTART</button><button id="quit" class="mid">MENU</button></div>
+</div>
+
+<div id="results" class="screen hidden">
+  <div id="resTitle" class="restitle">VICTORY</div>
+  <div class="resscore"><span class="blue" id="resB">0</span><span class="dash">-</span><span class="orange" id="resO">0</span></div>
+  <div id="resStats" class="resstats"></div>
+  <div class="lvl"><b id="resLvl">LV 1</b><div class="bar"><i id="resBar"></i></div><span id="resXp"></span></div>
+  <div id="resUnlock" class="unlock hidden"></div>
+  <button id="rematch" class="big">REMATCH</button>
+  <div class="row"><button id="resGarage" class="mid">GARAGE</button><button id="resMenu" class="mid">MENU</button></div>
+</div>
+
+<div id="topbar">
+  <button id="pauseBtn" title="Pause">II</button>
+  <button id="musicBtn" title="Music">♪</button>
+  <button id="muteBtn" title="Sound">🔊</button>
+</div>
+
+<div id="touch">
+  <div class="stick"><div class="knob"></div></div>
+  <button class="b-boost">BOOST</button>
+  <button class="b-jump">JUMP</button>
+</div>
+
+<div id="rotate" class="hidden">Tip: turn your phone sideways for a wider view</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

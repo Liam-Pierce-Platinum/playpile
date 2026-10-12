@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Sumo Slam</title>
+<meta name="description" content="Glossy sumo blobs on a floating ring that shrinks and tilts. Charge a dash, slam everyone off the edge, last blob standing wins. First to 3 rounds.">
+<meta name="theme-color" content="#5ec8ff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js" } }</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="tags"></div>
+<div id="pops"></div>
+
+<div id="hud" class="hidden">
+  <div id="board"></div>
+  <div id="roundLbl">ROUND 1</div>
+  <div class="topbtns">
+    <button id="muteBtn" class="iconbtn" aria-label="Mute">&#9835;</button>
+    <button id="pauseBtn" class="iconbtn" aria-label="Pause">&#10074;&#10074;</button>
+  </div>
+  <div id="banner"></div>
+  <div id="spect" class="hidden">SPECTATING<span>tap or press any key to skip</span></div>
+  <div id="tzone"></div>
+  <div id="stick"><i></i></div>
+  <button id="dashBtn" aria-label="Slam"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" class="bg"/><circle id="dashRing" cx="50" cy="50" r="45" class="fg"/></svg><b>SLAM</b><span>hold &amp; let go</span></button>
+  <div id="keysHint"></div>
+</div>
+
+<div id="title" class="screen hidden">
+  <button id="muteBtn2" class="iconbtn titlemute" aria-label="Sound on or off">&#9835;</button>
+  <div class="logo"><span class="l1">SUMO</span><span class="l2">SLAM!</span></div>
+  <p class="tag">Charge up. Slam them off. Last blob standing wins.</p>
+  <button id="playBtn" class="big">PLAY</button>
+  <div class="row" id="modeRow">
+    <button data-mode="solo" class="chip on">SOLO</button>
+    <button data-mode="2p" class="chip">2 PLAYERS</button>
+  </div>
+  <div class="row" id="tierRow"></div>
+  <div class="row swatches" id="colorRow"></div>
+  <p class="help" id="helpLine"></p>
+</div>
+
+<div id="results" class="screen hidden">
+  <div id="resTitle" class="restitle">YOU WIN!</div>
+  <div id="resSub" class="ressub"></div>
+  <div id="resList"></div>
+  <div id="resUnlock"></div>
+  <button id="retryBtn" class="big">RETRY</button>
+  <div class="row">
+    <button id="nextBtn" class="mid hidden">NEXT LEAGUE</button>
+    <button id="menuBtn" class="mid ghost">MENU</button>
+  </div>
+</div>
+
+<div id="pause" class="screen hidden">
+  <div class="restitle">PAUSED</div>
+  <button id="resumeBtn" class="big">RESUME</button>
+  <div class="row">
+    <button id="restartBtn" class="mid">RESTART</button>
+    <button id="quitBtn" class="mid ghost">MENU</button>
+  </div>
+</div>
+
+<div id="loading">SUMO SLAM</div>
+<noscript>Sumo Slam needs JavaScript turned on.</noscript>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

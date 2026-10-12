@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0b1630">
+<title>Curveball</title>
+<meta name="description" content="Swipe to curl free kicks round the wall, past the keeper and into the top corner. 30 challenges and Sudden Death.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="gl"></canvas>
+<canvas id="swipe"></canvas>
+<div id="touch"></div>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <div class="hud-l">
+    <div id="lvl">1 · FIRST TOUCH</div>
+    <div id="goalstars"></div>
+  </div>
+  <div class="hud-c">
+    <div id="score">0</div>
+    <div id="streak" class="hidden"></div>
+    <div id="wind" class="hidden"><span id="windArrow">&#x2191;</span> <span id="windTxt">WIND</span></div>
+  </div>
+  <div class="hud-r">
+    <div id="balls"></div>
+    <div class="hud-btns">
+      <button id="muteBtn" class="icon" aria-label="Mute">&#x266B;</button>
+      <button id="pauseBtn" class="icon" aria-label="Pause">&#10074;&#10074;</button>
+    </div>
+  </div>
+</div>
+<div id="speed" class="hidden"></div>
+<div id="tip" class="hidden"><span id="tipTxt"></span></div>
+<svg id="hand" class="hidden" viewBox="0 0 200 260" aria-hidden="true">
+  <path id="handPath" d="M100 235 C 60 170, 70 90, 120 20" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="6" stroke-dasharray="10 10" stroke-linecap="round"/>
+  <g id="handDot"><circle r="16" fill="#fff" opacity=".9"/><circle r="26" fill="none" stroke="#fff" stroke-width="3" opacity=".5"/></g>
+</svg>
+<div id="pop"></div>
+
+<!-- TITLE -->
+<div id="title" class="screen">
+  <button id="titleMute" class="icon corner" aria-label="Sound on/off">&#x266B;</button>
+  <div class="logo">
+    <svg viewBox="0 0 600 140" class="logo-svg" aria-hidden="true">
+      <defs><linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#ffe14d"/><stop offset="1" stop-color="#ff7a1a"/></linearGradient></defs>
+      <path d="M40 120 Q 300 -10 560 70" fill="none" stroke="url(#lg)" stroke-width="7" stroke-linecap="round" stroke-dasharray="2 16"/>
+      <circle cx="560" cy="70" r="14" fill="#fff"/>
+    </svg>
+    <h1>CURVEBALL</h1>
+    <p class="sub">swipe &middot; curl &middot; top bins</p>
+  </div>
+  <button id="playBtn" class="big">PLAY</button>
+  <div class="row">
+    <button id="levelsBtn" class="mid">CHALLENGES <span id="starTotal"></span></button>
+    <button id="sdBtn" class="mid">SUDDEN DEATH <span id="sdBest"></span></button>
+  </div>
+</div>
+
+<!-- LEVEL SELECT -->
+<div id="levels" class="screen hidden">
+  <div class="lv-head"><button id="lvBack" class="mid">&#8592; BACK</button><h2>CHALLENGES</h2><span id="lvStars"></span></div>
+  <div id="lvGrid"></div>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="screen hidden">
+  <h2 id="resTitle">CHALLENGE COMPLETE</h2>
+  <div id="resStars"><span class="st">&#9733;</span><span class="st">&#9733;</span><span class="st">&#9733;</span></div>
+  <div id="resScore">0</div>
+  <div id="resSub"></div>
+  <div id="resBtns">
+    <button id="retryBtn" class="big">RETRY</button>
+    <div class="row" id="resRow">
+      <button id="nextBtn" class="mid">NEXT &#8594;</button>
+      <button id="menuBtn" class="mid">MENU</button>
+    </div>
+  </div>
+  <p class="hint">R = retry &middot; Enter = next</p>
+</div>
+
+<!-- PAUSE -->
+<div id="pause" class="screen hidden">
+  <h2>PAUSED</h2>
+  <button id="resumeBtn" class="big">RESUME</button>
+  <div class="row">
+    <button id="restartBtn" class="mid">RESTART</button>
+    <button id="quitBtn" class="mid">MENU</button>
+  </div>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

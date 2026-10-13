@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>SPELLDELVE</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hurt"></div>
+<div id="dmg"></div>
+
+<div id="hud" class="hidden">
+  <div id="stats">
+    <div class="row"><div class="bar hp"><i id="hpf"></i><b id="shf"></b><span id="hpt"></span></div></div>
+    <div class="row"><div class="bar mp"><i id="mpf"></i><span id="mpt"></span></div></div>
+    <div class="row xprow"><div id="lvl">1</div><div class="bar xp"><i id="xpf"></i></div></div>
+    <div class="row small"><span id="gold">0</span><span id="floor">Floor 1</span></div>
+    <div id="relics"></div>
+  </div>
+  <div id="topright">
+    <canvas id="mini" width="150" height="150"></canvas>
+    <div class="btns">
+      <button id="b-grim" title="Grimoire (Tab)">Spells</button>
+      <button id="b-mute" title="Mute (M)">&#x266A;</button>
+      <button id="b-pause" title="Pause (Esc)">II</button>
+    </div>
+  </div>
+  <div id="boss" class="hidden"><div id="bossname"></div><div class="bar boss"><i id="bossf"></i></div></div>
+  <div id="spellbar"></div>
+  <div id="toasts"></div>
+  <div id="banner" class="hidden"><h2></h2><p></p></div>
+</div>
+
+<div id="touch" class="hidden">
+  <div id="stick"><div id="knob"></div></div>
+  <div id="tbtns">
+    <div id="tb-fire" class="tb big">&#x2726;</div>
+    <div id="tb-s1" class="tb"></div><div id="tb-s2" class="tb"></div>
+    <div id="tb-s3" class="tb"></div><div id="tb-s4" class="tb"></div>
+    <div id="tb-dash" class="tb dash">&#x00BB;</div>
+  </div>
+</div>
+
+<div id="shop" class="hidden"></div>
+<div id="modal" class="hidden"><div id="mcard"></div></div>
+<div id="screen"></div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

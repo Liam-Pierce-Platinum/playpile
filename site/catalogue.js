@@ -12,6 +12,46 @@
 //                     port. The page frames http://localhost:<port>.
 //         'unity'   - a Unity WebGL build under games/<slug>/build.
 export const GAMES = [
+  // ---- NEWEST FIRST: three from the 2026-10-12 session ----
+  {
+    slug: "chibi-clash", title: "CHIBI CLASH", how: 'mounted', port: 8375, url: "/",
+    content: "Cute cartoon pixel monsters fight with fire, leaves, water and lightning. Beaten monsters just faint with a \"K.O.!\", with no blood. Monsters flash white when hit and blink white while winding up a big attack, danger circles on the ground flicker red and white, the screen edge flashes red when you are hit, and hatching an egg or evolving ends in a quick white flash.",
+    web: "chibi-clash/",
+    tag: "Action", big: false, added: '2026-10-11',
+    cat: "Adventure", tags: ["new","monsters","pixel","collect","eggs","evolve","boss","mobile"],
+    blurb: "Hatch chibi monsters from eggs, then fight wild ones in real time with WASD and three abilities.",
+    about: `Pick a free starter, Pipkin, Sproutle or Bubbit, and take it into a field arena to fight wild monsters in real time. You move with WASD, aim with the mouse, fire three abilities on J, K and L, and dodge with Space. A red circle on the ground means an attack is about to land there, and a red ! over a foe means a big one is coming. Wins pay coins and XP: coins buy eggs in the shop, and XP levels your monster, teaches it new moves and evolves it into a bigger form.
+
+There are 67 species, each with an evolved form, across 10 types and 63 moves. Five zones each have three fights and a boss that turns ENRAGED at half health, the last one the dragon Eclipsidon. After that the Endless Arena throws waves at you forever, with a boss every fifth wave. Eggs cost 100 coins, or 900 for ten, and the rarity chances are shown in the shop. Coins are only ever won in the game.`,
+    controls: [["W A S D / arrows","move"],["Mouse","aim"],["J K L / 1 2 3","abilities (hold to repeat)"],["Left click","ability 1"],["Space / Shift","dodge"],["Esc / P","pause"],["M","sound on / off"],["Touch","drag on the left half to move, round buttons to attack and dodge"]],
+    tips: "Use your monster's own type: its own-type moves do 15% more, and a hit on the type it beats does half as much again. Evolve at level 5 before you take on the zone 2 boss.",
+  },
+  {
+    slug: "spelldelve", title: "SPELLDELVE", how: 'mounted', port: 8376, url: "/",
+    content: "Fantasy spell combat against cartoon monsters (slimes, skeletons, bats, ghosts, spiders) that dissolve away when they die, with no blood. Explosions light up the room, and the screen edges flash and pulse red when you are hurt or low on health.",
+    web: "spelldelve/",
+    tag: "Roguelite", big: true, added: '2026-10-11',
+    cat: "Adventure", tags: ["new","wizard","roguelite","dungeon","spells","bosses","3d","mobile"],
+    blurb: "A wizard, a spellbook and ten floors of dungeon. Read every spellbook you find and build a run that melts the Hollow Crown.",
+    about: `You are a wizard working down through nine floors of dungeon to a throne room at the bottom. Each floor is generated fresh: rooms seal shut when you walk in and only open when every monster is dead, and most attacks are drawn on the floor first as a red shape, so you get the chance to dodge. Slimes split, goblins charge, skeleton archers aim, ghosts teleport and fire homing orbs, knights hide behind shields and spiders leap at you.
+
+There are fifteen spells to learn from spellbooks, from Fireball and Chain Lightning to Meteor, Gravity Well and Blade Orbit, and every level-up and tome makes one stronger. Thirteen relics change how a run plays. Bosses wait on floors 3, 6 and 9 and in the throne room. When you fall, the gold you carried is banked in the Sanctum for upgrades that help the next run.`,
+    controls: [["W A S D","move"],["Mouse","aim"],["Left click","primary spell"],["Right click / Q / E / R","equipped spells"],["Space / Shift","dodge"],["Tab / G","grimoire (equip spells)"],["Esc / P","pause"],["M","mute"],["Touch","left half to move, right buttons to cast (auto-aim)"]],
+    tips: "Watch the floor, not the monster: charges, leaps, arrows and boss attacks are drawn in red first, and the edge turns pale gold just before it lands. Dodge through it, since the dodge makes you briefly untouchable.",
+  },
+  {
+    slug: "frontline", title: "FRONTLINE", how: 'mounted', port: 8377, url: "/",
+    content: "A war shooter with guns, grenades and explosions against simple low-poly soldiers. Hits show a small red puff and soldiers tumble when they fall; no gore. Muzzle flashes and explosion flashes.",
+    web: "frontline/",
+    tag: "FPS", big: true, added: '2026-10-12',
+    cat: "Shooter", tags: ["new","fps","squad","ai","low poly","3d","armory","war"],
+    blurb: "A low-poly squad shooter against soldiers who take cover, flank, suppress, throw grenades and call out your position.",
+    about: `Eight against eight across three capture points, with every other soldier on the field run by an AI that fights the way you do. Enemies hide behind cover and peek to shoot, pin you down with suppressing fire, send a flanker round the side, put a marksman on the bell tower, throw grenades when you camp, and revive each other. Spot one and he radios your position to his whole squad.
+
+Three battlefields - a war-torn village at dusk, a desert outpost with trenches, and a forest river with bridges - plus Skirmish, ten waves of hunters against you alone, and a mode where you just watch the AI fight with its thinking shown on screen. Nine guns and a knife, four attachments that change the model and the stats, and an Armory where credits from kills, captures, revives and wins buy your next gun.`,
+    controls: [["W A S D","move"],["Mouse","look"],["Left click","fire"],["Right click","aim down sights"],["R","reload"],["Shift","sprint"],["C / Ctrl","crouch"],["Space","jump"],["G","grenade"],["1-4 / wheel","switch weapon"],["E","pick up · resupply · hold to revive"],["Tab","scores"],["Esc","pause"],["Touch","left stick, drag right to look, on-screen buttons"]],
+    tips: "Move after every fight: whoever spotted you has already radioed your position, and his squad will come and search that exact spot for the next 22 seconds.",
+  },
   // ---- NEWEST FIRST: fifteen from the 2026-10-11 game batch ----
   {
     slug: "curveball", title: "CURVEBALL", how: 'mounted', port: 8360, url: "/",

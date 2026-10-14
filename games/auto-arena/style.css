@@ -1,0 +1,5 @@
+@font-face { font-family: 'Fell'; src: url(fonts/fell.woff2) format('woff2'); font-display: swap; }
+@font-face { font-family: 'Hand'; src: url(fonts/hand.woff2) format('woff2'); font-display: swap; }
+html, body { margin: 0; height: 100%; background: #efe4cb; overflow: hidden; touch-action: none;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+canvas { display: block; position: fixed; left: 0; top: 0; touch-action: none; }

@@ -1,0 +1,56 @@
+html, body { margin: 0; height: 100%; background: #05070a; overflow: hidden; color: #d7dde3; font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-user-select: none; user-select: none; touch-action: none; }
+#view canvas { display: block; position: fixed; inset: 0; width: 100% !important; height: 100% !important; }
+.hidden { display: none !important; }
+kbd { border: 1px solid #5a636c; border-radius: 3px; padding: 0 5px; font: 12px/1.6 ui-monospace, monospace; color: #e8ecef; }
+
+#load { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #05070a; color: #8b96a1; letter-spacing: .08em; z-index: 50; transition: opacity 1s; font-size: 13px; }
+#load b { font-size: 34px; color: #e2e6ea; letter-spacing: .5em; font-weight: 300; margin-bottom: 14px; padding-left: .5em; }
+#loadbar { width: 260px; max-width: 70vw; height: 2px; background: #1a2230; margin-top: 12px; }
+#loadbar i { display: block; height: 100%; width: 0; background: #c9d6e3; transition: width .3s; }
+
+.panel { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 20; background: radial-gradient(ellipse at center, rgba(0,0,0,.25), rgba(0,0,0,.78)); padding: 16px; box-sizing: border-box; }
+.tbox { text-align: center; max-width: 640px; width: 100%; }
+.tbox.small { max-width: 360px; }
+h1 { font-size: clamp(40px, 10vw, 120px); margin: 0; font-weight: 200; letter-spacing: .26em; padding-left: .26em; white-space: nowrap; color: #eef1f3; text-shadow: 0 0 40px rgba(180,30,20,.35), 0 2px 0 #000; }
+h2 { font-size: clamp(40px, 9vw, 84px); margin: 0 0 10px; font-weight: 200; letter-spacing: .3em; padding-left: .3em; color: #f1e9e6; }
+.tag { margin: 0 0 26px; color: #a68f8a; letter-spacing: .25em; font-size: 13px; text-transform: uppercase; }
+button { font: inherit; cursor: pointer; }
+.big { display: block; margin: 0 auto 14px; min-width: 240px; padding: 16px 40px; font-size: 26px; letter-spacing: .4em; padding-left: calc(40px + .4em); background: #b11d14; color: #fff; border: 0; border-radius: 2px; box-shadow: 0 0 30px rgba(177,29,20,.45); transition: transform .08s, background .15s; }
+.big:hover { background: #d0261b; transform: scale(1.03); }
+.big:active { transform: scale(.98); }
+.small { background: rgba(255,255,255,.06); color: #c6ced6; border: 1px solid rgba(255,255,255,.18); padding: 7px 14px; border-radius: 2px; font-size: 12px; letter-spacing: .15em; margin: 4px; }
+.small:hover { background: rgba(255,255,255,.14); }
+.row { margin-top: 8px; }
+.best { color: #c9b8a0; letter-spacing: .12em; font-size: 13px; min-height: 20px; margin-bottom: 10px; }
+.ctl { margin: 18px auto 6px; color: #9aa5af; font-size: 12.5px; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; }
+.note { color: #6f7880; font-size: 12px; margin-top: 14px; }
+.stats { display: flex; justify-content: center; gap: 34px; margin: 6px 0 16px; }
+.stats div { display: flex; flex-direction: column; }
+.stats b { font-size: 34px; font-weight: 300; color: #fff; }
+.stats span { font-size: 11px; letter-spacing: .25em; text-transform: uppercase; color: #8d97a0; }
+.cause { color: #b3958f; font-style: italic; margin-bottom: 18px; min-height: 20px; }
+body.touchdev .desk { display: none; }
+body:not(.touchdev) .touch { display: none; }
+
+#hud { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+#time { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); font: 300 22px/1 ui-monospace, monospace; letter-spacing: .12em; color: rgba(235,238,240,.75); text-shadow: 0 1px 3px #000; }
+#dist { position: absolute; top: 42px; left: 50%; transform: translateX(-50%); font-size: 11px; letter-spacing: .2em; color: rgba(200,205,210,.5); }
+#stam { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); width: 180px; height: 3px; background: rgba(255,255,255,.08); transition: opacity .4s; }
+#stam i { display: block; height: 100%; width: 100%; background: rgba(230,232,235,.75); }
+#stam.low i { background: #c0392b; }
+#prompt { position: absolute; top: 58%; left: 50%; transform: translateX(-50%); font-size: 13px; letter-spacing: .2em; color: #f2f2f2; text-shadow: 0 1px 4px #000; white-space: nowrap; }
+#msg { position: absolute; top: 34%; left: 50%; transform: translate(-50%, -50%); font-size: clamp(44px, 11vw, 110px); font-weight: 200; letter-spacing: .5em; padding-left: .5em; color: #fff; opacity: 0; transition: opacity .25s; text-shadow: 0 0 30px rgba(200,20,10,.7); white-space: nowrap; }
+#hint { position: absolute; bottom: 48px; left: 50%; transform: translateX(-50%); font-size: 12px; letter-spacing: .12em; color: rgba(220,224,228,.7); text-shadow: 0 1px 3px #000; opacity: 0; transition: opacity .6s; text-align: center; max-width: 92vw; }
+
+#touch { position: fixed; inset: 0; z-index: 12; pointer-events: none; }
+#stickzone { position: absolute; left: 0; bottom: 0; width: 45%; height: 60%; pointer-events: auto; }
+#stick { position: absolute; width: 120px; height: 120px; border-radius: 50%; border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.04); left: 40px; bottom: 50px; display: none; }
+#stick i { position: absolute; left: 50%; top: 50%; width: 50px; height: 50px; margin: -25px 0 0 -25px; border-radius: 50%; background: rgba(255,255,255,.25); }
+#tbtns { position: absolute; right: max(12px, env(safe-area-inset-right)); bottom: max(14px, env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(3, 66px); gap: 8px; pointer-events: auto; }
+.tb { width: 66px; height: 58px; border-radius: 10px; background: rgba(20,22,26,.42); color: #e9ecef; border: 1px solid rgba(255,255,255,.22); font-size: 11px; letter-spacing: .08em; padding: 0; line-height: 1.15; touch-action: none; }
+.tb.on { background: rgba(177,29,20,.6); border-color: rgba(255,120,110,.7); }
+.tb.wide { grid-column: span 3; width: auto; height: 46px; }
+.tb.tiny { position: absolute; top: max(10px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); width: 44px; height: 40px; pointer-events: auto; }
+@media (max-height: 460px) { .tb { height: 46px; width: 58px; } #tbtns { grid-template-columns: repeat(3, 58px); } .tb.wide { height: 38px; } h1 { font-size: 48px; } .tag { margin-bottom: 10px; } .big { padding: 10px 30px; font-size: 20px; } .ctl { margin-top: 8px; } }
+
+#danger { position: fixed; inset: 0; pointer-events: none; opacity: 0; z-index: 2; }

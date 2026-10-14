@@ -26,7 +26,9 @@ export const INTROS = {
     event at a time or as a whole season.`,
   Horror: `A game about not being able to see. EXPOSURE leaves you with nothing
     but your own muzzle flash, which lights the room for a moment and then stays on the
-    screen as a photograph of where everything was.`,
+    screen as a photograph of where everything was. PURSUED is the opposite: a
+    first-person chase through rainy night streets with something tall and eyeless
+    right behind you, and nowhere to stop.`,
   Puzzle: `Games you think your way through. A pipe-laying puzzle with six hand-made
     rooms and an endless generator after them, a minesweeper on the clock at four sizes
     and four difficulties, and a physics merge game that runs to a thousand stages.`,

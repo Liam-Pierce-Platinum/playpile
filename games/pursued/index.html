@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PURSUED</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#05070a">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "./vendor/three/build/three.module.js",
+  "three/addons/": "./vendor/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="view"></div>
+
+<!-- loading -->
+<div id="load"><b>PURSUED</b><span id="loadmsg">loading</span><div id="loadbar"><i></i></div></div>
+
+<!-- title -->
+<div id="title" class="panel hidden">
+  <div class="tbox">
+    <h1>PURSUED</h1>
+    <p class="tag">It is right behind you.</p>
+    <button id="play" class="big">PLAY</button>
+    <div id="best" class="best"></div>
+    <div class="ctl desk">
+      <span><kbd>W A S D</kbd> run</span><span><kbd>Shift</kbd> sprint</span><span>run at fences: <b>auto vault</b></span>
+      <span><kbd>Ctrl</kbd> slide</span><span><kbd>E</kbd> slam door</span><span><kbd>Click</kbd> shove things over</span>
+      <span><kbd>Q</kbd> / middle mouse: look back</span><span><kbd>M</kbd> sound</span>
+    </div>
+    <div class="ctl touch">left thumb: run &nbsp;·&nbsp; right thumb: look &nbsp;·&nbsp; run at fences to vault &nbsp;·&nbsp; buttons: sprint, slide, shove, door, look back</div>
+    <div class="row"><button id="snd" class="small">SOUND: ON</button><button id="qual" class="small">QUALITY: HIGH</button></div>
+    <p class="note">Headphones. Lights off. Gore-free, but it is meant to frighten you.</p>
+  </div>
+</div>
+
+<!-- in-game HUD -->
+<div id="danger"></div>
+<div id="hud" class="hidden">
+  <div id="time">0:00</div>
+  <div id="dist"></div>
+  <div id="stam"><i></i></div>
+  <div id="prompt"></div>
+  <div id="msg"></div>
+  <div id="hint"></div>
+</div>
+
+<!-- pause -->
+<div id="pause" class="panel hidden">
+  <div class="tbox small">
+    <h2>PAUSED</h2>
+    <button id="resume" class="big">RESUME</button>
+    <div class="row"><button id="restart" class="small">RESTART</button><button id="menu" class="small">MENU</button></div>
+  </div>
+</div>
+
+<!-- results -->
+<div id="results" class="panel hidden">
+  <div class="tbox">
+    <h2 id="rtitle">CAUGHT</h2>
+    <div class="stats">
+      <div><b id="rtime">0:00</b><span>survived</span></div>
+      <div><b id="rdist">0 m</b><span>run</span></div>
+      <div><b id="rscore">0</b><span>score</span></div>
+    </div>
+    <div id="rbest" class="best"></div>
+    <div id="rcause" class="cause"></div>
+    <button id="retry" class="big">RUN AGAIN</button>
+    <div class="row"><button id="rmenu" class="small">MENU</button></div>
+    <p class="note desk">R or Space to run again</p>
+  </div>
+</div>
+
+<!-- touch controls -->
+<div id="touch" class="hidden">
+  <div id="stickzone"><div id="stick"><i></i></div></div>
+  <div id="tbtns">
+    <button data-k="sprint" class="tb wide">SPRINT</button>
+    <button data-k="jump" class="tb">JUMP</button>
+    <button data-k="slide" class="tb">SLIDE</button>
+    <button data-k="shove" class="tb">SHOVE</button>
+    <button data-k="use" class="tb">DOOR</button>
+    <button data-k="back" class="tb">LOOK<br>BACK</button>
+  </div>
+  <button id="tpause" class="tb tiny">II</button>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

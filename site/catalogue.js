@@ -12,6 +12,85 @@
 //                     port. The page frames http://localhost:<port>.
 //         'unity'   - a Unity WebGL build under games/<slug>/build.
 export const GAMES = [
+  // ---- NEWEST FIRST: six from the 2026-10-12/13 category-fill batch ----
+  {
+    slug: "pursued", title: "PURSUED", how: 'mounted', port: 8378, url: "/",
+    content: "First-person horror chase. A tall, pale, eyeless monster chases you through dark rainy streets, with screams, jump scares and a grab when it catches you; no blood or gore. Lightning flashes light the sky now and then, the screen edge glows and pulses red when it is close, there is a red flash when it cuts you off, and a brief bright flash when it catches you.",
+    web: "pursued/",
+    tag: "Chase", big: true, added: '2026-10-13',
+    cat: "Horror", tags: ["new","horror","chase","monster","first person","parkour","rain","3d","mobile"],
+    blurb: "Night, rain, and something tall and wrong right behind you. Vault fences, slam doors, knock bins into its path and run.",
+    about: `It is night, it is raining, and something about 2.7 metres tall, pale and eyeless has just burst out of the dark behind you. You run. Fences, cars and dumpsters are vaulted automatically, you slide under half-shut gates, slam doors behind you and shove bins, trolleys and shelves over into its path.
+
+It hunts by sight and by sound through the same alleys, backyards and walk-through apartment buildings you do. Break its line of sight and keep quiet and it loses you and searches; get careless and it comes out of a side street ahead of you. It grows faster the longer you last. Score is time survived plus distance run, and your best is kept.`,
+    controls: [["W A S D / arrows","run"],["Mouse","look"],["Shift","sprint"],["Run at fences","auto vault"],["Space","jump / vault"],["Ctrl / C","slide · hold to crouch"],["E / F","open · slam door"],["Left click","shove things over"],["Q / middle mouse","look back"],["P","pause"],["M","sound on / off"],["R / Space","run again"],["Touch","left thumb to run (rim = sprint), right thumb to look, on-screen buttons"]],
+    tips: "Never stand still, and break its line of sight before you slow down: out of view and quiet, it loses you and searches. Slam a door or knock a bin into its path to buy a second.",
+  },
+  {
+    slug: "deep-dive", title: "DEEP DIVE", how: 'mounted', port: 8379, url: "/",
+    content: "Cartoon pixel-art sea rescue. Sharks bite, jellyfish sting and eels zap the diver, which costs oxygen; there is no blood. Survivors can be lost if they run out of air (shown with a burst of bubbles and a message) and the diver can black out. Taking a hit gives a faint red screen tint and a small screen shake.",
+    web: "deep-dive/",
+    tag: "Rescue", big: true, added: '2026-10-13',
+    cat: "Adventure", tags: ["new","diving","rescue","underwater","pixel","upgrades","endless","mobile"],
+    blurb: "A ship is going down with people trapped inside. Swim into the wreck, hook them onto your air line and tow them out before anyone's air runs out.",
+    about: `Every mission a ship is sinking, and its passengers are trapped in air pockets in the flooded rooms. You are the rescue diver: find a hole in the hull, crank hatches open, cut through debris, clip your spare air line onto each survivor and tow them out to the rescue bell or the surface. Your tank drains the whole time, each pocket's air runs low as the wreck tilts and sinks, and a survivor whose room floods can only hold their breath for nine seconds.
+
+There are 24 missions across fishing boats, ferries, cargo ships, cruise liners, submarines and oil rigs, with sharks, jellyfish, electric eels, fires, sliding cargo and collapsing ceilings. Coins and stars buy a bigger tank, faster fins, a flashlight, a cutter, sonar and a rescue sled. Mayday mode sends ship after ship down until you black out or lose three people.`,
+    controls: [["W A S D / Arrows","swim"],["Shift / K","kick (tap) or sprint (hold)"],["E / Space / J (hold)","air line, open hatch, cut debris"],["Q / L","sonar ping (needs the upgrade)"],["P / Esc","pause"],["M","mute"],["R","restart"],["Touch","drag on the left half to swim; KICK, ACT and PING buttons"]],
+    tips: "Follow the arrows: yellow WAY IN points to the nearest hole in the hull, and while you tow someone inside a wreck the green EXIT pointer traces the real route back to the bell. Holding the kick to sprint burns more than twice the oxygen, so tap it instead.",
+  },
+  {
+    slug: "sky-aces", title: "SKY ACES", how: 'mounted', port: 8380, url: "/",
+    content: "Cartoon plane dogfights: planes are shot down in fireballs with smoke and falling wreckage, no people are shown hurt. Bright explosion and muzzle flashes, a red flash at the screen edges when you are hit, screen shake, and the screen briefly turns white when you fly through a cloud.",
+    web: "sky-aces/",
+    tag: "Dogfight", big: true, added: '2026-10-13',
+    cat: "Shooter", tags: ["new","planes","dogfight","airships","3d","upgrades","online","mobile"],
+    blurb: "Arcade dogfights in a bright cartoon sky. Shoot down raiders, aces, bombers and armoured airships, then spend the money on faster planes.",
+    about: `You are a little pilot in goggles and a flapping scarf, flying an open-cockpit biplane over a sea of islands. Point with the mouse and the plane follows; lead your shots, lock missiles, boost, and barrel roll to shake a missile on your tail. Enemy pilots line up real shots, climb away when they are slow, break hard when you sit on their six and fly with wingmen.
+
+Ten campaign missions run from three rookie raiders to bomber raids on the harbour, a duel with the Red Baroness, armoured airships with gun turrets and the raider flagship, the Leviathan. Endless waves keep coming until you fall, and online lets up to eight planes fight free-for-all or in two teams with bots filling the gaps. Money buys five planes, from the Sparrow biplane to the Comet jet, each with seven upgrade tracks.`,
+    controls: [["Mouse","aim (click to lock the mouse)"],["W A S D","fly directly: S up, W down, A/D roll"],["Left click / Space","guns"],["Right click / F","missile"],["Shift","boost"],["Q / E","barrel roll"],["C","look back"],["Tab","scores (online)"],["Esc","pause"],["M","mute"],["Touch","left thumb steers, FIRE / BOOST / MSL / ROLL buttons"]],
+    tips: "Aim at the small lead marker ahead of the enemy, not the plane itself: bullets take time to fly. When the missile warning beeps, barrel roll as it closes in to shake it off.",
+  },
+  {
+    slug: "auto-arena", title: "AUTO ARENA", how: 'mounted', port: 8381, url: "/",
+    content: "Cartoon animals and monsters fight with swords, arrows and spells in a painted arena. Beaten units burst into an ink splat; there is no blood. Units flash white for a moment when hit, and big spells and lost fights give a small screen shake.",
+    web: "auto-arena/",
+    tag: "Auto-battler", big: false, added: '2026-10-13',
+    cat: "Strategy", tags: ["new","auto battler","strategy","shop","merge","ranked","daily","mobile"],
+    blurb: "Buy ink-and-watercolour fighters, merge three into a star, then watch them battle on their own. Ten trophies before six hearts run out.",
+    about: `Each round you shop, then fight. Spend gold on little fighters, from a mouse knight in a thimble helmet to a dragon made of ink, and arrange them on a two-row board: tanks in front, archers and mages behind. Press FIGHT and the battle plays itself: your units walk in, attack and cast their abilities when their mana fills. Win and you take a trophy; lose and you lose a heart. Ten trophies before your six hearts run out wins the run.
+
+There are 34 units with their own abilities, 10 traits that switch on when you field matching units, and 10 items offered as treasure every few rounds. Three copies of a unit merge into a stronger star-two, and three of those into a star-three. Seven computer rivals with their own plans shop and level just like you, a ranked ladder climbs from Paper to Masterwork, and a Daily run gives everyone the same shops.`,
+    controls: [["Click / drag","buy a card, move units between board and bench"],["Drag to shop / right click / E","sell"],["D","reroll the shop"],["F","buy XP"],["L","lock the shop"],["Space / Enter","fight · change fight speed · play again"],["1 2 3","pick a treasure item"],["M","mute"],["Esc","menu"],["Touch","tap to buy, drag to move or sell, on-screen buttons"]],
+    tips: "Hold gold when you can: every 10 gold you keep pays 1 extra a round, up to 5. And look at the faded board in the top half while you shop - that is your next rival, so you can set up against it.",
+  },
+  {
+    slug: "tiny-knight", title: "TINY KNIGHT", how: 'mounted', port: 8382, url: "/",
+    content: "Cartoon sword fighting against cute pixel monsters (slimes, zombies, skeletons, bats, shadow creatures) that pop into particles when beaten, with no blood. Enemies flash white when hit, a short white screen flash on every level-up, a red glow at the screen edges when you are hurt, red danger circles and lines on the ground, and screen shake on big hits.",
+    web: "tiny-knight/",
+    tag: "Action RPG", big: true, added: '2026-10-13',
+    cat: "Adventure", tags: ["new","pixel","crafting","action rpg","knight","boss","island","mobile"],
+    blurb: "Chop, mine and craft your way up from bare fists to the Shadowbane, then pay to build the bridge to the Shadow King's castle.",
+    about: `You are a tiny knight on a big island. In the middle, a castle sits on a lake, swallowed by shadow, and the only way across is a bridge that Foreman Bram builds in five stages, if you can pay for them. Chop trees and mine rock and iron, craft better swords, axes, pickaxes, shields, armour and a bow at the workbench, and push out through the Meadow, Whisperwood, the Pebble Hills and the Hollow Graves, where night brings out zombies and bats.
+
+Every hit lands with a flash, knockback and a bit of hit-stop, and every dangerous enemy attack is shown before it comes, so a well-timed dodge roll gets you through. Level up, loot fourteen chests and sell spare loot in Oakhaven, then cross the bridge, beat the three Shadow Sentinels and face Umbra, the Shadow King, in a three-phase fight. Win and the island stays open for free play.`,
+    controls: [["W A S D / arrows","move"],["J / Z / left click","attack (hold to combo)"],["K / Space / X / right click","dodge roll"],["E","chop, mine (hold) · open · talk · craft"],["L / F","shoot bow"],["Q / H","potion"],["I / Tab / B","bag"],["M","map"],["Esc / P","pause"],["N","mute"],["Touch","left stick, attack / roll / E / bow / potion buttons"]],
+    tips: "Every dangerous attack is shown first as a flash, a \"!\", a red circle or a red line. Roll through it rather than away: you cannot be hurt mid-roll. After Umbra's charge he is stunned and takes 1.6 times damage.",
+  },
+  {
+    slug: "the-mark", title: "THE MARK", how: 'mounted', port: 8383, url: "/",
+    content: "A sniper game with no blood: stylised figures simply fall down when hit. A short white screen flash on every shot, and a red and blue flashing siren light for a few seconds on some missions.",
+    web: "the-mark/",
+    tag: "Sniper", big: true, added: '2026-10-13',
+    cat: "Shooter", tags: ["new","sniper","deduction","puzzle","crowd","3d","mobile"],
+    blurb: "One person in the crowd below is an enemy agent. Read the clues, watch for the tell, and take one clean shot.",
+    about: `You lie on a rooftop with a scoped rifle above a busy crowd, and one of the people down there is THE MARK, an enemy agent trying to blend in. A target profile gives you two clues, and over the next few minutes your radio adds more: what they wear, which bag they carry, which hand they hold things in, and habits you have to watch for, like checking a wristwatch, glancing at the security cameras or steering clear of the police. A siren, a dropped parcel or a bag swap can give them away.
+
+You have three rounds. Hit the wrong person and the crowd panics while the mark runs for an exit. The mark and the clues are picked fresh every play, across sixteen missions in a market, a train station, a harbour, a festival and a rooftop party, from morning to rainy night.`,
+    controls: [["Click, then mouse","aim"],["Right mouse / Q","scope"],["Wheel / 1 2 3","zoom 3x · 6x · 10x"],["Shift (hold)","hold breath"],["Left click / Space / F","fire"],["E / middle click","tag a suspect"],["Tab","fold the intel panel"],["R","restart"],["P","pause"],["M","mute"],["Touch","drag to aim, pinch to zoom, SCOPE / HOLD BREATH / TAG / FIRE buttons"]],
+    tips: "Wait for the last piece of intel: the full set always points at exactly one person. Tag anyone who fits early with E so you only re-check them when the radio speaks.",
+  },
   // ---- NEWEST FIRST: three from the 2026-10-12 session ----
   {
     slug: "chibi-clash", title: "CHIBI CLASH", how: 'mounted', port: 8375, url: "/",

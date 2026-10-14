@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>THE MARK</title>
+<meta name="description" content="Sniper deduction: find the enemy agent hiding in the crowd. Three shots.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="scope" class="hidden">
+  <svg id="reticle" viewBox="-100 -100 200 200" preserveAspectRatio="xMidYMid meet">
+    <circle r="99" fill="none" stroke="#000" stroke-width="2.5"/>
+    <line x1="-99" y1="0" x2="-8" y2="0" stroke="#000" stroke-width="1.1"/>
+    <line x1="8" y1="0" x2="99" y2="0" stroke="#000" stroke-width="1.1"/>
+    <line x1="0" y1="-99" x2="0" y2="-8" stroke="#000" stroke-width="1.1"/>
+    <line x1="0" y1="8" x2="0" y2="99" stroke="#000" stroke-width="1.1"/>
+    <line x1="-99" y1="0" x2="-55" y2="0" stroke="#000" stroke-width="4"/>
+    <line x1="55" y1="0" x2="99" y2="0" stroke="#000" stroke-width="4"/>
+    <line x1="0" y1="55" x2="0" y2="99" stroke="#000" stroke-width="4"/>
+    <g fill="#000"><circle cx="-40" cy="0" r="1.3"/><circle cx="-24" cy="0" r="1.3"/><circle cx="24" cy="0" r="1.3"/><circle cx="40" cy="0" r="1.3"/><circle cx="0" cy="24" r="1.3"/><circle cx="0" cy="40" r="1.3"/><circle cx="0" cy="-24" r="1.3"/></g>
+    <circle r="1.1" fill="#ff2a2a"/>
+  </svg>
+  <div id="zoomLbl">3x</div>
+  <div id="target-info"></div>
+</div>
+<div id="cross" class="hidden"></div>
+<div id="vignette"></div>
+<div id="flash"></div>
+
+<div id="hud" class="hidden">
+  <div id="topbar">
+    <div id="lvlName">MORNING MARKET</div>
+    <div id="clock">3:00</div>
+  </div>
+  <div id="ammo"><span class="b"></span><span class="b"></span><span class="b"></span></div>
+  <div id="intel">
+    <div id="intelHead">TARGET PROFILE <span id="intelToggle">-</span></div>
+    <ul id="intelList"></ul>
+  </div>
+  <div id="radio" class="hidden"><b>CONTROL</b> <span></span></div>
+  <div id="toast" class="hidden"></div>
+  <div id="tip" class="hidden"></div>
+  <div id="escape" class="hidden">MARK ESCAPING <span>0:10</span></div>
+  <div id="breath" class="hidden"><div id="breathFill"></div><label>BREATH</label></div>
+  <div id="hint">Click to aim &middot; RMB scope &middot; Wheel zoom &middot; Shift hold breath &middot; LMB / Space fire &middot; E tag suspect</div>
+  <button id="muteBtn" class="iconbtn" title="Mute (M)">&#9835;</button>
+  <button id="pauseBtn" class="iconbtn" title="Pause (P)">II</button>
+</div>
+
+<div id="touch" class="hidden">
+  <button id="tFire" class="tb fire">FIRE</button>
+  <button id="tScope" class="tb">SCOPE</button>
+  <button id="tZoom" class="tb">ZOOM</button>
+  <button id="tBreath" class="tb">HOLD<br>BREATH</button>
+  <button id="tTag" class="tb">TAG</button>
+</div>
+
+<div id="title" class="screen">
+  <div class="logo"><span class="the">THE</span><span class="mark">MARK</span></div>
+  <div class="tag">One of them is not who they seem. Three shots.</div>
+  <button id="playBtn" class="big">PLAY</button>
+  <div id="levels"></div>
+  <div class="foot">Desktop: mouse aim &middot; right-click scope &middot; Shift steady &middot; click fire &middot; E tag &middot; R restart. Phone: drag to aim, pinch or ZOOM, FIRE.</div>
+</div>
+
+<div id="brief" class="screen hidden">
+  <div class="card">
+    <div class="stamp">CLASSIFIED</div>
+    <div class="loc" id="bLoc">MARKET SQUARE</div>
+    <h2 id="bName">Morning Market</h2>
+    <p class="lead">An enemy agent is blending into the crowd below. Identify and neutralise. Shoot an innocent and the crowd panics - the mark will run.</p>
+    <div class="profile">TARGET PROFILE</div>
+    <ul id="bClues"></ul>
+    <p class="more">More intel will come over the radio. Watch how people behave.</p>
+    <button id="goBtn" class="big">TAKE POSITION</button>
+  </div>
+</div>
+
+<div id="pause" class="screen hidden">
+  <h2>PAUSED</h2>
+  <button id="resumeBtn" class="big">RESUME</button>
+  <button id="pRestart" class="mid">RESTART</button>
+  <button id="pMenu" class="mid">LEVELS</button>
+</div>
+
+<div id="result" class="screen hidden">
+  <div class="card">
+    <h2 id="rTitle">TARGET DOWN</h2>
+    <div id="rStars"></div>
+    <p id="rWhy"></p>
+    <div id="rMark"></div>
+    <div id="rStats"></div>
+    <div class="row">
+      <button id="retryBtn" class="big">RETRY</button>
+      <button id="nextBtn" class="big">NEXT</button>
+    </div>
+    <button id="menuBtn" class="mid">LEVELS</button>
+    <div class="keys" id="rKeys">R retry &middot; Enter next</div>
+  </div>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

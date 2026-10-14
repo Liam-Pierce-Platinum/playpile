@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#7fb6e8">
+<title>SKY ACES</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="cloud"></div>
+<div id="vig"></div>
+<div id="hud" class="hide">
+  <div id="markers"></div>
+  <div id="aimc"></div>
+  <div id="nose"><i></i></div>
+  <div id="lead"></div>
+  <div id="lock"><span>LOCK</span></div>
+  <div id="hitm"></div>
+  <div id="top">
+    <div id="obj"></div>
+    <div id="money"></div>
+  </div>
+  <div id="feed"></div>
+  <div id="pops"></div>
+  <div id="callout"></div>
+  <div id="banner"><b></b><span></span></div>
+  <div id="warn"></div>
+  <div id="tips"></div>
+  <div id="panel">
+    <div class="row"><span class="lbl">HULL</span><div class="bar hp"><i></i></div></div>
+    <div class="row"><span class="lbl">BOOST</span><div class="bar bo"><i></i></div></div>
+    <div class="row"><span class="lbl">GUNS</span><div class="bar ht"><i></i></div></div>
+    <div class="row nums"><span id="spd">0</span><small>KM/H</small><span id="alt">0</span><small>M</small><span id="msl">0</span><small>MSL</small></div>
+  </div>
+  <canvas id="radar" width="160" height="160"></canvas>
+  <div id="board" class="hide"></div>
+  <div id="dead" class="hide"></div>
+</div>
+<div id="touch" class="hide">
+  <div id="stickArea"></div>
+  <div id="stick"><div id="knob"></div></div>
+  <button id="tFire">FIRE</button>
+  <button id="tBoost">BOOST</button>
+  <button id="tMsl">MSL</button>
+  <button id="tRoll">ROLL</button>
+</div>
+<div id="ui"></div>
+<button id="pauseBtn" class="hide" aria-label="pause">II</button>
+<button id="mute" aria-label="mute">&#9835;</button>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

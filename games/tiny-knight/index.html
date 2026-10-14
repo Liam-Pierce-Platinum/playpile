@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1a1c2c">
+<title>Tiny Knight</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="vignette"></div>
+
+<div id="hud">
+  <div class="tl">
+    <div class="row"><span id="lvl" class="lvl">Lv 1</span>
+      <div class="bar hp"><div id="hpfill"></div><span id="hptext"></span></div></div>
+    <div class="bar xp"><div id="xpfill"></div></div>
+    <div class="row res">
+      <span class="r"><i class="ic coin"></i><b id="coins">0</b></span>
+      <span class="r"><i class="ic wood"></i><b id="m-wood">0</b></span>
+      <span class="r"><i class="ic stone"></i><b id="m-stone">0</b></span>
+      <span class="r"><i class="ic iron"></i><b id="m-iron">0</b></span>
+      <span class="r"><i class="ic potion"></i><b id="potions">0</b></span>
+      <span class="r"><i class="ic arrow"></i><b id="arrows">-</b></span>
+    </div>
+  </div>
+  <div class="tr">
+    <canvas id="mini" width="48" height="48"></canvas>
+    <div class="btncol">
+      <button id="bagbtn" title="Bag (I)">🎒</button>
+      <button id="mapbtn" title="Map (M)">🗺</button>
+      <button id="mutebtn" title="Mute (N)">🔊</button>
+      <button id="pausebtn" title="Pause (Esc)">❚❚</button>
+    </div>
+  </div>
+  <div id="objective"><span class="star">★</span> <span id="objtext"></span></div>
+  <div id="prompt"></div>
+  <div id="gains"></div>
+  <div id="bossbar"><div id="bossname">UMBRA</div><div class="bar"><div id="bossfill"></div></div></div>
+</div>
+<div id="toasts"></div>
+<div id="banner"></div>
+<div id="zone"></div>
+
+<div id="touch">
+  <div id="stick"><div id="knob"></div></div>
+  <div class="tbtns">
+    <button data-k="attack" class="big">⚔</button>
+    <button data-k="roll" class="roll">ROLL</button>
+    <button data-k="use" class="use">E</button>
+    <button data-k="bow" class="bow">BOW</button>
+    <button data-k="potion" class="pot">POT</button>
+  </div>
+</div>
+
+<div id="panel" class="hidden"></div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

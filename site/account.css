@@ -105,3 +105,49 @@
   .acc-name { display: none; }
   .acc-button { padding: 0 10px; }
 }
+
+/* ---- 2026-10-14: picture, honest status pills, level line ------------- */
+.acc-button { padding: 0 14px 0 5px; position: relative; }
+.acc-button:has(.acc-dot) { padding-left: 14px; }
+.acc-button .pp-av { display: block; border-radius: 50%; flex: none; }
+.acc-mode { position: absolute; left: 24px; top: 24px; width: 9px; height: 9px; border-radius: 50%;
+  border: 2px solid #0f1f38; }
+.acc-mode.cloud { background: #22d37a; }
+.acc-mode.local { background: #ffb15e; }
+
+.acc-who { display: flex; align-items: center; gap: 12px; margin: 2px 0 12px; }
+.acc-who > svg { border-radius: 14px; flex: none; }
+.acc-who > div { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; min-width: 0; }
+.acc-who b { font: 700 16px/1.2 system-ui, sans-serif; overflow-wrap: anywhere; }
+.acc-who small { color: #8b96a8; font-size: 12px; overflow-wrap: anywhere; }
+.acc-pill { display: inline-block; padding: 4px 9px; border-radius: 999px; font: 700 11px/1.2 system-ui, sans-serif;
+  letter-spacing: .3px; background: rgba(255, 255, 255, .06); color: #a3b4cc; border: 1px solid #1f3557; }
+.acc-pill.good { background: rgba(34, 211, 122, .12); color: #4fe39a; border-color: rgba(34, 211, 122, .4); }
+.acc-pill.warn { background: rgba(255, 177, 94, .1); color: #ffc685; border-color: rgba(255, 177, 94, .35); }
+
+.acc-level { display: block; padding: 10px 12px; margin-bottom: 4px; border-radius: 10px;
+  background: #0f1f38; border: 1px solid #1f3557; color: #cdd7e4; font-size: 13px; }
+.acc-level:hover { border-color: #22d37a; }
+.acc-bar { display: block; height: 6px; margin: 7px 0 6px; border-radius: 99px; background: #081326; overflow: hidden; }
+.acc-bar i { display: block; height: 100%; background: #22d37a; border-radius: 99px; }
+.acc-more { color: #22d37a; font-weight: 600; font-size: 12px; }
+
+.acc-avs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin: 4px 0 2px; }
+.acc-av { padding: 3px; background: transparent; border: 2px solid transparent; border-radius: 12px; cursor: pointer;
+  display: grid; place-items: center; }
+.acc-av svg { width: 100%; height: auto; max-width: 40px; border-radius: 10px; }
+.acc-av:hover { border-color: #2b4a73; }
+.acc-av.on { border-color: #22d37a; }
+.acc-av:focus-visible, .acc-tab:focus-visible, .acc-btn:focus-visible, .acc-chip:focus-visible { outline: 2px solid #22d37a; outline-offset: 2px; }
+
+.acc-btn.wide { width: 100%; padding: 13px 16px; font-size: 14px; }
+.acc-btn:disabled { opacity: .6; cursor: wait; }
+.acc-chip { display: inline-flex; align-items: center; gap: 7px; padding: 4px 12px 4px 4px; }
+.acc-chip svg { border-radius: 50%; }
+
+.acc-edit, .acc-code { margin-top: 12px; border-top: 1px solid #132745; padding-top: 10px; }
+.acc-edit summary, .acc-code summary { cursor: pointer; color: #cdd7e4; font: 600 13px/1.6 system-ui, sans-serif; }
+.acc-edit summary:hover, .acc-code summary:hover { color: #22d37a; }
+.acc-edit[open] summary, .acc-code[open] summary { margin-bottom: 8px; }
+.acc-edit .acc-field { margin-bottom: 8px; }
+.acc-edit .acc-field input { width: 100%; }

@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="/site/style.css">
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
+<link rel="stylesheet" href="/site/progress.css">
 <script type="module" src="/site/account.js"></script>
 <link rel="icon" href="/site/icon.svg" type="image/svg+xml">
 <link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
@@ -51,6 +52,11 @@
   <div class="scrim" id="scrim"></div>
 
   <main id="main">
+    <!-- YOUR CORNER: the daily challenge, your level, continue playing.
+         Above the hero on purpose, so the hero sits between it and the
+         first ad slot - nothing you tap here is next to an advert. -->
+    <section class="pp-home" id="pphome"></section>
+
     <!-- the hero, built from the catalogue -->
     <section class="hero" id="hero"></section>
 
@@ -91,8 +97,10 @@
            a boxing game with ten opponents and a horror game played by torchlight. The rest
            are quick games written to be finished in a sitting, and the classics rebuilt
            with the details that make them feel right.</p>
-        <p>Everything runs in the browser. There is nothing to install and no account to
-           make, and your scores, unlocks and saved progress stay on your own machine.
+        <p>Everything runs in the browser. There is nothing to install and no account
+           needed, and your scores, unlocks and saved progress stay on your own machine.
+           Play counts towards a site-wide level, badges and a daily challenge, and a free
+           profile keeps all of that together on <a href="/me/">your profile page</a>.
            Each game has its own page with the controls, a written guide to how it plays,
            tips drawn from how the game actually works, and answers to the usual
            questions. The games are still being worked on &mdash; the
@@ -138,6 +146,7 @@ import { GAMES, mountShell, categories, catOf, search, recent, card, tile, row }
   from '/site/shell.js';
 import { loadAds, slot } from '/ads/ads.js';
 import { catSlug, directoryHtml } from '/site/pages.js';
+import { mountHome } from '/site/progress.js';
 
 const $ = (id) => document.getElementById(id);
 if (!$('directory').textContent.trim()) $('directory').innerHTML = directoryHtml(GAMES);
@@ -194,7 +203,6 @@ const touch = (g) => has(g, 'mobile', 'one button') || (g.controls || []).some((
 function front() {
   A.innerHTML =
     row('Just added', daily(NEWEST, 4), { seeAll: '/#r=just', wide: true })
-    + row('Recently played', recent(), { seeAll: '/#r=recent' })
     + row('Popular now', mix(oldBigs, daily(NEWEST, 5)), { seeAll: '/#r=popular', wide: true });
   B.innerHTML =
     row('Picked for you today', daily(GAMES, 6).slice(0, 12), { seeAll: '/#r=all' })
@@ -271,6 +279,7 @@ function route() {
   const h = new URLSearchParams(location.hash.replace(/^#/, ''));
   const c = h.get('c'), term = h.get('q'), r = h.get('r');
   document.getElementById('hero').style.display = (c || term || r) ? 'none' : '';
+  document.getElementById('pphome').style.display = (c || term || r) ? 'none' : '';
 
   if (term !== null) {
     q.value = term;
@@ -304,9 +313,11 @@ mountShell({
     // eight pages in the back button
     history.replaceState(null, '', t ? '#q=' + encodeURIComponent(t) : location.pathname);
     document.getElementById('hero').style.display = t ? 'none' : '';
+    document.getElementById('pphome').style.display = t ? 'none' : '';
     if (t) only('Results for &ldquo;' + t + '&rdquo;', search(t)); else front();
   },
 });
+mountHome($('pphome'));
 route();
 addEventListener('hashchange', route);
 

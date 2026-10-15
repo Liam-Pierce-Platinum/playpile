@@ -48,6 +48,7 @@ const I = {
   strategy:'M12 2.6 4 6.2v5.4c0 4.7 3.4 8.3 8 9.8 4.6-1.5 8-5.1 8-9.8V6.2zm0 2.2 6 2.7v4.1c0 3.5-2.4 6.3-6 7.6-3.6-1.3-6-4.1-6-7.6V7.5z',
   skill:  'M12 2 9.2 8.9 2 9.6l5.4 4.7L5.8 21 12 17.3 18.2 21l-1.6-6.7L22 9.6l-7.2-.7z',
   info:   'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm-1 4h2v2h-2zm0 4h2v6h-2z',
+  user:   'M12 3a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 10.5c4.4 0 8 2.2 8 5V21H4v-2.5c0-2.8 3.6-5 8-5z',
   tag:    'M11 3H4a1 1 0 0 0-1 1v7l9.5 9.5a1.5 1.5 0 0 0 2.1 0l6.9-6.9a1.5 1.5 0 0 0 0-2.1zM7 8.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z',
 };
 const CAT_ICON = {
@@ -188,6 +189,7 @@ export function mountShell({ active = '', onSearch = null } = {}) {
     const rec = recent().length;
     let html = '<nav>'
       + link('/', 'home', 'Home', '', active === 'home')
+      + link('/me/', 'user', 'Your profile', '', active === 'me')
       + link('/#r=new', 'new', 'New', '', active === 'new')
       + link('/#r=popular', 'fire', 'Popular', '', active === 'popular')
       + (rec ? link('/#r=recent', 'clock', 'Recently played', rec, active === 'recent') : '')

@@ -63,6 +63,20 @@
     <p>The saved progress is exactly what the games already keep on your device: high scores,
        the three letters you type in beside them, coins, unlocked clothes and settings. No
        location, no contacts, no device fingerprinting, nothing about what else you do online.</p>
+    <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Levels, badges, the daily challenge and leaderboards</h2>
+    <p>The site itself also keeps a few things in that same local storage, under keys beginning
+       <code>pd.site.</code>: how many minutes you have spent in each game and on which days
+       (used for your XP, level and play streak), which badges you have earned, your daily
+       challenge streak, the games you mark as favourites, the picture you choose, and the list of
+       games you played recently. It is counted in your browser while a game page is open in
+       front of you, it is not sent anywhere, and it is shown back to you on your profile page.</p>
+    <p>If you sign in to an <b>account</b>, those keys are saved with the rest of your progress
+       as described above. Signed-in players also appear on <b>public leaderboards</b>: for each
+       game that keeps a best score, we store your player name, your chosen picture and your best
+       score (in Google Firestore, under <code>leaderboards</code>), and anyone visiting that
+       game's page can see them. Your email address is never shown on a leaderboard. Pick a
+       nickname rather than your real name. Without an account, the leaderboard only shows the
+       profiles on your own device and nothing is published.</p>
     <p><b>Deleting it.</b> Sign out and clear your browser data and the device copy is gone. To
        have an account and its saved progress deleted from the server, email the address at the
        bottom of this page and it will be removed &mdash; there is no form to fill in and no
@@ -130,7 +144,7 @@
     <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Getting in touch</h2>
     <p>If you want anything on this page explained or removed, email <a href="mailto:liamlikescows@gmail.com">liamlikescows@gmail.com</a>.</p>
 
-    <div class="tip">Last updated 8 October 2026. If this page ever stops matching what the site actually does, the site is wrong, not the page &mdash; tell us and it gets fixed.</div>
+    <div class="tip">Last updated 14 October 2026. If this page ever stops matching what the site actually does, the site is wrong, not the page &mdash; tell us and it gets fixed.</div>
   </section>
 </main>
 

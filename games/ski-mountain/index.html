@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>SKI MOUNTAIN</title>
+<meta name="description" content="An endless, ever-faster downhill: weave the trees, hit kicker after kicker, grind rails, spin and flip with the mouse.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="spd"></div>
+<canvas id="lines"></canvas>
+<div id="hud">
+  <div id="tl"><div id="score">0</div><div id="combo"></div></div>
+  <div id="route"></div>
+  <div id="tr"><div id="time">0:00.0</div><div id="speed">0<small>km/h</small></div><button id="gearchip" title="scroll wheel / tap: swap">SKIS</button></div>
+  <div id="pops"></div>
+  <div id="bal"><div id="needle"></div></div>
+  <div id="lockhint">click to lock the mouse for spins</div>
+</div>
+<div id="toast"></div>
+<div id="hint" class="hidden">
+  <b>A / D</b> or mouse steer &nbsp;·&nbsp; <b>W</b> tuck &nbsp;·&nbsp; <b>S</b> brake<br>
+  <b>SPACE / click</b> hold + release = jump &nbsp;·&nbsp; <b>SCROLL</b> swap skis / board<br>
+  In the air: <b>move the mouse</b> to spin + flip &nbsp;·&nbsp; <b>SHIFT / right-click</b> grab<br>
+  <span>Weave through the gaps. Land straight. It only gets faster.</span>
+</div>
+<div id="touchui"><button id="tgrab">GRAB</button><div id="tl2">drag: steer · up tuck · down brake</div><div id="tr2">hold + release: jump · drag in air: spin / flip</div></div>
+<div id="card" class="hidden"></div>
+<div id="menu" class="hidden">
+  <div class="mwrap">
+    <header class="mhead">
+      <div class="logo"><span class="peak"></span><h1>SKI<br>MOUNTAIN</h1></div>
+      <p class="sub">one endless run · weave the trees, hit the kickers · the further you go, the faster you fly</p>
+    </header>
+    <section class="mcol">
+      <h3>RIDE <em class="tag">scroll wheel swaps any time</em></h3>
+      <div id="mgear" class="gearcards"></div>
+      <h3>YOUR BEST</h3>
+      <div id="mbest" class="best"></div>
+    </section>
+    <section class="mcol">
+      <div class="mbtns"><button id="mresume" class="hidden">RESUME <small>Esc</small></button><button id="mplay" class="primary big">DROP IN <small>Enter</small></button></div>
+      <div class="row"><label>OUTFIT</label><div id="moutfit" class="seg"></div></div>
+      <h3>CONTROLS</h3>
+      <div id="mkeys" class="ctl"></div>
+      <div id="mch"></div>
+    </section>
+  </div>
+</div>
+<div id="fade"></div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

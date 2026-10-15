@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>PIZZA PANIC</title>
+<meta name="description" content="Arcade scooter pizza delivery: drift through traffic and throw hot pizzas at doors before the shift ends.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="title" class="ov hidden">
+  <div class="logo"><span>PIZZA</span><span>PANIC</span></div>
+  <p class="tag">Hot pizzas. Fast scooter. Terrible traffic.</p>
+  <button id="play">PLAY</button>
+  <div class="keys"><b>WASD</b> drive &nbsp; <b>SPACE</b> drift &nbsp; <b>SHIFT</b> boost &nbsp; <b>CLICK</b> throw &nbsp; <b>E</b> auto-throw &nbsp; <b>P</b> pause &nbsp; <b>M</b> mute</div>
+</div>
+
+<div id="card" class="ov hidden">
+  <div class="panel">
+    <h2 id="cTitle"></h2>
+    <div id="cStats"></div>
+    <div id="shop" class="hidden"></div>
+    <div class="row"><button id="cGo">GO</button><button id="cMenu" class="ghost">MENU</button></div>
+  </div>
+</div>
+
+<div id="touch" class="hidden">
+  <div id="stick"><div id="knob"></div></div>
+  <button id="tDrift">DRIFT</button>
+  <button id="tBoost">BOOST</button>
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

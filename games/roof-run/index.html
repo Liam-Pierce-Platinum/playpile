@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>ROOF RUN</title>
+<meta name="description" content="One-button rooftop runner over a sunset city. Tap to jump, hold to slide, smash through windows.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud">
+  <div id="dist">0 m</div>
+  <div id="best">BEST 0 m</div>
+  <div id="coinBox"><span class="coin"></span><span id="coins">0</span></div>
+  <div id="combo"></div>
+</div>
+<button id="mute" aria-label="mute">🔊</button>
+<button id="pause" class="hidden">PAUSED<small>tap to resume</small></button>
+
+<div id="title" class="panel hidden">
+  <h1>ROOF<span>RUN</span></h1>
+  <p class="tag">jump the gaps · slide the signs · smash the glass</p>
+  <button id="playBtn" class="big">PLAY</button>
+  <button id="shopBtn">RUNNERS</button>
+  <p class="stats">BEST <b id="tBest">0</b> m &nbsp;·&nbsp; <span class="coin"></span> <b id="tCoins">0</b></p>
+  <p class="keys">TAP / SPACE = jump &nbsp;·&nbsp; HOLD = slide &nbsp;·&nbsp; hold in air = drop fast</p>
+</div>
+
+<div id="dead" class="panel hidden">
+  <h2 id="dTitle">WIPEOUT</h2>
+  <div id="dDist">0 m</div>
+  <div id="dBest">BEST 0 m</div>
+  <p class="earn"><span class="coin"></span> <b id="dCoins">+0</b> &nbsp; bank <b id="dBank">0</b></p>
+  <p id="dNext"></p>
+  <button id="retryBtn" class="big">RUN AGAIN</button>
+  <div class="row"><button id="dShopBtn">RUNNERS</button><button id="homeBtn">HOME</button></div>
+  <p class="keys">SPACE to retry</p>
+</div>
+
+<div id="shop" class="panel hidden">
+  <h2>RUNNERS</h2>
+  <p class="stats"><span class="coin"></span> <b id="bank">0</b></p>
+  <div id="shopList"></div>
+  <button id="backBtn">BACK</button>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

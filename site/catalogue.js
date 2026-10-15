@@ -12,6 +12,111 @@
 //                     port. The page frames http://localhost:<port>.
 //         'unity'   - a Unity WebGL build under games/<slug>/build.
 export const GAMES = [
+  // ---- NEWEST FIRST: eight from the 2026-10-14 batch ----
+  {
+    slug: "mirror-duel", title: "MIRROR DUEL", how: 'mounted', port: 8391, url: "/",
+    content: "A cartoon fighting game between two glowing stick figures with no blood; a knocked-out fighter just falls over. Brief white screen flashes on hazard hits and knockouts, and screen shake.",
+    web: "mirror-duel/",
+    tag: "Fighting puzzle", big: false, added: '2026-10-14',
+    cat: "Action", tags: ["new","fighting","puzzle","neon","2d","mobile"],
+    blurb: "One controller, two fighters. Your opponent copies every move you make, flipped. Win by making the same move hurt them more.",
+    about: `You control both fighters. Your cyan fighter gets your input, and the magenta MIRROR gets exactly the same input flipped left and right, so in an even room every punch would trade. Each of the eight neon arenas is lopsided on purpose: spikes on one side, a live electric wall, a conveyor belt, pits of different widths, lasers firing out of step, black ice, spiked ceilings.
+
+Find where the same move costs the MIRROR more than it costs you, and launch it into its own hazards with a heavy. Some stages give the MIRROR a twist like LAG, TURBO or ARMOR. Best of three rounds, 45 seconds a round, up to three diamonds per stage.`,
+    controls: [["A D / arrows","move (the MIRROR moves the other way)"],["W / Up / Space","jump"],["J / Z","punch"],["K / X","heavy (launches)"],["R","retry"],["Esc","menu"],["M","mute"],["Touch","arrow buttons, JUMP / PUNCH / HEAVY"]],
+    tips: "Read the hint at the top of each stage. Hazards decide fights, not fists: line up a heavy so the MIRROR flies into the spikes, laser or electric wall while you stay safe.",
+  },
+  {
+    slug: "bubble-trouble", title: "BUBBLE TROUBLE", how: 'mounted', port: 8394, url: "/",
+    content: "A bright cartoon platformer with candy enemies that pop into confetti. No blood. No full-screen flashes; the boss turns white for a moment when hit.",
+    web: "bubble-trouble/",
+    tag: "Platformer", big: false, added: '2026-10-14',
+    cat: "Arcade", tags: ["new","platformer","cute","boss","2d","mobile"],
+    blurb: "A bubble-gum blob bouncing through a candy city. Blow up to float, slam to smash, stick to walls and enemies.",
+    about: `Roll a bouncy bubble-gum blob through five levels of a bright candy city and then take on the Sour King. Hold jump in the air to blow yourself into a bubble and float, slam down to smash gum crates, and stick to walls to climb them. Stomp an enemy and it is wrapped in gum: harmless for a few seconds, a trampoline, and ready to be slammed for extra candy.
+
+Each level hides golden gumballs under crates and up high, and the end card gives a GOLD, SILVER or BRONZE time medal. The Sour King hops, charges and spits; wait until he crashes into a wall and goes dizzy, then land on him.`,
+    controls: [["A D / arrows","roll"],["Space / W / Up / Z","jump"],["Hold jump in the air","blow a bubble and float"],["S / Down / X in the air","slam"],["Hold toward a wall","stick, jump to climb"],["R","restart level"],["P / Esc","pause"],["M","mute"],["Touch","arrow buttons, JUMP / SLAM, II to pause"]],
+    tips: "Floating drains the gum bar in about two and a half seconds and it refills when you land. Only hit the Sour King while he is dizzy or spitting; a slam does double damage.",
+  },
+  {
+    slug: "pizza-panic", title: "PIZZA PANIC", how: 'mounted', port: 8395, url: "/",
+    content: "Cartoon traffic and scooters bump into each other; the worst that happens is a pizza splatting on the road. Screen shake and confetti, no flashing lights.",
+    web: "pizza-panic/",
+    tag: "Delivery", big: false, added: '2026-10-14',
+    cat: "Driving", tags: ["new","driving","delivery","arcade","top-down","upgrades","mobile"],
+    blurb: "Drift a scooter through rush-hour traffic and throw hot pizzas at glowing doors before the shift clock runs out.",
+    about: `You ride a pizza scooter through a busy top-down city with 80 seconds on the clock. Grab three pizzas at the shop, weave through traffic and throw them at the glowing doors as you pass; every delivery buys five more seconds. Pizzas cool as you ride, so hot ones tip best, and near misses, long drifts and long-range throws chain into a combo worth up to triple pay.
+
+From Shift 2 rival RAT scooters hunt you to ram pizzas off your rack, unless you boost into them first for a takedown. Everything you earn goes in the bank, win or lose, to spend between shifts on a faster engine, a bigger nitro tank, a thermal bag, a bigger rack and a stronger pitching arm.`,
+    controls: [["WASD / arrows","drive"],["Space","drift (handbrake)"],["Shift","boost"],["Click","throw a pizza (snaps to nearby order doors)"],["E","throw at the nearest order"],["P / Esc","pause"],["M","mute"],["Touch","left thumb steers, tap the right side to throw, DRIFT and BOOST buttons"]],
+    tips: "Hug cars for NEAR MISS cash and boost, drift to refill boost, and throw from the edge of your range for a LONG SHOT worth x1.5. When a rival flashes a red !, boost into it first for a TAKEDOWN.",
+  },
+  {
+    slug: "toy-soldier-blitz", title: "TOY SOLDIER BLITZ", how: 'mounted', port: 8396, url: "/",
+    content: "A toy-soldier shooter with no blood: plastic army men topple over and come back a few seconds later. Muzzle flashes, bright flashes from firecracker explosions and a red glow at the screen edges when hit. Online play is a direct connection to one friend by room code, with no chat.",
+    web: "toy-soldier-blitz/",
+    tag: "Build & fight", big: true, added: '2026-10-14',
+    cat: "Shooter", tags: ["new","shooter","third-person","building","3d","online","multiplayer","bots","mobile"],
+    blurb: "Build a fort out of wooden blocks and dominoes, then fight over it as a plastic army man in a kid's bedroom.",
+    about: `You are a little green plastic army man at war with the tan army across a kid's bedroom. Every battle starts with a timed build phase: both sides spend a points budget on wooden alphabet blocks, domino walls, staircases, ramps and ruler bridges on their own half. Then the fight starts, and every piece can be shot to splinters or blown apart with firecrackers, bringing down anything stacked on top.
+
+Play Team KO, King of the Hill or a one-on-one Duel across four maps: the rug, a pillow fort on the bed, a bathtub beach and a desk. Eight operations earn stars and XP through eight ranks from Private to General, each adding build points and unlocking new pieces. Quick Battle against bots of three skill levels, or host an online room and send the code to a friend.`,
+    controls: [["Click / right-click","place / remove a piece (build)"],["1-5","pick a piece"],["R (Q, E)","rotate"],["Z","undo"],["F","auto-build"],["Enter","ready"],["WASD + mouse","move and look (click to lock the mouse)"],["Left / right mouse","fire / aim"],["Space / Shift","jump / sprint"],["G","firecracker"],["R","reload (fight)"],["M","mute"],["Touch","tap to build; left stick to move, drag right side to look, FIRE / AIM / JUMP / BANG / R buttons"]],
+    tips: "Headshots do more than double damage, so aim high. Save a firecracker for the enemy tower: anything resting on a broken piece falls with it.",
+  },
+  {
+    slug: "ski-mountain", title: "SKI MOUNTAIN", how: 'mounted', port: 8397, url: "/",
+    content: "Skiing and snowboarding with cartoon wipeouts and no injuries shown. The screen shakes on crashes and there are fast-moving speed lines at high speed, but no flashing lights.",
+    web: "ski-mountain/",
+    tag: "Endless ski", big: true, added: '2026-10-14',
+    cat: "Sport", tags: ["new","ski","snowboard","tricks","endless","winter","3d","mobile"],
+    blurb: "One endless, ever-faster downhill. Weave the trees, hit the kickers, spin and flip with the mouse, and see how far you get on three lives.",
+    about: `Drop into a snowy valley that never ends. Weave through walls of trees, rock bands, fallen logs, snow fences, parked snowcats and huts, and there is always a gap if you can find it. Hit kicker after kicker, grind rails and logs, and spin and flip with the mouse, then land straight to bank the combo.
+
+The further you go, the faster you fly: the valley winds tighter, the gaps get narrower and the speed keeps climbing past 200 km/h. Swap between skis and a snowboard at any moment with the scroll wheel, even in mid-air. Sixteen challenges unlock five more outfits, and your best score, furthest distance and top speed are saved.`,
+    controls: [["A / D, arrows or mouse","steer"],["W / S","tuck / brake"],["Hold Space or click, release","jump"],["Mouse in the air","spin and flip"],["Shift / E / right click","grab"],["Scroll wheel","swap skis and snowboard"],["A / D in the air","bend your flight"],["Enter","go again"],["R","restart"],["Esc","home screen"],["M","mute"],["Touch","left half steers, right half jumps and spins, GRAB button, tap the gear chip to swap"]],
+    tips: "Tricks only count after two seconds back on the snow, so land clean and ride it out. Distance pays more the further you get, so staying alive often beats one risky spin.",
+  },
+  {
+    slug: "dodgeball-dash", title: "DODGEBALL DASH", how: 'mounted', port: 8398, url: "/",
+    content: "Cartoon gym dodgeball: players who are hit simply walk to the bench. A short red tint fills the screen when you go out and a short yellow tint on a catch, with screen shake on hits.",
+    web: "dodgeball-dash/",
+    tag: "Dodgeball", big: false, added: '2026-10-14',
+    cat: "Sport", tags: ["new","dodgeball","team","arcade","bots","2d","mobile"],
+    blurb: "3v3 arcade dodgeball. Charge and curve your throws, catch one to bring a teammate back, and climb an eight-team ladder.",
+    about: `Top-down 3 against 3 dodgeball in a packed school gym. Three balls sit on the centre line at the start of every round, so each one opens with a rush. Hold to charge a throw and let go to fire, bend it around a dodger with a curve, or catch an incoming ball to put the thrower out and bring your first teammate back off the bench. Holding a ball? The catch button blocks instead.
+
+Rounds last 60 seconds and the first team to three wins the match. Climb a ladder of eight teams, from the REC ROOM ROOKIES to THE CHAMPS, each quicker to react, aim, catch and dodge, and earn up to three stars against each.`,
+    controls: [["WASD / arrows","move"],["Hold click or J, release","charge and throw at the mouse"],["Q / E or swipe while charging","curve the throw"],["Space / right click / K","catch (block if holding a ball)"],["Shift / L","dash"],["P / Esc","pause"],["M","mute"],["Touch","left thumb stick, hold THROW and release (drag sideways to curve), CATCH and DASH buttons"]],
+    tips: "A ball goes dead the moment it bounces, so charge your throws or they drop short. Press catch just before the ball arrives, not early: mashing it leaves you open.",
+  },
+  {
+    slug: "roof-run", title: "ROOF RUN", how: 'mounted', port: 8399, url: "/",
+    content: "A cartoon rooftop runner with no violence: if you crash, your runner tumbles off the roof and you start again. Screen shake on crashes and glass smashes, but no flashing lights.",
+    web: "roof-run/",
+    tag: "Runner", big: false, added: '2026-10-14',
+    cat: "Arcade", tags: ["new","runner","one-button","endless","parkour","mobile"],
+    blurb: "Jump the gaps, slide under the neon signs and smash through glass towers as a sunset city speeds up beneath you.",
+    about: `One button, one runner, one endless skyline. Tap to jump the gaps and hop the rooftop boxes, hold to slide under hanging neon signs, and run straight through the lit office floors of glass towers for a burst of speed and a shower of shards. The run keeps getting faster, and the sky turns from golden hour to dusk to neon night as you go.
+
+Every clean move feeds a combo that doubles and then triples your coins, and the coins you bank unlock four more runners: KITE jumps higher, SPARK pulls coins in like a magnet, GHOST can double jump, and NOVA makes every coin count double.`,
+    controls: [["Tap / Space / click","jump"],["Hold","slide (in the air: drop fast)"],["Up / W","instant jump"],["Down / S / Shift","instant slide"],["P / Esc","pause"],["M","mute"],["Touch","tap to jump, hold to slide"]],
+    tips: "Hold in the air to drop fast and land already sliding under a sign. Keep the combo alive: a new move every 3.2 seconds, and at 10 your coins count double.",
+  },
+  {
+    slug: "firework-frenzy", title: "FIREWORK FRENZY", how: 'mounted', port: 8400, url: "/",
+    content: "A pixel-art arcade game about steering a firework rocket. No violence; a crash is a burst of sparks. The screen flashes briefly and faintly on firework bursts, and more strongly on shape bonuses, crashes and level clears.",
+    web: "firework-frenzy/",
+    tag: "Flying", big: false, added: '2026-10-14',
+    cat: "Arcade", tags: ["new","pixel","flying","physics","levels","mobile"],
+    blurb: "Steer a firework rocket through a night city: fly the rings, light the fireworks and set off chain reactions before your fuel runs out.",
+    about: `You are a firework rocket over a pixel city at night. Your flame only pushes you the way your nose points and gravity never lets go, so every flight is a wild, swooping arc. Fly through the rings, touch or flame the fireworks to light them, and watch one burst set off the next in a chain worth more with every pop. Burst a whole heart, star or circle for a big shape bonus.
+
+Ten levels teach one idea each, from CHAIN REACTION to LIVE WIRES and BIRD SEASON, up to a GRAND FINALE. Earn up to three stars on each by bursting everything and saving fuel, land gently on roofs to steady yourself, then take on ENDLESS mode as the city keeps on growing.`,
+    controls: [["Left / Right or A / D","turn"],["Hold Space / Up / W","thrust (each fresh press kicks)"],["R","retry"],["P / Esc","pause"],["M","mute"],["Touch","< > buttons on the left to turn, hold the right half to fire"]],
+    tips: "Fly in short bursts: fuel is seconds of thrust. Light the edge of a cluster and let the chain spread, and set down softly on a roof when you lose control.",
+  },
   // ---- NEWEST FIRST: six from the 2026-10-12/13 category-fill batch ----
   {
     slug: "pursued", title: "PURSUED", how: 'mounted', port: 8378, url: "/",

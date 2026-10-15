@@ -1,0 +1,74 @@
+:root { --p: #2ef2ff; --m: #ff2bd6; --bg: #04010d; --ink: #f2ecff; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); overflow: hidden;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; user-select: none; -webkit-user-select: none; touch-action: none; }
+canvas { position: fixed; inset: 0; display: block; }
+button { font: inherit; color: inherit; cursor: pointer; }
+
+#menuBtn { position: fixed; top: 8px; right: 8px; z-index: 5; width: 34px; height: 28px;
+  background: rgba(8,2,20,.6); border: 1px solid rgba(255,255,255,.18); border-radius: 4px; font-size: 15px; opacity: .5; }
+#menuBtn:hover { opacity: 1; }
+
+/* overlays */
+#card, #title { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 10; padding: 16px; }
+#card.show, #title.show { display: flex; }
+#card { background: radial-gradient(ellipse at center, rgba(8,2,20,.55), rgba(4,1,13,.9)); animation: fade .25s ease-out; }
+#title .panel { width: min(860px, 100%); overflow-x: hidden; }
+#title { background: linear-gradient(180deg, rgba(4,1,13,.35), rgba(4,1,13,.78)); }
+@keyframes fade { from { opacity: 0 } }
+.panel { width: min(620px, 100%); text-align: center; max-height: 100%; overflow: auto; }
+#card .panel { background: rgba(10,3,26,.92); border: 1px solid rgba(255,255,255,.12); padding: 26px 24px; clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+  animation: pop .3s cubic-bezier(.2,1.6,.4,1); }
+@keyframes pop { from { transform: scale(.8); opacity: 0 } }
+#card.win .panel { box-shadow: inset 0 3px 0 var(--p); }
+#card.lose .panel { box-shadow: inset 0 3px 0 var(--m); }
+#cardKicker { font-size: 12px; letter-spacing: .2em; opacity: .6; font-weight: 800; }
+#cardTitle { margin: 6px 0 4px; font-size: clamp(36px, 8vw, 60px); font-style: italic; font-weight: 900; letter-spacing: .02em;
+  text-shadow: -3px 0 var(--p), 3px 0 var(--m); }
+#cardStars span { font-size: 30px; margin: 0 4px; color: rgba(255,255,255,.15); }
+#cardStars span.on { color: #ffe23b; text-shadow: 0 0 12px #ffb300; }
+#cardBody { opacity: .85; margin: 10px 0 4px; }
+#cardTip { opacity: .6; font-size: 14px; margin: 4px 0 0; min-height: 1em; }
+.row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+.row button, #btnMute { background: transparent; border: 1px solid rgba(255,255,255,.3); padding: 10px 18px; font-weight: 800; letter-spacing: .08em; font-style: italic;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+button.big { background: linear-gradient(90deg, var(--p), var(--m)); color: #0a0218; border: 0; padding: 14px 34px; font-weight: 900; font-size: 18px; letter-spacing: .1em; font-style: italic;
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); transition: filter .15s, transform .15s; }
+button.big:hover, .row button:hover { filter: brightness(1.2); transform: translateY(-1px); }
+.keys { margin-top: 12px; font-size: 11px; opacity: .45; letter-spacing: .12em; }
+body.touch .keys { display: none; }
+
+.logo, .logo-r { margin: 0; font-size: clamp(44px, 10vw, 100px); padding: 0 .15em; font-weight: 900; font-style: italic; line-height: .9; letter-spacing: -.01em; display: flex; justify-content: center; gap: .2em; }
+.logo span:first-child { color: var(--p); text-shadow: 0 0 18px rgba(46,242,255,.6); }
+.logo span:last-child { color: var(--m); text-shadow: 0 0 18px rgba(255,43,214,.6); }
+.logo-r { transform: scaleY(-1); opacity: .18; margin-top: -4px; height: .5em; overflow: hidden; align-items: flex-end;
+  -webkit-mask-image: linear-gradient(transparent 20%, #000); mask-image: linear-gradient(transparent 20%, #000); }
+.logo-r span:first-child { color: var(--p); } .logo-r span:last-child { color: var(--m); }
+.tag { opacity: .8; margin: 4px 0 18px; }
+#stages { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 20px 0 14px; }
+.stage { background: rgba(10,3,26,.82); border: 1px solid rgba(255,255,255,.14); padding: 8px 6px; display: flex; flex-direction: column; gap: 2px; align-items: center; }
+.stage b { font-size: 20px; font-style: italic; } .stage span { font-size: 10px; letter-spacing: .1em; opacity: .75; font-weight: 700; }
+.stage i { font-style: normal; color: #ffe23b; font-size: 12px; letter-spacing: 2px; }
+.stage:hover:not(:disabled) { border-color: var(--p); }
+.stage.locked { opacity: .3; cursor: default; }
+.controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; font-size: 13px; opacity: .75; margin-bottom: 14px; }
+.controls b { color: var(--p); }
+body.touch .controls { display: none; }
+
+/* touch */
+#touch { position: fixed; left: 0; right: 0; bottom: 0; z-index: 4; display: flex; justify-content: space-between; align-items: flex-end;
+  padding: 0 max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); pointer-events: none; }
+#touch .pad { display: flex; gap: 10px; pointer-events: auto; align-items: flex-end; }
+#touch button { width: 74px; height: 74px; border-radius: 50%; border: 2px solid rgba(255,255,255,.28); background: rgba(10,3,26,.45); font-weight: 900; font-size: 13px; font-style: italic; touch-action: none; }
+#touch .left button { font-size: 26px; color: var(--p); border-color: rgba(46,242,255,.5); }
+#touch .j { color: #fff; margin-bottom: 60px; } #touch .p { color: var(--p); border-color: rgba(46,242,255,.5); } #touch .h { color: var(--m); border-color: rgba(255,43,214,.55); width: 84px; height: 84px; }
+#touch button.on { background: rgba(255,255,255,.25); transform: scale(.94); }
+@media (max-width: 500px) { #stages { grid-template-columns: repeat(2, 1fr); } #touch button { width: 62px; height: 62px; } #touch .h { width: 70px; height: 70px; } #touch .pad { gap: 6px; } }
+
+/* phone landscape: one low row of buttons under the floor line */
+@media (pointer: coarse) and (orientation: landscape) {
+  #touch button { width: 60px; height: 60px; font-size: 12px; } #touch .h { width: 66px; height: 66px; }
+  #touch .j { margin-bottom: 0; } #touch .pad { gap: 8px; }
+}
+#rotate { display: none; position: absolute; left: 0; right: 0; bottom: 210px; text-align: center; font-size: 13px; font-weight: 800; font-style: italic; letter-spacing: .08em; opacity: .55; pointer-events: none; }
+@media (orientation: portrait) { body.touch #rotate { display: block; } }

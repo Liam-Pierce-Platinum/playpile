@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>TOY SOLDIER BLITZ</title>
+<meta name="description" content="Build a fort from wooden blocks, then fight it out as a plastic army man. Bots or online.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="vig"></div>
+<div id="hurt"></div>
+
+<div id="hud" class="hidden">
+  <div id="score">
+    <div class="tm g"><span id="sc0">0</span></div>
+    <div id="mid"><div id="phase">BUILD</div><div id="clock">0:40</div><div id="goal">first to 12</div></div>
+    <div class="tm t"><span id="sc1">0</span></div>
+  </div>
+  <div id="hill" class="hidden"><div id="hillbar"><i id="hb0"></i><i id="hb1"></i></div><div id="hilltxt">HOLD THE HILL</div></div>
+  <div id="feed"></div>
+  <div id="cross"><i></i><i></i><i></i><i></i></div>
+  <div id="hitm"></div>
+  <div id="banner"></div>
+  <div id="sub"></div>
+  <div id="nums"></div>
+  <div id="hp"><div id="hpbar"><i id="hpfill"></i></div><span id="hptxt">100</span></div>
+  <div id="ammo"><b id="ammoN">24</b><span>/24</span><div id="grens"></div><div id="reload">RELOADING</div></div>
+  <div id="tip"></div>
+</div>
+
+<div id="buildbar" class="hidden">
+  <div id="bb-top"><span id="bb-title">BUILD YOUR SIDE</span><span id="bb-budget">12 / 12</span><span id="bb-time">40</span></div>
+  <div id="bb-pieces"></div>
+  <div id="bb-acts">
+    <button id="bb-rot" title="R">ROTATE <kbd>R</kbd></button>
+    <button id="bb-undo" title="Z">UNDO <kbd>Z</kbd></button>
+    <button id="bb-auto" title="F">AUTO-BUILD <kbd>F</kbd></button>
+    <button id="bb-ready" class="go" title="Enter">READY <kbd>ENTER</kbd></button>
+  </div>
+  <div id="bb-msg"></div>
+</div>
+
+<div id="menu" class="hidden">
+  <div id="logo"><span class="l1">TOY SOLDIER</span><span class="l2">BLITZ</span></div>
+  <div id="rank"></div>
+  <div id="menu-main">
+    <button id="m-play" class="big go">PLAY NEXT OPERATION</button>
+    <div id="ops"></div>
+    <div class="row">
+      <div class="card">
+        <h3>QUICK BATTLE</h3>
+        <label>Map <select id="q-map"></select></label>
+        <label>Mode <select id="q-mode"><option value="team">Team KO</option><option value="hill">King of the Hill</option><option value="duel">Duel 1v1</option></select></label>
+        <label>Bots <select id="q-diff"><option value="0">Rookie</option><option value="1" selected>Veteran</option><option value="2">Elite</option></select></label>
+        <button id="q-go">FIGHT</button>
+      </div>
+      <div class="card">
+        <h3>ONLINE</h3>
+        <p class="small">Host a room and send the code to a friend. Uses the Quick Battle map + mode (team modes fill with bots).</p>
+        <button id="o-host">HOST ROOM</button>
+        <div class="join"><input id="o-code" maxlength="4" placeholder="CODE" autocomplete="off"><button id="o-join">JOIN</button></div>
+        <div id="o-status" class="small"></div>
+      </div>
+    </div>
+    <div id="howto" class="small">WASD move &middot; mouse aim &middot; click fire &middot; right-click aim &middot; SPACE jump &middot; SHIFT sprint &middot; G firecracker &middot; R reload &middot; M mute</div>
+  </div>
+</div>
+
+<div id="result" class="hidden">
+  <div id="r-title">VICTORY</div>
+  <div id="r-stars"></div>
+  <div id="r-stats"></div>
+  <div id="r-xp"></div>
+  <div id="r-btns"><button id="r-retry" class="go">RETRY <kbd>R</kbd></button><button id="r-next">NEXT OP <kbd>N</kbd></button><button id="r-menu">MENU</button></div>
+</div>
+
+<div id="touch" class="hidden">
+  <div id="stick"><div id="knob"></div></div>
+  <button id="t-fire">FIRE</button>
+  <button id="t-jump">JUMP</button>
+  <button id="t-aim">AIM</button>
+  <button id="t-gren">BANG</button>
+  <button id="t-rel">R</button>
+</div>
+<button id="t-menu" class="hidden" title="Menu (Esc)">&#9776;</button>
+<div id="clickto" class="hidden">CLICK TO AIM</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

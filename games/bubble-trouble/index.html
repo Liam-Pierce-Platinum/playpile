@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>BUBBLE TROUBLE</title>
+<meta name="description" content="A bubble-gum blob bouncing through a candy city. Blow up to float, slam to smash, stick to walls and enemies.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="card" class="card hidden"></div>
+<div id="touch" class="hidden">
+  <div class="tpad left"><button data-k="l" aria-label="left">&#9664;</button><button data-k="r" aria-label="right">&#9654;</button></div>
+  <div class="tpad right"><button data-k="down" class="slam">SLAM</button><button data-k="jump" class="jump">JUMP</button></div>
+  <button id="tpause" aria-label="pause">II</button>
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

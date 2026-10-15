@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>MIRROR DUEL</title>
+<meta name="description" content="One controller, two fighters. Your opponent copies every move you make, flipped. Win by making the same move hurt them more.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<button id="menuBtn" aria-label="Menu">&#9776;</button>
+
+<div id="touch">
+  <div id="rotate">Turn your phone sideways for a bigger arena</div>
+  <div class="pad left">
+    <button data-k="l">&#9664;</button><button data-k="r">&#9654;</button>
+  </div>
+  <div class="pad right">
+    <button data-k="j" class="j">JUMP</button><button data-k="p" class="p">PUNCH</button><button data-k="h" class="h">HEAVY</button>
+  </div>
+</div>
+
+<div id="card">
+  <div class="panel">
+    <div id="cardKicker"></div>
+    <h1 id="cardTitle"></h1>
+    <div id="cardStars"></div>
+    <p id="cardBody"></p>
+    <p id="cardTip"></p>
+    <div class="row">
+      <button id="btnPrimary" class="big">NEXT</button>
+      <button id="btnRetry">RETRY</button>
+      <button id="btnTitle">MENU</button>
+    </div>
+    <div class="keys">ENTER continue &middot; R retry &middot; ESC menu</div>
+  </div>
+</div>
+
+<div id="title">
+  <div class="panel">
+    <h1 class="logo"><span>MIRROR</span><span>DUEL</span></h1>
+    <div class="logo-r" aria-hidden="true"><span>MIRROR</span><span>DUEL</span></div>
+    <p class="tag">One controller. Two fighters. The other one is you, flipped.</p>
+    <button id="btnPlay" class="big">PLAY</button>
+    <div id="stages"></div>
+    <div class="controls">
+      <div><b>A D</b> / <b>&#8592; &#8594;</b> move</div><div><b>W</b> / <b>SPACE</b> jump</div><div><b>J</b> punch</div><div><b>K</b> heavy</div><div><b>R</b> retry &middot; <b>M</b> mute</div>
+    </div>
+    <button id="btnMute">SOUND: ON</button>
+  </div>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

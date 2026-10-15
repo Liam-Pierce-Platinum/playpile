@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>DODGEBALL DASH</title>
+<meta name="description" content="3v3 arcade dodgeball. Charge, curve, catch a throw to bring a teammate back. Climb the ladder.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud" class="hidden">
+  <div id="board">
+    <div class="side l"><div class="tn" id="nL">DASHERS</div><div class="pips" id="pL"></div><div class="alive" id="aL"></div></div>
+    <div class="mid"><div id="clock">1:00</div><div id="rnd">ROUND 1</div></div>
+    <div class="side r"><div class="tn" id="nR">ROOKIES</div><div class="pips" id="pR"></div><div class="alive" id="aR"></div></div>
+  </div>
+  <div id="tip" class="hidden"></div>
+  <div id="hint">WASD move &middot; hold CLICK charge, release throw &middot; Q/E or swipe aim = curve &middot; SPACE catch / block &middot; SHIFT dash</div>
+  <button id="muteBtn" class="iconbtn" title="Mute (M)">&#9835;</button>
+  <button id="pauseBtn" class="iconbtn" title="Pause (P)">II</button>
+</div>
+
+<div id="touch" class="hidden">
+  <button id="tDash" class="tb">DASH</button>
+  <button id="tCatch" class="tb">CATCH</button>
+  <button id="tThrow" class="tb tthrow">THROW</button>
+</div>
+
+<div id="title" class="screen hidden">
+  <div class="logo"><span>DODGEBALL</span><span class="dash">DASH</span></div>
+  <div class="tag">3v3. Catch a throw - the thrower is out and your teammate comes back.</div>
+  <button id="playBtn" class="big">PLAY</button>
+  <div id="ladder"></div>
+  <div class="foot">WASD move &middot; hold click to charge, release to throw &middot; Q/E or swipe while charging to curve &middot; SPACE catch (block if holding) &middot; SHIFT dash &middot; P pause &middot; M mute</div>
+</div>
+
+<div id="pause" class="screen hidden">
+  <h2>PAUSED</h2>
+  <button id="resumeBtn" class="big">RESUME</button>
+  <button id="pRestart" class="mid">RESTART MATCH</button>
+  <button id="pMenu" class="mid">LADDER</button>
+</div>
+
+<div id="result" class="screen hidden">
+  <div class="card">
+    <div class="vs" id="rVs">VS ROOKIES</div>
+    <h2 id="rTitle">VICTORY</h2>
+    <div id="rStars"></div>
+    <div id="rScore"></div>
+    <div id="rStats"></div>
+    <div class="row">
+      <button id="retryBtn" class="big">RETRY</button>
+      <button id="nextBtn" class="big">NEXT TEAM</button>
+    </div>
+    <button id="menuBtn" class="mid">LADDER</button>
+    <div class="keys">R retry &middot; Enter next</div>
+  </div>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

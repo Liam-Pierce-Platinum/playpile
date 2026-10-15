@@ -1,0 +1,38 @@
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #3d4250; color: #fff; font-family: "Lilita One", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif; user-select: none; touch-action: none; }
+canvas { display: block; cursor: none; }
+.hidden { display: none !important; }
+.ov { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; background: radial-gradient(ellipse at center, rgba(27,21,48,.55), rgba(27,21,48,.88)); padding: 16px; z-index: 5; }
+.logo { display: flex; flex-direction: column; align-items: center; line-height: .9; transform: rotate(-4deg); }
+.logo span { font-size: clamp(64px, 14vw, 140px); color: #ffd23f; -webkit-text-stroke: 4px #1b1530; text-shadow: 0 8px 0 #d8452f, 0 14px 0 #1b1530; }
+.logo span + span { color: #ff6b2c; text-shadow: 0 8px 0 #8a1f14, 0 14px 0 #1b1530; }
+.tag { font-size: 20px; color: #ffe9c7; margin-top: 10px; }
+.keys { font-family: system-ui, sans-serif; font-size: 14px; color: #d8d2ea; text-align: center; max-width: 640px; line-height: 1.8; }
+.keys b { background: #fff; color: #1b1530; border-radius: 5px; padding: 1px 6px; font-weight: 700; }
+button { font: inherit; border: 0; cursor: pointer; }
+#play, #cGo { font-size: 30px; padding: 12px 46px; border-radius: 16px; background: #ffd23f; color: #1b1530; box-shadow: 0 6px 0 #c48a12, 0 10px 0 #1b1530; transition: transform .08s; }
+#play:hover, #cGo:hover { transform: translateY(-2px) scale(1.04); }
+#play:active, #cGo:active { transform: translateY(4px); box-shadow: 0 2px 0 #c48a12, 0 4px 0 #1b1530; }
+.ghost { font-size: 18px; padding: 10px 22px; border-radius: 14px; background: transparent; color: #d8d2ea; border: 2px solid #6b5f92; }
+.panel { background: #241c40; border: 4px solid #1b1530; box-shadow: 0 10px 0 #120d24; border-radius: 22px; padding: 22px 26px; width: min(560px, 100%); max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; text-align: center; }
+h2 { font-size: 38px; color: #ffd23f; -webkit-text-stroke: 2px #1b1530; }
+.big { font-size: 54px; } .big.win { color: #7dff8a; } .big.lose { color: #ff7b5c; } .big small { font-size: 22px; color: #b9b0d8; }
+.grid { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; text-align: left; font-family: system-ui, sans-serif; font-size: 15px; color: #d8d2ea; max-width: 300px; margin: 0 auto; }
+.grid b { color: #fff; text-align: right; }
+.hint { font-family: system-ui, sans-serif; font-size: 14px; color: #b9b0d8; }
+#shop { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.bank { grid-column: 1 / -1; font-size: 20px; color: #d8d2ea; } .bank b { color: #ffd23f; }
+.up { display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto auto; text-align: left; background: #34295c; color: #fff; border-radius: 12px; padding: 8px 10px; box-shadow: 0 4px 0 #1b1530; }
+.up:hover:not(:disabled) { background: #43367a; }
+.up:disabled { opacity: .55; cursor: default; }
+.un { font-size: 17px; } .uc { grid-row: 1; grid-column: 2; color: #ffd23f; font-size: 17px; }
+.ud { grid-column: 1 / -1; font-family: system-ui, sans-serif; font-size: 12px; color: #b9b0d8; }
+.pips { grid-column: 1 / -1; display: flex; gap: 3px; margin-top: 4px; } .pips i { width: 16px; height: 6px; border-radius: 3px; background: #1b1530; } .pips i.on { background: #5cd6ff; }
+.row { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; }
+#touch { position: fixed; inset: 0; pointer-events: none; z-index: 3; }
+#stick { position: absolute; left: 40px; bottom: 40px; width: 120px; height: 120px; border-radius: 50%; border: 3px solid rgba(255,255,255,.5); background: rgba(27,21,48,.25); opacity: .35; }
+#knob { position: absolute; left: 35px; top: 35px; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,.7); }
+#tBoost, #tDrift { position: absolute; pointer-events: auto; width: 84px; height: 84px; border-radius: 50%; font-size: 16px; color: #1b1530; box-shadow: 0 4px 0 #1b1530; }
+#tBoost { right: 22px; bottom: 30px; background: #5cd6ff; }
+#tDrift { right: 118px; bottom: 18px; background: #ffd23f; width: 70px; height: 70px; font-size: 14px; }
+@media (max-width: 520px) { #shop { grid-template-columns: 1fr; } h2 { font-size: 30px; } .big { font-size: 42px; } }

@@ -23,8 +23,9 @@ export const INTROS = {
     circuits from their real corner sequences, with downforce, tyre wear, rain and pit
     stops; NASCAR does the same for twenty ovals, where banking and the draft decide
     the race. Both can be raced one
-    event at a time or as a whole season. PIZZA PANIC is the light one: a pizza
-    scooter drifting through rush-hour traffic against the shift clock.`,
+    event at a time or as a whole season. RUSH HOUR is pure arcade speed: one 36 km road of
+    traffic, hairpins and drifts against the checkpoint clock. PIZZA PANIC is the light
+    one: a pizza scooter weaving through city traffic against the shift clock.`,
   Horror: `A game about not being able to see. EXPOSURE leaves you with nothing
     but your own muzzle flash, which lights the room for a moment and then stays on the
     screen as a photograph of where everything was. PURSUED is the opposite: a

@@ -12,6 +12,20 @@
 //                     port. The page frames http://localhost:<port>.
 //         'unity'   - a Unity WebGL build under games/<slug>/build.
 export const GAMES = [
+  // ---- 2026-10-14 (later): RUSH HOUR ----
+  {
+    slug: "rush-hour", title: "RUSH HOUR", how: 'mounted', port: 8401, url: "/",
+    content: "Blocky cartoon cars; a crash throws off block debris and sparks and nobody is shown hurt. The screen flashes red on every crash, roadwork arrow signs blink amber, and there is screen shake on crashes and near misses.",
+    web: "rush-hour/",
+    tag: "Traffic racer", big: true, added: '2026-10-14',
+    cat: "Driving", tags: ["new","driving","racing","traffic","drift","highway","3d","mobile"],
+    blurb: "Weave through traffic at 250 km/h down one 36 km road. Ten stages of hairpins, drifts and near misses against the clock.",
+    about: `A blocky high-speed traffic racer with a high chase camera. The throttle is always on, and one connected 35.8 km road runs through ten stages and 138 corners, from wide sweepers to hairpin switchbacks. Every checkpoint arch adds time to the clock and rolls straight into the next stage, with the sky, weather and scenery changing as you go: trucks on Freight Line, roadworks in Cone Zone, oncoming traffic at sunset, rain in Storm Front and one lane each way through the canyon.
+
+Shave past cars for NEAR MISS, CLOSE and INSANE bonuses, tap the brake mid-corner to drift for a DRIFT BOOST, and clip the inside of tight bends for an APEX. Chains build a combo of up to x10 and fill your nitro. A crash costs three seconds. Each stage awards up to three stars, and you can restart from any checkpoint you have reached.`,
+    controls: [["A D / arrows","steer"],["S / Down","brake"],["Tap brake while steering, or X","drift"],["Space / Shift","nitro"],["R","retry from the checkpoint"],["Esc / P","pause"],["M","mute"],["Touch","hold the left or right side to steer, BRAKE, NITRO and II buttons"]],
+    tips: "Speed is the danger, not steering: the car always makes the gap, but traffic bunches up in corners, so brake a touch before blind bends. Drift for at least 0.6 seconds for a DRIFT BOOST.",
+  },
   // ---- NEWEST FIRST: eight from the 2026-10-14 batch ----
   {
     slug: "mirror-duel", title: "MIRROR DUEL", how: 'mounted', port: 8391, url: "/",
@@ -45,7 +59,7 @@ Each level hides golden gumballs under crates and up high, and the end card give
     web: "pizza-panic/",
     tag: "Delivery", big: false, added: '2026-10-14',
     cat: "Driving", tags: ["new","driving","delivery","arcade","top-down","upgrades","mobile"],
-    blurb: "Drift a scooter through rush-hour traffic and throw hot pizzas at glowing doors before the shift clock runs out.",
+    blurb: "Drift a scooter through busy city traffic and throw hot pizzas at glowing doors before the shift clock runs out.",
     about: `You ride a pizza scooter through a busy top-down city with 80 seconds on the clock. Grab three pizzas at the shop, weave through traffic and throw them at the glowing doors as you pass; every delivery buys five more seconds. Pizzas cool as you ride, so hot ones tip best, and near misses, long drifts and long-range throws chain into a combo worth up to triple pay.
 
 From Shift 2 rival RAT scooters hunt you to ram pizzas off your rack, unless you boost into them first for a takedown. Everything you earn goes in the bank, win or lose, to spend between shifts on a faster engine, a bigger nitro tank, a thermal bag, a bigger rack and a stronger pitching arm.`,

@@ -9,14 +9,14 @@
 .acc-button {
   display: inline-flex; align-items: center; gap: 8px;
   height: 36px; padding: 0 14px;
-  background: #1b2433; color: #e7ecf3;
-  border: 1px solid #2b3648; border-radius: 999px;
+  background: #0f1f38; color: #f5f8fc;
+  border: 1px solid #1f3557; border-radius: 999px;
   font: 600 13px/1 system-ui, sans-serif; letter-spacing: .3px;
   cursor: pointer; white-space: nowrap;
   transition: background .12s, border-color .12s;
 }
-.acc-button:hover { background: #222d3f; border-color: #3a4761; }
-.acc-dot { width: 9px; height: 9px; border-radius: 50%; background: #55617a; flex: none; }
+.acc-button:hover { background: #15294a; border-color: #2b4a73; }
+.acc-dot { width: 9px; height: 9px; border-radius: 50%; background: #5f7697; flex: none; }
 .acc-name { max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
 
 .acc-shade {
@@ -31,8 +31,8 @@
   left: 50%; top: 50%; transform: translate(-50%, -48%) scale(.98);
   width: min(420px, calc(100vw - 32px));
   max-height: min(82vh, 720px); overflow: auto;
-  background: #10161f; color: #e7ecf3;
-  border: 1px solid #263145; border-radius: 16px;
+  background: #0a1628; color: #f5f8fc;
+  border: 1px solid #1f3557; border-radius: 16px;
   box-shadow: 0 30px 80px rgba(0, 0, 0, .6);
   padding: 18px 20px 20px;
   opacity: 0; pointer-events: none; transition: opacity .16s, transform .16s;
@@ -45,7 +45,7 @@
   background: none; border: 0; color: #8b96a8; font-size: 24px; line-height: 1;
   cursor: pointer; padding: 0 4px;
 }
-.acc-x:hover { color: #e7ecf3; }
+.acc-x:hover { color: #f5f8fc; }
 
 .acc-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
 .acc-tab {
@@ -54,25 +54,25 @@
   border: 1px solid transparent; border-radius: 9px;
   font: 600 13px/1 system-ui, sans-serif;
 }
-.acc-tab.on { background: #ff8a3d; color: #1a1005; border-color: #ff8a3d; }
+.acc-tab.on { background: #22d37a; color: #03140a; border-color: #22d37a; }
 
 .acc-form { display: flex; flex-direction: column; gap: 10px; }
 .acc-field { display: flex; flex-direction: column; gap: 4px; }
 .acc-field input {
-  background: #0a0f17; color: #e7ecf3;
-  border: 1px solid #2b3648; border-radius: 9px;
+  background: #081326; color: #f5f8fc;
+  border: 1px solid #1f3557; border-radius: 9px;
   padding: 10px 12px; font: 400 14px system-ui, sans-serif;
 }
-.acc-field input:focus { outline: none; border-color: #ff8a3d; }
+.acc-field input:focus { outline: none; border-color: #22d37a; }
 .acc-label { color: #8b96a8; font: 600 11px/1.4 system-ui, sans-serif; letter-spacing: 1px; text-transform: uppercase; }
 
 .acc-btn {
   padding: 11px 16px; cursor: pointer;
-  background: #ff8a3d; color: #1a1005; border: 0; border-radius: 9px;
+  background: #22d37a; color: #03140a; border: 0; border-radius: 9px;
   font: 700 13px/1 system-ui, sans-serif; letter-spacing: .4px;
 }
 .acc-btn:hover { filter: brightness(1.07); }
-.acc-btn.ghost { background: transparent; color: #cdd7e4; border: 1px solid #2b3648; }
+.acc-btn.ghost { background: transparent; color: #cdd7e4; border: 1px solid #1f3557; }
 .acc-btn.small { padding: 8px 12px; font-size: 12px; }
 .acc-buttons { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 
@@ -83,16 +83,16 @@
 .acc-chip {
   display: inline-block; margin: 6px 6px 0 0; padding: 7px 12px; cursor: pointer;
   background: rgba(255, 255, 255, .05); color: #cdd7e4;
-  border: 1px solid #2b3648; border-radius: 999px;
+  border: 1px solid #1f3557; border-radius: 999px;
   font: 600 12px/1 system-ui, sans-serif;
 }
-.acc-chip:hover { border-color: #ff8a3d; color: #fff; }
+.acc-chip:hover { border-color: #22d37a; color: #fff; }
 
-.acc-code { margin-top: 16px; border-top: 1px solid #1d2635; padding-top: 12px; }
+.acc-code { margin-top: 16px; border-top: 1px solid #132745; padding-top: 12px; }
 .acc-code textarea {
   width: 100%; margin-top: 6px; resize: vertical;
-  background: #0a0f17; color: #9fb0c4;
-  border: 1px solid #2b3648; border-radius: 9px;
+  background: #081326; color: #9fb0c4;
+  border: 1px solid #1f3557; border-radius: 9px;
   padding: 8px 10px; font: 400 11px/1.4 ui-monospace, Consolas, monospace;
   word-break: break-all;
 }

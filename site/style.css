@@ -23,18 +23,18 @@
    simply render without a sidebar.                                   */
 
 :root{
-  --ink:#080b11;          /* page */
-  --surface:#0e131c;      /* top bar, sidebar */
-  --panel:#141b26;        /* cards, panels */
-  --panel-2:#1a2331;      /* hover */
-  --edge:#222c3b;         /* hairlines */
-  --edge-2:#32405404;
-  --text:#e9eef6;
-  --dim:#94a0b3;
-  --faint:#5f6b7e;
-  --accent:#ff9f43;       /* one colour, used sparingly */
-  --accent-ink:#161209;
-  --accent-2:#4dc9ff;
+  --ink:#050a14;          /* page */
+  --surface:#0a1628;      /* top bar, sidebar */
+  --panel:#0f1f38;        /* cards, panels */
+  --panel-2:#15294a;      /* hover */
+  --edge:#1f3557;         /* hairlines */
+  --edge-2:#2b4a7304;
+  --text:#f5f8fc;
+  --dim:#a3b4cc;
+  --faint:#5f7697;
+  --accent:#22d37a;       /* one colour, used sparingly: PLAYPILE green */
+  --accent-ink:#03140a;
+  --accent-2:#ffffff;
   --pad:18px;
   --topbar:58px;
   --rail:224px;           /* the category sidebar */
@@ -49,7 +49,7 @@
 
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-html{scrollbar-color:#2a3546 var(--ink)}
+html{scrollbar-color:#1f3557 var(--ink)}
 body{
   background:var(--ink);color:var(--text);
   font:15px/1.6 var(--sans);
@@ -72,7 +72,7 @@ img{max-width:100%;display:block}
    ------------------------------------------------------------------ */
 header.top{
   position:fixed;inset:0 0 auto 0;z-index:50;height:var(--topbar);
-  background:rgba(14,19,28,.94);backdrop-filter:blur(10px);
+  background:rgba(10,22,40,.94);backdrop-filter:blur(10px);
   border-bottom:1px solid var(--edge);
 }
 header.top .bar{
@@ -106,7 +106,7 @@ header.top .bar{
   color:var(--text);font:14px/1 var(--sans);outline:0;
 }
 .search input::placeholder{color:var(--faint)}
-.search input:focus{border-color:#3d4f68;background:var(--panel-2)}
+.search input:focus{border-color:#2b4a73;background:var(--panel-2)}
 .search input::-webkit-search-cancel-button{filter:invert(.6)}
 
 /* the right-hand side of the bar. #accountSlot is somebody else's to
@@ -118,7 +118,7 @@ header.top .bar{
 }
 #accountSlot:empty::after{
   content:"";display:block;width:110px;height:36px;border-radius:18px;
-  background:linear-gradient(90deg,#141b26,#18212e);border:1px solid var(--edge);
+  background:linear-gradient(90deg,#0f1f38,#132745);border:1px solid var(--edge);
 }
 /* legacy pages (privacy, cookies) still carry this nav */
 nav.links{display:flex;gap:18px;margin-left:auto;font-size:13px;color:var(--dim)}
@@ -137,7 +137,7 @@ nav.links a.on{color:var(--accent)}
   scrollbar-width:thin;
 }
 .sidenav::-webkit-scrollbar{width:8px}
-.sidenav::-webkit-scrollbar-thumb{background:#243043;border-radius:4px}
+.sidenav::-webkit-scrollbar-thumb{background:#1c3354;border-radius:4px}
 .sidenav nav{display:flex;flex-direction:column;gap:2px}
 .navlink{
   display:flex;align-items:center;gap:11px;height:40px;padding:0 10px;
@@ -158,7 +158,7 @@ nav.links a.on{color:var(--accent)}
 .navsmall{display:flex;flex-wrap:wrap;gap:4px 12px;padding:2px 12px}
 .navsmall a{font-size:12px;color:var(--faint)}
 .navsmall a:hover{color:var(--text)}
-.navfoot{padding:14px 12px 0;color:#3f4a5c;font:10px/1.6 var(--mono);letter-spacing:.1em}
+.navfoot{padding:14px 12px 0;color:#3b5274;font:10px/1.6 var(--mono);letter-spacing:.1em}
 
 .scrim{display:none}
 
@@ -190,7 +190,7 @@ nav.links a.on{color:var(--accent)}
   body.navopen .sidenav{transform:none;box-shadow:0 0 40px rgba(0,0,0,.6)}
   body.navopen .scrim{
     display:block;position:fixed;inset:var(--topbar) 0 0 0;z-index:44;
-    background:rgba(4,6,10,.62);
+    background:rgba(2,6,14,.62);
   }
   .shell > main{margin-left:0;padding:0 14px}
   .logo{font-size:16px;letter-spacing:.2em}
@@ -214,14 +214,14 @@ nav.links a.on{color:var(--accent)}
 }
 .hero-main{
   position:relative;display:block;border-radius:var(--r);overflow:hidden;
-  background:#05070a;border:1px solid var(--edge);aspect-ratio:16/8;
+  background:#030812;border:1px solid var(--edge);aspect-ratio:16/8;
 }
 .hero-main img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
   transition:transform .4s ease}
 .hero-main:hover img{transform:scale(1.03)}
 .hero-main .veil{
   position:absolute;inset:0;
-  background:linear-gradient(90deg,rgba(5,7,11,.94) 0%,rgba(5,7,11,.78) 38%,rgba(5,7,11,.12) 78%);
+  background:linear-gradient(90deg,rgba(3,8,18,.94) 0%,rgba(3,8,18,.78) 38%,rgba(3,8,18,.12) 78%);
 }
 .hero-main .copy{
   position:absolute;inset:auto 0 0 0;padding:22px 24px;display:grid;gap:8px;
@@ -253,7 +253,7 @@ nav.links a.on{color:var(--accent)}
   .hero-side{grid-template-rows:none}
   .hero-side .tile{aspect-ratio:16/9;height:auto}
   .hero-main .copy{max-width:none;padding:16px 18px}
-  .hero-main .veil{background:linear-gradient(0deg,rgba(5,7,11,.95) 6%,rgba(5,7,11,.35) 62%,rgba(5,7,11,.1) 100%)}
+  .hero-main .veil{background:linear-gradient(0deg,rgba(3,8,18,.95) 6%,rgba(3,8,18,.35) 62%,rgba(3,8,18,.1) 100%)}
   .hero-side{grid-template-columns:repeat(4,1fr)}
 }
 @media (max-width:560px){.hero-side{grid-template-columns:1fr 1fr}}
@@ -274,7 +274,7 @@ nav.links a.on{color:var(--accent)}
   color:var(--dim);display:inline-flex;align-items:center;gap:6px;
   border:1px solid var(--edge);border-radius:14px;padding:7px 12px;
 }
-.rowhead .seeall:hover{color:var(--accent);border-color:#3d4f68}
+.rowhead .seeall:hover{color:var(--accent);border-color:#2b4a73}
 
 .strip{
   display:grid;gap:var(--gap);
@@ -292,33 +292,33 @@ nav.links a.on{color:var(--accent)}
 }
 .card:hover{transform:translateY(-3px)}
 .card .thumb{
-  position:relative;display:block;aspect-ratio:16/9;background:#05070a;
+  position:relative;display:block;aspect-ratio:16/9;background:#030812;
   border:1px solid var(--edge);border-radius:var(--r);overflow:hidden;
 }
-.card:hover .thumb{border-color:#3d4f68}
+.card:hover .thumb{border-color:#2b4a73}
 .card .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
   object-position:center 42%}
 /* STACK, MERGE and HOOPS are portrait. Filling a 16:9 card with the
    middle of a portrait board shows an empty strip of it; fitted whole on
    the game's own black, the card shows what the game actually is. */
-.card .thumb img.tall{object-fit:contain;background:#080b11}
+.card .thumb img.tall{object-fit:contain;background:#050a14}
 .card .ph{
   position:absolute;inset:0;display:grid;place-items:center;
-  font:700 20px/1 var(--mono);letter-spacing:.3em;color:#1f2b3a;
+  font:700 20px/1 var(--mono);letter-spacing:.3em;color:#1a3050;
 }
 .card .badge{
   position:absolute;left:7px;top:7px;padding:3px 7px;border-radius:4px;
-  background:rgba(6,9,14,.82);border:1px solid rgba(255,255,255,.08);
+  background:rgba(4,10,22,.82);border:1px solid rgba(255,255,255,.08);
   font:9px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#b6c1d1;
 }
 .card .big-flag{
   position:absolute;right:7px;top:7px;padding:3px 7px;border-radius:4px;
-  background:rgba(255,159,67,.9);color:var(--accent-ink);
+  background:rgba(34,211,122,.9);color:var(--accent-ink);
   font:9px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;
 }
 .card .hover{
   position:absolute;inset:0;display:grid;place-items:center;opacity:0;
-  background:linear-gradient(0deg,rgba(5,7,11,.85),rgba(5,7,11,.25));
+  background:linear-gradient(0deg,rgba(3,8,18,.85),rgba(3,8,18,.25));
   transition:opacity .14s ease;
 }
 .card .hover span{
@@ -336,19 +336,19 @@ nav.links a.on{color:var(--accent)}
 /* a small tile for the hero side and the "more games" rail */
 .tile{
   position:relative;display:block;border-radius:var(--r);overflow:hidden;
-  border:1px solid var(--edge);background:#05070a;aspect-ratio:16/9;
+  border:1px solid var(--edge);background:#030812;aspect-ratio:16/9;
 }
 .tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.tile img.tall{object-fit:contain;background:#080b11}
+.tile img.tall{object-fit:contain;background:#050a14}
 .tile .ph{position:absolute;inset:0;display:grid;place-items:center;
-  font:700 16px/1 var(--mono);letter-spacing:.3em;color:#1f2b3a}
+  font:700 16px/1 var(--mono);letter-spacing:.3em;color:#1a3050}
 .tile .cap{
   position:absolute;inset:auto 0 0 0;padding:16px 10px 8px;
-  background:linear-gradient(0deg,rgba(5,7,11,.92),transparent);
+  background:linear-gradient(0deg,rgba(3,8,18,.92),transparent);
   font:600 11.5px/1.2 var(--sans);color:#e2e9f3;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.tile:hover{border-color:#3d4f68}
+.tile:hover{border-color:#2b4a73}
 
 /* ---- the "nothing matched" state ---------------------------------- */
 .empty{
@@ -404,7 +404,7 @@ nav.links a.on{color:var(--accent)}
 .stage iframe{width:100%;height:100%;border:0;display:block;background:#000}
 .stage .curtain{
   position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:14px;
-  background:radial-gradient(120% 90% at 50% 38%,#16202e,#05070a 72%);
+  background:radial-gradient(120% 90% at 50% 38%,#10213b,#030812 72%);
   text-align:center;padding:24px;
 }
 .stage .curtain .shotbg{
@@ -421,7 +421,7 @@ nav.links a.on{color:var(--accent)}
 }
 .btn:hover{filter:brightness(1.08)}
 .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--edge)}
-.btn.ghost:hover{border-color:#3d4f68;background:var(--panel-2)}
+.btn.ghost:hover{border-color:#2b4a73;background:var(--panel-2)}
 
 /* the bar under the frame: what a portal puts there, in that order */
 .stagebar{
@@ -455,7 +455,7 @@ nav.links a.on{color:var(--accent)}
 .keys li{display:flex;gap:10px;align-items:baseline;background:var(--panel);
   border:1px solid var(--edge);border-radius:6px;padding:7px 10px}
 .keys kbd{font:11px/1 var(--mono);letter-spacing:.06em;color:var(--accent-2);
-  background:#0a0f16;border:1px solid var(--edge);border-radius:4px;padding:4px 6px;
+  background:#081326;border:1px solid var(--edge);border-radius:4px;padding:4px 6px;
   white-space:nowrap}
 .keys span{color:var(--dim);font-size:13px}
 .tip{margin-top:16px;padding:12px 14px;border-left:2px solid var(--accent);
@@ -465,7 +465,7 @@ nav.links a.on{color:var(--accent)}
   border:1px solid var(--edge);background:var(--panel);border-radius:14px;
   padding:6px 12px;font:11px/1 var(--sans);color:var(--dim);
 }
-.chip:hover{border-color:#3d4f68;color:var(--text)}
+.chip:hover{border-color:#2b4a73;color:var(--text)}
 .chip.on{border-color:var(--accent);color:var(--accent)}
 
 .side{display:flex;flex-direction:column;gap:14px;min-width:0}
@@ -476,9 +476,9 @@ nav.links a.on{color:var(--accent)}
 .mini{display:flex;gap:10px;align-items:center;padding:7px 0;
   border-top:1px solid var(--edge)}
 .mini:first-of-type{border-top:0}
-.mini .th{width:60px;height:34px;border-radius:4px;background:#05070a center/cover;
+.mini .th{width:60px;height:34px;border-radius:4px;background:#030812 center/cover;
   border:1px solid var(--edge);flex:none}
-.mini:hover .th{border-color:#3d4f68}
+.mini:hover .th{border-color:#2b4a73}
 .mini b{font:600 12px/1.2 var(--sans);display:block}
 .mini small{color:var(--faint);font-size:11px}
 
@@ -491,12 +491,12 @@ nav.links a.on{color:var(--accent)}
 .ad{display:flex;align-items:center;justify-content:center;margin:0 auto}
 .ad-ph{
   width:100%;height:100%;display:grid;place-items:center;gap:4px;text-align:center;
-  border:1px dashed #2a3a4d;border-radius:8px;background:
-    repeating-linear-gradient(135deg,#0b1016 0 10px,#0d1319 10px 20px);
-  color:#46566b;font:10px/1.5 var(--mono);letter-spacing:.16em;text-transform:uppercase;
+  border:1px dashed #22406a;border-radius:8px;background:
+    repeating-linear-gradient(135deg,#081224 0 10px,#0a162b 10px 20px);
+  color:#46618a;font:10px/1.5 var(--mono);letter-spacing:.16em;text-transform:uppercase;
   padding:8px;
 }
-.ad-ph b{color:#5d7189;font-size:11px;letter-spacing:.2em}
+.ad-ph b{color:#6683ab;font-size:11px;letter-spacing:.2em}
 .ad-ph i{font-style:normal;color:#38485c;font-size:9px;letter-spacing:.1em}
 .ad-leader{max-width:728px;height:90px;margin:16px auto}
 .ad-rail{width:300px;height:250px}
@@ -555,10 +555,10 @@ footer.foot .sp{flex:1}
   padding:12px 18px;background:rgba(10,14,20,.96);
   border-top:1px solid rgba(255,255,255,.12);
   font:400 13px/1.5 system-ui,sans-serif;color:#cbd6e4}
-.notice a{color:#ffd166}
-.notice button{background:#ffd166;color:#151a22;border:0;border-radius:6px;
+.notice a{color:var(--accent)}
+.notice button{background:var(--accent);color:var(--accent-ink);border:0;border-radius:6px;
   padding:8px 16px;font:600 13px/1 system-ui,sans-serif;cursor:pointer}
-.notice button:hover{background:#ffdd8a}
+.notice button:hover{background:#5ee59f}
 @media (max-width:640px){.notice{font-size:12px;padding:10px 14px}}
 
 /* ---------------------------------------------------------------------
@@ -641,7 +641,7 @@ body > main.wrap > .hero p{margin:0;color:var(--dim);max-width:62ch}
    so it never changes the slot's size. */
 .ad{position:relative}
 .ad:has(> ins.adsbygoogle):not(.ad-unfilled)::before{content:'Advertisements';position:absolute;
-  top:-15px;left:0;font:10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#5d7189}
+  top:-15px;left:0;font:10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#6683ab}
 
 /* trust pages, 2026-10-08 */
 .prose ul.plain{color:var(--dim);padding-left:20px}

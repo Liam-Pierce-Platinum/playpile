@@ -243,7 +243,7 @@ function house(el, sz) {
     + '<b style="letter-spacing:.2em">' + g.title + '</b>'
     + '<span style="text-transform:none;letter-spacing:0;font-size:12px;line-height:1.5">'
     + g.blurb + '</span>'
-    + '<i style="color:#ff9f43;letter-spacing:.14em">PLAY FREE &rarr;</i></a>';
+    + '<i style="color:#22d37a;letter-spacing:.14em">PLAY FREE &rarr;</i></a>';
 }
 
 /**

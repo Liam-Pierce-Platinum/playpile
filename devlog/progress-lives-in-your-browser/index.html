@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Why your progress lives in your browser, and how levels and badges work - PLAYPILE</title>
+<meta name="description" content="PLAYPILE has no accounts server. Here is how saves, save codes, XP, fifteen badges and a daily challenge work without one.">
+<link rel="canonical" href="https://playpile.net/devlog/progress-lives-in-your-browser/">
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#050a14">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Why your progress lives in your browser, and how levels and badges work","description":"PLAYPILE has no accounts server. Here is how saves, save codes, XP, fifteen badges and a daily challenge work without one.","datePublished":"2026-10-14","author":{"@type":"Person","name":"Liam"},"publisher":{"@type":"Organization","name":"PLAYPILE"},"mainEntityOfPage":"https://playpile.net/devlog/progress-lives-in-your-browser/"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <div class="prose">
+      <p class="crumbs"><a href="/">Games</a> &rsaquo; <a href="/devlog/">Dev log</a></p>
+      <article>
+      <section class="hero"><h1>Why your progress lives in your browser, and how levels and badges work</h1>
+        <p id="lede"><time datetime="2026-10-14">14 October 2026</time> &middot; 5 min read</p></section>
+<p>PLAYPILE has no sign-up. You open a game and play it, and your best scores, coins and unlocks are still there next time. On 14 October we added a profile page with a site-wide level, XP, fifteen badges and a daily challenge. All of it works without an account, and nothing you do is sent to us. This post explains why it is built that way and exactly how it works.</p>
+
+<h2>A website with nobody at home</h2>
+<p>PLAYPILE is a static site: a folder of files served from a content network, with no server of ours behind it. There is nowhere for us to keep your progress, so your browser keeps it, in its local storage. Every game saves under keys that start with <i>pd.</i>, and that prefix has been the rule since the first game shipped. Your progress is simply every <i>pd.</i> key on your device.</p>
+<p>This has real advantages. There is no password to forget, no email to hand over, and no database of players that could leak. It also has a cost, and we would rather say it plainly: if you clear your browser's site data, your progress goes with it. It also does not follow you to another browser on its own. That is what save codes are for.</p>
+
+<h2>Save codes</h2>
+<p>Since 20 September every profile can be copied out as a save code and pasted into another browser. The code is not clever. It is every <i>pd.</i> key and its value, written out as text and encoded so it can be pasted safely. It is not compressed or encrypted, so a code is only as private as wherever you paste it.</p>
+<p>Loading a code does not simply overwrite what is already there. It merges the two key by key. For a game's best score, the higher one wins. Play stats, badges, favourites and daily challenge records are combined, so pasting an old code onto a newer browser never takes anything away. A test copies 250 coins from one game's purse into a fresh browser through a code and checks that they arrive.</p>
+
+<h2>XP: earned by playing, with a cap</h2>
+<p>The level on your profile is earned by playing, across every game on the site. The rules are:</p>
+<ul>
+<li><b>1 XP for every 30 seconds of play</b>, counted only while the game's page is visible and focused. It checks every five seconds, so a game left open in a background tab earns nothing.</li>
+<li><b>At most 30 minutes per game per day count towards XP</b>, and at most 240 XP a day from time across all games.</li>
+<li><b>+10 XP the first time you play a game</b>, and <b>+50 for a daily challenge</b>.</li>
+<li>Each badge also pays its own XP.</li>
+</ul>
+<p>The caps are deliberate. Without them, the fastest way to level up would be to leave one game running overnight. With them, the fastest way is to play lots of different games for a while each, which is what we would like people to do anyway. Level 2 needs 100 XP, and each level after that needs 50 more than the one before: 100, then 150, then 200, and so on. Early levels come quickly and later ones take a while.</p>
+
+<h2>Fifteen badges</h2>
+<p>The badges reward trying things rather than grinding one thing:</p>
+<ul>
+<li>For variety: <b>First game</b> (25 XP), <b>Five games</b> (50), <b>Ten games</b> (100), <b>Explorer</b> for 25 different games (200), and <b>Tried everything</b> for a game in every category (150).</li>
+<li>For time: <b>One hour in</b> (75), <b>Regular</b> for ten hours in total (250), and <b>Marathon</b> for half an hour in one game in one day (75).</li>
+<li>For coming back: <b>Three days running</b> (50) and <b>Week streak</b> (150).</li>
+<li>For the daily challenge: <b>Challenger</b> for your first (50) and <b>Daily devotee</b> for seven in a row (200).</li>
+<li>And <b>Favourite</b> for adding a game to your favourites (15), plus <b>Level 5</b> and <b>Level 10</b>.</li>
+</ul>
+<p>One small detail: badges are checked twice in a row. A badge's XP can push you into a new level, and that level can itself be a badge.</p>
+
+<h2>The same daily challenge for everyone, with no server</h2>
+<p>The daily challenge picks one game a day, and it is the same game for everyone. Normally that would need a server to announce it. Ours works it out from the date alone. Every browser takes the text "playpile:" followed by today's date, runs it through a simple, well-known hashing function, and uses the result to pick from the list of games, sorted by name. Since every browser does the same sum on the same date, they all get the same answer.</p>
+<p>The same number decides the kind of challenge. On some days it is "play for three minutes". For the games that keep a score, it can instead be "beat your best from the start of the day, or play for five minutes". Either way it pays 50 XP.</p>
+<p>The honest limitation is time zones. The date is your local date, so the challenge changes at your midnight, not at the same moment worldwide. Two friends in different countries share a challenge for most of the day, but not all of it.</p>
+
+<h2>Streaks</h2>
+<p>There are two streaks. Your play streak counts consecutive days on which you played anything, and if you have not played yet today, yesterday still counts, so the streak does not look broken at breakfast. Your daily streak counts consecutive daily challenges. Miss a day and it starts again at one, but your best is kept.</p>
+
+<h2>Profiles, and what leaves your machine</h2>
+<p>A single browser can hold several named profiles, each with its own picture, which suits a family sharing one computer. Switching profile swaps in that player's saved keys. Leaderboards on a game page currently show the profiles on this device.</p>
+<p>On the privacy settings page you can see every score and save the site has kept in your browser, download a copy as a file, or delete it, either all at once or a group at a time. For guests and local profiles, nothing you do leaves your machine. The only outside services the site talks to are the advertising script and, for games with online play, a matchmaking service that introduces two players' browsers to each other. We keep no analytics at all.</p>
+      </article>
+      <h2>More from the dev log</h2>
+      <ul><li><a href="/devlog/one-script-for-every-phone/" style="color:var(--accent)">One script that makes every game work on a phone</a></li><li><a href="/devlog/designing-tension/" style="color:var(--accent)">Designing tension in three games: a crowd, a chase and a muzzle flash</a></li><li><a href="/devlog/how-we-check-every-game/" style="color:var(--accent)">How we check every game without playing each one by hand</a></li><li><a href="/devlog/a-guide-for-every-game/" style="color:var(--accent)">Writing a guide for every game, checked against the code</a></li></ul>
+
+    </div>
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">100 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/devlog/">Dev log</a><a href="/articles/">Articles</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<script type="module">
+import { GAMES, mountShell, row } from '/site/shell.js';
+import { loadAds } from '/ads/ads.js';
+mountShell({ active: 'about' });
+document.getElementById('picks').innerHTML =
+  row('Start with one of these', GAMES.filter((g) => g.big).slice(0, 6), { seeAll: '/' });
+// no ad slots on this page, but it does load the ad script, so it owes
+// the visitor the same cookie notice as everywhere else
+loadAds();
+</script>
+</body>
+</html>

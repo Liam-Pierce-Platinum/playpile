@@ -51,13 +51,12 @@
       <p class="crumbs"><a href="/">Games</a> &rsaquo; <a href="/devlog/">Dev log</a></p>
       <article>
       <section class="hero"><h1>KICKBACK: when the gun is how you move</h1>
-        <p id="lede"><time datetime="2026-09-22">22 September 2026</time> &middot; 6 min read</p></section>
+        <p id="lede"><time datetime="2026-09-22">22 September 2026</time> &middot; 5 min read</p></section>
 <p><a href="/play/kickback/">KICKBACK</a> is a small pixel-art shooter set on six floors of an unfinished tower over the harbour, with downtown across the water. You carry a sawed-off shotgun with two shells in it, and the shells are your legs. This post is about how that idea works in numbers, and about three bugs that made the fights feel wrong for reasons nobody could see.</p>
 
 <h2>The gun is the movement system</h2>
 <p>Fire the gun and you get pushed the opposite way from where you aimed. In the code the kick is a single impulse of 10.8 against gravity of 27, applied directly against the aim. Shoot at the floor and you go up, about half a storey for one barrel. Fire both barrels quickly and you reach 27 metres a second, which clears a whole floor through the stairwell. Fire into a wall beside you and a muzzle-to-wall check adds up to 5 more, so a diagonal shot into concrete is a real wall jump rather than a nudge.</p>
 <p>Two rules keep that feeling good. First, walking never fights the recoil. Holding a direction can only push you up to walking pace, which is 4.2, so a shot that threw you across the room keeps you thrown. Second, and this is the asymmetry the whole game rests on: the people in the building carry the same gun and get none of the kick. They call the same firing code and the impulse is calculated and thrown away. They out-shoot you. You out-move them. The moment you run dry you are just a man standing on a floor.</p>
-<p>Two shells means every jump is a choice. A shell spent getting up a floor is a shell you do not have for the man at the top of the stairs, and reloading takes 0.95 seconds that you have to find somewhere.</p>
 
 <h2>Making the enemies fair to fight</h2>
 <p>The first version of the enemies swung a barrel round and fired the instant it lined up. That is not a duel, it is a hazard. You cannot see it coming, so nothing you do matters, and the best play is to stand still and trade shots, which is the opposite of a game about moving. Five rules fixed it:</p>
@@ -73,7 +72,7 @@
 <h2>Three bugs you could not see</h2>
 <p>By September the game looked right and felt wrong. Shots that should have landed did nothing, and enemies barely fought back. All three causes were invisible in a screenshot, which is exactly why they had shipped.</p>
 <h3>The columns ate every shot</h3>
-<p>In a 3D building you walk round a pillar. In 2D there is no round, so a full-height column between you and the stairs made a floor impossible to cross. We had fixed that by letting you walk through columns. But the columns still stopped bullets, and there was one every 4.4 metres across a 44-metre floor. Any level shot fired along a floor died on concrete, yours and theirs, and because you walk straight through a column there was nothing on screen to explain it. Columns now carry a second flag that tells bullets to ignore them. Shooting into one still throws you off it. This is a whole class of bug for us now: anything marked as walk-through has to be checked against bullets separately.</p>
+<p>In a 3D building you walk round a pillar. In 2D there is no round, so a full-height column between you and the stairs made a floor impossible to cross. We had fixed that by letting you walk through columns. But the columns still stopped bullets, and there was one every 4.4 metres across a 44-metre floor. Any level shot fired along a floor died on concrete, yours and theirs, and because you walk straight through a column nothing on screen explained it. Columns now carry a second flag that tells bullets to ignore them. We now treat this as a class of bug: anything made walk-through has to be checked against bullets separately.</p>
 <h3>The barricades were taller than the barrel</h3>
 <p>The gun fires from 0.75 metres off the floor. The brick barricades were 0.95 metres tall, so seven pellets in ten hit the barricade at any range past four metres. They were also too tall to step over, so the only way past was to spend a shell. They are 0.62 metres now with a step height of 0.7, so you shoot over them standing and walk up onto them.</p>
 <h3>Nothing said you had hit anybody</h3>
@@ -86,11 +85,10 @@
 <p>An upgrade called Choke tightens the spread. Two of them used to turn 16 damage at twelve metres into 38 for free, which is not a choice, it is the right answer. Choke now costs kick, the thing you travel on.</p>
 
 <h2>Faces at seventeen pixels</h2>
-<p>The last fix this round was the faces. The heads are seventeen pixels across and they used to tilt with every feature rotated, so eyes came out as three stripes, the fringe made a domino mask when a figure turned round, and the jaw shadow covered 45 per cent of the head and read as a beard. Heads no longer rotate. Every feature sits on whole pixels, and the pupils follow the aim instead. The muzzle flash was also leaving from a third of the way down the barrel, because the gun was drawn longer than the point the pellets came from. The drawing and the shot now ask the same function where the end of the barrel is.</p>
-<p>The game's own test suite has 45 checks now, including the column, barricade and range cases above, so they cannot quietly come back.</p>
+<p>The last fix this round was the faces. The heads are seventeen pixels across and used to tilt, with every feature rotated, so eyes came out as three stripes and the jaw shadow read as a beard. Heads no longer rotate, every feature sits on whole pixels, and the pupils follow the aim instead. The game's own test suite now has checks for the three invisible bugs above, so they cannot quietly come back.</p>
       </article>
       <h2>More from the dev log</h2>
-      <ul><li><a href="/devlog/one-script-for-every-phone/" style="color:var(--accent)">One script that makes every game work on a phone</a></li><li><a href="/devlog/designing-tension/" style="color:var(--accent)">Designing tension in three games: a crowd, a chase and a muzzle flash</a></li><li><a href="/devlog/how-we-check-every-game/" style="color:var(--accent)">How we check every game without playing each one by hand</a></li><li><a href="/devlog/southpaw-ten-boxers-ten-weaknesses/" style="color:var(--accent)">SOUTHPAW: ten boxers, and why mashing loses</a></li></ul>
+      <ul><li><a href="/devlog/one-script-for-every-phone/" style="color:var(--accent)">One script that makes every game work on a phone</a></li><li><a href="/devlog/progress-lives-in-your-browser/" style="color:var(--accent)">Why your progress lives in your browser, and how levels and badges work</a></li><li><a href="/devlog/designing-tension/" style="color:var(--accent)">Designing tension in three games: a crowd, a chase and a muzzle flash</a></li><li><a href="/devlog/how-we-check-every-game/" style="color:var(--accent)">How we check every game without playing each one by hand</a></li></ul>
 
     </div>
     <!-- THE FOOTER IS REAL HTML, not something a script draws.

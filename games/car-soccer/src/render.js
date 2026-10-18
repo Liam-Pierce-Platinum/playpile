@@ -1,6 +1,6 @@
 // Canvas drawing: arena (pre-rendered layer), cars, ball, particles, HUD.
 // World space is y-up; the world transform flips it so everything is drawn in world units.
-import { W, H, GH, GD, CR, BALL_R, POLY } from './arena.js';
+import { W, H, GH, GD, CR, BALL_R, POLY, FLOOR, DIP_D } from './arena.js';
 import { L, HH, WHEEL_R } from './physics.js';
 import { fx } from './fx.js';
 
@@ -117,7 +117,7 @@ function buildLayer(s) {
   const tg = g.createLinearGradient(-W / 2 - GD, 0, W / 2 + GD, 0);
   tg.addColorStop(0, 'rgba(43,140,255,0.16)'); tg.addColorStop(0.46, 'rgba(43,140,255,0.03)');
   tg.addColorStop(0.54, 'rgba(255,138,31,0.03)'); tg.addColorStop(1, 'rgba(255,138,31,0.16)');
-  g.fillStyle = tg; g.fillRect(-W / 2 - GD, 0, W + 2 * GD, H);
+  g.fillStyle = tg; g.fillRect(-W / 2 - GD, -DIP_D, W + 2 * GD, H + DIP_D);
   // hex grid
   g.strokeStyle = 'rgba(140,170,255,0.06)'; g.lineWidth = 3;
   const hr = 70, hw = hr * Math.sqrt(3);
@@ -159,9 +159,8 @@ function buildLayer(s) {
   }
   g.restore();
   // floor strip
-  const fl = g.createLinearGradient(0, -30, 0, 30);
-  fl.addColorStop(0, 'rgba(0,0,0,0)'); fl.addColorStop(0.5, 'rgba(150,200,255,0.25)'); fl.addColorStop(1, 'rgba(0,0,0,0)');
-  g.fillStyle = fl; g.fillRect(-W / 2 - GD, -30, W + 2 * GD, 60);
+  g.strokeStyle = 'rgba(150,200,255,0.14)'; g.lineWidth = 50; g.lineJoin = 'round';
+  g.beginPath(); FLOOR.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke();
   // neon boundary: blue left half, orange right half, white glow
   const bgr = g.createLinearGradient(-W / 2, 0, W / 2, 0);
   bgr.addColorStop(0, TEAM[0].glow); bgr.addColorStop(0.45, '#9fb8ff'); bgr.addColorStop(0.55, '#ffd0b0'); bgr.addColorStop(1, TEAM[1].glow);

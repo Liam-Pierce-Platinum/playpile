@@ -3,10 +3,19 @@
 // into both goals, straight side walls above the goals, rounded ceiling corners.
 // A signed-distance grid is baked once at load: sdf > 0 in free space, < 0 inside walls.
 export const W = 2400, H = 1100, GH = 310, GD = 230, CR = 360, BALL_R = 80;
+// two dips in the floor between the kickoff spots and midfield's flanks: the ball rolls into them,
+// cars lose speed climbing out, and you can use the lip as a ramp (centre, spawns and goal mouths stay flat)
+export const DIP_X = 420, DIP_HW = 300, DIP_D = 80;
+export function floorY(x) {
+  const u = (Math.abs(x) - DIP_X) / DIP_HW;
+  return Math.abs(u) < 1 ? -DIP_D * 0.5 * (1 + Math.cos(Math.PI * u)) : 0;
+}
+export const FLOOR = [];
+for (let x = -W / 2 - GD; x <= W / 2 + GD + 1; x += 25) FLOOR.push([x, floorY(x)]);
 
 export const POLY = (() => {
   const p = [];
-  p.push([-W / 2 - GD, 0], [W / 2 + GD, 0], [W / 2 + GD, GH], [W / 2, GH], [W / 2, H - CR]);
+  p.push(...FLOOR.map((q) => [q[0], q[1]]), [W / 2 + GD, GH], [W / 2, GH], [W / 2, H - CR]);
   const seg = 24;
   for (let i = 1; i <= seg; i++) {
     const t = (i / seg) * Math.PI / 2;
@@ -22,9 +31,9 @@ export const POLY = (() => {
 })();
 
 const RES = 5;
-const X0 = -W / 2 - GD - 150, Y0 = -150;
+const X0 = -W / 2 - GD - 150, Y0 = -300;
 const NX = Math.ceil((W + 2 * GD + 300) / RES) + 1;
-const NY = Math.ceil((H + 300) / RES) + 1;
+const NY = Math.ceil((H + 450) / RES) + 1;
 const grid = new Float32Array(NX * NY);
 
 function segDist(px, py, ax, ay, bx, by) {

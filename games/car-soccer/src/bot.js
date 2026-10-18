@@ -5,9 +5,9 @@ import { W, H, GH, BALL_R } from './arena.js';
 import { predictBall, L, RIDE } from './physics.js';
 
 export const DIFFS = {
-  rookie:  { defend: 0.2, react: 0.4,  thr: 0.7,  boostDist: 9999, boostP: 0,   reachY: 200, flipP: 0.1, aerial: 0,   aim: 120, speed: 750,  dj: 0,   slack: 0.3,  idle: 0.25, kickDelay: 0, kickFlip: 150, kickBoost: 1 },
-  pro:     { defend: 0.85, react: 0.1, thr: 1.0,  boostDist: 500,  boostP: 0.85, reachY: 210, flipP: 0.7, aerial: 0,  aim: 30,  speed: 1250, dj: 0.8, slack: 0.07, idle: 0.03, kickDelay: 0.05, kickFlip: 190 },
-  allstar: { defend: 1,   react: 0.06, thr: 1.0,  boostDist: 380,  boostP: 1.0, reachY: 220, flipP: 0.9, aerial: 0,   aim: 14,  speed: 1400, dj: 1,   slack: 0.03, idle: 0, kickDelay: 0, kickFlip: 230 },
+  rookie:  { defend: 0.2, react: 0.4,  thr: 0.7,  boostDist: 9999, boostP: 0,   reachY: 200, flipP: 0.1, aerial: 0,   aim: 120, speed: 750,  dj: 0,   slack: 0.3,  idle: 0.25, smart: 0, kickDelay: 0, kickFlip: 150, kickBoost: 1 },
+  pro:     { defend: 0.85, react: 0.1, thr: 1.0,  boostDist: 500,  boostP: 0.85, reachY: 210, flipP: 0.7, aerial: 0,  aim: 30,  speed: 1250, dj: 0.8, slack: 0.07, idle: 0.03, smart: 0.4, kickDelay: 0.05, kickFlip: 190 },
+  allstar: { defend: 1,   react: 0.06, thr: 1.0,  boostDist: 380,  boostP: 1.0, reachY: 220, flipP: 0.9, aerial: 0,   aim: 14,  speed: 1400, dj: 1,   slack: 0.03, idle: 0, smart: 0.6, kickDelay: 0, kickFlip: 230 },
 };
 
 export function makeBot(diff, carIndex) {
@@ -49,10 +49,15 @@ export function botInput(bot, w, dt) {
     const near = Math.abs(b.x - c.x) < 520;
     if (oppShoots && oppT < myT - 0.12 && !near && rand() < p.defend * 1.6) bot.mode = 'defend';
     else if (bot.mode === 'defend' && (near || !oppShoots || oppT > myT + 0.1)) bot.mode = side < 0 ? 'attack' : 'rotate';
-    if (bot.mode === 'defend') bot.tx = -s * (W / 2 - 110);
+    const loses = oppT < myT - 0.3 && opp.demo <= 0 && side < 0 && !near;
+    if (bot.mode === 'attack' && loses && rand() < p.smart) bot.mode = 'shadow';
+    else if (bot.mode === 'shadow' && (!loses || near || danger)) bot.mode = side < 0 ? 'attack' : 'rotate';
+    if (bot.mode === 'shadow') bot.tx = Math.max(-W / 2 + 140, Math.min(W / 2 - 140, b.x - s * (420 + 300 * Math.max(0, 1 - oppT))));
+    else if (bot.mode === 'defend') bot.tx = -s * (W / 2 - 110);
     else if (bot.mode === 'attack') bot.tx = ix - s * (BALL_R + L * 0.55) + bot.noise;
     else {
-      bot.tx = Math.max(-W / 2 + 140, Math.min(W / 2 - 140, b.x - s * 650));
+      const back = 650 - p.smart * (oppT < myT ? -120 : 220);
+      bot.tx = Math.max(-W / 2 + 140, Math.min(W / 2 - 140, b.x - s * back));
       if (danger) bot.tx = -s * (W / 2 - 120);
     }
     bot.flipRoll = rand();
@@ -75,6 +80,8 @@ export function botInput(bot, w, dt) {
   const kick = Math.abs(b.x) < 4 && Math.abs(b.vx) < 5 && b.y < BALL_R + 6 && Math.abs(b.vy) < 30;
   if (kick && c.grounded && c.ny > 0.7) {
     bot.mode = 'attack'; bot.kickT = (bot.kickT || 0) + dt;
+    if (bot.kickT === dt) bot.fake = rand() < 0.18 * p.smart;
+    if (bot.fake && bot.kickT < 1.1) { out.x = 0; return fin(); }
     const kd = p.kickDelay || 0;
     if (bot.kickT < kd) { out.x = 0; return fin(); }
     out.x = Math.sign(b.x - c.x);
@@ -84,7 +91,7 @@ export function botInput(bot, w, dt) {
       queue(bot, t, [[0, { jump: true }], [0.05, { jump: false }], [0.08, { jump: true, x: s }], [0.13, { jump: false, x: s }]]);
     return fin();
   }
-  bot.kickT = 0;
+  bot.kickT = 0; bot.fake = false;
   if (c.grounded) {
     bot.aerial = false;
     if (c.ny < 0.7) {                            // on a wall or ceiling: hop back down
@@ -108,9 +115,11 @@ export function botInput(bot, w, dt) {
     if (bot.mode === 'attack' && rx > 0 && rx < 300 && Math.abs(ry) < 260) out.x = s * p.thr;
     const facing = Math.sign(out.x) === c.dir;
     const sp = Math.hypot(c.vx, c.vy);
-    if (facing && c.boost > 5 && bot.boostRoll < p.boostP && Math.abs(dx) > p.boostDist && sp < 2250) out.boost = true;
+    const reserve = p.smart && bot.mode !== 'attack' && !bot.danger ? 30 * p.smart : 5;
+    if (facing && c.boost > reserve && bot.boostRoll < p.boostP && Math.abs(dx) > p.boostDist && sp < 2250) out.boost = true;
     if (bot.mode === 'rotate' && bot.danger && facing && c.boost > 5 && p.boostP > 0.5) out.boost = true;
     if (bot.seq.length || t - bot.lastSeq < 0.45) return fin();
+    if (bot.mode === 'shadow') { bot.runup = false; if (Math.abs(dx) < 60) out.x = c.dir !== s ? s * 0.5 : 0; return fin(); }
     if (bot.mode === 'defend') {
       bot.runup = false;
       if (Math.abs(dx) < 90) out.x = c.dir !== s ? s * 0.5 : 0;   // sit in goal facing the play

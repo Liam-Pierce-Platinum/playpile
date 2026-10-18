@@ -357,7 +357,7 @@ There are 15 courses in four sky themes, Dawn, Noon, Sunset and Dusk. Checkpoint
     content: "Blocky cartoon cars; a crash throws off block debris and sparks and nobody is shown hurt. The screen flashes red on every crash, roadwork arrow signs blink amber, and there is screen shake on crashes and near misses.",
     web: "rush-hour/",
     tag: "Traffic racer", big: true, added: '2026-10-14',
-    cat: "Driving", tags: ["new","driving","racing","traffic","drift","highway","3d","mobile"],
+    cat: "Driving", tags: ["driving","racing","traffic","drift","highway","3d","mobile"],
     blurb: "Weave through traffic at 250 km/h down one 36 km road. Ten stages of hairpins, drifts and near misses against the clock.",
     about: `A blocky high-speed traffic racer with a high chase camera. The throttle is always on, and one connected 35.8 km road runs through ten stages and 138 corners, from wide sweepers to hairpin switchbacks. Every checkpoint arch adds time to the clock and rolls straight into the next stage, with the sky, weather and scenery changing as you go: trucks on Freight Line, roadworks in Cone Zone, oncoming traffic at sunset, rain in Storm Front and one lane each way through the canyon.
 
@@ -371,7 +371,7 @@ Shave past cars for NEAR MISS, CLOSE and INSANE bonuses, tap the brake mid-corne
     content: "A cartoon fighting game between two glowing stick figures with no blood; a knocked-out fighter just falls over. Brief white screen flashes on hazard hits and knockouts, and screen shake.",
     web: "mirror-duel/",
     tag: "Fighting puzzle", big: false, added: '2026-10-14',
-    cat: "Action", tags: ["new","fighting","puzzle","neon","2d","mobile"],
+    cat: "Action", tags: ["fighting","puzzle","neon","2d","mobile"],
     blurb: "One controller, two fighters. Your opponent copies every move you make, flipped. Win by making the same move hurt them more.",
     about: `You control both fighters. Your cyan fighter gets your input, and the magenta MIRROR gets exactly the same input flipped left and right, so in an even room every punch would trade. Each of the eight neon arenas is lopsided on purpose: spikes on one side, a live electric wall, a conveyor belt, pits of different widths, lasers firing out of step, black ice, spiked ceilings.
 
@@ -384,7 +384,7 @@ Find where the same move costs the MIRROR more than it costs you, and launch it 
     content: "A bright cartoon platformer with candy enemies that pop into confetti. No blood. No full-screen flashes; the boss turns white for a moment when hit.",
     web: "bubble-trouble/",
     tag: "Platformer", big: false, added: '2026-10-14',
-    cat: "Arcade", tags: ["new","platformer","cute","boss","2d","mobile"],
+    cat: "Arcade", tags: ["platformer","cute","boss","2d","mobile"],
     blurb: "A bubble-gum blob bouncing through a candy city. Blow up to float, slam to smash, stick to walls and enemies.",
     about: `Roll a bouncy bubble-gum blob through five levels of a bright candy city and then take on the Sour King. Hold jump in the air to blow yourself into a bubble and float, slam down to smash gum crates, and stick to walls to climb them. Stomp an enemy and it is wrapped in gum: harmless for a few seconds, a trampoline, and ready to be slammed for extra candy.
 
@@ -397,7 +397,7 @@ Each level hides golden gumballs under crates and up high, and the end card give
     content: "Cartoon traffic and scooters bump into each other; the worst that happens is a pizza splatting on the road. Screen shake and confetti, no flashing lights.",
     web: "pizza-panic/",
     tag: "Delivery", big: false, added: '2026-10-14',
-    cat: "Driving", tags: ["new","driving","delivery","arcade","top-down","upgrades","mobile"],
+    cat: "Driving", tags: ["driving","delivery","arcade","top-down","upgrades","mobile"],
     blurb: "Drift a scooter through busy city traffic and throw hot pizzas at glowing doors before the shift clock runs out.",
     about: `You ride a pizza scooter through a busy top-down city with 80 seconds on the clock. Grab three pizzas at the shop, weave through traffic and throw them at the glowing doors as you pass; every delivery buys five more seconds. Pizzas cool as you ride, so hot ones tip best, and near misses, long drifts and long-range throws chain into a combo worth up to triple pay.
 
@@ -410,7 +410,7 @@ From Shift 2 rival RAT scooters hunt you to ram pizzas off your rack, unless you
     content: "A toy-soldier shooter with no blood: plastic army men topple over and come back a few seconds later. Muzzle flashes, bright flashes from firecracker explosions and a red glow at the screen edges when hit. Online play is a direct connection to one friend by room code, with no chat.",
     web: "toy-soldier-blitz/",
     tag: "Build & fight", big: true, added: '2026-10-14',
-    cat: "Shooter", tags: ["new","shooter","third-person","building","3d","online","multiplayer","bots","mobile"],
+    cat: "Shooter", tags: ["shooter","third-person","building","3d","online","multiplayer","bots","mobile"],
     blurb: "Build a fort out of wooden blocks and dominoes, then fight over it as a plastic army man in a kid's bedroom.",
     about: `You are a little green plastic army man at war with the tan army across a kid's bedroom. Every battle starts with a timed build phase: both sides spend a points budget on wooden alphabet blocks, domino walls, staircases, ramps and ruler bridges on their own half. Then the fight starts, and every piece can be shot to splinters or blown apart with firecrackers, bringing down anything stacked on top.
 
@@ -423,7 +423,7 @@ Play Team KO, King of the Hill or a one-on-one Duel across four maps: the rug, a
     content: "Skiing and snowboarding with cartoon wipeouts and no injuries shown. The screen shakes on crashes and there are fast-moving speed lines at high speed, but no flashing lights.",
     web: "ski-mountain/",
     tag: "Endless ski", big: true, added: '2026-10-14',
-    cat: "Sport", tags: ["new","ski","snowboard","tricks","endless","winter","3d","mobile"],
+    cat: "Sport", tags: ["ski","snowboard","tricks","endless","winter","3d","mobile"],
     blurb: "One endless, ever-faster downhill. Weave the trees, hit the kickers, spin and flip with the mouse, and see how far you get on three lives.",
     about: `Drop into a snowy valley that never ends. Weave through walls of trees, rock bands, fallen logs, snow fences, parked snowcats and huts, and there is always a gap if you can find it. Hit kicker after kicker, grind rails and logs, and spin and flip with the mouse, then land straight to bank the combo.
 
@@ -436,7 +436,7 @@ The further you go, the faster you fly: the valley winds tighter, the gaps get n
     content: "Cartoon gym dodgeball: players who are hit simply walk to the bench. A short red tint fills the screen when you go out and a short yellow tint on a catch, with screen shake on hits.",
     web: "dodgeball-dash/",
     tag: "Dodgeball", big: false, added: '2026-10-14',
-    cat: "Sport", tags: ["new","dodgeball","team","arcade","bots","2d","mobile"],
+    cat: "Sport", tags: ["dodgeball","team","arcade","bots","2d","mobile"],
     blurb: "3v3 arcade dodgeball. Charge and curve your throws, catch one to bring a teammate back, and climb an eight-team ladder.",
     about: `Top-down 3 against 3 dodgeball in a packed school gym. Three balls sit on the centre line at the start of every round, so each one opens with a rush. Hold to charge a throw and let go to fire, bend it around a dodger with a curve, or catch an incoming ball to put the thrower out and bring your first teammate back off the bench. Holding a ball? The catch button blocks instead.
 
@@ -449,7 +449,7 @@ Rounds last 60 seconds and the first team to three wins the match. Climb a ladde
     content: "A cartoon rooftop runner with no violence: if you crash, your runner tumbles off the roof and you start again. Screen shake on crashes and glass smashes, but no flashing lights.",
     web: "roof-run/",
     tag: "Runner", big: false, added: '2026-10-14',
-    cat: "Arcade", tags: ["new","runner","one-button","endless","parkour","mobile"],
+    cat: "Arcade", tags: ["runner","one-button","endless","parkour","mobile"],
     blurb: "Jump the gaps, slide under the neon signs and smash through glass towers as a sunset city speeds up beneath you.",
     about: `One button, one runner, one endless skyline. Tap to jump the gaps and hop the rooftop boxes, hold to slide under hanging neon signs, and run straight through the lit office floors of glass towers for a burst of speed and a shower of shards. The run keeps getting faster, and the sky turns from golden hour to dusk to neon night as you go.
 
@@ -462,7 +462,7 @@ Every clean move feeds a combo that doubles and then triples your coins, and the
     content: "A pixel-art arcade game about steering a firework rocket. No violence; a crash is a burst of sparks. The screen flashes briefly and faintly on firework bursts, and more strongly on shape bonuses, crashes and level clears.",
     web: "firework-frenzy/",
     tag: "Flying", big: false, added: '2026-10-14',
-    cat: "Arcade", tags: ["new","pixel","flying","physics","levels","mobile"],
+    cat: "Arcade", tags: ["pixel","flying","physics","levels","mobile"],
     blurb: "Steer a firework rocket through a night city: fly the rings, light the fireworks and set off chain reactions before your fuel runs out.",
     about: `You are a firework rocket over a pixel city at night. Your flame only pushes you the way your nose points and gravity never lets go, so every flight is a wild, swooping arc. Fly through the rings, touch or flame the fireworks to light them, and watch one burst set off the next in a chain worth more with every pop. Burst a whole heart, star or circle for a big shape bonus.
 
@@ -476,7 +476,7 @@ Ten levels teach one idea each, from CHAIN REACTION to LIVE WIRES and BIRD SEASO
     content: "First-person horror chase. A tall, pale, eyeless monster chases you through dark rainy streets, with screams, jump scares and a grab when it catches you; no blood or gore. Lightning flashes light the sky now and then, the screen edge glows and pulses red when it is close, there is a red flash when it cuts you off, and a brief bright flash when it catches you.",
     web: "pursued/",
     tag: "Chase", big: true, added: '2026-10-13',
-    cat: "Horror", tags: ["new","horror","chase","monster","first person","parkour","rain","3d","mobile"],
+    cat: "Horror", tags: ["horror","chase","monster","first person","parkour","rain","3d","mobile"],
     blurb: "Night, rain, and something tall and wrong right behind you. Vault fences, slam doors, knock bins into its path and run.",
     about: `It is night, it is raining, and something about 2.7 metres tall, pale and eyeless has just burst out of the dark behind you. You run. Fences, cars and dumpsters are vaulted automatically, you slide under half-shut gates, slam doors behind you and shove bins, trolleys and shelves over into its path.
 
@@ -489,7 +489,7 @@ It hunts by sight and by sound through the same alleys, backyards and walk-throu
     content: "Cartoon pixel-art sea rescue. Sharks bite, jellyfish sting and eels zap the diver, which costs oxygen; there is no blood. Survivors can be lost if they run out of air (shown with a burst of bubbles and a message) and the diver can black out. Taking a hit gives a faint red screen tint and a small screen shake.",
     web: "deep-dive/",
     tag: "Rescue", big: true, added: '2026-10-13',
-    cat: "Adventure", tags: ["new","diving","rescue","underwater","pixel","upgrades","endless","mobile"],
+    cat: "Adventure", tags: ["diving","rescue","underwater","pixel","upgrades","endless","mobile"],
     blurb: "A ship is going down with people trapped inside. Swim into the wreck, hook them onto your air line and tow them out before anyone's air runs out.",
     about: `Every mission a ship is sinking, and its passengers are trapped in air pockets in the flooded rooms. You are the rescue diver: find a hole in the hull, crank hatches open, cut through debris, clip your spare air line onto each survivor and tow them out to the rescue bell or the surface. Your tank drains the whole time, each pocket's air runs low as the wreck tilts and sinks, and a survivor whose room floods can only hold their breath for nine seconds.
 
@@ -502,7 +502,7 @@ There are 24 missions across fishing boats, ferries, cargo ships, cruise liners,
     content: "Cartoon plane dogfights: planes are shot down in fireballs with smoke and falling wreckage, no people are shown hurt. Bright explosion and muzzle flashes, a red flash at the screen edges when you are hit, screen shake, and the screen briefly turns white when you fly through a cloud.",
     web: "sky-aces/",
     tag: "Dogfight", big: true, added: '2026-10-13',
-    cat: "Shooter", tags: ["new","planes","dogfight","airships","3d","upgrades","online","mobile"],
+    cat: "Shooter", tags: ["planes","dogfight","airships","3d","upgrades","online","mobile"],
     blurb: "Arcade dogfights in a bright cartoon sky. Shoot down raiders, aces, bombers and armoured airships, then spend the money on faster planes.",
     about: `You are a little pilot in goggles and a flapping scarf, flying an open-cockpit biplane over a sea of islands. Point with the mouse and the plane follows; lead your shots, lock missiles, boost, and barrel roll to shake a missile on your tail. Enemy pilots line up real shots, climb away when they are slow, break hard when you sit on their six and fly with wingmen.
 
@@ -515,7 +515,7 @@ Ten campaign missions run from three rookie raiders to bomber raids on the harbo
     content: "Cartoon animals and monsters fight with swords, arrows and spells in a painted arena. Beaten units burst into an ink splat; there is no blood. Units flash white for a moment when hit, and big spells and lost fights give a small screen shake.",
     web: "auto-arena/",
     tag: "Auto-battler", big: false, added: '2026-10-13',
-    cat: "Strategy", tags: ["new","auto battler","strategy","shop","merge","ranked","daily","mobile"],
+    cat: "Strategy", tags: ["auto battler","strategy","shop","merge","ranked","daily","mobile"],
     blurb: "Buy ink-and-watercolour fighters, merge three into a star, then watch them battle on their own. Ten trophies before six hearts run out.",
     about: `Each round you shop, then fight. Spend gold on little fighters, from a mouse knight in a thimble helmet to a dragon made of ink, and arrange them on a two-row board: tanks in front, archers and mages behind. Press FIGHT and the battle plays itself: your units walk in, attack and cast their abilities when their mana fills. Win and you take a trophy; lose and you lose a heart. Ten trophies before your six hearts run out wins the run.
 
@@ -528,7 +528,7 @@ There are 34 units with their own abilities, 10 traits that switch on when you f
     content: "Cartoon sword fighting against cute pixel monsters (slimes, zombies, skeletons, bats, shadow creatures) that pop into particles when beaten, with no blood. Enemies flash white when hit, a short white screen flash on every level-up, a red glow at the screen edges when you are hurt, red danger circles and lines on the ground, and screen shake on big hits.",
     web: "tiny-knight/",
     tag: "Action RPG", big: true, added: '2026-10-13',
-    cat: "Adventure", tags: ["new","pixel","crafting","action rpg","knight","boss","island","mobile"],
+    cat: "Adventure", tags: ["pixel","crafting","action rpg","knight","boss","island","mobile"],
     blurb: "Chop, mine and craft your way up from bare fists to the Shadowbane, then pay to build the bridge to the Shadow King's castle.",
     about: `You are a tiny knight on a big island. In the middle, a castle sits on a lake, swallowed by shadow, and the only way across is a bridge that Foreman Bram builds in five stages, if you can pay for them. Chop trees and mine rock and iron, craft better swords, axes, pickaxes, shields, armour and a bow at the workbench, and push out through the Meadow, Whisperwood, the Pebble Hills and the Hollow Graves, where night brings out zombies and bats.
 
@@ -541,7 +541,7 @@ Every hit lands with a flash, knockback and a bit of hit-stop, and every dangero
     content: "A sniper game with no blood: stylised figures simply fall down when hit. A short white screen flash on every shot, and a red and blue flashing siren light for a few seconds on some missions.",
     web: "the-mark/",
     tag: "Sniper", big: true, added: '2026-10-13',
-    cat: "Shooter", tags: ["new","sniper","deduction","puzzle","crowd","3d","mobile"],
+    cat: "Shooter", tags: ["sniper","deduction","puzzle","crowd","3d","mobile"],
     blurb: "One person in the crowd below is an enemy agent. Read the clues, watch for the tell, and take one clean shot.",
     about: `You lie on a rooftop with a scoped rifle above a busy crowd, and one of the people down there is THE MARK, an enemy agent trying to blend in. A target profile gives you two clues, and over the next few minutes your radio adds more: what they wear, which bag they carry, which hand they hold things in, and habits you have to watch for, like checking a wristwatch, glancing at the security cameras or steering clear of the police. A siren, a dropped parcel or a bag swap can give them away.
 
@@ -555,7 +555,7 @@ You have three rounds. Hit the wrong person and the crowd panics while the mark 
     content: "Cute cartoon pixel monsters fight with fire, leaves, water and lightning. Beaten monsters just faint with a \"K.O.!\", with no blood. Monsters flash white when hit and blink white while winding up a big attack, danger circles on the ground flicker red and white, the screen edge flashes red when you are hit, and hatching an egg or evolving ends in a quick white flash.",
     web: "chibi-clash/",
     tag: "Action", big: false, added: '2026-10-11',
-    cat: "Adventure", tags: ["new","monsters","pixel","collect","eggs","evolve","boss","mobile"],
+    cat: "Adventure", tags: ["monsters","pixel","collect","eggs","evolve","boss","mobile"],
     blurb: "Hatch chibi monsters from eggs, then fight wild ones in real time with WASD and three abilities.",
     about: `Pick a free starter, Pipkin, Sproutle or Bubbit, and take it into a field arena to fight wild monsters in real time. You move with WASD, aim with the mouse, fire three abilities on J, K and L, and dodge with Space. A red circle on the ground means an attack is about to land there, and a red ! over a foe means a big one is coming. Wins pay coins and XP: coins buy eggs in the shop, and XP levels your monster, teaches it new moves and evolves it into a bigger form.
 
@@ -568,7 +568,7 @@ There are 67 species, each with an evolved form, across 10 types and 63 moves. F
     content: "Fantasy spell combat against cartoon monsters (slimes, skeletons, bats, ghosts, spiders) that dissolve away when they die, with no blood. Explosions light up the room, and the screen edges flash and pulse red when you are hurt or low on health.",
     web: "spelldelve/",
     tag: "Roguelite", big: true, added: '2026-10-11',
-    cat: "Adventure", tags: ["new","wizard","roguelite","dungeon","spells","bosses","3d","mobile"],
+    cat: "Adventure", tags: ["wizard","roguelite","dungeon","spells","bosses","3d","mobile"],
     blurb: "A wizard, a spellbook and ten floors of dungeon. Read every spellbook you find and build a run that melts the Hollow Crown.",
     about: `You are a wizard working down through nine floors of dungeon to a throne room at the bottom. Each floor is generated fresh: rooms seal shut when you walk in and only open when every monster is dead, and most attacks are drawn on the floor first as a red shape, so you get the chance to dodge. Slimes split, goblins charge, skeleton archers aim, ghosts teleport and fire homing orbs, knights hide behind shields and spiders leap at you.
 
@@ -581,7 +581,7 @@ There are fifteen spells to learn from spellbooks, from Fireball and Chain Light
     content: "A war shooter with guns, grenades and explosions against simple low-poly soldiers. Hits show a small red puff and soldiers tumble when they fall; no gore. Muzzle flashes and explosion flashes.",
     web: "frontline/",
     tag: "FPS", big: true, added: '2026-10-12',
-    cat: "Shooter", tags: ["new","fps","squad","ai","low poly","3d","armory","war"],
+    cat: "Shooter", tags: ["fps","squad","ai","low poly","3d","armory","war"],
     blurb: "A low-poly squad shooter against soldiers who take cover, flank, suppress, throw grenades and call out your position.",
     about: `Eight against eight across three capture points, with every other soldier on the field run by an AI that fights the way you do. Enemies hide behind cover and peek to shoot, pin you down with suppressing fire, send a flanker round the side, put a marksman on the bell tower, throw grenades when you camp, and revive each other. Spot one and he radios your position to his whole squad.
 
@@ -595,7 +595,7 @@ Three battlefields - a war-torn village at dusk, a desert outpost with trenches,
     content: "Football free kicks in a floodlit stadium with cartoon players. Nobody gets hurt: the keeper dives and the wall jumps. A short bright glow appears when the ball is kicked and when it hits the post, keeper, wall or net. Small camera flashes twinkle in the crowd the whole time, and there are many more after a goal.",
     web: "curveball/",
     tag: "Sport", big: false, added: '2026-10-11',
-    cat: "Sport", tags: ["new","football","free kick","swipe","curl","3d","one touch","mobile"],
+    cat: "Sport", tags: ["football","free kick","swipe","curl","3d","one touch","mobile"],
     blurb: "Swipe from the ball to bend free kicks round the wall, past a diving keeper and into the top corner.",
     about: `A free-kick game in a floodlit 3D stadium, played with one swipe. Swipe up from the ball. The direction picks left or right, the length picks the height, the speed sets the power from 16 to 34 metres per second, and bending the swipe curls the ball the same way. The wall jumps, the keeper dives, and a goal brings confetti, a bulging net and a roar from the crowd. A goal is worth 100, with bonuses on top: rings in the goal, TOP BINS, CURLER, ROCKET, OFF THE POST and UNDER THE WALL.
 
@@ -608,7 +608,7 @@ There are thirty challenges of three to five balls each, with three stars on eve
     content: "A bouncing ball and a tower of candy rings. Nobody gets hurt: the ball just goes splat in paint. The screen brightens briefly when the fireball smashes a ring and when a level is cleared.",
     web: "helix-drop/",
     tag: "Arcade", big: false, added: '2026-10-11',
-    cat: "Arcade", tags: ["new","one finger","tower","fireball","3d","endless","mobile","casual"],
+    cat: "Arcade", tags: ["one finger","tower","fireball","3d","endless","mobile","casual"],
     blurb: "Spin the candy tower, drop the ball through the gaps and stay off the red. Fall three rings in a row and you smash the next one.",
     about: `A ball bounces on top of a tall tower of candy rings and never moves sideways. You drag to spin the tower, and the tower follows your finger exactly, so you line a gap up underneath the ball and it drops to the next ring. Coloured parts are safe to bounce on, red ones splat you and restart the level. Fall through three rings without a bounce and the ball catches fire: the next ring it touches shatters, red or not, and a smash is worth double.
 
@@ -621,7 +621,7 @@ Levels are built from fixed seeds, so every player gets the same towers. They st
     content: "Cartoon axes thrown into wooden logs, which burst into pieces; boss logs have angry carved faces. Nobody is hurt and there are no scares.",
     web: "axe-throw/",
     tag: "Arcade", big: false, added: '2026-10-11',
-    cat: "Arcade", tags: ["new","one touch","axes","timing","endless","bosses","mobile"],
+    cat: "Arcade", tags: ["one touch","axes","timing","endless","bosses","mobile"],
     blurb: "Tap to throw axes into a spinning log. Hit an axe that is already stuck and the run is over.",
     about: `A log spins at the top of the screen and your axe waits at the bottom. Tap and it flies up and sticks. Land every axe the log needs and it splits apart with a TIMBER!, but every axe you land keeps turning with the log, and hitting one that is already stuck is a CLANG! that ends the run. Logs speed up, slow down, flip and whip about, and from stage 3 some arrive with old rusty axes already in them.
 
@@ -634,7 +634,7 @@ Every fifth stage is a boss log with a carved angry face: Old Gnarl, Iron Bark, 
     content: "Cartoon cars play football with a giant ball. Cars can be rammed and blown up (demolished) and come straight back; nobody is shown hurt. Every goal sets off a big explosion with a bright coloured flash.",
     web: "car-soccer/",
     tag: "Sport", big: false, added: '2026-10-11',
-    cat: "Sport", tags: ["new","football","cars","boost","2 players","bots","versus","mobile"],
+    cat: "Sport", tags: ["football","cars","boost","2 players","bots","versus","mobile"],
     blurb: "Rocket-car football from the side: boost, double jump and flip into a giant ball to smash it into the net.",
     about: `Two cars, one huge glowing ball and two minutes on the clock. You drive the blue car and attack the orange goal on the right. Jump, jump again in the air for a double jump, or hold a direction to flip, which hits the ball far harder. Boost until you go supersonic and you can demolish the other car by ramming it. Your wheels stick to the walls and ceiling, and a tied match goes to golden-goal overtime.
 
@@ -647,7 +647,7 @@ Play a bot at Rookie, Pro or All-Star, or two players on one keyboard. Every goa
     content: "Cartoon tanks shell each other across hills; hits make big cartoon fireballs, craters and damage numbers, and a beaten tank blows up with a KO! No people are shown and there is no blood. Explosions give a soft screen flash and screen shake.",
     web: "tank-duel/",
     tag: "Strategy", big: false, added: '2026-10-11',
-    cat: "Strategy", tags: ["new","artillery","tanks","turn based","2 players","wind","weapons","mobile"],
+    cat: "Strategy", tags: ["artillery","tanks","turn based","2 players","wind","weapons","mobile"],
     blurb: "Pull back, let go, and lob a shell over the hill through the wind. First to three rounds wins.",
     about: `Two cartoon tanks on rolling hills take turns shooting at each other. Press on the battlefield and pull back like a slingshot: the direction is the angle, the length of the pull is the power, and a short dotted line shows where the shell starts to go. The wind changes every turn and pushes every shell sideways, and every blast digs a crater that tanks drop into, with fall damage if the drop is big. Each tank has 100 health, and the first to win three rounds takes the match.
 
@@ -660,7 +660,7 @@ There are twelve weapons, from the unlimited Shell to the Cluster, the MIRV that
     content: "Cartoon toy sumo blobs bump each other off a floating ring and fall away into the clouds with a slide-whistle; nobody is hurt and there is no blood. Blobs flash white for a moment when hit, and the screen shakes on big hits.",
     web: "sumo-slam/",
     tag: "Party", big: false, added: '2026-10-11',
-    cat: "Action", tags: ["new","sumo","party","brawler","physics","2 player","3d","mobile"],
+    cat: "Action", tags: ["sumo","party","brawler","physics","2 player","3d","mobile"],
     blurb: "Hold to charge, let go to dash. Slam the other blobs off a shrinking, tilting ring and be the last one standing.",
     about: `Four glossy sumo blobs on a ring floating in the sky, and one rule: be the last one on it. Hold to charge a dash, let go to launch, and a dash that connects throws the other blob hard. One that hits nothing can carry you straight off the edge. From 4 seconds the edge crumbles and the ring shrinks, from 6 seconds it tilts and keeps swinging round so everyone slides downhill, and at 48 seconds it starts collapsing fast, so no round reaches a minute. First to three rounds wins the match.
 
@@ -673,7 +673,7 @@ Power-up orbs drop in: GIANT makes you bigger and heavier, HEAVY gives you an ir
     content: "Abstract neon shapes and a glowing ball; nobody gets hurt. When the ball breaks it shatters into coloured pieces with a short white screen flash, and a smaller flash marks every tenth star.",
     web: "prism/",
     tag: "Arcade", big: false, added: '2026-10-11',
-    cat: "Arcade", tags: ["new","colour","neon","one touch","endless","tap","reflex","mobile"],
+    cat: "Arcade", tags: ["colour","neon","one touch","endless","tap","reflex","mobile"],
     blurb: "Tap to hop a glowing ball up a neon tower, but you can only pass through the colour that matches it.",
     about: `Each tap hops your ball up a little and gravity pulls it back down. Every obstacle in the endless tower is split into cyan, pink, yellow and violet, and you may only pass through the part that matches your ball. Touch any other colour and it shatters. A star sits in the middle of every obstacle, and a four-colour switch orb in the gap above it gives you a new colour for the next one.
 
@@ -686,7 +686,7 @@ There are eight kinds of obstacle: rings, squares and sliding bars to start, the
     content: "A cartoon baseball home run derby at night. Nobody gets hurt and there is no violence; perfect hits give a brief white screen flash and home runs set off fireworks.",
     web: "home-run/",
     tag: "Sport", big: false, added: '2026-10-11',
-    cat: "Sport", tags: ["new","baseball","home run","timing","3d","stadium","one button","mobile"],
+    cat: "Sport", tags: ["baseball","home run","timing","3d","stadium","one button","mobile"],
     blurb: "Put the circle on the pitch, time the swing, and send it into the night. Ten outs, only home runs count.",
     about: `A home run derby under the stadium lights. The pitcher winds up, the pitch is called with its type and speed, and you put the aim circle on the ball and swing as it arrives. Timing decides how hard you hit it and where it goes - early pulls it to left, late pushes it to right - and aim decides the launch: centred is a bomb, too high is a grounder, too low is a pop-up. Only home runs count. Everything else is an out, and ten outs (or 30 pitches) ends the round.
 
@@ -699,7 +699,7 @@ Eight stages run from SANDLOT to MYTHIC, adding the changeup, curveball and slid
     content: "Neon air hockey with no violence or scares. Goals flash the goal mouth in colour with a screen shake, and hard hits throw sparks.",
     web: "air-hockey/",
     tag: "Sport", big: false, added: '2026-10-11',
-    cat: "Sport", tags: ["new","air hockey","neon","2 players","one screen","vs bot","quick","mobile"],
+    cat: "Sport", tags: ["air hockey","neon","2 players","one screen","vs bot","quick","mobile"],
     blurb: "Neon air hockey where your mouse or finger is the mallet. Beat the bot or a friend on one phone. First to 7.",
     about: `Your mallet is a glowing ring that sits right under your mouse or finger and stays in your half of the table. Swipe through the puck to fire it down the table, bank it off the rails round a defender, and score in the goal at the far end. After a goal the puck is put back, sitting still, in the half of whoever let it in. First to 7 wins, and a match takes a minute or two.
 
@@ -712,7 +712,7 @@ Play the bot on Easy, Medium or Hard. The bots get faster, react quicker and aim
     content: "Bowling in a neon alley. Pins crash and fly with sparks and confetti; nobody is shown and nothing violent happens.",
     web: "strike/",
     tag: "Sport", big: false, added: '2026-10-11',
-    cat: "Sport", tags: ["new","bowling","swipe","neon","3d","physics","puzzle","mobile"],
+    cat: "Sport", tags: ["bowling","swipe","neon","3d","physics","puzzle","mobile"],
     blurb: "Swipe up to bowl, curve the swipe to hook it, and send the pins flying in a glossy neon alley.",
     about: `One swipe throws the ball. Swipe direction is your aim, swipe speed is the ball speed, and a curved swipe is a hook: bow it out like a ) and the ball goes out right and curls back left. Drag sideways first to move your starting spot. The front of the lane is oiled, so the ball skids straight and only bites on the dry end near the pins, where real pin physics decide what falls. The camera rides the ball, then swings round to the pins for the crash.
 
@@ -725,7 +725,7 @@ The 10-frame game uses real scoring, bonus balls in the tenth and a 300 perfect 
     content: "A word-finding game on a grid of letter tiles. No violence, no scares and no bright flashes, just confetti, a small screen shake on long words and a soft red glow at the screen edge in the last ten seconds. A blocklist removes rude words from the word list.",
     web: "word-blitz/",
     tag: "Word", big: false, added: '2026-10-11',
-    cat: "Puzzle", tags: ["new","words","spelling","boggle","daily","90 seconds","brain","mobile"],
+    cat: "Puzzle", tags: ["words","spelling","boggle","daily","90 seconds","brain","mobile"],
     blurb: "Ninety seconds, sixteen letters. Drag through touching tiles to spell words, and the long ones score huge.",
     about: `A 4x4 grid of letter tiles and a 90-second clock. Press on a letter and drag through the ones touching it, diagonals included, then let go: green means a new word, yellow means you already found it, red means it is not a word. Every tile shows its points, from 1 for common letters up to 9 for J and Z, and the word's total is multiplied by its length, up to x4 for eight letters or more. Each board has two 2L tiles that double a letter and one 3W tile that triples the whole word. Words found within four seconds of each other build a combo of up to x2.
 
@@ -738,7 +738,7 @@ Classic deals a new board every round, and the Daily Board is the same board for
     content: "A neon cube that shatters into squares when it hits a spike, then restarts straight away. No people, no blood. Bright colour flashes when you finish a level and go through gravity portals, and the background pulses on the beat.",
     web: "beat-dash/",
     tag: "Rhythm", big: false, added: '2026-10-11',
-    cat: "Arcade", tags: ["new","rhythm","music","one button","runner","neon","jump","mobile"],
+    cat: "Arcade", tags: ["rhythm","music","one button","runner","neon","jump","mobile"],
     blurb: "Tap to jump. A neon cube runs a course built on the beat, and one touch of a spike sends you back to the start.",
     about: `A glowing cube runs right on its own across a course built on the beat of a synth track, and your only button is jump. Clear spikes, land on blocks, bounce off yellow pads, tap orbs for a jump in mid-air, hit blue orbs to flip gravity and go through portals to run along the ceiling. Hold to keep jumping every time you land. One touch of a hazard and the cube shatters, and the next attempt starts in under a second.
 
@@ -751,7 +751,7 @@ Six hand-built levels go from First Light at 128 BPM to Event Horizon at 170, an
     content: "Abstract glowing shapes burst into neon sparks when shot; there are no people and no blood. Explosions shake the screen, and bombs and deaths give a bright full-screen flash.",
     web: "neon-swarm/",
     tag: "Shooter", big: false, added: '2026-10-11',
-    cat: "Shooter", tags: ["new","twin stick","neon","arena","shooter","high score","endless","mobile"],
+    cat: "Shooter", tags: ["twin stick","neon","arena","shooter","high score","endless","mobile"],
     blurb: "Shred waves of neon shapes on a warping grid, and grab every green shard to send your multiplier through the roof.",
     about: `A twin-stick arena shooter on a glowing grid that bends under every explosion. Your little white ship fires on its own, so you just steer and aim. Every shape you destroy drops green shards, and each one you collect adds 1 to your multiplier, so a long life is worth far more than a fast one. Die and the screen clears, and the multiplier drops back to x1. A bomb wipes out everything on the screen.
 
@@ -764,7 +764,7 @@ Purple pinwheels drift, cyan diamonds chase, green squares sidestep your bullets
     content: "A neon space-themed pinball table with no people and no violence. Jackpots, multiball, mission completes, skill shots, extra balls and tilts briefly wash the screen in a bright colour.",
     web: "pinball/",
     tag: "Arcade", big: false, added: '2026-10-11',
-    cat: "Arcade", tags: ["new","pinball","neon","multiball","physics","high score","retro","mobile"],
+    cat: "Arcade", tags: ["pinball","neon","multiball","physics","high score","retro","mobile"],
     blurb: "A full neon pinball table: lock two balls in the Black Hole for multiball, then hit the ramp for jackpots.",
     about: `One full pinball table in bright neon, seen from above, with real ball physics. Pull the plunger, keep the ball alive with the flippers, and shoot whatever the orange dot-matrix display asks for. Hold a flipper up to catch the ball and aim. Tip shots are hard, base shots soft. There are three pop bumpers, slingshots, a wire ramp, a left orbit with a spinner, three drop targets, three STAR targets, three top lanes and the Black Hole.
 
@@ -777,7 +777,7 @@ Eight missions, from Bumper Storm to Ramp Race, promote you one rank each, from 
     content: "Cartoon mini golf with no violence and no scares. The worst that happens is your ball splashes into a pond, and the 'ghost golfers' you race are just coloured balls.",
     web: "mini-golf/",
     tag: "Sport", big: false, added: '2026-10-11',
-    cat: "Sport", tags: ["new","golf","mini golf","putting","race","physics","casual","mobile"],
+    cat: "Sport", tags: ["golf","mini golf","putting","race","physics","casual","mobile"],
     blurb: "Pull back, let go, watch it roll. Eighteen holes of windmills, portals and conveyor belts, plus races against three ghost golfers.",
     about: `Bright top-down mini golf where the whole hole fits on the screen. Press anywhere, drag away from where you want the ball to go and let go: a dotted line shows the path and the first bounce, and the power ring goes from green to red. A slow ball drops into the cup, but a fast one rattles round the lip and spins out. Water costs a stroke and puts you back where you shot from, sand stops the ball hard, hills push it downhill, belts carry it, matching portals throw it out the other side at the same speed, and windmill blades, sliding walls and pink bumpers knock it about.
 
@@ -791,7 +791,7 @@ PLAY is the career round of eighteen holes, par 48, with up to three stars on ea
     content: "Abstract neon arrow dodging walls, spikes and saws. Crashes are a burst of sparks, and there are brief white screen flashes when you crash, use Phase, speed up or finish a level. No people and no violence.",
     web: "graze/",
     tag: "Arcade", big: false, added: '2026-10-11',
-    cat: "Arcade", tags: ["new","one button","neon","wave","reflex","daily","endless","mobile"],
+    cat: "Arcade", tags: ["one button","neon","wave","reflex","daily","endless","mobile"],
     blurb: "Hold to climb, let go to dive. Scrape past the walls to build your combo, then ghost straight through one.",
     about: `A one-button neon dodger. Your arrow only ever flies at 45 degrees, up while you hold and down when you let go, through tunnels of walls, spikes and spinning saws, all to a beat-driven soundtrack. Flying close past anything without touching it is a graze: it scores ten times your multiplier, builds a combo up to x10 and fills your Phase meter. With a full meter your next crash does not kill you - time slows and for just over half a second you pass straight through anything.
 
@@ -804,7 +804,7 @@ PLAY is an endless run that speeds up a tier every 30 seconds. DAILY is one 90-s
     content: "Cartoon forest creatures (moths, wolves, walking trees, ghostly wraiths) catch fire and fade away in your lantern light; no blood or gore. The dark is spooky, with glowing eyes and a big shadowy boss, and there are bright flashes when weapons evolve, when the boss arrives and at sunrise.",
     web: "lanternfall/",
     tag: "Survivor", big: false, added: '2026-10-11',
-    cat: "Action", tags: ["new","survivor","roguelite","horde","lantern","night","daily","mobile"],
+    cat: "Action", tags: ["survivor","roguelite","horde","lantern","night","daily","mobile"],
     blurb: "Carry the last lantern through a haunted forest. Anything that steps into your light burns. Last five minutes until dawn.",
     about: `You only move: everything fires on its own. Out in the dark the forest is pairs of glowing eyes, and anything that wanders into your lantern's circle slows down, catches fire and drops an ember. Collect embers to level up and pick one of three gifts - twenty-three in all, from orbiting wisps and firefly bolts to thorn hedges, shield moths and a sweeping lighthouse beam. Max a weapon, own its partner charm and open a chest, and it evolves into one of nine bigger forms.
 
@@ -817,7 +817,7 @@ The night lasts five minutes and gets worse as the moon crosses the sky: wolves 
     content: "Cartoon stunt-bike crashes: the rider flops off as a ragdoll, slides on his face and gets singed by lava, but there is no blood and he is always straight back on the bike. TNT explosions give a bright flash and a screen shake.",
     web: "bailout/",
     tag: "Stunts", big: false, added: '2026-10-11',
-    cat: "Driving", tags: ["new","stunt","bike","ragdoll","flips","physics","daily","mobile"],
+    cat: "Driving", tags: ["stunt","bike","ragdoll","flips","physics","daily","mobile"],
     blurb: "Two buttons, forty courses: flip for time, stick the landing, and land on your head to send the rider flying.",
     about: `A side-on stunt-bike race against the clock, with gas, brake and nothing else. Hold gas up the ramp, let go over the lip, then tap gas for a backflip or brake for a frontflip. Every full flip you land takes a second off your time and a clean landing gives you a speed boost. Touch anything with the rider's head or chest and he bails: he flies over the bars as a floppy ragdoll in slow motion, and you are back at the last checkpoint a moment later.
 
@@ -830,7 +830,7 @@ Forty levels in five worlds - the Canyon, the Junkyard, the Glacier, the Volcano
     content: "Cartoon tornadoes suck up toy cars, cows, houses and little people, who float away unharmed; rival storms swallow each other. No blood or injuries. Bigger storms throw small lightning bolts that flash brightly.",
     web: "twister-io/",
     tag: "Arena", big: true, added: '2026-10-11',
-    cat: "Action", tags: ["new","tornado","io","grow","3d","arena","bots","mobile"],
+    cat: "Action", tags: ["tornado","io","grow","3d","arena","bots","mobile"],
     blurb: "Be a tornado in a toy town: suck up cones, then cars, then houses, and be the biggest storm when the clock runs out.",
     about: `Every round is two minutes in a bright toy town against nine rival storms, and the biggest one at the end wins. Steer over anything your size or smaller and it rips loose, spirals up and joins the ring of debris circling you. You start on cones and bins and climb through seven categories: people, cars and cows, trees and vans, houses, towers and the lighthouse, and finally the stadium.
 
@@ -843,7 +843,7 @@ Your debris ring is your armour. Fling pieces at rivals to knock their rings apa
     content: "A gentle block puzzle with no violence or scares. Clears set off sparkles, short glows along the cleared lines and a small screen shake (a bigger one for the Bomb glyph).",
     web: "block-royale/",
     tag: "Puzzle", big: false, added: '2026-10-11',
-    cat: "Puzzle", tags: ["new","blocks","8x8","roguelike","charms","daily","zen","mobile"],
+    cat: "Puzzle", tags: ["blocks","8x8","roguelike","charms","daily","zen","mobile"],
     blurb: "The 8x8 block puzzle scored like a poker hand: clears earn Chips, streaks build Mult, and charms break the rules.",
     about: `Drag pieces onto an 8x8 board and fill rows and columns to clear them. Every clear scores Chips x Mult: 10 Chips per block cleared, and Mult grows with lines cleared at once and with your streak of clears in a row. Each round gives you a target and 20 placements. A run is 8 antes of a Small, a Big and a Boss round, and the bosses bend the rules: one stops columns clearing, one shrinks the board, one deals pieces one at a time.\n\nBetween rounds the shop sells charms, which fire left to right on every clear, and one-shot glyphs like Bomb, Undo and Redeal. There are 60 charms and 8 glyphs to build with. Daily gives everyone the same seed with a shareable result card, Zen is endless classic play, and runs earn XP that unlocks 5 more decks (6 in all), with 8 stakes each.`,
     controls: [["Drag","move a piece onto the board"],["Tap piece, tap board","place it"],["1 / 2 / 3","select a piece"],["Arrows / WASD","move it"],["Space / Enter","place"],["Q / E","rotate (with Rotate)"],["4 / 5","use a glyph"],["Z","undo (with Undo)"],["Esc","pause"],["Shop: Enter / R","next round / reroll"]],
@@ -854,7 +854,7 @@ Your debris ring is your armour. Fling pieces at rivals to knock their rings apa
     content: "Medieval battles between toy-like armies with swords, bows, cavalry and siege engines: soldiers fall when beaten and villages can be burned, but there is no blood, and hits show as small sparks and dust.",
     web: "bannerfall/",
     tag: "Strategy", big: true, added: '2026-10-11',
-    cat: "Strategy", tags: ["new","strategy","medieval","rts","castles","siege","3d","war"],
+    cat: "Strategy", tags: ["strategy","medieval","rts","castles","siege","3d","war"],
     blurb: "Dig trenches, raise walls, then lead your army in real time to storm every rival capital.",
     about: `Found a kingdom with a royal grant of 50,000 gold. While time is stopped you dig trenches, raise palisades and stone walls, and recruit your first squads. Then raise the banners and the war runs in real time on a generated map 2, 3 or 4 km across, against 1 to 3 rival kingdoms that also fight each other. Take villages and pillage them or tax them, raid forts, claim land, and break into castles with rams and mangonels. A kingdom falls when its capital is taken, its ruler is slain or it surrenders. Space pauses whenever you need to think.
 
@@ -868,7 +868,7 @@ Recruit from 25 kinds of troops, from militia and longbowmen to knights, siege t
     content: "Cartoon food falls and stacks up. A seagull steals bits of burger, and customers gag and walk out when you catch a boot, a fish or a sock. No violence.",
     web: "stack-attack/",
     tag: "Arcade", big: false, added: '2026-10-09',
-    cat: "Arcade", tags: ["new","burger","stacking","cooking","physics","cartoon","mobile","endless"],
+    cat: "Arcade", tags: ["burger","stacking","cooking","physics","cartoon","mobile","endless"],
     blurb: "Catch the order on a wobbly bun, in the right order, before the tower falls over.",
     about: `Food rains down on a cartoon diner and you catch it on a sliding bottom bun, in the order the ticket says, then grab the top bun to serve. Every piece stays exactly where it lands and hangs off the one below on a springy hinge, so an off-centre catch makes the tower lean and a jerk of the bun makes it sway. Wrong slices cost pay and tip. Catch a boot, a fish or a sock and the customer walks out.
 
@@ -881,7 +881,7 @@ Ten shifts of 60 to 90 seconds add wind, a seagull that dives for the top of you
     content: "Cartoon kids throw snowballs at each other; three hits knock a kid out to the sidelines and they come back a few seconds later. A dog runs through and knocks kids over. The screen shakes and its edges briefly go red when you are hit. Nothing graphic.",
     web: "snowball-royale/",
     tag: "Arcade", big: false, added: '2026-10-09',
-    cat: "Action", tags: ["new","snowball fight","top down","battle royale","teams","winter","mobile"],
+    cat: "Action", tags: ["snowball fight","top down","battle royale","teams","winter","mobile"],
     blurb: "A snowball fight at dusk: duck behind snow walls, lob over them, and roll a giant one to flatten everybody.",
     about: `Up to six kids, one snowy garden, ninety seconds. A click throws a fast flat snowball that a wall will stop; hold it and you lob one over the wall instead, and a red ring on the ground shows you where theirs are coming down. Scoop fresh snow to reload and you dig the ground bare, so nobody can camp. Build your own walls, belly-dive under throws and tackle people, or hold R and roll a snowball until it is big enough to flatten anyone in its way.
 
@@ -894,7 +894,7 @@ Four modes - free-for-all, 2 v 2, 3 v 3 and King of the Fort - across eight maps
     content: "Cartoon buildings, cars and gas tanks get smashed, crumple and explode into dust and fireballs. There are no people in it and nobody gets hurt.",
     web: "wrecking-ball/",
     tag: "Arcade", big: false, added: '2026-10-09',
-    cat: "Arcade", tags: ["new","physics","destruction","crane","city","upgrades","mobile","2d"],
+    cat: "Arcade", tags: ["physics","destruction","crane","city","upgrades","mobile","2d"],
     blurb: "One crane, one wrecking ball, 30 seconds: knock the whole block down.",
     about: `You do not throw the ball. You drive the trolley it hangs from, and the trolley is slow on purpose, so the big hits come from rocking it in time with the swing until the ball is flying. Every building is made of physics blocks welded together. Snap the columns low down and the floors above pancake into the street, and every brick, window and car that falls pays. Gas tanks explode and set each other off, water towers burst, cars crumple and set off their alarms, and a big enough collapse drops the game into slow motion.
 
@@ -907,7 +907,7 @@ There are fifteen blocks in three districts: Old Town brick and timber, Downtown
     content: "Cartoon garden chaos: gnomes and toys get knocked flying and shatter, a dog chases the mower and bumps into it, and cats leap away hissing. No animals are hurt and there is no blood.",
     web: "mower-madness/",
     tag: "Arcade", big: false, added: '2026-10-09',
-    cat: "Driving", tags: ["new","mowing","lawn","stripes","garden","time trial","cartoon","top down"],
+    cat: "Driving", tags: ["mowing","lawn","stripes","garden","time trial","cartoon","top down"],
     blurb: "A ride-on mower, a ticking clock, and a lawn full of gnomes that will not get out of the way.",
     about: `Fifteen gardens to cut against the clock, from a tidy front lawn on Number 12 to a royal garden party with the corgis loose. The mower drives the way you press and spins on the spot, the grass turns light or dark by the way you mowed it, and every straight pass you lay right beside the last one grows a STRIPE CHAIN that multiplies everything you cut, up to five times.
 
@@ -920,7 +920,7 @@ Gnomes, a dog that chases, sleeping cats, toys that clog the blades, pop-up spri
     content: "Cartoon customers in a sushi bar get grumpy and storm out if kept waiting, and a cat steals plates. No violence.",
     web: "sushi-conveyor/",
     tag: "Arcade", big: false, added: '2026-10-09',
-    cat: "Arcade", tags: ["new","sushi","cooking","serving","time management","cute","touch","2d"],
+    cat: "Arcade", tags: ["sushi","cooking","serving","time management","cute","touch","2d"],
     blurb: "Grab the right plate off three speeding belts and get it to the right face before they storm out.",
     about: `Customers line the back of the counter, each with a bubble that says what they want: a dish, any plate of a colour, a colour under a price, or just "something hot". Drag, flick or tap the right plate up to them before their patience bar runs red. Serve fast for bigger tips and a growing combo; serve wrong and they shove it back. Three walkouts and the shop closes.
 
@@ -933,7 +933,7 @@ Twelve short days at four restaurants, from a Tiny Tokyo Stall to a Floating Riv
     content: "A cartoon bomb that goes BOOM with a comic-book explosion, a bright white flash and a sooty pair of eyes when you fail. A strike tints the screen red and shakes it. Nobody is hurt and there is no blood.",
     web: "bomb-squad/",
     tag: "Puzzle", big: false, added: '2026-10-09',
-    cat: "Puzzle", tags: ["new","bomb","defusal","puzzle","manual","timer","daily","endless"],
+    cat: "Puzzle", tags: ["bomb","defusal","puzzle","manual","timer","daily","endless"],
     blurb: "A ticking bomb, a paper manual and three strikes to spare: snip, flip, read, don't panic.",
     about: `A bomb sits on your desk under the lamp, with a manual open beside it. Pick a module and the booklet flips to its page: cut the right one of three to six wires, tap or hold the button and let go on the right digit, set five switches by their cap colours, press four symbol keys in column order, answer Simon with the mapped colour, steer through a maze whose walls you cannot see, or spin four letter wheels to the one word that fits. Almost every rule depends on the serial number, the batteries and the lights along the top.
 
@@ -946,7 +946,7 @@ Every wrong move is a strike and makes the clock run a quarter faster, and three
     content: "A cartoon goblin swings over spikes, lava and icy water and dodges bats. A fall is a puff of smoke and a restart at the last flag. Nothing graphic.",
     web: "grapple-goblin/",
     tag: "Arcade", big: false, added: '2026-10-09',
-    cat: "Arcade", tags: ["new","one button","swinging","grappling hook","mobile","caves","endless","2d"],
+    cat: "Arcade", tags: ["one button","swinging","grappling hook","mobile","caves","endless","2d"],
     blurb: "Hold to hook, let go to fling: one button, one goblin, and twenty caves full of gold.",
     about: `Hold and the hook fires at the next anchor; let go and the goblin flies off with everything the swing gave him. That is the whole game, and it is enough. The rope is a real pendulum, faint dots show where a release right now would send you, and a release on the upswing at just the right angle is a PERFECT - faster, and it pulls in the gold around you. Spikes, lava, pits and bats send you back to the last flag, but the coins you took stay taken.
 
@@ -959,7 +959,7 @@ Twenty caves in four places - the Mossy Cave, the Crystal Cavern, the Lava Mine 
     content: "Cartoon fantasy fighters (bandits, knights, ninjas, ogres, pirates) are knocked flying or puff away with a KO when you block them back. Small cartoon explosions from bombs and fireballs. No blood.",
     web: "parry/",
     tag: "Rhythm", big: false, added: '2026-10-09',
-    cat: "Arcade", tags: ["new","rhythm","music","blocking","boss fights","reflex","endless","2d"],
+    cat: "Arcade", tags: ["rhythm","music","blocking","boss fights","reflex","endless","2d"],
     blurb: "You only block, and every arrow, axe and fireball lands on the beat.",
     about: `You stand at a crossroads and attacks come down all four roads, each landing on the beat of a drum and bass loop that speeds up through the round. A ring closes on the target in each lane: block as it lands. A perfect, inside 45 milliseconds, sends the arrow or fireball straight back and knocks out whoever threw it. A good just bounces it off, and a miss costs one of your three hearts. Rogues fake a swing and strike a beat later. Ninjas throw two daggers down the same road, half a beat apart. Boulders have to be held, and bombs must not be blocked at all.
 
@@ -972,7 +972,7 @@ There are eight stages, from Forest Road to the Storm Citadel. Each round lasts 
     content: "A cartoon pixel thief sneaks past guards, cameras and lasers. Being spotted sets off an alarm and a soft red pulse over the room, then the level restarts. Nobody is hurt.",
     web: "one-tile/",
     tag: "Puzzle", big: false, added: '2026-10-09',
-    cat: "Puzzle", tags: ["new","heist","stealth","pixel","guards","real time","puzzle","2d"],
+    cat: "Puzzle", tags: ["heist","stealth","pixel","guards","real time","puzzle","2d"],
     blurb: "Crack the safe, grab the gold and get out before the guard turns round.",
     about: `Twenty-four rooms across a bank, a museum, a casino and a penthouse, each one a single screen seen from above. Hold WASD and the thief dashes tile to tile, more than twice as fast as a guard. Stand next to the safe until it clicks open three times, then run for the EXIT, which stays padlocked until you do. Guards, cameras and lasers run their loops whether you move or not, and each one throws a cone showing exactly what it can see.
 
@@ -985,7 +985,7 @@ Walk one tile behind a guard and he never knows. Duck into a potted fern or a lo
     content: "Cartoon top-down cars ram each other, lose panels, smoke and catch fire. There are no people shown and nobody is hurt.",
     web: "derby/",
     tag: "Driving", big: false, added: '2026-10-09',
-    cat: "Driving", tags: ["new","demolition derby","cars","crashing","top down","arena","destruction","physics"],
+    cat: "Driving", tags: ["demolition derby","cars","crashing","top down","arena","destruction","physics"],
     blurb: "Eight cars, one dirt bowl, and the last one still running wins.",
     about: `Seven AI drivers and you, boxed into a walled arena with nowhere to go but into each other. Your front bumper is armoured and the sides crumple, so the hit that counts is the T-bone: nose into a door at full boost. Panels dent where they are struck, bumpers, bonnets and doors fall off and stay on the dirt, and engines go from grey smoke to black smoke to fire before they stall for good. At 75 seconds a ring of fire starts closing in, so nobody hides forever.
 
@@ -998,7 +998,7 @@ Every round pays coins by place, by damage dealt and by wrecks caused, to spend 
     content: "Cartoon cars racing and drifting on a mountain road. They scrape the guardrail and bump each other, with sparks and tyre smoke. No crashes that hurt anyone and no people shown.",
     web: "touge-drift/",
     tag: "Driving", big: false, added: '2026-10-09',
-    cat: "Driving", tags: ["new","drifting","racing","touge","eurobeat","top down","cars","time attack"],
+    cat: "Driving", tags: ["drifting","racing","touge","eurobeat","top down","cars","time attack"],
     blurb: "Slide an 80s hatchback down an endless Japanese mountain pass at dusk, one long drift at a time.",
     about: `A white-and-black hatchback with pop-up headlights, a mountain road that never ends, and eurobeat playing. Turn hard at speed and the back steps out; hold the slide and the points climb, faster and wider worth more. Hold it long enough and the multiplier ticks up to x10, and drifting right next to the guardrail doubles everything. Slam the rail hard, though, and you lose the drift you have not banked yet. Banked points fill the nitro.
 
@@ -1011,7 +1011,7 @@ Race puts you on a grid with three rivals, Kenta, Shin and Mika, for an eighty-s
     content: "Stylised ink stick-figure samurai fights: enemies split in two when cut, barrels explode, and hits leave red ink splats on the paper. No realistic blood or gore.",
     web: "blade-dash/",
     tag: "Action", big: false, added: '2026-10-09',
-    cat: "Action", tags: ["new","samurai","ink","slash","combo","one touch","endless","mobile"],
+    cat: "Action", tags: ["samurai","ink","slash","combo","one touch","endless","mobile"],
     blurb: "Tap to dash-slash. Every kill refills your dash, so the whole room can be one unbroken chain.",
     about: `Every stage is one room drawn in ink on paper, full of enemies, and you clear it with a tap. Your samurai dashes wherever you point, the aim snaps onto anyone close to your line, and a kill refills both of your dash charges, so you can go from enemy to enemy without touching the ground. Landing breaks the chain. Swordsmen flash a red ! before they swing, archers draw a line at you before they loose, shield guards block from the front, barrel carriers blow up everyone near them, and generals take three hits.
 
@@ -1024,7 +1024,7 @@ Thirty stages in three chapters, the Bamboo Forest, the Red Castle and the Night
     content: "A peaceful island game. Nobody gets hurt and you cannot die. You chop trees and catch, cook and eat fish; storms bring rain, thunder and lightning.",
     web: "tiny-harbor/",
     tag: "Cosy", big: true, added: '2026-10-09',
-    cat: "Adventure", tags: ["new","cosy","island","fishing","lighthouse","building","3d","sailing"],
+    cat: "Adventure", tags: ["cosy","island","fishing","lighthouse","building","3d","sailing"],
     blurb: "Keep a tiny island: tie up the trading boats, light them in at night, and grow a leaky tent into a cottage.",
     about: `You keep a small island with a campfire, a wooden dock and a striped lighthouse out on its own islet. Chop trees for wood, fish off the dock for supper, and pick up clams and shells off the wet sand when the tide goes out - it comes back twice a day and takes whatever you left. Three trading boats sail in by day, and each one pays extra for something: fish, shells or wood. At night they wait out at sea, and you climb the lighthouse and lead them past the rocks with the beam.
 
@@ -1102,7 +1102,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     content: 'Motor racing. Cars crash and lose wheels; no people are shown hurt.',
     web: 'apex/',
     tag: 'Racing', big: true,
-    cat: 'Driving', tags: ['new', 'racing', 'f1', 'cars', 'simulation', '3d', 'track',
+    cat: 'Driving', tags: ['racing', 'f1', 'cars', 'simulation', '3d', 'track',
                            'rain', 'pit stops', 'damage', 'career'],
     blurb: 'Thirty-three real circuits, twenty-four cars, and air that decides the overtake.',
     about: `Every circuit on the calendar and a good many that are not, each laid out
@@ -1129,7 +1129,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     content: 'Motor racing on ovals. Cars crash and spin; no people are shown hurt.',
     web: 'nascar/',
     tag: 'Racing', big: true,
-    cat: 'Driving', tags: ['new', 'racing', 'nascar', 'stock cars', 'oval', 'cars',
+    cat: 'Driving', tags: ['racing', 'nascar', 'stock cars', 'oval', 'cars',
                            'simulation', '3d', 'draft', 'pit stops', 'career'],
     blurb: 'Twenty ovals, forty cars, and a draft that decides it on the last lap.',
     about: `Twenty speedways, each solved from its published lap distance, banking and
@@ -1156,7 +1156,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     content: 'A crime story seen from above: robberies, police chases and gunfights with the police. Small figures, no blood close up.',
     web: 'night-shift/',
     tag: 'Crime', big: true,
-    cat: 'Action', tags: ['new', 'crime', 'driving', 'stealth', 'top down', 'cars', 'open world'],
+    cat: 'Action', tags: ['crime', 'driving', 'stealth', 'top down', 'cars', 'open world'],
     blurb: 'Do the job, and do not get caught. They have to kill you to stop you.',
     about: `A top-down city at night, and a police force that does not look for YOU -
     it looks for a description, built one line at a time out of what you left at the
@@ -1175,7 +1175,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     content: 'Skateboarding in the street. Falls, but nothing violent.',
     web: 'grind-city/',
     tag: 'Sport', big: true,
-    cat: 'Sport', tags: ['new', 'skateboard', 'pixel', 'tricks', '2d', 'street'],
+    cat: 'Sport', tags: ['skateboard', 'pixel', 'tricks', '2d', 'street'],
     blurb: 'A 2D pixel skater where the mouse IS the board, not a pointer.',
     about: `Your hand is your weight on the deck. Slide to a tip and flick sideways and
     it flips; push down in the middle and it spins flat; push down over a tip and it
@@ -1195,7 +1195,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     content: 'Cartoon pixel-art boxing, plus wrestling and sumo. Fighters are knocked down; no blood.',
     web: 'southpaw/',
     tag: 'Sport', big: true,
-    cat: 'Sport', tags: ['new', 'boxing', 'fighting', 'pixel', 'wrestling', 'sumo', 'career', '2d'],
+    cat: 'Sport', tags: ['boxing', 'fighting', 'pixel', 'wrestling', 'sumo', 'career', '2d'],
     blurb: 'Arcade pixel boxing: ten opponents, a gym, and a wrestling bowl and a sumo ring besides.',
     about: `Ten fighters stand between you and the belt, and every one of them has a
     strength and a hole you can find - one drops his guard after a flurry, one taunts,
@@ -1218,7 +1218,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     content: 'Storybook fantasy battles: archers, knights and wizards against ink monsters, which splash into ink when beaten. No blood.',
     web: 'inkvale/',
     tag: 'Strategy', big: true,
-    cat: 'Strategy', tags: ['new', 'tower defence', 'watercolour', 'co-op', 'online', 'heroes', 'story', '2 player'],
+    cat: 'Strategy', tags: ['tower defence', 'watercolour', 'co-op', 'online', 'heroes', 'story', '2 player'],
     blurb: 'A tower defence painted in watercolour, where your towers paint the enemy and the colours mix.',
     about: `Twelve battles, three acts, and a Hollow King at the end of the road. Archers stain
     what they hit ochre, mages ultramarine, artillery vermilion - and a second colour on a
@@ -1242,7 +1242,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     content: 'A cartoon penguin fishing while seals, sharks and orcas try to catch it. Nothing graphic.',
     web: 'penguin-dash/',
     tag: 'Arcade', big: true,
-    cat: 'Arcade', tags: ['new', 'penguin', 'fishing', 'pixel', 'underwater', 'side scroller', 'animals'],
+    cat: 'Arcade', tags: ['penguin', 'fishing', 'pixel', 'underwater', 'side scroller', 'animals'],
     blurb: 'A penguin, a grey sea, and everything in it that eats penguins.',
     about: `Swim out from the shore, catch a fish in your beak and bring it back to the
     pile - while seals, sharks and orcas hunt you. The penguin swims towards the
@@ -1344,7 +1344,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
   {
     slug: 'hoops', title: 'HOOPS', how: 'local', tag: 'Sport',
     content: 'Basketball. Can be played online with a friend using a room code; there is no chat.',
-    cat: 'Sport', tags: ['new', 'basketball', 'multiplayer', 'online', '2 player', 'ball'],
+    cat: 'Sport', tags: ['basketball', 'multiplayer', 'online', '2 player', 'ball'],
     blurb: 'Streetball on the blacktop or a full game in the arena - alone, or online with a friend.',
     about: `Three games on one side-on court. HALF COURT is streetball: one ring, both teams
     attacking it, first to eleven and win by two, and a team that wins the ball has to take it
@@ -1395,7 +1395,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
   {
     slug: 'crossing', title: 'CROSSING', how: 'local', tag: 'Endless',
     content: 'A pixel-art frog crossing roads and rivers. The frog can be run over or fall in the water, cartoon style.',
-    cat: 'Arcade', tags: ['new', 'endless', 'hopping', 'traffic', 'mobile', 'one life'],
+    cat: 'Arcade', tags: ['endless', 'hopping', 'traffic', 'mobile', 'one life'],
     blurb: 'It never ends, and the bottom of the screen is rising. How far did you get?',
     about: `Road and river, generated forever as they come into view, and they play as
     opposites - on the road touching anything kills you, on the river touching NOTHING

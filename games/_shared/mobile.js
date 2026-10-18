@@ -121,5 +121,10 @@
       setTimeout(function () { h.remove(); }, 5000);
     }
   }
+  // ---- 5. fit the screen: games re-measure on resize, so fire one after rotation / browser-bar changes settle
+  var rz = 0;
+  function nudge() { clearTimeout(rz); rz = setTimeout(function () { window.dispatchEvent(new Event('resize')); }, 250); }
+  addEventListener('orientationchange', nudge);
+  if (window.visualViewport) visualViewport.addEventListener('resize', function () { if (!rz) nudge(); setTimeout(function () { rz = 0; }, 400); });
   if (document.body) setup(); else document.addEventListener('DOMContentLoaded', setup);
 })();

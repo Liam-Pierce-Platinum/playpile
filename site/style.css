@@ -401,6 +401,13 @@ nav.links a.on{color:var(--accent)}
 .stage:fullscreen,.stage:-webkit-full-screen{
   max-height:none;border:0;border-radius:0;aspect-ratio:auto;width:100vw;height:100vh;
 }
+/* phones: the game takes the whole screen (works on iPhone too, where element fullscreen does not exist) */
+.stage.mfull{position:fixed;inset:0;z-index:9999;width:100vw;height:100vh;height:100dvh;max-height:none;min-height:0;
+  aspect-ratio:auto;border:0;border-radius:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+body.mfull-on{overflow:hidden}
+.stage .mexit{display:none;position:absolute;top:calc(8px + env(safe-area-inset-top));left:calc(8px + env(safe-area-inset-left));z-index:3;
+  width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,.6);background:rgba(10,14,22,.55);color:#fff;font:700 16px system-ui;padding:0}
+.stage.mfull .mexit{display:block}
 .stage iframe{width:100%;height:100%;border:0;display:block;background:#000}
 .stage .curtain{
   position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:14px;

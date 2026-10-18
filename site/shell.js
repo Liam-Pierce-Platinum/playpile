@@ -35,6 +35,8 @@ const I = {
   fire:   'M12 2c1 3.2-.6 4.6-2 6-1.7 1.7-3 3.2-3 5.6A5.4 5.4 0 0 0 12 19a5.4 5.4 0 0 0 5-5.4c0-3-2-4.3-2-7-1 1.2-1.6 1.7-2.3 1.7C11.6 8.3 12.6 5.4 12 2z',
   new:    'M12 3l2.1 5.2L19.8 9l-4 4 1 5.7-4.8-2.8L7.2 18.7l1-5.7-4-4 5.7-.8z',
   clock:  'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm.9 4.6h-1.8v5.1l4.1 2.5.9-1.5-3.2-1.9z',
+  pen:    'M4 17.2V20h2.8l8.3-8.3-2.8-2.8L4 17.2zm13.7-7.5a.8.8 0 0 0 0-1.1l-2.3-2.3a.8.8 0 0 0-1.1 0l-1.6 1.6 2.8 2.8 2.2-1z',
+  doc:    'M6 2h8l4 4v16H6V2zm7 1.5V7h3.5L13 3.5zM8 11h8v1.6H8V11zm0 3.5h8v1.6H8v-1.6zm0 3.5h5v1.6H8V18z',
   grid:   'M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z',
   action: 'M13.5 2 4 13.8h6L9.5 22 20 9.6h-6.8z',
   adventure:'M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 4.4A2.6 2.6 0 1 1 12 11.6a2.6 2.6 0 0 1 0-5.2z',
@@ -202,7 +204,9 @@ export function mountShell({ active = '', onSearch = null } = {}) {
     html += '</nav>'
       + '<div class="navrule"></div>'
       + '<nav>' + link('/site/about.html', 'info', 'About', '', active === 'about')
-      + link('/site/updates.html', 'clock', 'Updates', '', active === 'updates') + '</nav>'
+      + link('/site/updates.html', 'clock', 'Updates', '', active === 'updates')
+      + link('/devlog/', 'pen', 'Dev log', '', active === 'devlog')
+      + link('/articles/', 'doc', 'Articles', '', active === 'articles') + '</nav>'
       + '<div class="navsmall">'
       + '<a href="/site/contact.html">Contact</a>'
       + '<a href="/site/parents.html">Parents</a>'

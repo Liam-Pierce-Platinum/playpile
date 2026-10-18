@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="../_shared/mobile.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BLADEBORN</title>
+<link rel="icon" href="data:,">
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#555;font-family:Impact,'Arial Narrow',Arial,sans-serif;color:#e8e8e8;user-select:none}
+  canvas{display:block}
+  #hud{position:fixed;inset:0;pointer-events:none}
+  #hp{position:absolute;left:28px;bottom:28px;width:300px;height:14px;background:rgba(0,0,0,.45);border:2px solid #ddd}
+  #hpf{height:100%;width:100%;background:#e6e6e6;transition:width .12s}
+  #hpl{position:absolute;left:28px;bottom:46px;font-size:15px;letter-spacing:3px;color:#ccc}
+  #combo{position:absolute;right:40px;top:30%;text-align:right;opacity:0;transition:opacity .2s}
+  #combo b{display:block;font-size:84px;line-height:.9;color:#f2f2f2;text-shadow:0 0 18px rgba(0,0,0,.6)}
+  #combo span{font-size:18px;letter-spacing:5px;color:#bbb}
+  #wave{position:absolute;left:28px;top:24px;font-size:20px;letter-spacing:4px;color:#ddd}
+  #kills{position:absolute;left:28px;top:50px;font-size:14px;letter-spacing:3px;color:#aaa}
+  #banner{position:absolute;left:0;right:0;top:22%;text-align:center;font-size:64px;letter-spacing:12px;opacity:0;transition:opacity .4s;text-shadow:0 0 20px #000}
+  #hint{position:absolute;left:0;right:0;bottom:24px;text-align:center;font:13px Arial,sans-serif;letter-spacing:1px;color:#ccc;opacity:.8}
+  @media (max-width:1400px){#hint{left:350px;right:16px}}
+  #cross{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:rgba(255,255,255,.7)}
+  #sight{position:absolute;left:50%;top:22px;width:150px;margin-left:-75px;text-align:center;transition:opacity .25s}
+  #sight .bar{height:4px;background:rgba(0,0,0,.4);border:1px solid rgba(230,230,230,.5)}
+  #sightf{height:100%;width:0;background:#e8e8e8;transition:width .12s}
+  #sightl{font:11px Arial,sans-serif;letter-spacing:3px;color:#ccc;margin-top:4px}
+  #sight.seen #sightf{animation:pulse .5s infinite alternate}
+  @keyframes pulse{from{opacity:.55}to{opacity:1}}
+  #fin{position:absolute;left:28px;bottom:70px;width:300px}
+  #fin .bar{height:6px;background:rgba(0,0,0,.45);border:1px solid #9a9a9a}
+  #finf{height:100%;width:0;background:#7a0000;transition:width .15s}
+  #fin span{display:block;font-size:12px;letter-spacing:3px;color:#999;margin-bottom:3px}
+  #fin.ready .bar{border-color:#e0e0e0;animation:rdy .7s infinite alternate}
+  #fin.ready span{color:#e6e6e6}
+  @keyframes rdy{from{box-shadow:0 0 0 rgba(160,0,0,0)}to{box-shadow:0 0 10px rgba(160,0,0,.8)}}
+  #dmg{position:absolute;inset:0;box-shadow:inset 0 0 160px rgba(120,0,0,.0);transition:box-shadow .3s}
+  .screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(20,20,20,.72);z-index:5}
+  .screen h1{font-size:110px;margin:0;letter-spacing:18px;color:#eee}
+  .screen h1 i{color:#8a0000;font-style:normal}
+  .screen p{font:15px/1.9 Arial,sans-serif;color:#bbb;text-align:center;margin:18px 0}
+  .screen button{font:22px Impact,sans-serif;letter-spacing:6px;padding:12px 48px;margin:6px;background:#ddd;color:#222;border:0;cursor:pointer}
+  .screen button:hover{background:#fff}
+  .hidden{display:none!important}
+  kbd{background:#333;border:1px solid #666;padding:1px 6px;border-radius:3px;color:#eee}
+  /* stage HUD */
+  body.campaign #wave, body.campaign #kills{display:none}
+  #obj{position:absolute;left:28px;top:24px;font:13px Arial,sans-serif;letter-spacing:2px;color:#ddd;max-width:380px}
+  #obj .o{padding:5px 0 5px 14px;border-left:2px solid #bbb;margin-bottom:6px;text-transform:uppercase;transition:opacity .6s,transform .4s;text-shadow:0 0 8px #000}
+  #obj .o.new{opacity:0;transform:translateX(-12px)}
+  #obj .o.done{opacity:.35;text-decoration:line-through;border-color:#7a0000}
+  #subs{position:fixed;left:50%;transform:translateX(-50%);bottom:13vh;max-width:min(900px,calc(100% - 32px));text-align:center;font:20px/1.4 Arial,sans-serif;color:#f0f0f0;opacity:0;transition:opacity .2s;pointer-events:none;z-index:4;text-shadow:0 0 6px #000;padding:8px 18px;background:rgba(0,0,0,.55)}
+  #subs b{display:block;font:13px Impact,sans-serif;letter-spacing:5px;color:#aaa;margin-bottom:2px}
+  .lb{position:fixed;left:0;right:0;height:0;background:#000;z-index:3;transition:height .6s ease;pointer-events:none}
+  #lbt{top:0} #lbb{bottom:0}
+  body.letterbox .lb{height:11vh}
+  body.cine #hud > :not(#dmg){opacity:0!important}
+  #skip{position:fixed;right:28px;bottom:3vh;font:11px Arial,sans-serif;letter-spacing:3px;color:#888;z-index:4}
+  #fade{position:fixed;inset:0;background:#000;opacity:0;transition:opacity .25s;pointer-events:none;z-index:6}
+  #card{position:fixed;left:0;right:0;top:38%;text-align:center;opacity:0;transition:opacity .8s;pointer-events:none;z-index:4;text-shadow:0 0 20px #000}
+  #card i{display:block;font:14px Arial,sans-serif;letter-spacing:8px;color:#aaa;font-style:normal}
+  #card b{display:block;font-size:72px;letter-spacing:14px;color:#eee;font-weight:normal}
+  /* home screen: title + menu over the slow shot */
+  #home{position:fixed;inset:0;z-index:5;display:flex;align-items:center;background:linear-gradient(90deg,rgba(10,10,10,.82) 0%,rgba(10,10,10,.5) 38%,rgba(10,10,10,0) 70%)}
+  #home .col{margin-left:7vw;max-width:520px;width:calc(100% - 32px)}
+  #home h1{font-size:96px;margin:0 0 4px;letter-spacing:16px;color:#eee;font-weight:normal;line-height:1}
+  #home h1 i{color:#8a0000;font-style:normal}
+  #home .tag{font:13px Arial,sans-serif;letter-spacing:4px;color:#999;margin-bottom:34px}
+  #home .page > button,#home .chap{display:block;width:100%;text-align:left;font:24px Impact,sans-serif;letter-spacing:6px;padding:8px 0;background:none;color:#cfcfcf;border:0;cursor:pointer;transition:color .15s,padding .15s}
+  #home .page > button:hover,#home .chap:hover{color:#fff;padding-left:12px}
+  #home .page > button small{display:block;font:11px Arial,sans-serif;letter-spacing:2px;color:#888}
+  #home .chap{border-bottom:1px solid #333;padding:10px 0}
+  #home .chap i{font-style:normal;color:#8a0000;margin-right:14px}
+  #home .chap small{display:block;font:12px Arial,sans-serif;letter-spacing:1px;color:#999;margin-top:2px}
+  #home .chap.locked{opacity:.4;cursor:default}
+  #home .chap.locked:hover{padding-left:0}
+  #home .back{margin-top:18px;font-size:16px!important;color:#999!important}
+  #home .txt{font:14px/1.9 Arial,sans-serif;color:#bbb}
+  #home label{display:flex;align-items:center;gap:14px;font:13px Arial,sans-serif;letter-spacing:2px;color:#ccc;padding:9px 0;border-bottom:1px solid #2c2c2c}
+  #home label span{width:150px} #home label input[type=range]{flex:1;accent-color:#bbb} #home label output{width:56px;text-align:right;color:#999}
+  #home h2{font:28px Impact,sans-serif;letter-spacing:8px;color:#ddd;margin:0 0 14px;font-weight:normal}
+  @media (max-width:700px){#home h1{font-size:56px;letter-spacing:8px}#home .col{margin-left:16px}}
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "./vendor/three/build/three.module.js",
+  "three/addons/": "./vendor/three/examples/jsm/",
+  "cannon-es": "./vendor/cannon-es/cannon-es.js"
+} }
+</script>
+</head>
+<body>
+<div id="hud" class="hidden">
+  <div id="dmg"></div>
+  <div id="cross"></div>
+  <div id="sight"><div class="bar"><div id="sightf"></div></div><div id="sightl">HIDDEN</div></div>
+  <div id="obj"></div>
+  <div id="wave">WAVE 1</div>
+  <div id="kills">KILLS 0</div>
+  <div id="fin"><span>FINISHER</span><div class="bar"><div id="finf"></div></div></div>
+  <div id="hpl">HEALTH</div>
+  <div id="hp"><div id="hpf"></div></div>
+  <div id="combo"><b id="cn">0</b><span>COMBO</span></div>
+  <div id="banner"></div>
+  <div id="hint">Click LEFT + RIGHT together to unsheathe</div>
+</div>
+<div id="home">
+  <div class="col">
+    <h1>BLADE<i>BORN</i></h1>
+    <div class="tag">CUBE MEN. CLAWS. NO MERCY.</div>
+    <div class="page" data-page="main">
+      <button id="h-arena">PLAY<small>endless waves in the yard</small></button>
+      <button data-go="chapters">STAGES<small>four levels, plain objectives</small></button>
+      <button data-go="controls">CONTROLS</button>
+      <button data-go="settings">SETTINGS</button>
+    </div>
+    <div class="page hidden" data-page="chapters"><h2>STAGES</h2><div id="h-chapters"></div><button class="back" data-go="main">BACK</button></div>
+    <div class="page hidden" data-page="settings"><h2>SETTINGS</h2>
+      <label><span>MOUSE SENSITIVITY</span><input id="s-sens" type="range" min="0.3" max="2.5" step="0.05"><output></output></label>
+      <label><span>INVERT Y</span><input id="s-inv" type="checkbox"><output></output></label>
+      <label><span>VOLUME</span><input id="s-vol" type="range" min="0" max="1" step="0.05"><output></output></label>
+      <label><span>SCREEN SHAKE</span><input id="s-shake" type="range" min="0" max="1.5" step="0.05"><output></output></label>
+      <label><span>SUBTITLES</span><input id="s-subs" type="checkbox"><output></output></label>
+      <label><span>POST EFFECTS</span><input id="s-fx" type="checkbox"><output>restart</output></label>
+      <button class="back" id="s-reset">DEFAULTS</button><button class="back" data-go="main">BACK</button></div>
+    <div class="page hidden" data-page="controls"><h2>CONTROLS</h2><div class="txt">
+      <kbd>WASD</kbd> move &nbsp; <kbd>Mouse</kbd> look &nbsp; <kbd>Space</kbd> jump &nbsp; <kbd>Shift</kbd> sprint &nbsp; <kbd>C</kbd>/<kbd>Ctrl</kbd> crouch<br>
+      <kbd>LMB</kbd> + <kbd>RMB</kbd> together: unsheathe &nbsp; HOLD both: sheathe<br>
+      <kbd>LMB</kbd> / <kbd>RMB</kbd> claw strike at the crosshair &nbsp; hold <kbd>MIDDLE</kbd>: block (time it = parry)<br>
+      DOUBLE-CLICK <kbd>LMB</kbd>: finisher (bar full) / quick block<br>
+      In the air: click near a wall or branch = grab, same button twice = slam<br>
+      On a wall: click = climb, <kbd>A</kbd>/<kbd>D</kbd> round corners, <kbd>Space</kbd> wall-jump (look at the next tree to leap to it), <kbd>MIDDLE</kbd> = stealth kill below<br>
+      <kbd>E</kbd> takedown / interact &nbsp; Vents: crouch into a vent mouth, <kbd>E</kbd> at a grate, <kbd>Space</kbd> drop through<br>
+      Ladders: walk into one holding <kbd>W</kbd>, <kbd>S</kbd> down, <kbd>Space</kbd> jump off<br>
+      Dash, sprint or slash through glass &nbsp; <kbd>Esc</kbd> pause<br><br><small style="color:#888">Toronto street map: OpenStreetMap contributors, ODbL. Animations: Mixamo. Engine: three.js, cannon-es.</small></div>
+      <button class="back" data-go="main">BACK</button></div>
+  </div>
+</div>
+<div id="pause" class="screen hidden">
+  <h1 style="font-size:70px">PAUSED</h1>
+  <button id="resume">RESUME</button>
+  <button id="restart">RESTART</button>
+  <button id="tomenu">QUIT TO MENU</button>
+</div>
+<div id="over" class="screen hidden">
+  <h1 style="font-size:80px">YOU <i>FELL</i></h1>
+  <p id="overstats"></p>
+  <button id="again">AGAIN</button>
+  <button id="overmenu">MENU</button>
+</div>
+<div id="lbt" class="lb"></div><div id="lbb" class="lb"></div>
+<div id="subs"></div>
+<div id="card"></div>
+<div id="fade"></div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

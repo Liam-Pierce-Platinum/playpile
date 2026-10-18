@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>One script that makes every game work on a phone - PLAYPILE</title>
+<meta name="description" content="How a single helper, loaded before each game's own code, adds touch pads, caps the pixel ratio and asks you to turn your phone.">
+<link rel="canonical" href="https://playpile.net/devlog/one-script-for-every-phone/">
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#050a14">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"One script that makes every game work on a phone","description":"How a single helper, loaded before each game's own code, adds touch pads, caps the pixel ratio and asks you to turn your phone.","datePublished":"2026-10-18","author":{"@type":"Person","name":"Liam"},"publisher":{"@type":"Organization","name":"PLAYPILE"},"mainEntityOfPage":"https://playpile.net/devlog/one-script-for-every-phone/"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <div class="prose">
+      <p class="crumbs"><a href="/">Games</a> &rsaquo; <a href="/devlog/">Dev log</a></p>
+      <article>
+      <section class="hero"><h1>One script that makes every game work on a phone</h1>
+        <p id="lede"><time datetime="2026-10-18">18 October 2026</time> &middot; 6 min read</p></section>
+<p>We expect a lot of PLAYPILE to be played on phones, and PLAYPILE's games were not all written with a phone in mind. The small arcade games share an engine that was touch-first from day one. The big ones were not: <a href="/play/apex/">APEX</a> and <a href="/play/nascar/">NASCAR</a> are driven with the arrow keys, <a href="/play/dungeon-quest/">DUNGEON QUEST</a> wants WASD plus six more keys, and on a phone those games simply sat there. This post is about how we fixed that for the whole site at once, without opening most of the games.</p>
+
+<h2>Where we started</h2>
+<p>The quick games run on a small shared cabinet we call the deck. It answers the same questions once for every game: the game draws at a fixed virtual resolution and the canvas is scaled and letterboxed to fit the window, so "the paddle is 90 wide" means the same thing on a big monitor and a phone held upright. A mouse press, a finger and the space bar are the same event. The frame time is clamped, because a tab that comes back after two minutes hands the game a 120-second frame and physics tunnels through its floor.</p>
+<p>That covered the small games. Everything else had its own input code, written for its own reasons. Fixing them one at a time would have meant touching dozens of folders, each a chance to break something that works on a desktop.</p>
+
+<h2>One helper, loaded first</h2>
+<p>Instead, the build step that assembles the site now adds one line to every game's page: a script tag for a shared file, <i>mobile.js</i>, placed at the very top of the <i>head</i> so it runs before the game's own code. The first thing the helper does is check whether it is on a touch device with a coarse pointer. On a desktop it stops there and does nothing at all, so the desktop versions of the games are exactly what they were.</p>
+<p>On a phone or tablet it does four jobs.</p>
+
+<h3>1. Stop the page fighting the game</h3>
+<p>A game in a browser is still a web page, and a web page wants to zoom when you double-tap, scroll when you drag, and bounce when you reach the edge. The helper sets the viewport so there is no pinch or double-tap zoom, turns off overscroll and scroll-chaining, stops text from being selected under a thumb, and removes the grey flash that phones draw over a tapped element. None of that is visible when it works. All of it is very visible when it does not.</p>
+
+<h3>2. Draw fewer pixels</h3>
+<p>Modern phones report a device pixel ratio of 3 or more, and most 3D games honour it, which means rendering nine times as many pixels as the screen's nominal size. The helper caps the ratio the game sees at <b>1.5</b>. On a 3x phone that is a quarter of the pixels, and on a small screen the difference is hard to spot.</p>
+<p>It also changes two things about every WebGL context a game creates: it turns off multisample antialiasing, and it reports a maximum texture size of <b>2048</b>. Most of our 3D games are built on three.js, which reads that limit and clamps its shadow maps and large textures to fit. The result is lighter shadows and less memory, without a single line changed in any game. The trade is real: shadow edges are softer on a phone than on a desktop. We would rather a game run smoothly with soft shadows than stutter with sharp ones.</p>
+
+<h3>3. A pad for the keyboard games</h3>
+<p>Five games read only the keyboard, so they get an on-screen pad. It is a d-pad on the left and a few round buttons on the right, and each button sends the same keyboard events the game already listens for. As far as the game knows, somebody pressed the right arrow.</p>
+<ul>
+<li><b>APEX</b> and <b>NASCAR</b>: arrows to drive, GEAR+ and GEAR- for <kbd>E</kbd> and <kbd>Q</kbd>, and a pause button.</li>
+<li><b><a href="/play/exposure/">EXPOSURE</a></b>: arrows, FIRE, MATCH and OK.</li>
+<li><b><a href="/play/penguin-dash/">PENGUIN DASH</a></b>: arrows, JUMP, OK and pause.</li>
+<li><b>DUNGEON QUEST</b>: a WASD pad, plus attack, jump, block, special, use and bag.</li>
+</ul>
+<p>Two keyboard-and-mouse games are deliberately left out. <a href="/play/highrise/">HIGHRISE</a> and <a href="/play/kickback/">KICKBACK</a> aim with the mouse all the time, and a d-pad cannot stand in for that, so we would rather say plainly that they are desktop games than ship a pad that makes them worse.</p>
+<p>Two details took the most care. Older game code often reads <i>keyCode</i> rather than the newer <i>code</i> property, and a synthetic keyboard event does not fill that in by default, so the helper defines it on each event by hand. And a button has to let go of its key when your thumb slides off it, not only when you lift the thumb. Without that, a driver whose thumb drifted off the accelerator would keep accelerating into a wall. Each button releases on pointer-up, pointer-cancel and pointer-leave. The sizes are 58 pixels for the d-pad, 64 for action buttons and 44 for pause, which is big enough to hit without looking.</p>
+
+<h3>4. Ask for the right orientation</h3>
+<p>The pad games need landscape: two thumbs, a pad each side, and a wide view of the road. In portrait they show a full-screen prompt, "Turn your phone sideways to play", which goes away by itself once you do. The helper counts the screen as portrait when its height is more than 1.1 times its width.</p>
+<p>Some games are happier upright. <a href="/play/stack/">STACK</a>, <a href="/play/helix-drop/">HELIX DROP</a>, <a href="/play/word-blitz/">WORD BLITZ</a>, <a href="/play/subway-run/">SUBWAY RUN</a>, <a href="/play/tunnel-dive/">TUNNEL DIVE</a> and twenty others are on a list of 25 that get no hint at all. Everything else gets a small tip at the bottom of the screen, "turn your phone sideways for a bigger view", which fades after four seconds and never blocks play.</p>
+<p>Rotating a phone also changes the window size in stages, as the browser's address bar slides in and out. Games re-measure on resize, but the last resize event can arrive before the browser has settled. So after a rotation the helper waits 250 milliseconds and fires one more resize, which gets the game to fit the final shape of the screen.</p>
+
+<h2>Why one file and not ninety</h2>
+<p>The obvious alternative was to add touch controls to each game. We did that where it mattered most: <a href="/play/drifter/">DRIFTER</a> and <a href="/play/spike/">SPIKE</a> were reworked for touchscreens on 7 October, and <a href="/play/hoops/">HOOPS</a> got a landscape layout in September. But a shared helper has three advantages. It fixes every game on the same day. It keeps the games themselves unchanged, so a desktop player gets exactly the game that was tested on a desktop. And when we learn something new about phones, such as another gesture that needs blocking, it is one change in one file.</p>
+
+<h2>What it does not do</h2>
+<p>An on-screen d-pad makes a keyboard game playable on a phone. It does not make it a phone game. Steering an F1 car with a thumb on a glass button is harder than with a key, and we say so rather than pretend otherwise. The games that are best on a phone are still the ones designed around one finger from the start.</p>
+<p>The site around the games is checked on phones too. Before every release, our readiness script loads the home page at 390 and 360 pixels wide, roughly a current iPhone and a common Android, and fails if the page can be scrolled sideways by more than two pixels.</p>
+      </article>
+      <h2>More from the dev log</h2>
+      <ul><li><a href="/devlog/designing-tension/" style="color:var(--accent)">Designing tension in three games: a crowd, a chase and a muzzle flash</a></li><li><a href="/devlog/how-we-check-every-game/" style="color:var(--accent)">How we check every game without playing each one by hand</a></li><li><a href="/devlog/southpaw-ten-boxers-ten-weaknesses/" style="color:var(--accent)">SOUTHPAW: ten boxers, and why mashing loses</a></li><li><a href="/devlog/apex-rain-reflections-and-33-circuits/" style="color:var(--accent)">APEX: rain, reflections and thirty-three circuits in a browser</a></li></ul>
+
+    </div>
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">100 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/devlog/">Dev log</a><a href="/articles/">Articles</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<script type="module">
+import { GAMES, mountShell, row } from '/site/shell.js';
+import { loadAds } from '/ads/ads.js';
+mountShell({ active: 'about' });
+document.getElementById('picks').innerHTML =
+  row('Start with one of these', GAMES.filter((g) => g.big).slice(0, 6), { seeAll: '/' });
+// no ad slots on this page, but it does load the ad script, so it owes
+// the visitor the same cookie notice as everywhere else
+loadAds();
+</script>
+</body>
+</html>

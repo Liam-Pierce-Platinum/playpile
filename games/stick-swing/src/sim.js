@@ -83,13 +83,17 @@ export function step(S, dt, press) {
       const ox = Math.min(p.x + R - w.x0, w.x1 - (p.x - R)), oy = Math.min(p.y + R - w.y0, w.y1 - (p.y - R));
       if (ox < oy) { if (px < (w.x0 + w.x1) / 2) { p.x = w.x0 - R; } else p.x = w.x1 + R; p.vx *= -0.35; }
       else { if (py > (w.y0 + w.y1) / 2) { p.y = w.y1 + R; p.vy = Math.abs(p.vy) * 0.4; } else { p.y = w.y0 - R; p.vy = -Math.abs(p.vy) * 0.4; } }
-      S.ev.push('bonk'); if (S.hook) S.hook = null;
+      if (Math.hypot(p.vx, p.vy) > 2 || S.hook) S.ev.push('bonk'); if (S.hook) S.hook = null;
     }
   }
   // spin
   if (S.hook) { const a = Math.atan2(p.x - S.hook.x, S.hook.y - p.y); p.av = 0; const d = a - p.rot; p.rot += (Math.atan2(Math.sin(d), Math.cos(d))) * Math.min(1, dt * 14); }
   else if (S.ground) { p.rot *= Math.pow(0.001, dt); S.spin = 0; }
   else { p.av = -p.vx * 0.55; p.rot += p.av * dt; S.spin += p.av * dt; if (Math.abs(S.spin) > Math.PI * 2) { S.spin = 0; S.flips++; S.ev.push('flip'); } }
+  // resting somewhere with nothing to hook (pillar top, wedged on a wall): don't soft-lock, reset the run
+  const slow = !S.hook && Math.hypot(p.vx, p.vy) < 0.8 && !(S.ground && pickHook(S));
+  S.still = slow && S.t > 1 ? (S.still || 0) + dt : 0;
+  if (S.still > 1.2 && !S.won) { S.dead = true; S.stuck = true; S.ev.push('dead'); return; }
   if (p.y < KILL_Y) { S.dead = true; S.ev.push('dead'); }
   if (p.x > L.goalX && p.y > -1) { S.won = true; S.ev.push('win'); }
 }

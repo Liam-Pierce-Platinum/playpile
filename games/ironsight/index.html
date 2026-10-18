@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="../_shared/mobile.js"></script>
+<meta charset="utf-8">
+<title>IRONSIGHT</title>
+<link rel="icon" href="data:,">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="src/ui/ui.css">
+<script type="importmap">
+{ "imports": {
+  "three": "./vendor/three/build/three.module.js",
+  "three/addons/": "./vendor/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<!-- loading screen: visible from the first frame (art, tips and the idle bar run from the inline script below) -->
+<div id="load">
+  <div class="ld-art">
+    <svg id="ldSky" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true"></svg>
+    <div class="ld-rain"></div>
+    <svg class="ld-ret" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="92"/><circle cx="100" cy="100" r="60"/><path d="M100 0v70M100 130v70M0 100h70M130 100h70"/><circle cx="100" cy="100" r="1.6" class="dot"/></svg>
+  </div>
+  <div class="ld-hdr"><span>IRONSIGHT // TACTICAL OPERATIONS</span><span id="ldClock">SECURE LINK</span></div>
+  <div class="ld-mid">
+    <h1>IRONSIGHT</h1>
+    <p id="loadtitle">Initialising</p>
+  </div>
+  <div class="ld-foot">
+    <div class="ld-tip"><b>Field tip</b><span id="loadtip"></span></div>
+    <div class="ld-prog">
+      <div class="ld-row"><span id="loadmsg">Starting engine</span><span id="loadpct">0%</span></div>
+      <div id="bar"><i></i></div>
+    </div>
+    <button data-act="loadBack" class="ld-back primary">Back to menu</button>
+  </div>
+</div>
+<script>
+(function () {
+  // skyline: deterministic towers in three depth layers, lit windows on the nearest
+  var sv = document.getElementById('ldSky'), s = 7, R = function () { s = (s * 16807) % 2147483647; return s / 2147483647; }, out = '';
+  [[0.18, 380, '#0b1118'], [0.32, 300, '#080c11'], [0.55, 220, '#05070a']].forEach(function (L, li) {
+    var x = -20; while (x < 1620) { var w = 40 + R() * 110, h = L[1] + R() * 260 * (1 - li * 0.2); out += '<rect x="' + x.toFixed(0) + '" y="' + (900 - h).toFixed(0) + '" width="' + w.toFixed(0) + '" height="' + h.toFixed(0) + '" fill="' + L[2] + '"/>';
+      if (li === 2) for (var wy = 900 - h + 16; wy < 880; wy += 22) for (var wx = x + 8; wx < x + w - 10; wx += 16) if (R() < 0.07) out += '<rect x="' + wx.toFixed(0) + '" y="' + wy.toFixed(0) + '" width="6" height="9" fill="' + (R() < 0.7 ? '#d6b25e' : '#9fb7d6') + '" opacity="' + (0.25 + R() * 0.45).toFixed(2) + '"/>';
+      x += w + R() * 14; }
+  });
+  sv.innerHTML = out;
+  var tips = [
+    'Headshots kill in one round with every rifle. Body hits only wound.',
+    'Suppressors keep enemies from hearing you past 20 m. A muzzle brake carries much further.',
+    'Bullets drop and take time to arrive. Long shots need you to lead and hold over.',
+    'Tap Shift again while sprinting for a tactical sprint. Crouch mid-sprint to slide.',
+    'Q and E lean around corners without stepping out of cover.',
+    'Thin walls, doors and car panels do not stop rifle rounds. Shoot through them.',
+    'Enemies move as a squad. When one calls you out, the rest will flank.',
+    'Slide an optic along the rail in the Gunsmith to keep it inside the eye box.',
+    'Press B to change fire mode. Bursts stay on target at range.',
+    'Crouch (C) or go prone (Z) to tighten your spread and make yourself a smaller target.',
+    'Rain and night shorten how far enemies can see you. So does staying out of the light.',
+    'Test every build in the Firing Range: steel plates ring and show the drop.'
+  ], i = Math.floor(Math.random() * tips.length), tip = document.getElementById('loadtip');
+  function next() { tip.style.opacity = 0; setTimeout(function () { tip.textContent = tips[i++ % tips.length]; tip.style.opacity = 1; }, 300); }
+  tip.textContent = tips[i++ % tips.length]; setInterval(next, 5200);
+})();
+</script>
+
+<!-- main menu -->
+<div id="menu" class="screen hidden">
+  <div class="brand"><h1>IRONSIGHT</h1><p>tactical shooter</p></div>
+  <div class="menu-col">
+    <button data-act="play" class="primary big"><b>Play</b><small>Pick a map and deploy</small></button>
+    <button data-act="online"><b>Online</b><small>Team play with friends · lobby code · bots fill to 10</small></button>
+    <button data-act="gunsmith"><b>Gunsmith</b><small>Build and tune your weapons</small></button>
+    <button data-act="range"><b>Firing Range</b><small>Test your loadout on steel and dummies</small></button>
+    <button data-act="settings"><b>Settings</b><small>Mouse, field of view, graphics, audio</small></button>
+  </div>
+  <div id="mnLoadout"><small>Equipped primary</small><b id="mnGun">-</b><span id="mnAtt"></span></div>
+  <div id="menuErr" class="hidden"></div>
+  <div class="menu-foot">WASD move · Shift sprint (tap again: tactical sprint) · C crouch / slide · Z prone · Space jump / mantle · Q/E lean · RMB aim · R reload · B fire mode · 1-2 weapons · T laser · V inspect · F lethal · X tactical · Tab leaderboard · L loadout · Esc pause</div>
+</div>
+
+<!-- map + mode select: clicking a map deploys straight into it -->
+<div id="mapsel" class="screen hidden">
+  <h2>Deployment</h2>
+  <div class="row-opts">
+    <label>Mode <select id="modeSel"><option value="ffa">Free for all (you + 9 bots)</option><option value="tdm">Team deathmatch (5 v 5)</option></select></label>
+    <label>Bots <select id="diffSel"><option value="0">Recruit</option><option value="1" selected>Regular</option><option value="2">Veteran</option><option value="3">Realism</option></select></label>
+    <label>Loadout <select id="loadoutSel"></select></label>
+  </div>
+  <p class="ms-hint">Click a map to deploy</p>
+  <div id="maplist" class="cards"></div>
+  <div class="row-btn"><button data-act="back">Back</button></div>
+</div>
+
+<!-- online: create / join a lobby by code -->
+<div id="online" class="screen hidden">
+  <h2>Online</h2>
+  <div class="row-opts"><label>Your name <input id="olName" maxlength="16"></label></div>
+  <div id="olStart" class="ol-cols">
+    <div class="ol-box"><h3>Create a lobby</h3>
+      <label>Mode <select id="olMode"><option value="ffa">Free for all</option><option value="tdm">Team deathmatch 5 v 5</option></select></label>
+      <label>Map <select id="olMap"></select></label>
+      <label>Bots <select id="olDiff"><option value="0">Recruit</option><option value="1" selected>Regular</option><option value="2">Veteran</option><option value="3">Realism</option></select></label>
+      <button data-act="olCreate" class="primary">Create lobby</button></div>
+    <div class="ol-box"><h3>Join a lobby</h3>
+      <label>Code <input id="olCode" maxlength="4" placeholder="ABCD" style="text-transform:uppercase"></label>
+      <button data-act="olJoin" class="primary">Join</button></div>
+  </div>
+  <div id="olLobby" class="hidden ol-box">
+    <div class="ol-code">Lobby code <b id="olCodeV"></b></div>
+    <p id="olInfo"></p>
+    <ul id="olPlayers"></ul>
+    <div id="olHostOpts" class="row-opts">
+      <label>Mode <select id="olLMode"><option value="ffa">Free for all</option><option value="tdm">Team deathmatch 5 v 5</option></select></label>
+      <label>Map <select id="olLMap"></select></label>
+      <label>Bots <select id="olLDiff"><option value="0">Recruit</option><option value="1">Regular</option><option value="2">Veteran</option><option value="3">Realism</option></select></label>
+    </div>
+    <p id="olWait">Waiting for the host to start</p>
+    <p id="olLink" class="ol-link"></p>
+    <div class="row-btn"><button data-act="olLeave">Leave lobby</button><button data-act="olGo" id="olGo" class="primary">Start match</button></div>
+  </div>
+  <p id="olMsg"></p>
+  <div class="row-btn"><button data-act="olBack">Back</button></div>
+</div>
+<!-- gunsmith -->
+<div id="gunsmith" class="screen hidden">
+  <div class="gs-left">
+    <h2>Gunsmith</h2>
+    <label>Loadout slot <select id="gsSlot"><option value="0">Primary</option><option value="1">Secondary</option></select></label>
+    <label>Weapon <select id="gsGun"></select></label>
+    <div class="gs-sec"><span>Optic</span><select id="gsOptic"></select></div>
+    <div class="gs-sec"><span>Optic position on rail</span><input id="gsRail" type="range" min="0" max="1" step="0.01" value="0.5"><em id="gsRailV"></em></div>
+    <div class="gs-sec"><span>Muzzle</span><select id="gsMuzzle"></select></div>
+    <div class="gs-sec"><span>Laser</span><select id="gsLaser"></select></div>
+    <div class="gs-sec"><span>Laser colour</span><input id="gsLaserCol" type="color" value="#ff2020"><label class="tog"><input id="gsLaserOn" type="checkbox" checked> on</label></div>
+    <div class="gs-sec"><span>Underbarrel</span><select id="gsUnder"></select></div>
+    <div class="gs-sec"><span>Magazine</span><select id="gsMag"></select></div>
+    <div class="gs-sec"><span>Stock</span><select id="gsStock"></select></div>
+    <div class="gs-sec"><span>Camo</span><select id="gsCamo"></select></div>
+    <div class="gs-sec"><span>Lethal (F)</span><select id="gsLethal"></select></div>
+    <div class="gs-sec"><span>Tactical (X)</span><select id="gsTactical"></select></div>
+    <div class="gs-sec"><span>Gloves</span><select id="gsGlove"></select></div>
+    <div class="gs-sec"><span>Sleeves</span><select id="gsSleeve"></select></div>
+    <div class="gs-sec gs-pre"><span>Presets</span><select id="gsPreset"></select><button id="gsPresetLoad">Load</button><button id="gsPresetDel">Delete</button></div>
+    <div class="gs-sec gs-pre"><span>Save as</span><input id="gsPresetName" maxlength="24" placeholder="Preset name"><button id="gsPresetSave">Save preset</button></div>
+    <div class="row-btn"><button data-act="gsBack">Back</button><button data-act="gsRange">Test in range</button><button data-act="gsSave" class="primary">Save loadout</button></div>
+  </div>
+  <div class="gs-right">
+    <div id="gsName"></div>
+    <div id="gsStats"></div>
+    <div class="gs-hint">Drag to rotate · wheel to zoom</div>
+  </div>
+</div>
+
+<!-- settings -->
+<div id="settings" class="screen hidden">
+  <h2>Settings</h2>
+  <div class="set-grid">
+    <label>Mouse sensitivity <input id="setSens" type="range" min="0.2" max="4" step="0.05"><em></em></label>
+    <label>ADS sensitivity multiplier <input id="setAdsSens" type="range" min="0.3" max="1.5" step="0.05"><em></em></label>
+    <label>Field of view <input id="setFov" type="range" min="60" max="110" step="1"><em></em></label>
+    <label>Weapon FOV <input id="setVmFov" type="range" min="40" max="80" step="1"><em></em></label>
+    <label>Graphics quality <select id="setQuality"><option value="0">Low</option><option value="1">Medium</option><option value="2">High</option><option value="3">Ultra</option></select></label>
+    <label>Master volume <input id="setVol" type="range" min="0" max="1" step="0.05"><em></em></label>
+    <label>Invert Y <input id="setInvert" type="checkbox"></label>
+    <label>Show FPS <input id="setFps" type="checkbox"></label>
+  </div>
+  <div class="row-btn"><button data-act="setBack" class="primary">Done</button></div>
+</div>
+
+<!-- pause -->
+<div id="pause" class="screen hidden dim">
+  <h2>Paused</h2>
+  <div class="menu-col">
+    <button data-act="resume" class="primary">Resume</button>
+    <button data-act="restart">Restart</button>
+    <button data-act="settings">Settings</button>
+    <button data-act="quit">Quit to menu</button>
+  </div>
+</div>
+
+<!-- end of round -->
+<div id="endscreen" class="screen hidden dim">
+  <h2 id="endTitle">Mission complete</h2>
+  <div id="endStats"></div>
+  <div class="row-btn"><button data-act="restart" class="primary">Play again</button><button data-act="next">Next map</button><button data-act="quit">Menu</button></div>
+</div>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <div id="compass"><div id="compassStrip"></div><i></i></div>
+  <div id="xhair"><i class="t"></i><i class="b"></i><i class="l"></i><i class="r"></i></div>
+  <div id="hitmark"></div>
+  <div id="dmgdir"></div>
+  <div id="killfeed"></div>
+  <div id="callouts"></div>
+  <div id="objective"></div>
+  <div id="score"><b id="scoreV"></b><div id="scorePops"></div></div>
+  <div id="matchbar"></div>
+  <div id="board" class="hidden"></div>
+  <div id="quickLoad" class="hidden"></div>
+  <div id="pickup"></div>
+  <div id="ammo"><div id="gunName"></div><div><b id="mag">30</b><span id="reserve">/ 90</span></div><div id="fireMode">AUTO</div><div id="nades"></div></div>
+  <div id="health"><div id="hpBar"><i></i></div><span id="stance">STAND</span></div>
+  <div id="center-msg"></div>
+  <div id="rangeInfo"></div>
+</div>
+<div id="engage" class="hidden"><b>Click to engage</b><span>mouse capture is off</span></div>
+<div id="vignette"></div>
+<div id="fps"></div>
+<script>try { if (parent !== window && parent.__PLAYPILE_WEB) window.__PLAYPILE_WEB = 1; } catch (e) {}
+if (window.__PLAYPILE_WEB) addEventListener("DOMContentLoaded", () => { const b = document.querySelector("[data-act=online]"); if (b) { b.disabled = true; b.style.opacity = 0.45; b.querySelector("small").textContent = "Online play: run the game locally (needs its server)"; } });</script>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

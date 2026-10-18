@@ -1,0 +1,54 @@
+[
+ {
+  "name": "Military_Female_01",
+  "g": "f",
+  "parts": [
+   "body",
+   "equipment",
+   "head",
+   "helmet"
+  ]
+ },
+ {
+  "name": "Military_Female_02",
+  "g": "f",
+  "parts": [
+   "body",
+   "equipment",
+   "head",
+   "helmet"
+  ]
+ },
+ {
+  "name": "Military_Male_01",
+  "g": "m",
+  "parts": [
+   "body",
+   "combat_knife",
+   "equipment",
+   "head",
+   "helmet"
+  ]
+ },
+ {
+  "name": "Military_Male_03",
+  "g": "m",
+  "parts": [
+   "body",
+   "equipment",
+   "head",
+   "helmet",
+   "pistol"
+  ]
+ },
+ {
+  "name": "Military_Male_04",
+  "g": "m",
+  "parts": [
+   "body",
+   "equipment",
+   "head",
+   "helmet"
+  ]
+ }
+]

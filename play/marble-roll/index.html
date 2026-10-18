@@ -118,25 +118,44 @@
              file per game in site/guides/, written from the game's own
              code. The build pastes it in here; locally it is fetched. -->
         <article class="guide" id="guide"><h2>How to play</h2>
-<p>MARBLE ROLL is a balance game with a glass cat's-eye marble. You roll it along courses of polished stone with brass trim that float high above a sea of clouds, from the start to a swirling portal at the finish.</p>
-<p>Hold the mouse button or a finger on the screen to <b>roll forward</b>, and <b>drag sideways</b> to steer. On a keyboard, <kbd>W</kbd> or <kbd>Up</kbd> rolls, <kbd>A</kbd> <kbd>D</kbd> or <kbd>Left</kbd> <kbd>Right</kbd> steer, and <kbd>S</kbd> or <kbd>Down</kbd> brakes. <kbd>R</kbd> restarts the course, <kbd>Esc</kbd> opens the menu and <kbd>M</kbd> mutes.</p>
-<p>Roll off the edge and you drop back to the last <b>checkpoint arch</b> you passed. Reach the portal to clear the course.</p>
+<p>MARBLE ROLL is a balance game with a glass cat's-eye marble. You roll it along courses of polished stone with brass trim that float high above a sea of clouds, from the start to a swirling portal at the finish. A bar at the top of the screen shows how far along the course you are.</p>
+<p>Hold the mouse button or a finger on the screen to <b>roll forward</b>, and <b>drag sideways</b> to steer. The further you drag from where you pressed, the harder the marble turns. On a keyboard, <kbd>W</kbd> or <kbd>Up</kbd> rolls, <kbd>A</kbd> <kbd>D</kbd> or <kbd>Left</kbd> <kbd>Right</kbd> steer, and <kbd>S</kbd> or <kbd>Down</kbd> brakes. <kbd>R</kbd> restarts the course, <kbd>Esc</kbd> opens the menu and <kbd>M</kbd> mutes. When a course is cleared, <kbd>Enter</kbd> or <kbd>Space</kbd> goes on to the next one.</p>
+<p>Roll off the edge and you drop back to the last <b>checkpoint arch</b> you passed. The arch glows once it is yours. Reach the portal to clear the course.</p>
 
 <h2>Tips and strategy</h2>
-<p><b>Momentum is everything.</b> A glass marble keeps rolling. Let go or brake before narrow beams and tight turns, and steer with small movements.</p>
-<p><b>Line up before you commit.</b> On a beam, get the marble straight before you speed up. Correcting halfway along is how most falls happen.</p>
-<p><b>Speed for the gaps.</b> Jump gaps need a run-up. Build speed on the straight before a gap and keep it straight as you leave the edge.</p>
-<p><b>Time the moving parts.</b> Sweepers swing across the course and pushers shove from the side. Wait for one to pass, then roll through behind it.</p>
-<p><b>Fewer falls, more stars.</b> Stars on each course depend on how many times you fall, so a slow clean run is worth more than a fast messy one.</p>
+<ul>
+<li><b>Momentum is everything.</b> A glass marble keeps rolling. Let go or brake before narrow beams and tight turns, and steer with small movements.</li>
+<li><b>Holding the mouse means rolling forward.</b> With a mouse or a finger there is no brake, so to slow down you let go. On a keyboard, <kbd>S</kbd> is a real brake.</li>
+<li><b>Line up before you commit.</b> The narrow beams are only one and a half marble-widths wide. Get the marble straight before you speed up. Correcting halfway along is how most falls happen.</li>
+<li><b>Speed for the gaps.</b> A jump gap starts with a small rise that throws you into the air, and the far side is lower than the near side. Build speed on the straight before it and keep it straight as you leave the edge. You can still nudge the marble in the air, but only gently.</li>
+<li><b>Time the moving parts.</b> Sweepers are long arms that spin around a post, and pushers are blocks that slide from side to side. Wait for one to pass, then roll through behind it.</li>
+<li><b>Find the hole in the pillar walls.</b> Each pillar wall is a row of three stone blocks with one missing. There are three rows, and the hole is in a different place in each, so look ahead before you pick a line.</li>
+<li><b>Fewer falls, more stars.</b> A run with no falls earns three stars, one or two falls earn two, and more than that earns one. A slow clean run is worth more than a fast messy one.</li>
+</ul>
 
 <h2>What's in it</h2>
-<p><b>Fifteen courses</b> in four sky themes, <b>Dawn</b>, <b>Noon</b>, <b>Sunset</b> and <b>Dusk</b>, with narrow beams, diagonal shifts, zigzags, drops, jump gaps, sweepers, pushers and pillar walls. There are checkpoint arches, gems to collect and stars for each course, and new courses unlock as you clear them. Gems buy six glass marbles, including Clear Eye, Ruby, Cobalt, Jade, Amber and Opal Night. Your progress is saved.</p>
+<p><b>Fifteen courses</b>, numbered I to XV. They cycle through four sky themes in turn, <b>Dawn</b>, <b>Noon</b>, <b>Sunset</b> and <b>Dusk</b>, from a pink morning to a starry night. Every course gets a little longer and a little narrower than the one before.</p>
+<p>New pieces of track arrive as you go. The first course has straights, side shifts, zigzags and drops. Course II adds narrow beams and sweepers, course III adds jump gaps, and course IV brings pushers and pillar walls. From course VI there are narrow beams that shift sideways and double sweepers spinning in opposite directions. Checkpoint arches come after every few sections.</p>
+<p>Gems float along the track. Gems buy new glass marbles in the menu. <b>Clear Eye</b> is yours from the start, and five more are for sale: <b>Ruby</b> (30 gems), <b>Cobalt</b> (60), <b>Jade</b> (100), <b>Amber</b> (150) and <b>Opal Night</b> (220). Each has its own tint and its own coloured vane inside the glass. Clearing a course unlocks the next one.</p>
+
+<h2>Behind the game</h2>
+<p>The marble is a real rolling ball. It runs on a fixed physics step 120 times a second, and gravity, grip and bounce all act on it the same way every time. On the stone it picks up speed quickly and slows down quickly once you let go. In the air you have only about a third of that control, which is why a jump has to be lined up before you take off. Stone barely bounces at all, but the dark obstacle stone is springy and adds an extra shove, so touching a sweeper sends you flying instead of just stopping you.</p>
+<p>Each course is built from a fixed seed, so the layout is the same every time you play it. You can learn a course and come back for three stars. The camera widens its view as you speed up.</p>
+<p>The marble is clear glass with a twisted vane inside, so you can watch it turn as it rolls. The sound is made in your browser as you play: a rolling hum that rises with your speed, and glass chimes for gems and arches.</p>
 
 <h2>Questions</h2>
-<p><b>Do I need an account?</b> No. Your courses, stars, gems and marbles are saved in your browser.</p>
-<p><b>Is it violent?</b> No. It is a marble.</p>
-<p><b>Can I play on a phone?</b> Yes. Hold a finger down to roll and drag to steer.</p>
-<p><b>Does it flash?</b> No.</p></article>
+<h3>Do I need an account?</h3>
+<p>No. Your courses, stars, gems and marbles are saved in your browser. Clearing your browser's site data clears the save.</p>
+<h3>Do I keep the gems if I fall or restart?</h3>
+<p>Gems are banked when you reach the portal. If you fall and roll on, you keep the ones you have picked up so far. If you restart the course or leave it from the menu, the gems from that run are lost.</p>
+<h3>Can I play on a phone?</h3>
+<p>Yes. Hold a finger down to roll and drag left or right to steer. It works upright or sideways.</p>
+<h3>Can I replay a course I have already cleared?</h3>
+<p>Yes. Open the menu and pick any unlocked course from the grid. Your best stars show under each number.</p>
+<h3>Is it violent?</h3>
+<p>No. It is a marble.</p>
+<h3>Does it flash?</h3>
+<p>The screen fades briefly to white when you fall and go back to a checkpoint. There is a burst of sparkles when you collect gems and when you finish a course.</p></article>
 
         <div id="ad-play-footer"></div>
 
@@ -164,12 +183,12 @@
       <div class="cols2">
         <div>
           <div class="brand">PLAY<b>PILE</b></div>
-          <p class="blurb">98 browser games, all of them written for this site. No sign-up,
+          <p class="blurb">100 browser games, all of them written for this site. No sign-up,
              no download, and your best scores stay in your own browser.</p>
         </div>
         <div class="fl"><b>Site</b>
           <a href="/">All games</a><a href="/site/about.html">About</a>
-          <a href="/site/updates.html">Updates</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/updates.html">Updates</a><a href="/devlog/">Dev log</a><a href="/articles/">Articles</a><a href="/site/contact.html">Contact</a>
           <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
         <div class="fl"><b>Legal</b>
           <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>

@@ -119,24 +119,50 @@
              code. The build pastes it in here; locally it is fetched. -->
         <article class="guide" id="guide"><h2>How to play</h2>
 <p>EGGY ROAD is a gentle-looking but tricky physics driving game, painted in watercolour. You drive a small truck over rolling hills, and there is an <b>egg sitting loose in the back</b>. It bounces and rolls with every bump. If it falls out and touches the ground, it cracks and your run ends.</p>
-<p>Press <kbd>Right</kbd>, <kbd>D</kbd> or <kbd>W</kbd> for gas, and <kbd>Left</kbd>, <kbd>A</kbd> or <kbd>S</kbd> to brake or reverse. In the air, pressing gas leans the truck back. <kbd>R</kbd> restarts, and <kbd>Space</kbd> or <kbd>Enter</kbd> retries after a crack. On a phone, hold the right half of the screen for gas and the left half to brake.</p>
-<p>Your run is measured in metres. You get a milestone every 100 m, and every 350 m you cross into a new painted region.</p>
+<p>Press <kbd>Right</kbd>, <kbd>D</kbd>, <kbd>Up</kbd> or <kbd>W</kbd> for gas, and <kbd>Left</kbd>, <kbd>A</kbd>, <kbd>Down</kbd> or <kbd>S</kbd> to brake or reverse. In the air, pressing gas leans the truck back. <kbd>R</kbd> restarts, and <kbd>Space</kbd> or <kbd>Enter</kbd> retries after a crack. On a phone, hold the right half of the screen for gas and the left half to brake; gas and brake pedals light up at the bottom to show which one you are pressing.</p>
+<p>Your run is measured in metres. You get a milestone every 100 m, and every 350 m you cross into a new painted region. A run can also end if the truck lands upside down and stays that way for a couple of seconds, or if it stops making progress for nine seconds.</p>
 
 <h2>Tips and strategy</h2>
-<p><b>Ease over the crests.</b> The egg flies out when the truck is thrown upward, which mostly happens at the top of a hill. Lift off the gas just before the crest and let the truck roll over.</p>
-<p><b>Land level.</b> If you do leave the ground, use the gas to lean back so both wheels land together. A nose-first landing bounces the egg out.</p>
-<p><b>Brake on the way down.</b> Speed builds fast on downhills, and the next bump will launch you. A touch of brake keeps things calm.</p>
-<p><b>Spend your drops.</b> Golden drops buy upgrades in the Garage, and each one has five levels. The <b>Basket wall</b> keeps the egg in, <b>Soft springs</b> soak up bumps, <b>Tyres</b> grip better on climbs, and the <b>Engine</b> gets you up steep hills. Walls and springs help most at the start.</p>
+<ul>
+<li><b>Ease over the crests.</b> The egg flies out when the truck is thrown upward, which mostly happens at the top of a hill. Lift off the gas just before the crest and let the truck roll over.</li>
+<li><b>Land level.</b> If you do leave the ground, use the gas to lean back so both wheels land together. A nose-first landing bounces the egg out.</li>
+<li><b>Brake on the way down.</b> Speed builds fast on downhills, and the next bump will launch you. A touch of brake keeps things calm.</li>
+<li><b>Watch the egg, not the road.</b> The egg bounces a little on every hard bump. When it starts to rock, slow down until it settles.</li>
+<li><b>Learn the road.</b> The hills are the same every run, so the bump that caught you last time will be in the same place next time.</li>
+<li><b>The road gets rougher.</b> The hills grow steadily bumpier over the first 800 m or so, with more small ripples on top of the big rolls. A pace that is fine in Meadow Lane will throw the egg out later.</li>
+<li><b>Spend your drops early.</b> Walls and springs make the biggest difference at the start. The first level of any upgrade costs only 20 drops.</li>
+</ul>
 
 <h2>What's in it</h2>
-<p>An endless road through five painted regions that repeat as you go further: <b>Meadow Lane</b>, <b>Ochre Fields</b>, <b>Plum Dusk</b>, <b>Frost Hollow</b> and <b>Rose Dunes</b>. Golden drops to collect, 100 m milestones, four upgrades with five levels each, and your best distance saved.</p>
-<p>Every surface is painted by the game as a watercolour wash, with pigment pooling at the edges, paper grain and hills that bleed into the paper.</p>
+<p>An endless road through five painted regions that repeat as you go further: <b>Meadow Lane</b>, <b>Ochre Fields</b>, <b>Plum Dusk</b>, <b>Frost Hollow</b> and <b>Rose Dunes</b>. Each has its own grass, soil, sky and tree colours, and the colours blend from one region into the next.</p>
+<p>Golden drops float above the road every few metres. Either the truck or the egg can pick them up. Your drops are added to your total as soon as you collect them, so they are never lost when the egg cracks.</p>
+<p>The <b>Garage</b> has four upgrades, each with five levels, costing 20, 50, 110, 220 and 400 drops:</p>
+<ul>
+<li><b>Engine</b>: more pull up steep hills and a higher top speed.</li>
+<li><b>Soft springs</b>: a smoother ride and less egg bounce.</li>
+<li><b>Basket wall</b>: a taller lip behind the egg.</li>
+<li><b>Tyres</b>: more grip and less wheelspin.</li>
+</ul>
+<p>The end card shows how far you went, whether it is a new best and how many drops you picked up, and tells you when you can afford an upgrade.</p>
+
+<h2>Behind the game</h2>
+<p>The truck and the egg are both real physics objects. The truck has two sprung wheels that push against the ground, grip it and spin under the engine. The egg is a separate round body that sits in the truck bed and bumps against its floor, its back wall and the cab. Nothing holds it in place. When the truck jolts, the egg is thrown by the same forces you feel, which is why smooth driving matters more than speed.</p>
+<p>The physics runs in ten small steps for every frame, so even a hard landing is handled carefully and the egg never slips through the bed. A hard knock makes the egg bounce a little; a soft one just nudges it. The springs upgrade softens the wheels so less of each bump reaches the bed, and the basket wall raises the lip so the egg has further to fly before it can escape.</p>
+<p>Every surface is painted by the game as a watercolour wash, with pigment pooling at the edges, paper grain and hills that bleed into the paper. A final pass over the whole screen adds paper fibres and a slight wobble, like paint on real paper.</p>
 
 <h2>Questions</h2>
-<p><b>Do I need an account?</b> No. Your best distance, drops and upgrades are saved in your browser.</p>
-<p><b>Is it violent?</b> No. The only casualty is the egg.</p>
-<p><b>Does it flash?</b> There is one short bright flash and a moment of slow motion when the egg cracks.</p>
-<p><b>Why did my egg crack on a flat road?</b> It probably bounced out on the last bump and rolled. Watch it in the bed and slow down when it starts to move.</p></article>
+<h3>Do I need an account?</h3>
+<p>No. Your best distance, drops and upgrades are saved in your browser.</p>
+<h3>Can I play on a phone?</h3>
+<p>Yes. Hold the right side of the screen for gas and the left side to brake.</p>
+<h3>Why did my egg crack on a flat road?</h3>
+<p>It probably bounced out on the last bump and rolled. Watch it in the bed and slow down when it starts to move.</p>
+<h3>Why did my run end when the egg was fine?</h3>
+<p>The truck flipped onto its roof, or it stalled on a hill for too long. More engine and better tyres help on the steep climbs.</p>
+<h3>Is it violent?</h3>
+<p>No. The only casualty is the egg.</p>
+<h3>Does it flash?</h3>
+<p>There is one short bright flash and a moment of slow motion when the egg cracks.</p></article>
 
         <div id="ad-play-footer"></div>
 
@@ -164,12 +190,12 @@
       <div class="cols2">
         <div>
           <div class="brand">PLAY<b>PILE</b></div>
-          <p class="blurb">98 browser games, all of them written for this site. No sign-up,
+          <p class="blurb">100 browser games, all of them written for this site. No sign-up,
              no download, and your best scores stay in your own browser.</p>
         </div>
         <div class="fl"><b>Site</b>
           <a href="/">All games</a><a href="/site/about.html">About</a>
-          <a href="/site/updates.html">Updates</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/updates.html">Updates</a><a href="/devlog/">Dev log</a><a href="/articles/">Articles</a><a href="/site/contact.html">Contact</a>
           <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
         <div class="fl"><b>Legal</b>
           <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>

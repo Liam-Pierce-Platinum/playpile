@@ -118,25 +118,43 @@
              file per game in site/guides/, written from the game's own
              code. The build pastes it in here; locally it is fetched. -->
         <article class="guide" id="guide"><h2>How to play</h2>
-<p>MOTO STUNT is a side-view stunt motorbike game drawn like a comic book, with halftone dots, ink outlines and bright sunburst skies. Ride from the start to the finish of each level as fast as you can.</p>
-<p><kbd>Up</kbd> or <kbd>W</kbd> is the gas, and <kbd>Down</kbd> or <kbd>S</kbd> brakes and reverses. <kbd>Left</kbd> or <kbd>A</kbd> leans back, and in the air that turns into a <b>backflip</b>. <kbd>Right</kbd> or <kbd>D</kbd> leans forward for a <b>frontflip</b>. <kbd>R</kbd> restarts the level and <kbd>P</kbd> or <kbd>Esc</kbd> pauses. On a phone there are on-screen lean buttons plus GO and brake.</p>
-<p>If the rider's head hits the ground, or you hit a barrel, a swinging hammer or a spike pit, you crash and go back to the last checkpoint flag.</p>
+<p>MOTO STUNT is a side-view stunt motorbike game drawn like a comic book, with halftone dots, ink outlines and bright sunburst skies. Ride from the start to the chequered gate at the finish of each level as fast as you can.</p>
+<p><kbd>Up</kbd> or <kbd>W</kbd> is the gas, and <kbd>Down</kbd> or <kbd>S</kbd> brakes and then reverses. <kbd>Left</kbd> or <kbd>A</kbd> leans back, and in the air that turns into a <b>backflip</b>. <kbd>Right</kbd> or <kbd>D</kbd> leans forward for a <b>frontflip</b>. <kbd>R</kbd> restarts the level and <kbd>P</kbd> or <kbd>Esc</kbd> pauses. When a level is done, <kbd>Enter</kbd> or <kbd>Space</kbd> goes to the next one and <kbd>L</kbd> opens the level list.</p>
+<p>If the rider's head or body hits the ground, or you hit a barrel, a swinging hammer or the spikes at the bottom of a pit, you crash and go back to the last checkpoint flag. The clock keeps your time, so a crash costs you the ground you lost.</p>
 
 <h2>Tips and strategy</h2>
-<p><b>Flips are time.</b> Every full flip you land takes <b>one second</b> off your time. Three stars on a level usually needs flips, not just clean riding.</p>
-<p><b>Land on your wheels.</b> A flip only counts if you survive it. Start leaning early on a big jump so you have time to come back round, then let go of the lean and level the bike before you touch down.</p>
-<p><b>Use the lean on the ground too.</b> Leaning back lifts the front wheel and leaning forward keeps it down on steep slopes. Small corrections stop you looping over on hills.</p>
-<p><b>Time the hammers.</b> Swinging hammers move on a rhythm. Slow down, watch one swing, then go through behind it.</p>
-<p><b>Do not panic at a crash.</b> You restart at the last flag you passed, not at the start, so a crash late in a level only costs a little.</p>
+<ul>
+<li><b>Flips are time.</b> Every full flip you land takes <b>one second</b> off your final time, and a double flip takes off two. Three stars on a level usually needs flips, not just clean riding.</li>
+<li><b>Know the par.</b> Each level has a par time based on its length, shown on the results card. Finish at or under par for three stars, within about a third more for two, and slower for one.</li>
+<li><b>Land on your wheels.</b> A flip only counts once you land it and ride on. Start leaning early on a big jump so you have time to come back round, then let go of the lean and level the bike before you touch down. A flip does not need to be perfect: about seven-eighths of a turn is enough.</li>
+<li><b>The back wheel drives.</b> The gas only pushes when the rear wheel is on the ground. If you wheelie too far or land nose first, you lose drive until the back wheel comes down.</li>
+<li><b>Use the lean on the ground too.</b> Leaning back lifts the front wheel and leaning forward keeps it down on steep slopes. Small corrections stop you looping over on hills.</li>
+<li><b>Barrels explode.</b> A red barrel sits just after a small kicker ramp. Hit it and it goes off with a big KA-BOOM. Hop it with speed from the kicker, or clear it in the air.</li>
+<li><b>Time the hammers.</b> Swinging hammers move on a rhythm. Slow down, watch one swing, then go through behind it.</li>
+</ul>
 
 <h2>What's in it</h2>
-<p><b>Twelve levels</b> with jumps, hills, barrels, swinging hammers and spike pits, in comic settings such as Mesa Noon, Sunset Junk and Night Pop. There are checkpoint flags, flip counting, stars for your time and unlocks as you progress, all saved on your device.</p>
+<p><b>Twelve levels</b>, each with a name: Warm Up, Hop Scotch, Barrel Run, Big Air, Hammer Time, Rolling Hills, The Pit, Crusher Alley, Sky Ramp, Double Trouble, Kaboom Canyon and Grand Finale. They come in three comic settings of four levels each: the red rock of <b>Mesa Noon</b>, the purple scrapyard of <b>Sunset Junk</b> and the neon blues of <b>Night Pop</b>.</p>
+<p>The track is built from hills, bump runs, long climbs, steep drops and jumps over spike pits. New dangers arrive as you go. Barrels appear from level 2, big jumps from level 4, swinging hammers from level 5, and from level 7 there are pit jumps that land you straight onto a barrel kicker.</p>
+<p>There are checkpoint flags that turn green as you pass them, flip counting, stars for your time, and a best time for every level. Finishing a level unlocks the next. The level list shows your stars for each level and your total out of 36.</p>
+
+<h2>Behind the game</h2>
+<p>The bike is a small physics model: a frame with two wheels that each touch the ground on their own. When a wheel hits a slope, the push goes through the frame, so a hard landing on one wheel can tip the whole bike over. Leaning spins the bike, and the spin fades quickly on the ground but keeps going in the air. That is why you can flip in the air but the bike stays fairly steady on the ground. The game measures how far you rotate during each jump. If you have turned most of the way round when the wheels touch down, it counts the flip.</p>
+<p>When a flip lands, the game slows down for a moment with a flash and a pop-up, so you can see what you did. Crashes are cartoon ones: the rider comes off and tumbles, a comic word such as BONK! or WHAM! appears, and after about a second and a half you are back at the flag. Every level is built from a fixed seed, so it always has the same jumps in the same places, and learning them is how you plan your flips.</p>
 
 <h2>Questions</h2>
-<p><b>Do I need an account?</b> No. Your stars and unlocks are saved in your browser.</p>
-<p><b>Is it violent?</b> No. Crashes are comic-book "booms" and the rider just respawns at the flag.</p>
-<p><b>Does it flash?</b> There is a bright comic "boom" flash and screen shake on each crash.</p>
-<p><b>Why did my flip not count?</b> You have to land it. If you crash on landing, the flip is lost.</p></article>
+<h3>Do I need an account?</h3>
+<p>No. Your stars, best times and unlocked levels are saved in your browser.</p>
+<h3>Can I play on a phone?</h3>
+<p>Yes. On a touch screen, two lean buttons appear at the bottom left (back and forward) and a brake button and a large GO button at the bottom right. It plays best with the phone sideways.</p>
+<h3>Why did my flip not count?</h3>
+<p>You have to land it. If you crash on landing, the flip is lost. Very short hops do not count either, because the bike has to be in the air for a moment.</p>
+<h3>Can I replay an old level to get three stars?</h3>
+<p>Yes. Open the level list and pick any level you have unlocked. Only your best stars and best time are kept.</p>
+<h3>Is it violent?</h3>
+<p>No. Crashes are comic-book "booms" and the rider just respawns at the flag.</p>
+<h3>Does it flash?</h3>
+<p>There is a bright comic flash and screen shake when a barrel explodes, and a smaller flash when you land a flip.</p></article>
 
         <div id="ad-play-footer"></div>
 
@@ -164,12 +182,12 @@
       <div class="cols2">
         <div>
           <div class="brand">PLAY<b>PILE</b></div>
-          <p class="blurb">98 browser games, all of them written for this site. No sign-up,
+          <p class="blurb">100 browser games, all of them written for this site. No sign-up,
              no download, and your best scores stay in your own browser.</p>
         </div>
         <div class="fl"><b>Site</b>
           <a href="/">All games</a><a href="/site/about.html">About</a>
-          <a href="/site/updates.html">Updates</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/updates.html">Updates</a><a href="/devlog/">Dev log</a><a href="/articles/">Articles</a><a href="/site/contact.html">Contact</a>
           <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
         <div class="fl"><b>Legal</b>
           <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>

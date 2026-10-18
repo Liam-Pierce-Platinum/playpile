@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>APEX: rain, reflections and thirty-three circuits in a browser - PLAYPILE</title>
+<meta name="description" content="How our F1 game draws a wet track, why its circuits are surveyed instead of described, and the bugs that threw no errors.">
+<link rel="canonical" href="https://playpile.net/devlog/apex-rain-reflections-and-33-circuits/">
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#050a14">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"APEX: rain, reflections and thirty-three circuits in a browser","description":"How our F1 game draws a wet track, why its circuits are surveyed instead of described, and the bugs that threw no errors.","datePublished":"2026-09-23","author":{"@type":"Person","name":"Liam"},"publisher":{"@type":"Organization","name":"PLAYPILE"},"mainEntityOfPage":"https://playpile.net/devlog/apex-rain-reflections-and-33-circuits/"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <div class="prose">
+      <p class="crumbs"><a href="/">Games</a> &rsaquo; <a href="/devlog/">Dev log</a></p>
+      <article>
+      <section class="hero"><h1>APEX: rain, reflections and thirty-three circuits in a browser</h1>
+        <p id="lede"><time datetime="2026-09-23">23 September 2026</time> &middot; 6 min read</p></section>
+<p><a href="/play/apex/">APEX</a> is the biggest racing game on PLAYPILE: a low-poly Formula 1 game with thirty-three circuits, tyres that wear, pit stops, damage and weather. The full version reached the site on 22 September, and a handling fix followed on the 23rd. This post covers three parts of it that took the most work: the circuits, the rain, and keeping the car from spinning.</p>
+
+<h2>Circuits: describing them did not work</h2>
+<p>Our first approach to the tracks was the one that sounds sensible. Every real circuit has a published corner sequence: a straight of this length, a right-hander of that radius, and so on. We wrote each circuit as a list of straights and arcs and solved the list until the lap closed.</p>
+<p>The laps did close. But Spa and Monaco each ran through themselves twice, and Suzuka crossed itself twice where the real circuit crosses once, on a bridge. Before solving, hand-written laps missed closing by one to four kilometres, and Spa ran anticlockwise because La Source had been written down as a left.</p>
+<p>So the circuits are now surveyed rather than described. The centre lines come from the open <a href="https://github.com/bacinger/f1-circuits">f1-circuits</a> map data, projected into metres. A survey is a few hundred points, five metres apart in a hairpin and two hundred apart on a straight. We run it through a smooth curve, resample it, smooth it again and scale it to the circuit's published length. Smoothing mattered: the raw curve measured Monza's tightest corner at 10.7 metres, tighter than the Monaco hairpin.</p>
+<p>What a survey does not know is still written by hand: the track width, the start line, the corner names and the grandstands. Corner names appear only where we know them. Many modern circuits only have turn numbers, and some carry just the ones we could place with confidence.</p>
+<h3>Check a lap by its corners, not its shape</h3>
+<p>A lap drawn backwards looks exactly like the right one from above. Two files in the data ran against the race direction. Marina Bay's first sector read right, right, right, when it should be left, right, left hairpin. At Paul Ricard the road turned left twice after Signes, where the Beausset is a double right. Both are reversed in code. Every circuit was checked the same way: the direction of the first corner, the hairpins where they belong, the longest straight leading to the right corner.</p>
+<h3>One bridge</h3>
+<p>Suzuka is the only circuit where the road crosses itself. The build finds the crossing and raises one road 7.5 metres on 180-metre ramps, a 4 per cent grade, with a deck, girders and piers placed clear of the road beneath. Our first version of "which part of the road is the car on" used distance alone, and a car passing under the bridge was closer to the bridge's centre line than its own. It got placed up on the bridge, 2.4 kilometres round the lap, inside the walls. Height is now checked first, then continuity with the previous frame.</p>
+
+<h2>Rain is two numbers</h2>
+<p>The weather can be dry, changeable, light rain or heavy rain. Underneath, the game tracks two separate values. One is how hard it is raining. The other is how much water is on the road, and that one lags behind the rain in both directions. A shower does not soak the track instantly, and the track does not dry the moment the rain stops. The tyres only feel the water on the road.</p>
+<p>That shows up in the tyre choice. Slicks start losing grip to aquaplaning once the water passes 0.35 on a 0-to-1 scale. Each of the five compounds has its own grip curve: soft 1.035, medium 1.0, hard 0.97, intermediate 0.90 and full wet 0.82. In the dry the wet tyre is far slower. In standing water the slicks are the ones in trouble. A medium lasts about six laps of Monza.</p>
+<h3>Reflections that are actually reflections</h3>
+<p>The wet road reflects the world, and it is a real mirror rather than a painted shine. A second camera, mirrored under the road surface, renders the scene at half resolution. Only the road materials look at that image. In puddles they read it sharply, at a roughness of 0.04, and the reflection wobbles with rain ripples. On merely wet tarmac they read a blurred version, at a roughness of 0.32, which gives a sheen rather than a mirror.</p>
+<p>Puddles come from two scales of noise, with a water level that rises through them as the road gets wetter, so small puddles appear first and join up. Spray appears once there is real water down and a car passes 12 metres a second, thrown up from the rear wheels out of a pool of 1,400 particles.</p>
+<p>A mirror doubles the cost of drawing the scene, so it is kept cheap. On a dry road it is switched off completely. Around twenty thousand grass tufts are drawn in big batches, and any batch of more than 1,500 copies is hidden from the reflection, because nobody can see grass in a puddle at 300 km/h. Shadows are not recalculated during the reflection pass either.</p>
+
+<h2>The car that kept going round</h2>
+<p>A racing game lives or dies on how the car feels at the limit. Our test bench passed throughout, and the car still spun. The bench only measured slip flat out in fourth gear, and the spins happened elsewhere. A probe that tried other situations found two: 169 degrees of slide when putting the power down out of a slow corner, and 92 degrees when lifting off mid-corner.</p>
+<p>The first round of fixes softened the shape of the tyre's grip curve, and added traction control, a taper on engine braking and stability control. The worst case fell to 8 degrees. That was not the end of it, so the car now also has a hard limit. A racing car at the limit runs six to ten degrees of slip. APEX now lets the car get up to 22 degrees sideways, which leaves room to feel it move and to catch a slide, and takes away the part where it keeps going round. Above 8 metres a second, if the car passes that angle it is pulled back to it, and the rotation that was taking it there is cut to 35 per cent. Without that last part the car sat against the limit, buzzing.</p>
+<p>The computer drivers had their own version of the problem. A robot that floored it at 5 km/h on full lock still spun, so below 12 metres a second their throttle is capped at 0.6 whenever they are steering hard.</p>
+
+<h2>Bugs that threw no errors</h2>
+<p>Some of APEX's worst bugs produced no error message at all, only a wrong picture. For a while the whole racing surface was culled from view, and the car drove on grass with the tarmac invisible beneath it. The car was buried to its axles. The steering wheel turned the wrong way. Tyre wear was taken once per physics step instead of being scaled by time, so tyres went bald in under a lap and every computer car crashed on every circuit. A lap-by-lap test caught that one. The bench, which only ran short tests, did not.</p>
+<p>That is the lesson we keep relearning with APEX: a test only answers the question it asks. The bench said the car was fine because it asked about fourth gear. The useful tests were the ones that drove a whole lap, or a whole race, and counted what went wrong.</p>
+      </article>
+      <h2>More from the dev log</h2>
+      <ul><li><a href="/devlog/one-script-for-every-phone/" style="color:var(--accent)">One script that makes every game work on a phone</a></li><li><a href="/devlog/designing-tension/" style="color:var(--accent)">Designing tension in three games: a crowd, a chase and a muzzle flash</a></li><li><a href="/devlog/how-we-check-every-game/" style="color:var(--accent)">How we check every game without playing each one by hand</a></li><li><a href="/devlog/southpaw-ten-boxers-ten-weaknesses/" style="color:var(--accent)">SOUTHPAW: ten boxers, and why mashing loses</a></li></ul>
+
+    </div>
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">100 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/devlog/">Dev log</a><a href="/articles/">Articles</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<script type="module">
+import { GAMES, mountShell, row } from '/site/shell.js';
+import { loadAds } from '/ads/ads.js';
+mountShell({ active: 'about' });
+document.getElementById('picks').innerHTML =
+  row('Start with one of these', GAMES.filter((g) => g.big).slice(0, 6), { seeAll: '/' });
+// no ad slots on this page, but it does load the ad script, so it owes
+// the visitor the same cookie notice as everywhere else
+loadAds();
+</script>
+</body>
+</html>

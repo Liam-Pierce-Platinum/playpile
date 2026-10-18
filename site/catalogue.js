@@ -12,6 +12,29 @@
 //                     port. The page frames http://localhost:<port>.
 //         'unity'   - a Unity WebGL build under games/<slug>/build.
 export const GAMES = [
+  // ---- 2026-10-18 (later): BLADEBORN + IRONSIGHT ----
+  {
+    slug: "bladeborn", title: "BLADEBORN", how: 'mounted', port: 8435, url: "/",
+    content: "Blocky cube men, but very violent: claw slashes, severed limbs, heavy red blood and finishing moves. Enemies use guns, batons and blades. No accounts, no chat, no purchases.",
+    web: "bladeborn/",
+    tag: "Cube-man claw brawler", big: true, added: '2026-10-18',
+    cat: "Action", tags: ["new","action","fighting","climbing","stealth","3d","desktop"],
+    blurb: "A cube man with three claws on each hand. Slash where you aim, climb any wall with your claws, slam down from above and finish enemies with brutal takedowns. Desktop only: needs a mouse and keyboard.",
+    about: `A third-person brawler where everyone is built from cubes. Click both mouse buttons to pop the claws, then every click is a strike that lands where the crosshair is: the head or neck kills, arms drop a guard, legs make them limp. Any concrete wall can be climbed by driving the claws in, one hand at a time, and from up high you can drop on an enemy with a slam or a takedown. PLAY is the yard with endless waves; STAGES has four levels with plain objectives: a lab and walled compound, a night forest, downtown Toronto and a tower with a two-sword boss on the helipad. Desktop only: it needs a mouse and keyboard.`,
+    controls: [["WASD","move"],["Mouse","look"],["LMB + RMB","claws out (hold both to sheathe)"],["LMB / RMB","left / right claw strike"],["Middle mouse","block, time it to parry"],["Double-click LMB","finisher when the bar is full"],["Space","jump, wall-jump"],["Shift","sprint"],["C","crouch"],["E","takedown"],["Esc","pause"]],
+    tips: "Aim for the head or neck: it kills in one strike. On a wall, middle-click kills the enemy below without a fight. Parry with a well-timed middle click to knock an attacker down.",
+  },
+  {
+    slug: "ironsight", title: "IRONSIGHT", how: 'mounted', port: 8430, url: "/",
+    content: "A realistic military shooter against computer-controlled soldiers. Guns, grenades and headshots; no gore beyond a small hit effect. No accounts, no chat and no purchases. Online play only works when the game is run on your own computer.",
+    web: "ironsight/",
+    tag: "Realistic tactical FPS", big: true, added: '2026-10-18',
+    cat: "Shooter", tags: ["new","shooter","fps","realistic","gunsmith","3d","desktop"],
+    blurb: "A realistic first-person shooter. Build your gun in the gunsmith, then fight nine bots in free-for-all or a 5v5 team match across four maps. Headshots kill instantly. Desktop only: needs a mouse and keyboard. Big download.",
+    about: `A tactical first-person shooter with realistic gloved hands, real-looking guns and four maps: a rainy city, an office tower, the docks and a desert compound. Every match has ten fighters: free-for-all against nine bots, or team deathmatch five against five. Bots fight each other too, hunt, and throw frag, flash and smoke grenades. A headshot is an instant kill. In the gunsmith you choose optics from iron sights to an 8x scope, muzzles, grips, laser colour and camo. The firing range is for trying builds. The online lobby needs the game running on your own computer, so it is switched off here. Desktop only, and the first load is large (around 100 MB per map).`,
+    controls: [["WASD","move"],["Mouse","aim"],["Click","shoot"],["Right mouse","aim down sights"],["Shift","sprint"],["C","crouch / slide"],["Z","prone"],["Space","jump / mantle"],["Q / E","lean"],["R","reload"],["1-2","weapons"],["F / X","lethal / tactical grenade"],["Tab","leaderboard"],["L","loadout"],["Esc","pause"]],
+    tips: "Aim for the head: one shot kills. Lean round corners instead of stepping out, and use smoke to cross open ground.",
+  },
   // ---- 2026-10-18: BLADE DASH: CASTLE + 25 3D games from the session hub ----
   {
     slug: "blade-dash-story", title: "BLADE DASH: CASTLE", how: 'mounted', port: 8402, url: "/",

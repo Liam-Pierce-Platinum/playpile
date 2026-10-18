@@ -119,23 +119,49 @@
              code. The build pastes it in here; locally it is fetched. -->
         <article class="guide" id="guide"><h2>How to play</h2>
 <p>CRAZY CATTLE is a battle royale for knitted sheep. Everything is made of felt and wool: the sheep have button eyes, and the arena is a patchwork quilt floating in the sky, held together with running stitches. Each round there are between 6 and 15 sheep on the quilt, and only one can win.</p>
-<p>Move with <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or the arrow keys. Press <kbd>Space</kbd> (or <kbd>Shift</kbd> or <kbd>J</kbd>) to <b>RAM</b>: a quick dash that knocks back any sheep you hit. On a phone, use the left thumb stick and the RAM button. After a round, <kbd>Enter</kbd> goes to the next one.</p>
-<p>Fall off the quilt and you are out. While you fight, the quilt <b>unravels patch by patch from the outside in</b>, so the space keeps getting smaller. The last sheep standing clears the field.</p>
+<p>Move with <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or the arrow keys. Press <kbd>Space</kbd> (or <kbd>Shift</kbd> or <kbd>J</kbd>) to <b>RAM</b>: a quick dash in the direction you are facing that knocks back any sheep you hit. A bar on screen fills up again as the ram recharges. On a phone, use the left thumb stick and the RAM button. After a round, <kbd>Enter</kbd> goes to the next one.</p>
+<p>Fall off the quilt and you are out. While you fight, the quilt <b>unravels patch by patch from the outside in</b>, so the space keeps getting smaller. A patch shakes for a moment before it drops, which is your warning to step off it. The last sheep standing clears the field.</p>
 
 <h2>Tips and strategy</h2>
-<p><b>Hold the middle.</b> The edge patches go first. Sheep near the edge are in danger from both the unravelling and from rams, so stay central and let the others fight out there.</p>
-<p><b>Flustered sheep fly further.</b> The knockback from a ram grows each time a sheep is hit again. A sheep that has just been rammed a couple of times is easy to finish off.</p>
-<p><b>Do not ram towards the edge.</b> If you miss, your own dash can carry you off. Ram from the inside out, so a miss leaves you safe.</p>
-<p><b>Watch for two at once.</b> When two sheep line up behind you, move away. Getting bounced between them is the fastest way off the quilt.</p>
+<ul>
+<li><b>Hold the middle.</b> The outer patches always go first. Sheep near the edge are in danger from both the unravelling and from rams, so stay central and let the others fight out there.</li>
+<li><b>Flustered sheep fly further.</b> A ram knocks a sheep back well over twice as hard as a normal bump, and every ram it takes makes the next one hit harder still. The fluster wears off only slowly, so a sheep that has just been rammed a couple of times is easy to finish off.</li>
+<li><b>Ramming is safe for the rammer.</b> When you ram a sheep that is not ramming, you only feel a quarter of the push. Two sheep ramming head-on both bounce back, so dodge a ram that is coming straight at you rather than meeting it.</li>
+<li><b>Do not ram towards the edge.</b> A ram is a burst of speed, and if you miss, it can carry you off. Ram from the inside out, so a miss leaves you safe.</li>
+<li><b>Time your rams.</b> A ram lasts about a quarter of a second and needs a little over a second to recharge. Do not waste it on a sheep that is out of reach.</li>
+<li><b>Watch for two at once.</b> When two sheep line up behind you, move away. Getting bounced between them is the fastest way off the quilt.</li>
+</ul>
 
 <h2>What's in it</h2>
-<p>Rounds of 6 to 15 sheep on a shrinking quilt. Each sheep you ram off earns <b>+10 yarn</b>, and yarn buys new wool coats: Cream, Coal, Rose, Mint, Sky, Mustard, Plum and Rainbow. Later levels bring bigger flocks, more aggressive sheep and a different-sized quilt. There are baas, bonks and ripping-wool sounds, and tufts of wool fly when sheep collide.</p>
+<p>Rounds of 6 to 15 sheep on a shrinking quilt. You start against five other sheep, and every round you win adds one more, up to fourteen rivals. The quilt itself gets bigger as you climb, the rival sheep pick fights more often, and the quilt starts to unravel sooner and faster. A round lasts up to two minutes; if it runs out with several sheep still standing, the round ends there and does not count as a win.</p>
+<p>You earn <b>yarn</b> every round:</p>
+<ul>
+<li><b>+10 yarn</b> for each sheep that falls off within a few seconds of your ram.</li>
+<li><b>+3 yarn</b> for each sheep you outlast.</li>
+<li>A win pays a bonus of 25 yarn plus 5 for every level.</li>
+</ul>
+<p>Yarn buys new wool coats: Cream (free), Rose (30), Mint (60), Sky (100), Mustard (150), Plum (220), Coal (320) and Rainbow (500). There are baas, bonks and ripping-wool sounds, and tufts of wool fly when sheep collide.</p>
+
+<h2>Behind the game</h2>
+<p>Every collision is worked out from how fast the two sheep are moving towards each other. A plain bump pushes both apart evenly. A ram changes the sums: the rammer has the right of way and hardly moves, while the target takes the push multiplied by its fluster. That is why a third or fourth ram on the same sheep sends it sailing, and why a careless sheep in the middle can still be sent off the side.</p>
+<p>The rival sheep look around every second or so, pick the nearest sheep as a target (with a slight preference for you), and ram when they are close and facing it. Each one also feels for the edge in eight directions and pulls back towards solid quilt when it gets close, so they do not walk off on their own. Their urge to fight grows with every level, which is why later fields feel like a brawl from the first second.</p>
+<p>The quilt drops about an eighth of its remaining outer patches at a time, but always keeps at least four in the middle. As the field shrinks the sheep are crowded together, and the fight comes to a head.</p>
 
 <h2>Questions</h2>
-<p><b>Do I need an account?</b> No. Your level, yarn and coats are saved in your browser.</p>
-<p><b>Is it violent?</b> No. Knocked-off sheep fall away in a puff of wool.</p>
-<p><b>Is there online multiplayer?</b> Not yet. The other sheep are computer players.</p>
-<p><b>Does it flash?</b> No.</p></article>
+<h3>Do I need an account?</h3>
+<p>No. Your level, yarn, wins and coats are saved in your browser.</p>
+<h3>How do I change my coat?</h3>
+<p>The coat swatches are on the panel between rounds. Click a swatch you own to wear it, or one showing a price to buy it with yarn.</p>
+<h3>What happens if I lose a round?</h3>
+<p>You keep the yarn you earned, and you play the same level again.</p>
+<h3>Can I play on a phone?</h3>
+<p>Yes. There is a thumb stick for moving and a RAM button.</p>
+<h3>Is there online multiplayer?</h3>
+<p>No. The other sheep are computer players.</p>
+<h3>Is it violent?</h3>
+<p>No. Knocked-off sheep fall away in a puff of wool.</p>
+<h3>Does it flash?</h3>
+<p>No. There is a little screen shake when you ram or fall.</p></article>
 
         <div id="ad-play-footer"></div>
 
@@ -148,7 +174,7 @@
         <div id="ad-play-rail"></div>
         <div class="panel">
           <h4>More games</h4>
-          <div id="more"><a class="mini" href="/play/blade-dash-story/"><span class="th" style="background-image:url('/shots/blade-dash-story.png')"></span><span><b>BLADE DASH: CASTLE</b><small>Action</small></span></a><a class="mini" href="/play/getaway-flop/"><span class="th" style="background-image:url('/shots/getaway-flop.png')"></span><span><b>GETAWAY FLOP</b><small>Action</small></span></a><a class="mini" href="/play/mirror-duel/"><span class="th" style="background-image:url('/shots/mirror-duel.png')"></span><span><b>MIRROR DUEL</b><small>Action</small></span></a><a class="mini" href="/play/sumo-slam/"><span class="th" style="background-image:url('/shots/sumo-slam.png')"></span><span><b>SUMO SLAM</b><small>Action</small></span></a><a class="mini" href="/play/lanternfall/"><span class="th" style="background-image:url('/shots/lanternfall.png')"></span><span><b>LANTERNFALL</b><small>Action</small></span></a></div>
+          <div id="more"><a class="mini" href="/play/bladeborn/"><span class="th" style="background-image:url('/shots/bladeborn.png')"></span><span><b>BLADEBORN</b><small>Action</small></span></a><a class="mini" href="/play/blade-dash-story/"><span class="th" style="background-image:url('/shots/blade-dash-story.png')"></span><span><b>BLADE DASH: CASTLE</b><small>Action</small></span></a><a class="mini" href="/play/getaway-flop/"><span class="th" style="background-image:url('/shots/getaway-flop.png')"></span><span><b>GETAWAY FLOP</b><small>Action</small></span></a><a class="mini" href="/play/mirror-duel/"><span class="th" style="background-image:url('/shots/mirror-duel.png')"></span><span><b>MIRROR DUEL</b><small>Action</small></span></a><a class="mini" href="/play/sumo-slam/"><span class="th" style="background-image:url('/shots/sumo-slam.png')"></span><span><b>SUMO SLAM</b><small>Action</small></span></a></div>
         </div>
         <div id="ad-play-tall"></div>
       </aside>
@@ -163,12 +189,12 @@
       <div class="cols2">
         <div>
           <div class="brand">PLAY<b>PILE</b></div>
-          <p class="blurb">98 browser games, all of them written for this site. No sign-up,
+          <p class="blurb">100 browser games, all of them written for this site. No sign-up,
              no download, and your best scores stay in your own browser.</p>
         </div>
         <div class="fl"><b>Site</b>
           <a href="/">All games</a><a href="/site/about.html">About</a>
-          <a href="/site/updates.html">Updates</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/updates.html">Updates</a><a href="/devlog/">Dev log</a><a href="/articles/">Articles</a><a href="/site/contact.html">Contact</a>
           <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
         <div class="fl"><b>Legal</b>
           <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>

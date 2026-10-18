@@ -212,7 +212,7 @@ function handleEvents() {
     else if (e === 'bonk') { sfx.bonk(); shake = 0.5; }
     else if (e === 'flip') { sfx.flip(); toast(S.flips > 1 ? 'FLIP x' + S.flips : 'FLIP!', 0.6); }
     else if (e === 'land') sfx.land();
-    else if (e === 'dead') { sfx.dead(); mode = 'dead'; deadT = 0; shake = 0.4; burst(S.p.x, KILL_Y + 1, 30, 7); toast('SPLASH!', 0.8); }
+    else if (e === 'dead') { sfx.dead(); mode = 'dead'; deadT = 0; shake = 0.4; if (!S.stuck) burst(S.p.x, KILL_Y + 1, 30, 7); toast(S.stuck ? 'STUCK! AGAIN' : 'SPLASH!', 0.8); }
     else if (e === 'win') onWin();
   }
   S.ev.length = 0;

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Designing tension in three games: a crowd, a chase and a muzzle flash - PLAYPILE</title>
+<meta name="description" content="How THE MARK, PURSUED and EXPOSURE each build pressure, from clue solvers to a hunter that cuts you off, in real numbers from the code.">
+<link rel="canonical" href="https://playpile.net/devlog/designing-tension/">
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#050a14">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Designing tension in three games: a crowd, a chase and a muzzle flash","description":"How THE MARK, PURSUED and EXPOSURE each build pressure, from clue solvers to a hunter that cuts you off, in real numbers from the code.","datePublished":"2026-10-13","author":{"@type":"Person","name":"Liam"},"publisher":{"@type":"Organization","name":"PLAYPILE"},"mainEntityOfPage":"https://playpile.net/devlog/designing-tension/"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <div class="prose">
+      <p class="crumbs"><a href="/">Games</a> &rsaquo; <a href="/devlog/">Dev log</a></p>
+      <article>
+      <section class="hero"><h1>Designing tension in three games: a crowd, a chase and a muzzle flash</h1>
+        <p id="lede"><time datetime="2026-10-13">13 October 2026</time> &middot; 6 min read</p></section>
+<p>Three games on PLAYPILE are built around a held breath. In <a href="/play/the-mark/">THE MARK</a> you watch a crowd through a rifle scope, knowing one person in it is an enemy agent. In <a href="/play/pursued/">PURSUED</a> something tall is running after you through a wet town at night. In <a href="/play/exposure/">EXPOSURE</a> you can only see the room when you fire your gun. THE MARK and PURSUED arrived on 13 October; EXPOSURE has been on the site since the start. They feel different, but they rest on the same idea: tension is information you are not quite allowed to have. Each game rations it differently.</p>
+
+<h2>THE MARK: a puzzle that has to be fair</h2>
+<p>A level starts with a crowd, from 60 people at the Morning Market up to 150 at the Grand Bazaar, across 16 levels and five places. The crowd is busy on purpose: walkers, shoppers, groups chatting, people sitting, dancers, vendors, police. Every person is posed in code each frame rather than playing a recorded animation, which is how 170 animated people fit into about 30 draw calls.</p>
+<p>The mark is picked at random, fresh each time you play, from anyone who is not sitting down. That is what makes it replayable, and it is also the hard part. A random target means the clues have to be worked out afterwards, and they have to lead to exactly one person.</p>
+<h3>Building the clues</h3>
+<p>The game first dresses some decoys. Between 4 and 14 lookalikes copy two to four parts of the mark's outfit: top, hat, bag, glasses, trousers, or what they hold. The mark also gets two or three habits from a list of five: checking a watch, glancing at the security cameras, steering clear of police, pacing on one spot, or turning the face away when someone passes. A few innocent people are given the same habits, so a habit alone never settles it.</p>
+<p>Your briefing is two clues about appearance. The game tries 80 random pairs and keeps the one that leaves closest to the level's target number of suspects, from 6 early on to 18 later, with a penalty for any pair that leaves fewer than three. Then more clues arrive over the radio. Each one is chosen so the suspect list shrinks steadily rather than collapsing at once. If two people still fit at the end, the game changes the leftover lookalikes, up to eight times, until only the mark does.</p>
+<p>Later levels add events. A siren goes off, and only the mark stops, looks round and hurries away, while each other person has a 30 per cent chance of just glancing. A parcel gets left on the ground. The mark swaps bags.</p>
+<h3>The shot</h3>
+<p>Holding your breath steadies the scope to a tenth of its normal sway, for about four seconds, with a heartbeat ticking every 0.85 seconds. Run out and the sway jumps to 2.3 times normal for 2.6 seconds. Hit the wrong person and the crowd panics. Everyone within 30 metres runs, and the mark makes for an exit about 20 metres away, avoiding any exit close to where your shot landed. A computer player that knows the clue rules won 47 of 48 test levels with one bullet. A person has to spot the habits by eye, which is harder, and that gap is where the tension lives.</p>
+
+<h2>PURSUED: a hunter that never gives up</h2>
+<p>You run at 5.6 metres a second and sprint at 8.3, for about 14 seconds of stamina. The hunter starts at 5.6 too and gains 0.33 metres a second for every half minute you survive, reaching about 8.2 after four minutes. It is never just faster than you, though. It thinks.</p>
+<ul>
+<li><b>It stays close.</b> If it falls more than 10 metres behind, it speeds up by up to 50 per cent. We moved that point in from 13 metres so that it stays inside the range where the screen shakes and the edges glow.</li>
+<li><b>It aims where you are going.</b> It leads your running line by about half a second, more as the chase goes on.</li>
+<li><b>It cuts you off.</b> Every so often it appears 17 to 28 metres ahead of you, preferably round a corner, so running in a straight line is not a plan.</li>
+<li><b>It hunts by ear.</b> Sprinting makes noise out to 20 metres, walking 6, crouching 2.5. A slammed door is heard out to 28.</li>
+</ul>
+<p>The things you can do all buy seconds, not safety. A slammed door takes it just over a second to smash through at first in three blows, and it will go round if that is quicker. A bin knocked into its path makes it stumble for up to 1.35 seconds, depending on how heavy the bin is.</p>
+<h3>The fence problem</h3>
+<p>The first playtest note was blunt: the challenge must not be the player failing to get over a fence. Dying because a jump did not register is frustrating, not frightening. So vaults are automatic and cannot fail, taking 0.27 seconds for a low fence and 0.42 for a tall one. The next review found that pressing jump early, or pushing against a fence, could still leave you stuck on it, so vaulting now works mid-jump and from a standstill.</p>
+<p>Fear is a number in the code, and it rises fast and falls slowly. It drives everything you hear: the heartbeat runs at 72 beats a minute plus up to 105 more, a pulsing beat kicks in as it closes, and a red glow shows on the side it is coming from. When it catches you, the game tells you why: "Dead end." "You stopped running." "It cut you off."</p>
+
+<h2>EXPOSURE: the photograph that rots</h2>
+<p>EXPOSURE is drawn at 240 by 160 pixels in 16 colours, and the deck of the ship is dark. Firing your gun takes a photograph. The muzzle flash lights everything within 104 pixels that it can actually reach, since light does not pass through walls, and the creatures in that light are frozen where they stood at that instant.</p>
+<p>Then the photograph rots. Over nine seconds it fades, step by dithered step, until the screen reads "NO PICTURE". You are moving through a memory that gets less true every second, and the creatures are not where the picture says they are.</p>
+<p>Every shot is a trade. You start with 12 rounds. Each flash also tells every creature within 200 pixels that can see you where you are, and they keep coming for six seconds. A match is the quiet option: it burns for 2.6 seconds over a smaller circle and alerts creatures at half the range, but any step puts it out. So the choice is always between seeing more and being found, or seeing less and standing still in the dark.</p>
+
+<h2>What the three share</h2>
+<p>None of these games is tense because it is hard. They are tense because you always have part of the answer and never all of it. THE MARK gives you clues that are true but incomplete. PURSUED gives you a hunter you can hear before you can see. EXPOSURE gives you a picture that is accurate for one instant and wrong after. In each one, the design work was making sure that what you do not know is the threat, and that the controls never are.</p>
+      </article>
+      <h2>More from the dev log</h2>
+      <ul><li><a href="/devlog/one-script-for-every-phone/" style="color:var(--accent)">One script that makes every game work on a phone</a></li><li><a href="/devlog/how-we-check-every-game/" style="color:var(--accent)">How we check every game without playing each one by hand</a></li><li><a href="/devlog/southpaw-ten-boxers-ten-weaknesses/" style="color:var(--accent)">SOUTHPAW: ten boxers, and why mashing loses</a></li><li><a href="/devlog/apex-rain-reflections-and-33-circuits/" style="color:var(--accent)">APEX: rain, reflections and thirty-three circuits in a browser</a></li></ul>
+
+    </div>
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">100 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/devlog/">Dev log</a><a href="/articles/">Articles</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<script type="module">
+import { GAMES, mountShell, row } from '/site/shell.js';
+import { loadAds } from '/ads/ads.js';
+mountShell({ active: 'about' });
+document.getElementById('picks').innerHTML =
+  row('Start with one of these', GAMES.filter((g) => g.big).slice(0, 6), { seeAll: '/' });
+// no ad slots on this page, but it does load the ad script, so it owes
+// the visitor the same cookie notice as everywhere else
+loadAds();
+</script>
+</body>
+</html>

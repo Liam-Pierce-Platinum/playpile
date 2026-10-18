@@ -1,0 +1,2853 @@
+{
+ "version": 1,
+ "units": "metres",
+ "axes": "glTF: +Y up, +Z forward (muzzle)",
+ "arms": {
+  "file": "arms/arms.glb",
+  "origin": "eye (camera) at the rig root, looking +Z",
+  "weapon_bone": "weapon",
+  "skeleton": [
+   "root",
+   "weapon",
+   "upperarm_R",
+   "forearm_R",
+   "forearm_twist_R",
+   "hand_R",
+   "thumb_01_R",
+   "thumb_02_R",
+   "thumb_03_R",
+   "index_01_R",
+   "index_02_R",
+   "index_03_R",
+   "middle_01_R",
+   "middle_02_R",
+   "middle_03_R",
+   "ring_01_R",
+   "ring_02_R",
+   "ring_03_R",
+   "pinky_01_R",
+   "pinky_02_R",
+   "pinky_03_R",
+   "upperarm_L",
+   "forearm_L",
+   "forearm_twist_L",
+   "hand_L",
+   "thumb_01_L",
+   "thumb_02_L",
+   "thumb_03_L",
+   "index_01_L",
+   "index_02_L",
+   "index_03_L",
+   "middle_01_L",
+   "middle_02_L",
+   "middle_03_L",
+   "ring_01_L",
+   "ring_02_L",
+   "ring_03_L",
+   "pinky_01_L",
+   "pinky_02_L",
+   "pinky_03_L"
+  ],
+  "clips": {
+   "idle": "{gun}_idle",
+   "ads": "{gun}_ads",
+   "fire": "{gun}_fire",
+   "fire_ads": "{gun}_fire_ads",
+   "sprint": "{gun}_sprint",
+   "equip": "{gun}_equip",
+   "inspect": "{gun}_inspect",
+   "reload_ar14": "reload_ar14",
+   "reload_vx9": "reload_vx9",
+   "reload_m38": "reload_m38",
+   "reload_lr338": "reload_lr338",
+   "reload_h12": "reload_h12",
+   "reload_p9": "reload_p9"
+  },
+  "perGun": {
+   "p9": [
+    "p9_idle",
+    "p9_ads",
+    "p9_fire",
+    "p9_fire_ads",
+    "p9_sprint",
+    "p9_equip",
+    "p9_inspect",
+    "reload_p9"
+   ],
+   "vx9": [
+    "vx9_idle",
+    "vx9_ads",
+    "vx9_fire",
+    "vx9_fire_ads",
+    "vx9_sprint",
+    "vx9_equip",
+    "vx9_inspect",
+    "reload_vx9"
+   ],
+   "ar14": [
+    "ar14_idle",
+    "ar14_ads",
+    "ar14_fire",
+    "ar14_fire_ads",
+    "ar14_sprint",
+    "ar14_equip",
+    "ar14_inspect",
+    "reload_ar14"
+   ],
+   "m38": [
+    "m38_idle",
+    "m38_ads",
+    "m38_fire",
+    "m38_fire_ads",
+    "m38_sprint",
+    "m38_equip",
+    "m38_inspect",
+    "reload_m38"
+   ],
+   "lr338": [
+    "lr338_idle",
+    "lr338_ads",
+    "lr338_fire",
+    "lr338_fire_ads",
+    "lr338_sprint",
+    "lr338_equip",
+    "lr338_inspect",
+    "reload_lr338",
+    "lr338_cycle"
+   ],
+   "h12": [
+    "h12_idle",
+    "h12_ads",
+    "h12_fire",
+    "h12_fire_ads",
+    "h12_sprint",
+    "h12_equip",
+    "h12_inspect",
+    "reload_h12",
+    "h12_pump"
+   ]
+  },
+  "clipInfo": {
+   "p9_idle": {
+    "gun": "p9",
+    "duration": 3.0,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "p9_ads": {
+    "gun": "p9",
+    "duration": 3.0,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "p9_fire": {
+    "gun": "p9",
+    "duration": 0.16,
+    "loop": false,
+    "fps": 60,
+    "events": [
+     {
+      "t": 0.0,
+      "name": "shot"
+     }
+    ]
+   },
+   "p9_fire_ads": {
+    "gun": "p9",
+    "duration": 0.16,
+    "loop": false,
+    "fps": 60,
+    "events": [
+     {
+      "t": 0.0,
+      "name": "shot"
+     }
+    ]
+   },
+   "p9_sprint": {
+    "gun": "p9",
+    "duration": 0.7,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "p9_equip": {
+    "gun": "p9",
+    "duration": 0.55,
+    "loop": false,
+    "fps": 30,
+    "events": []
+   },
+   "p9_inspect": {
+    "gun": "p9",
+    "duration": 3.6,
+    "loop": false,
+    "fps": 30,
+    "events": []
+   },
+   "reload_p9": {
+    "gun": "p9",
+    "duration": 1.9,
+    "loop": false,
+    "fps": 30,
+    "events": [
+     {
+      "t": 0.1,
+      "name": "mag_out"
+     },
+     {
+      "t": 1.0,
+      "name": "mag_in"
+     },
+     {
+      "t": 1.38,
+      "name": "slide_release"
+     }
+    ]
+   },
+   "vx9_idle": {
+    "gun": "vx9",
+    "duration": 3.0,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "vx9_ads": {
+    "gun": "vx9",
+    "duration": 3.0,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "vx9_fire": {
+    "gun": "vx9",
+    "duration": 0.075,
+    "loop": false,
+    "fps": 60,
+    "events": [
+     {
+      "t": 0.0,
+      "name": "shot"
+     }
+    ]
+   },
+   "vx9_fire_ads": {
+    "gun": "vx9",
+    "duration": 0.075,
+    "loop": false,
+    "fps": 60,
+    "events": [
+     {
+      "t": 0.0,
+      "name": "shot"
+     }
+    ]
+   },
+   "vx9_sprint": {
+    "gun": "vx9",
+    "duration": 0.7,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "vx9_equip": {
+    "gun": "vx9",
+    "duration": 0.55,
+    "loop": false,
+    "fps": 30,
+    "events": []
+   },
+   "vx9_inspect": {
+    "gun": "vx9",
+    "duration": 3.6,
+    "loop": false,
+    "fps": 30,
+    "events": []
+   },
+   "reload_vx9": {
+    "gun": "vx9",
+    "duration": 2.5,
+    "loop": false,
+    "fps": 30,
+    "events": [
+     {
+      "t": 0.45,
+      "name": "mag_out"
+     },
+     {
+      "t": 1.6,
+      "name": "mag_in"
+     },
+     {
+      "t": 2.05,
+      "name": "charge"
+     },
+     {
+      "t": 2.16,
+      "name": "bolt_release"
+     }
+    ]
+   },
+   "ar14_idle": {
+    "gun": "ar14",
+    "duration": 3.0,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "ar14_ads": {
+    "gun": "ar14",
+    "duration": 3.0,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "ar14_fire": {
+    "gun": "ar14",
+    "duration": 0.075,
+    "loop": false,
+    "fps": 60,
+    "events": [
+     {
+      "t": 0.0,
+      "name": "shot"
+     }
+    ]
+   },
+   "ar14_fire_ads": {
+    "gun": "ar14",
+    "duration": 0.075,
+    "loop": false,
+    "fps": 60,
+    "events": [
+     {
+      "t": 0.0,
+      "name": "shot"
+     }
+    ]
+   },
+   "ar14_sprint": {
+    "gun": "ar14",
+    "duration": 0.7,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "ar14_equip": {
+    "gun": "ar14",
+    "duration": 0.55,
+    "loop": false,
+    "fps": 30,
+    "events": []
+   },
+   "ar14_inspect": {
+    "gun": "ar14",
+    "duration": 3.6,
+    "loop": false,
+    "fps": 30,
+    "events": []
+   },
+   "reload_ar14": {
+    "gun": "ar14",
+    "duration": 2.5,
+    "loop": false,
+    "fps": 30,
+    "events": [
+     {
+      "t": 0.45,
+      "name": "mag_out"
+     },
+     {
+      "t": 1.6,
+      "name": "mag_in"
+     },
+     {
+      "t": 2.05,
+      "name": "charge"
+     },
+     {
+      "t": 2.16,
+      "name": "bolt_release"
+     }
+    ]
+   },
+   "m38_idle": {
+    "gun": "m38",
+    "duration": 3.0,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "m38_ads": {
+    "gun": "m38",
+    "duration": 3.0,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "m38_fire": {
+    "gun": "m38",
+    "duration": 0.12,
+    "loop": false,
+    "fps": 60,
+    "events": [
+     {
+      "t": 0.0,
+      "name": "shot"
+     }
+    ]
+   },
+   "m38_fire_ads": {
+    "gun": "m38",
+    "duration": 0.12,
+    "loop": false,
+    "fps": 60,
+    "events": [
+     {
+      "t": 0.0,
+      "name": "shot"
+     }
+    ]
+   },
+   "m38_sprint": {
+    "gun": "m38",
+    "duration": 0.7,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "m38_equip": {
+    "gun": "m38",
+    "duration": 0.55,
+    "loop": false,
+    "fps": 30,
+    "events": []
+   },
+   "m38_inspect": {
+    "gun": "m38",
+    "duration": 3.6,
+    "loop": false,
+    "fps": 30,
+    "events": []
+   },
+   "reload_m38": {
+    "gun": "m38",
+    "duration": 2.5,
+    "loop": false,
+    "fps": 30,
+    "events": [
+     {
+      "t": 0.45,
+      "name": "mag_out"
+     },
+     {
+      "t": 1.6,
+      "name": "mag_in"
+     },
+     {
+      "t": 2.05,
+      "name": "charge"
+     },
+     {
+      "t": 2.16,
+      "name": "bolt_release"
+     }
+    ]
+   },
+   "lr338_idle": {
+    "gun": "lr338",
+    "duration": 3.0,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "lr338_ads": {
+    "gun": "lr338",
+    "duration": 3.0,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "lr338_fire": {
+    "gun": "lr338",
+    "duration": 0.45,
+    "loop": false,
+    "fps": 60,
+    "events": [
+     {
+      "t": 0.0,
+      "name": "shot"
+     }
+    ]
+   },
+   "lr338_fire_ads": {
+    "gun": "lr338",
+    "duration": 0.45,
+    "loop": false,
+    "fps": 60,
+    "events": [
+     {
+      "t": 0.0,
+      "name": "shot"
+     }
+    ]
+   },
+   "lr338_sprint": {
+    "gun": "lr338",
+    "duration": 0.7,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "lr338_equip": {
+    "gun": "lr338",
+    "duration": 0.55,
+    "loop": false,
+    "fps": 30,
+    "events": []
+   },
+   "lr338_inspect": {
+    "gun": "lr338",
+    "duration": 3.6,
+    "loop": false,
+    "fps": 30,
+    "events": []
+   },
+   "reload_lr338": {
+    "gun": "lr338",
+    "duration": 3.6,
+    "loop": false,
+    "fps": 30,
+    "events": [
+     {
+      "t": 0.45,
+      "name": "mag_out"
+     },
+     {
+      "t": 1.6,
+      "name": "mag_in"
+     },
+     {
+      "t": 2.2,
+      "name": "bolt_up"
+     },
+     {
+      "t": 2.45,
+      "name": "bolt_back"
+     },
+     {
+      "t": 2.75,
+      "name": "bolt_fwd"
+     }
+    ]
+   },
+   "lr338_cycle": {
+    "gun": "lr338",
+    "duration": 1.1,
+    "loop": false,
+    "fps": 30,
+    "events": [
+     {
+      "t": 0.2,
+      "name": "bolt_up"
+     },
+     {
+      "t": 0.45,
+      "name": "bolt_back"
+     },
+     {
+      "t": 0.75,
+      "name": "bolt_fwd"
+     }
+    ]
+   },
+   "h12_idle": {
+    "gun": "h12",
+    "duration": 3.0,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "h12_ads": {
+    "gun": "h12",
+    "duration": 3.0,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "h12_fire": {
+    "gun": "h12",
+    "duration": 0.4,
+    "loop": false,
+    "fps": 60,
+    "events": [
+     {
+      "t": 0.0,
+      "name": "shot"
+     }
+    ]
+   },
+   "h12_fire_ads": {
+    "gun": "h12",
+    "duration": 0.4,
+    "loop": false,
+    "fps": 60,
+    "events": [
+     {
+      "t": 0.0,
+      "name": "shot"
+     }
+    ]
+   },
+   "h12_sprint": {
+    "gun": "h12",
+    "duration": 0.7,
+    "loop": true,
+    "fps": 30,
+    "events": []
+   },
+   "h12_equip": {
+    "gun": "h12",
+    "duration": 0.55,
+    "loop": false,
+    "fps": 30,
+    "events": []
+   },
+   "h12_inspect": {
+    "gun": "h12",
+    "duration": 3.6,
+    "loop": false,
+    "fps": 30,
+    "events": []
+   },
+   "reload_h12": {
+    "gun": "h12",
+    "duration": 0.75,
+    "loop": false,
+    "fps": 30,
+    "events": [
+     {
+      "t": 0.6,
+      "name": "shell_in"
+     }
+    ]
+   },
+   "h12_pump": {
+    "gun": "h12",
+    "duration": 0.5,
+    "loop": false,
+    "fps": 30,
+    "events": [
+     {
+      "t": 0.16,
+      "name": "pump_back"
+     },
+     {
+      "t": 0.38,
+      "name": "pump_fwd"
+     }
+    ]
+   }
+  },
+  "ads": {
+   "p9": {
+    "rear": [
+     0.0,
+     0.0205,
+     -0.054
+    ],
+    "front": [
+     0.0,
+     0.0205,
+     0.116
+    ],
+    "eye": 0.36
+   },
+   "vx9": {
+    "rear": [
+     0.0,
+     0.06,
+     -0.06
+    ],
+    "front": [
+     0.0,
+     0.06,
+     0.238
+    ],
+    "eye": 0.085
+   },
+   "ar14": {
+    "rear": [
+     0.0,
+     0.066,
+     -0.072
+    ],
+    "front": [
+     0.0,
+     0.066,
+     0.365
+    ],
+    "eye": 0.085
+   },
+   "m38": {
+    "rear": [
+     0.0,
+     0.072,
+     -0.09
+    ],
+    "front": [
+     0.0,
+     0.072,
+     0.282
+    ],
+    "eye": 0.085
+   },
+   "lr338": {
+    "rear": [
+     0.0,
+     0.0714,
+     -0.1825
+    ],
+    "front": [
+     0.0,
+     0.0714,
+     0.1175
+    ],
+    "eye": 0.09
+   },
+   "h12": {
+    "rear": [
+     0.0,
+     0.027,
+     -0.06
+    ],
+    "front": [
+     0.0,
+     0.0145,
+     0.552
+    ],
+    "eye": 0.1
+   }
+  },
+  "note": "Gun GLBs carry part clips with the same names (mag, bolt, slide, charging_handle, pump, trigger, shell); play one name on both mixers. The gun is parented to the weapon bone at its root."
+ },
+ "guns": [
+  {
+   "id": "ar14",
+   "name": "AR-14 Ranger",
+   "class": "assault_rifle",
+   "file": "guns/ar14.glb",
+   "modes": [
+    "auto",
+    "semi"
+   ],
+   "real": "5.56x45 mm DI carbine, 368 mm barrel, 30 rds",
+   "stats": {
+    "rpm": 800,
+    "damage": 34,
+    "headMult": 100,
+    "mag": 30,
+    "reload": 2.5,
+    "recoil": {
+     "v": 0.55,
+     "h": 0.22,
+     "pattern": [
+      [
+       0,
+       1
+      ],
+      [
+       0.15,
+       1
+      ],
+      [
+       -0.1,
+       1.1
+      ],
+      [
+       0.3,
+       0.9
+      ],
+      [
+       0.25,
+       1
+      ],
+      [
+       -0.2,
+       0.9
+      ],
+      [
+       -0.35,
+       0.8
+      ],
+      [
+       0.1,
+       0.9
+      ]
+     ]
+    },
+    "spread": {
+     "hip": 3.2,
+     "ads": 0.06,
+     "move": 2.5
+    },
+    "ads_time": 0.22,
+    "velocity": 880,
+    "move": 0.82,
+    "pen": 1.0,
+    "range": 120
+   },
+   "sockets": {
+    "rail_top": {
+     "start": [
+      0.0,
+      0.0324,
+      -0.07
+     ],
+     "end": [
+      0.0,
+      0.0324,
+      0.33
+     ]
+    },
+    "muzzle": [
+     0.0,
+     0.0,
+     0.432
+    ],
+    "under_rail": [
+     0.0,
+     -0.0304,
+     0.265
+    ],
+    "side_rail": [
+     -0.0324,
+     0.001,
+     0.345
+    ],
+    "magwell": [
+     0.0,
+     -0.016,
+     0.073
+    ],
+    "grip_R": [
+     0.0,
+     -0.078,
+     -0.05
+    ],
+    "grip_L": [
+     0.0,
+     -0.022,
+     0.255
+    ],
+    "stock": [
+     0.0,
+     -0.002,
+     -0.24
+    ],
+    "ejection": [
+     -0.014,
+     0.002,
+     0.044
+    ]
+   },
+   "socketUp": {
+    "stock": [
+     0,
+     1,
+     0
+    ],
+    "magwell": [
+     0,
+     1,
+     0
+    ],
+    "rail_top": [
+     0,
+     1,
+     0
+    ],
+    "muzzle": [
+     0,
+     1,
+     0
+    ],
+    "under_rail": [
+     0,
+     -1,
+     0
+    ],
+    "side_rail": [
+     -1,
+     0,
+     0
+    ],
+    "grip_R": [
+     0,
+     1,
+     0
+    ],
+    "grip_L": [
+     0,
+     -1,
+     0
+    ],
+    "ejection": [
+     -1,
+     0,
+     0
+    ]
+   },
+   "nodes": [
+    "body",
+    "bolt",
+    "charging_handle",
+    "mag",
+    "sight_front",
+    "sight_rear",
+    "stock_default",
+    "trigger"
+   ],
+   "pivots": {
+    "trigger": [
+     0.0,
+     -0.038,
+     -0.004
+    ],
+    "stock_default": [
+     0.0,
+     -0.002,
+     -0.24
+    ],
+    "bolt": [
+     0.0,
+     0.001,
+     -0.012
+    ],
+    "charging_handle": [
+     0.0,
+     0.019,
+     -0.105
+    ],
+    "mag": [
+     0.0,
+     -0.016,
+     0.073
+    ],
+    "sight_rear": [
+     0.0,
+     0.0324,
+     -0.072
+    ],
+    "sight_front": [
+     0.0,
+     0.0324,
+     0.365
+    ]
+   },
+   "textures": {
+    "color": "guns/ar14_col.png",
+    "orm": "guns/ar14_orm.png",
+    "normal": "guns/ar14_nrm.png",
+    "camoMask": "guns/ar14_mask.png"
+   },
+   "ironSight": {
+    "rear": [
+     0.0,
+     0.066,
+     -0.072
+    ],
+    "front": [
+     0.0,
+     0.066,
+     0.365
+    ]
+   }
+  },
+  {
+   "id": "vx9",
+   "name": "VX-9 Hornet",
+   "class": "smg",
+   "file": "guns/vx9.glb",
+   "modes": [
+    "auto",
+    "semi"
+   ],
+   "real": "9x19 mm roller-delayed SMG, 225 mm barrel, 30 rds",
+   "stats": {
+    "rpm": 850,
+    "damage": 25,
+    "headMult": 100,
+    "mag": 30,
+    "reload": 2.5,
+    "recoil": {
+     "v": 0.34,
+     "h": 0.18,
+     "pattern": [
+      [
+       0,
+       1
+      ],
+      [
+       0.1,
+       1
+      ],
+      [
+       -0.12,
+       1.05
+      ],
+      [
+       0.18,
+       0.95
+      ],
+      [
+       -0.15,
+       0.9
+      ],
+      [
+       0.05,
+       0.9
+      ]
+     ]
+    },
+    "spread": {
+     "hip": 2.4,
+     "ads": 0.1,
+     "move": 1.6
+    },
+    "ads_time": 0.18,
+    "velocity": 400,
+    "move": 0.9,
+    "pen": 0.45,
+    "range": 50
+   },
+   "sockets": {
+    "rail_top": {
+     "start": [
+      0.0,
+      0.0294,
+      -0.055
+     ],
+     "end": [
+      0.0,
+      0.0294,
+      0.21
+     ]
+    },
+    "muzzle": [
+     0.0,
+     0.0,
+     0.268
+    ],
+    "under_rail": [
+     0.0,
+     -0.0294,
+     0.19
+    ],
+    "side_rail": [
+     -0.0304,
+     0.0,
+     0.225
+    ],
+    "magwell": [
+     0.0,
+     -0.014,
+     0.052
+    ],
+    "grip_R": [
+     0.0,
+     -0.074,
+     -0.048
+    ],
+    "grip_L": [
+     0.0,
+     -0.02,
+     0.175
+    ],
+    "stock": [
+     0.0,
+     -0.002,
+     -0.096
+    ],
+    "ejection": [
+     -0.013,
+     0.002,
+     0.025
+    ]
+   },
+   "socketUp": {
+    "stock": [
+     0,
+     1,
+     0
+    ],
+    "magwell": [
+     0,
+     1,
+     0
+    ],
+    "rail_top": [
+     0,
+     1,
+     0
+    ],
+    "muzzle": [
+     0,
+     1,
+     0
+    ],
+    "under_rail": [
+     0,
+     -1,
+     0
+    ],
+    "side_rail": [
+     -1,
+     0,
+     0
+    ],
+    "grip_R": [
+     0,
+     1,
+     0
+    ],
+    "grip_L": [
+     0,
+     -1,
+     0
+    ],
+    "ejection": [
+     -1,
+     0,
+     0
+    ]
+   },
+   "nodes": [
+    "body",
+    "bolt",
+    "charging_handle",
+    "mag",
+    "sight_front",
+    "sight_rear",
+    "stock_default",
+    "trigger"
+   ],
+   "pivots": {
+    "trigger": [
+     0.0,
+     -0.034,
+     -0.004
+    ],
+    "stock_default": [
+     0.0,
+     -0.002,
+     -0.096
+    ],
+    "bolt": [
+     0.0,
+     0.002,
+     -0.01
+    ],
+    "charging_handle": [
+     0.0,
+     0.016,
+     -0.082
+    ],
+    "mag": [
+     0.0,
+     -0.014,
+     0.052
+    ],
+    "sight_rear": [
+     0.0,
+     0.0294,
+     -0.06
+    ],
+    "sight_front": [
+     0.0,
+     0.0294,
+     0.238
+    ]
+   },
+   "textures": {
+    "color": "guns/vx9_col.png",
+    "orm": "guns/vx9_orm.png",
+    "normal": "guns/vx9_nrm.png",
+    "camoMask": "guns/vx9_mask.png"
+   },
+   "ironSight": {
+    "rear": [
+     0.0,
+     0.06,
+     -0.06
+    ],
+    "front": [
+     0.0,
+     0.06,
+     0.238
+    ]
+   }
+  },
+  {
+   "id": "m38",
+   "name": "M38 Arbiter",
+   "class": "dmr",
+   "file": "guns/m38.glb",
+   "modes": [
+    "semi"
+   ],
+   "real": "7.62x51 mm piston battle rifle, 406 mm barrel, 20 rds",
+   "stats": {
+    "rpm": 380,
+    "damage": 58,
+    "headMult": 100,
+    "mag": 20,
+    "reload": 2.6,
+    "recoil": {
+     "v": 1.25,
+     "h": 0.35,
+     "pattern": [
+      [
+       0,
+       1
+      ],
+      [
+       0.15,
+       1
+      ],
+      [
+       -0.15,
+       1.05
+      ],
+      [
+       0.2,
+       0.95
+      ]
+     ]
+    },
+    "spread": {
+     "hip": 4.0,
+     "ads": 0.03,
+     "move": 3.0
+    },
+    "ads_time": 0.3,
+    "velocity": 840,
+    "move": 0.78,
+    "pen": 1.6,
+    "range": 250,
+    "zero": 100
+   },
+   "sockets": {
+    "rail_top": {
+     "start": [
+      0.0,
+      0.0374,
+      -0.085
+     ],
+     "end": [
+      0.0,
+      0.0374,
+      0.25
+     ]
+    },
+    "muzzle": [
+     0.0,
+     0.0,
+     0.455
+    ],
+    "under_rail": [
+     0.0,
+     -0.0234,
+     0.24
+    ],
+    "side_rail": [
+     -0.0244,
+     0.004,
+     0.255
+    ],
+    "magwell": [
+     0.0,
+     -0.016,
+     0.079
+    ],
+    "grip_R": [
+     0.0,
+     -0.082,
+     -0.054
+    ],
+    "grip_L": [
+     0.0,
+     -0.023,
+     0.235
+    ],
+    "stock": [
+     0.0,
+     -0.002,
+     -0.137
+    ],
+    "ejection": [
+     -0.015,
+     0.004,
+     0.036
+    ]
+   },
+   "socketUp": {
+    "stock": [
+     0,
+     1,
+     0
+    ],
+    "magwell": [
+     0,
+     1,
+     0
+    ],
+    "rail_top": [
+     0,
+     1,
+     0
+    ],
+    "muzzle": [
+     0,
+     1,
+     0
+    ],
+    "under_rail": [
+     0,
+     -1,
+     0
+    ],
+    "side_rail": [
+     -1,
+     0,
+     0
+    ],
+    "grip_R": [
+     0,
+     1,
+     0
+    ],
+    "grip_L": [
+     0,
+     -1,
+     0
+    ],
+    "ejection": [
+     -1,
+     0,
+     0
+    ]
+   },
+   "nodes": [
+    "body",
+    "bolt",
+    "charging_handle",
+    "mag",
+    "sight_front",
+    "sight_rear",
+    "stock_default",
+    "trigger"
+   ],
+   "pivots": {
+    "trigger": [
+     0.0,
+     -0.042,
+     -0.004
+    ],
+    "stock_default": [
+     0.0,
+     -0.002,
+     -0.137
+    ],
+    "bolt": [
+     0.0,
+     0.003,
+     -0.022
+    ],
+    "charging_handle": [
+     0.017,
+     0.012,
+     0.06
+    ],
+    "mag": [
+     0.0,
+     -0.016,
+     0.079
+    ],
+    "sight_rear": [
+     0.0,
+     0.0374,
+     -0.09
+    ],
+    "sight_front": [
+     0.0,
+     0.0374,
+     0.282
+    ]
+   },
+   "textures": {
+    "color": "guns/m38_col.png",
+    "orm": "guns/m38_orm.png",
+    "normal": "guns/m38_nrm.png",
+    "camoMask": "guns/m38_mask.png"
+   },
+   "ironSight": {
+    "rear": [
+     0.0,
+     0.072,
+     -0.09
+    ],
+    "front": [
+     0.0,
+     0.072,
+     0.282
+    ]
+   },
+   "default": {
+    "optic": "lpvo"
+   }
+  },
+  {
+   "id": "lr338",
+   "name": "LR-338 Longbow",
+   "class": "sniper",
+   "file": "guns/lr338.glb",
+   "modes": [
+    "bolt"
+   ],
+   "real": ".338 Lapua bolt rifle, 686 mm barrel, 5 rds",
+   "stats": {
+    "rpm": 45,
+    "damage": 125,
+    "headMult": 100,
+    "mag": 5,
+    "reload": 3.6,
+    "boltCycle": 1.1,
+    "recoil": {
+     "v": 3.2,
+     "h": 0.6,
+     "pattern": [
+      [
+       0,
+       1
+      ]
+     ]
+    },
+    "spread": {
+     "hip": 6.0,
+     "ads": 0.0,
+     "move": 4.0
+    },
+    "ads_time": 0.38,
+    "velocity": 900,
+    "move": 0.72,
+    "pen": 2.4,
+    "range": 600,
+    "zero": 100
+   },
+   "sockets": {
+    "rail_top": {
+     "start": [
+      0.0,
+      0.0274,
+      -0.11
+     ],
+     "end": [
+      0.0,
+      0.0274,
+      0.2
+     ]
+    },
+    "muzzle": [
+     0.0,
+     0.0,
+     0.79
+    ],
+    "under_rail": [
+     0.0,
+     -0.0384,
+     0.37
+    ],
+    "side_rail": [
+     -0.0344,
+     -0.006,
+     0.33
+    ],
+    "magwell": [
+     0.0,
+     -0.014,
+     0.051
+    ],
+    "grip_R": [
+     0.0,
+     -0.084,
+     -0.058
+    ],
+    "grip_L": [
+     0.0,
+     -0.029,
+     0.3
+    ],
+    "stock": [
+     0.0,
+     -0.008,
+     -0.172
+    ],
+    "ejection": [
+     -0.017,
+     0.007,
+     0.032
+    ]
+   },
+   "socketUp": {
+    "stock": [
+     0,
+     1,
+     0
+    ],
+    "magwell": [
+     0,
+     1,
+     0
+    ],
+    "rail_top": [
+     0,
+     1,
+     0
+    ],
+    "muzzle": [
+     0,
+     1,
+     0
+    ],
+    "under_rail": [
+     0,
+     -1,
+     0
+    ],
+    "side_rail": [
+     -1,
+     0,
+     0
+    ],
+    "grip_R": [
+     0,
+     1,
+     0
+    ],
+    "grip_L": [
+     0,
+     -1,
+     0
+    ],
+    "ejection": [
+     -1,
+     0,
+     0
+    ]
+   },
+   "nodes": [
+    "body",
+    "bolt",
+    "mag",
+    "stock_default",
+    "trigger"
+   ],
+   "pivots": {
+    "trigger": [
+     0.0,
+     -0.042,
+     -0.008
+    ],
+    "stock_default": [
+     0.0,
+     -0.008,
+     -0.172
+    ],
+    "bolt": [
+     0.0,
+     0.0,
+     -0.12
+    ],
+    "mag": [
+     0.0,
+     -0.014,
+     0.051
+    ]
+   },
+   "textures": {
+    "color": "guns/lr338_col.png",
+    "orm": "guns/lr338_orm.png",
+    "normal": "guns/lr338_nrm.png",
+    "camoMask": "guns/lr338_mask.png"
+   },
+   "action": "bolt",
+   "default": {
+    "optic": "scope8x"
+   }
+  },
+  {
+   "id": "h12",
+   "name": "H12 Harrow",
+   "class": "shotgun",
+   "file": "guns/h12.glb",
+   "modes": [
+    "pump"
+   ],
+   "real": "12 ga pump, 470 mm barrel, 6+1 tube",
+   "stats": {
+    "rpm": 70,
+    "damage": 20,
+    "pellets": 9,
+    "pelletSpread": 2.6,
+    "headMult": 100,
+    "mag": 6,
+    "reload": 0.75,
+    "perShell": true,
+    "pumpTime": 0.5,
+    "recoil": {
+     "v": 2.4,
+     "h": 0.6,
+     "pattern": [
+      [
+       0,
+       1
+      ]
+     ]
+    },
+    "spread": {
+     "hip": 2.2,
+     "ads": 0.0,
+     "move": 1.2
+    },
+    "ads_time": 0.26,
+    "velocity": 400,
+    "move": 0.84,
+    "pen": 0.4,
+    "range": 30
+   },
+   "sockets": {
+    "rail_top": {
+     "start": [
+      0.0,
+      0.0344,
+      -0.055
+     ],
+     "end": [
+      0.0,
+      0.0344,
+      0.03
+     ]
+    },
+    "muzzle": [
+     0.0,
+     0.0,
+     0.56
+    ],
+    "under_rail": [
+     0.0,
+     -0.037,
+     0.472
+    ],
+    "side_rail": [
+     -0.0224,
+     -0.012,
+     0.472
+    ],
+    "magwell": [
+     0.0,
+     -0.024,
+     0.048
+    ],
+    "grip_R": [
+     0.0,
+     -0.04,
+     -0.165
+    ],
+    "grip_L": [
+     0.0,
+     -0.04,
+     0.228
+    ],
+    "stock": [
+     0.0,
+     0.0,
+     -0.11
+    ],
+    "ejection": [
+     -0.015,
+     0.006,
+     0.03
+    ]
+   },
+   "socketUp": {
+    "stock": [
+     0,
+     1,
+     0
+    ],
+    "magwell": [
+     0,
+     -1,
+     0
+    ],
+    "rail_top": [
+     0,
+     1,
+     0
+    ],
+    "muzzle": [
+     0,
+     1,
+     0
+    ],
+    "under_rail": [
+     0,
+     -1,
+     0
+    ],
+    "side_rail": [
+     -1,
+     0,
+     0
+    ],
+    "grip_R": [
+     0,
+     1,
+     0
+    ],
+    "grip_L": [
+     0,
+     -1,
+     0
+    ],
+    "ejection": [
+     -1,
+     0,
+     0
+    ]
+   },
+   "nodes": [
+    "body",
+    "bolt",
+    "pump",
+    "shell",
+    "stock_default",
+    "trigger"
+   ],
+   "pivots": {
+    "trigger": [
+     0.0,
+     -0.032,
+     -0.004
+    ],
+    "stock_default": [
+     0.0,
+     0.0,
+     -0.11
+    ],
+    "pump": [
+     0.0,
+     -0.022,
+     0.228
+    ],
+    "bolt": [
+     0.0,
+     0.005,
+     0.032
+    ],
+    "shell": [
+     0.0,
+     -0.06,
+     0.05
+    ]
+   },
+   "textures": {
+    "color": "guns/h12_col.png",
+    "orm": "guns/h12_orm.png",
+    "normal": "guns/h12_nrm.png",
+    "camoMask": "guns/h12_mask.png"
+   },
+   "ironSight": {
+    "rear": [
+     0.0,
+     0.027,
+     -0.06
+    ],
+    "front": [
+     0.0,
+     0.0145,
+     0.552
+    ]
+   },
+   "action": "pump"
+  },
+  {
+   "id": "p9",
+   "name": "P9 Sentinel",
+   "class": "pistol",
+   "file": "guns/p9.glb",
+   "modes": [
+    "semi"
+   ],
+   "real": "9x19 mm striker pistol, 114 mm barrel, 17 rds",
+   "stats": {
+    "rpm": 450,
+    "damage": 30,
+    "headMult": 100,
+    "mag": 17,
+    "reload": 1.9,
+    "recoil": {
+     "v": 1.1,
+     "h": 0.35,
+     "pattern": [
+      [
+       0,
+       1
+      ],
+      [
+       0.25,
+       1.0
+      ],
+      [
+       -0.2,
+       1.05
+      ],
+      [
+       0.15,
+       0.95
+      ]
+     ]
+    },
+    "spread": {
+     "hip": 1.8,
+     "ads": 0.12,
+     "move": 1.0
+    },
+    "ads_time": 0.14,
+    "velocity": 375,
+    "move": 0.95,
+    "pen": 0.35,
+    "range": 40
+   },
+   "sockets": {
+    "rail_top": {
+     "start": [
+      0.0,
+      0.0165,
+      -0.038
+     ],
+     "end": [
+      0.0,
+      0.0165,
+      -0.038
+     ]
+    },
+    "muzzle": [
+     0.0,
+     0.0,
+     0.124
+    ],
+    "under_rail": [
+     0.0,
+     -0.0354,
+     0.088
+    ],
+    "side_rail": [
+     0.0,
+     -0.0354,
+     0.088
+    ],
+    "magwell": [
+     0.0,
+     -0.028,
+     -0.04
+    ],
+    "grip_R": [
+     0.0,
+     -0.068,
+     -0.044
+    ],
+    "grip_L": [
+     0.015,
+     -0.072,
+     -0.046
+    ],
+    "ejection": [
+     -0.006,
+     0.015,
+     0.02
+    ]
+   },
+   "socketUp": {
+    "magwell": [
+     0,
+     0.93969,
+     0.34202
+    ],
+    "rail_top": [
+     0,
+     1,
+     0
+    ],
+    "muzzle": [
+     0,
+     1,
+     0
+    ],
+    "under_rail": [
+     0,
+     -1,
+     0
+    ],
+    "side_rail": [
+     0,
+     -1,
+     0
+    ],
+    "grip_R": [
+     0,
+     1,
+     0
+    ],
+    "grip_L": [
+     1,
+     0,
+     0
+    ],
+    "ejection": [
+     -1,
+     1,
+     0
+    ]
+   },
+   "nodes": [
+    "body",
+    "mag",
+    "slide",
+    "trigger"
+   ],
+   "pivots": {
+    "slide": [
+     0.0,
+     0.0,
+     -0.0
+    ],
+    "trigger": [
+     0.0,
+     -0.026,
+     -0.0
+    ],
+    "mag": [
+     0.0,
+     -0.028,
+     -0.04
+    ]
+   },
+   "textures": {
+    "color": "guns/p9_col.png",
+    "orm": "guns/p9_orm.png",
+    "normal": "guns/p9_nrm.png",
+    "camoMask": "guns/p9_mask.png"
+   },
+   "ironSight": {
+    "rear": [
+     0.0,
+     0.0205,
+     -0.054
+    ],
+    "front": [
+     0.0,
+     0.0205,
+     0.116
+    ]
+   }
+  }
+ ],
+ "attachments": [
+  {
+   "id": "agrip",
+   "slot": "underbarrel",
+   "name": "Angled Grip",
+   "file": "attachments/agrip.glb",
+   "mods": {
+    "ads_time": -0.025,
+    "recoil_v": -0.05,
+    "recoil_h": -0.06
+   },
+   "mult": {
+    "ads_time": 0.9,
+    "recoil_v": 0.95,
+    "recoil_h": 0.94
+   },
+   "nodes": [],
+   "size": [
+    0.036,
+    0.0418,
+    0.0708
+   ],
+   "fits": [
+    "ar14",
+    "vx9",
+    "m38",
+    "lr338"
+   ]
+  },
+  {
+   "id": "brake",
+   "slot": "muzzle",
+   "name": "Muzzle Brake",
+   "file": "attachments/brake.glb",
+   "mods": {
+    "recoil_v": -0.38,
+    "recoil_h": -0.28,
+    "loud": 1.35,
+    "flash": 1.15
+   },
+   "mult": {
+    "recoil_v": 0.62,
+    "recoil_h": 0.72,
+    "sound": 1.35,
+    "flash": 1.15,
+    "length": 0.07200000000000001
+   },
+   "nodes": [],
+   "size": [
+    0.027,
+    0.03,
+    0.072
+   ],
+   "fits": [
+    "ar14",
+    "m38",
+    "lr338",
+    "h12"
+   ]
+  },
+  {
+   "id": "compensator",
+   "slot": "muzzle",
+   "name": "Compensator",
+   "file": "attachments/compensator.glb",
+   "mods": {
+    "recoil_v": -0.22,
+    "recoil_h": -0.12,
+    "flash": 1.25,
+    "loud": 1.1
+   },
+   "mult": {
+    "recoil_v": 0.78,
+    "recoil_h": 0.88,
+    "flash": 1.25,
+    "sound": 1.1,
+    "length": 0.056
+   },
+   "nodes": [],
+   "size": [
+    0.024,
+    0.0258,
+    0.0605
+   ],
+   "fits": [
+    "p9",
+    "vx9",
+    "ar14",
+    "m38"
+   ]
+  },
+  {
+   "id": "flashhider",
+   "slot": "muzzle",
+   "name": "3-Prong Flash Hider",
+   "file": "attachments/flashhider.glb",
+   "mods": {
+    "flash": 0.3,
+    "recoil_v": -0.04,
+    "loud": 1.0
+   },
+   "mult": {
+    "flash": 0.3,
+    "recoil_v": 0.96,
+    "sound": 1.0,
+    "length": 0.062
+   },
+   "nodes": [],
+   "size": [
+    0.023,
+    0.0248,
+    0.0665
+   ],
+   "fits": [
+    "vx9",
+    "ar14",
+    "m38",
+    "lr338"
+   ]
+  },
+  {
+   "id": "holo",
+   "slot": "optic",
+   "name": "Holographic Sight",
+   "file": "attachments/holo.glb",
+   "mods": {
+    "ads_time": 0.01,
+    "aim_zoom": 1.1
+   },
+   "mult": {
+    "ads_time": 1.04,
+    "aim_zoom": 1.1
+   },
+   "nodes": [
+    "lens_front",
+    "lens_rear",
+    "reticle"
+   ],
+   "size": [
+    0.047,
+    0.0682,
+    0.084
+   ],
+   "fits": [
+    "ar14",
+    "vx9",
+    "m38",
+    "lr338",
+    "h12"
+   ],
+   "optic": {
+    "zoom": 1.0,
+    "reticle": "holo_68moa_ring_1moa_dot",
+    "eyeRelief": null,
+    "sightHeight": 0.041,
+    "color": "#ff2a1a",
+    "pip": false
+   }
+  },
+  {
+   "id": "laser_box",
+   "slot": "laser",
+   "name": "IR/Visible Laser Module",
+   "file": "attachments/laser_box.glb",
+   "mods": {
+    "spread_hip": -0.18,
+    "ads_time": 0.005
+   },
+   "mult": {
+    "hip_spread": 0.82,
+    "ads_time": 1.02
+   },
+   "nodes": [
+    "illum_lens",
+    "laser_lens"
+   ],
+   "size": [
+    0.0615,
+    0.0502,
+    0.112
+   ],
+   "fits": [
+    "ar14",
+    "vx9",
+    "m38",
+    "lr338",
+    "h12"
+   ],
+   "empties": {
+    "emitter": [
+     0.014,
+     0.022,
+     0.056
+    ]
+   },
+   "laser": {
+    "emitter": "emitter",
+    "lens": "laser_lens",
+    "color": "#ff2020",
+    "presets": [
+     "#ff2020",
+     "#20ff40",
+     "#2080ff",
+     "#ff20ff",
+     "#ffffff",
+     "#ffb000"
+    ],
+    "beamWidth": 0.0015,
+    "range": 200,
+    "dotSize": 0.012
+   }
+  },
+  {
+   "id": "laser_compact",
+   "slot": "laser",
+   "name": "Compact Laser",
+   "file": "attachments/laser_compact.glb",
+   "mods": {
+    "spread_hip": -0.14
+   },
+   "mult": {
+    "hip_spread": 0.86
+   },
+   "nodes": [
+    "laser_lens"
+   ],
+   "size": [
+    0.035,
+    0.032,
+    0.069
+   ],
+   "fits": [
+    "p9",
+    "vx9",
+    "ar14",
+    "h12"
+   ],
+   "empties": {
+    "emitter": [
+     0.0,
+     0.016,
+     0.038
+    ]
+   },
+   "laser": {
+    "emitter": "emitter",
+    "lens": "laser_lens",
+    "color": "#20ff40",
+    "presets": [
+     "#ff2020",
+     "#20ff40",
+     "#2080ff",
+     "#ff20ff",
+     "#ffffff",
+     "#ffb000"
+    ],
+    "beamWidth": 0.0012,
+    "range": 120,
+    "dotSize": 0.01
+   }
+  },
+  {
+   "id": "lpvo",
+   "slot": "optic",
+   "name": "1-4x LPVO",
+   "file": "attachments/lpvo.glb",
+   "mods": {
+    "ads_time": 0.045,
+    "sway": 1.1
+   },
+   "mult": {
+    "ads_time": 1.18,
+    "sway": 1.1,
+    "aim_zoom": [
+     1.0,
+     4.0
+    ]
+   },
+   "nodes": [
+    "lens_front",
+    "lens_pip"
+   ],
+   "size": [
+    0.054,
+    0.0762,
+    0.25
+   ],
+   "fits": [
+    "ar14",
+    "vx9",
+    "m38",
+    "lr338"
+   ],
+   "optic": {
+    "zoom": [
+     1.0,
+     4.0
+    ],
+    "reticle": "lpvo_bdc_dot",
+    "eyeRelief": 0.095,
+    "sightHeight": 0.039,
+    "color": "#ff2a1a",
+    "pip": true,
+    "pipNode": "lens_pip",
+    "fov_at_max": 6.6
+   }
+  },
+  {
+   "id": "mag_ar40",
+   "slot": "mag",
+   "name": "40-Round Magazine",
+   "file": "attachments/mag_ar40.glb",
+   "mods": {
+    "mag_mult": 1.3333,
+    "capacity": 40,
+    "reload": 0.12,
+    "ads_time": 0.008
+   },
+   "mult": {
+    "mag": 40,
+    "reload": 1.12,
+    "ads_time": 1.03
+   },
+   "nodes": [],
+   "size": [
+    0.026,
+    0.2493,
+    0.1084
+   ],
+   "fits": [
+    "ar14"
+   ]
+  },
+  {
+   "id": "mag_lr10",
+   "slot": "mag",
+   "name": "10-Round Magazine",
+   "file": "attachments/mag_lr10.glb",
+   "mods": {
+    "mag_mult": 2.0,
+    "capacity": 10,
+    "reload": 0.1
+   },
+   "mult": {
+    "mag": 10,
+    "reload": 1.1
+   },
+   "nodes": [],
+   "size": [
+    0.035,
+    0.1405,
+    0.098
+   ],
+   "fits": [
+    "lr338"
+   ]
+  },
+  {
+   "id": "mag_m38_25",
+   "slot": "mag",
+   "name": "25-Round Magazine",
+   "file": "attachments/mag_m38_25.glb",
+   "mods": {
+    "mag_mult": 1.25,
+    "capacity": 25,
+    "reload": 0.1,
+    "ads_time": 0.008
+   },
+   "mult": {
+    "mag": 25,
+    "reload": 1.1,
+    "ads_time": 1.03
+   },
+   "nodes": [],
+   "size": [
+    0.029,
+    0.2077,
+    0.0868
+   ],
+   "fits": [
+    "m38"
+   ]
+  },
+  {
+   "id": "mag_p9_33",
+   "slot": "mag",
+   "name": "33-Round Pistol Stick",
+   "file": "attachments/mag_p9_33.glb",
+   "mods": {
+    "mag_mult": 1.9412,
+    "capacity": 33,
+    "reload": 0.15,
+    "ads_time": 0.01
+   },
+   "mult": {
+    "mag": 33,
+    "reload": 1.15,
+    "ads_time": 1.04
+   },
+   "nodes": [],
+   "size": [
+    0.026,
+    0.204,
+    0.1071
+   ],
+   "fits": [
+    "p9"
+   ]
+  },
+  {
+   "id": "mag_vx45",
+   "slot": "mag",
+   "name": "45-Round Stick",
+   "file": "attachments/mag_vx45.glb",
+   "mods": {
+    "mag_mult": 1.5,
+    "capacity": 45,
+    "reload": 0.12,
+    "ads_time": 0.008
+   },
+   "mult": {
+    "mag": 45,
+    "reload": 1.12,
+    "ads_time": 1.03
+   },
+   "nodes": [],
+   "size": [
+    0.027,
+    0.2456,
+    0.0558
+   ],
+   "fits": [
+    "vx9"
+   ]
+  },
+  {
+   "id": "mrds",
+   "slot": "optic",
+   "name": "Pistol Mini Red Dot",
+   "file": "attachments/mrds.glb",
+   "mods": {
+    "ads_time": 0.0,
+    "aim_zoom": 1.05
+   },
+   "mult": {
+    "ads_time": 1.0,
+    "aim_zoom": 1.05
+   },
+   "nodes": [
+    "lens_front",
+    "reticle"
+   ],
+   "size": [
+    0.027,
+    0.028,
+    0.044
+   ],
+   "fits": [
+    "p9"
+   ],
+   "optic": {
+    "zoom": 1.0,
+    "reticle": "dot_3.25moa",
+    "eyeRelief": null,
+    "sightHeight": 0.015,
+    "color": "#ff2a1a",
+    "pip": false
+   }
+  },
+  {
+   "id": "prism3x",
+   "slot": "optic",
+   "name": "3x Prism Sight",
+   "file": "attachments/prism3x.glb",
+   "mods": {
+    "ads_time": 0.03,
+    "aim_zoom": 3.0
+   },
+   "mult": {
+    "ads_time": 1.12,
+    "aim_zoom": 3.0
+   },
+   "nodes": [
+    "lens_front",
+    "lens_pip"
+   ],
+   "size": [
+    0.059,
+    0.0772,
+    0.146
+   ],
+   "fits": [
+    "ar14",
+    "vx9",
+    "m38",
+    "lr338"
+   ],
+   "optic": {
+    "zoom": 3.0,
+    "reticle": "prism_chevron_bdc",
+    "eyeRelief": 0.065,
+    "sightHeight": 0.038,
+    "color": "#ff2a1a",
+    "pip": true,
+    "pipNode": "lens_pip"
+   }
+  },
+  {
+   "id": "reddot",
+   "slot": "optic",
+   "name": "Micro Red Dot 2MOA",
+   "file": "attachments/reddot.glb",
+   "mods": {
+    "ads_time": 0.0,
+    "aim_zoom": 1.1
+   },
+   "mult": {
+    "ads_time": 1.0,
+    "aim_zoom": 1.1
+   },
+   "nodes": [
+    "lens_front",
+    "lens_rear",
+    "reticle"
+   ],
+   "size": [
+    0.048,
+    0.0652,
+    0.057
+   ],
+   "fits": [
+    "ar14",
+    "vx9",
+    "m38",
+    "lr338",
+    "h12"
+   ],
+   "optic": {
+    "zoom": 1.0,
+    "reticle": "dot_2moa",
+    "eyeRelief": null,
+    "sightHeight": 0.036000000000000004,
+    "color": "#ff2a1a",
+    "pip": false
+   }
+  },
+  {
+   "id": "scope8x",
+   "slot": "optic",
+   "name": "8x Long-Range Scope",
+   "file": "attachments/scope8x.glb",
+   "mods": {
+    "ads_time": 0.112,
+    "sway": 1.35,
+    "move": -0.026,
+    "aim_zoom": 8.0
+   },
+   "mult": {
+    "ads_time": 1.45,
+    "sway": 1.35,
+    "aim_zoom": 8.0,
+    "move_speed": 0.97
+   },
+   "nodes": [
+    "lens_front",
+    "lens_pip"
+   ],
+   "size": [
+    0.068,
+    0.0962,
+    0.398
+   ],
+   "fits": [
+    "m38",
+    "lr338"
+   ],
+   "optic": {
+    "zoom": 8.0,
+    "reticle": "mil_dot_tree",
+    "eyeRelief": 0.09,
+    "sightHeight": 0.044,
+    "color": "#101010",
+    "pip": true,
+    "pipNode": "lens_pip",
+    "fov": 4.6
+   }
+  },
+  {
+   "id": "stock_ctr",
+   "slot": "stock",
+   "name": "Carbine Stock",
+   "file": "attachments/stock_ctr.glb",
+   "mods": {
+    "recoil_v": -0.05,
+    "ads_time": 0.0
+   },
+   "mult": {
+    "recoil_v": 0.95,
+    "ads_time": 1.0
+   },
+   "nodes": [],
+   "size": [
+    0.042,
+    0.144,
+    0.169
+   ],
+   "fits": [
+    "ar14",
+    "vx9",
+    "m38"
+   ]
+  },
+  {
+   "id": "stock_precision",
+   "slot": "stock",
+   "name": "Precision Stock",
+   "file": "attachments/stock_precision.glb",
+   "mods": {
+    "recoil_v": -0.18,
+    "recoil_h": -0.15,
+    "ads_time": 0.025,
+    "sway": 0.85,
+    "move": -0.026
+   },
+   "mult": {
+    "recoil_v": 0.82,
+    "recoil_h": 0.85,
+    "ads_time": 1.1,
+    "sway": 0.85,
+    "move_speed": 0.97
+   },
+   "nodes": [],
+   "size": [
+    0.048,
+    0.164,
+    0.254
+   ],
+   "fits": [
+    "ar14",
+    "vx9",
+    "m38"
+   ]
+  },
+  {
+   "id": "stock_skeletal",
+   "slot": "stock",
+   "name": "Skeletal Stock",
+   "file": "attachments/stock_skeletal.glb",
+   "mods": {
+    "ads_time": -0.025,
+    "recoil_v": 0.08,
+    "move": 0.026
+   },
+   "mult": {
+    "ads_time": 0.9,
+    "recoil_v": 1.08,
+    "move_speed": 1.03
+   },
+   "nodes": [],
+   "size": [
+    0.042,
+    0.1197,
+    0.222
+   ],
+   "fits": [
+    "ar14",
+    "vx9",
+    "m38"
+   ]
+  },
+  {
+   "id": "suppressor",
+   "slot": "muzzle",
+   "name": "Suppressor",
+   "file": "attachments/suppressor.glb",
+   "mods": {
+    "loud": 0.25,
+    "suppressed": true,
+    "flash": 0.05,
+    "recoil_v": -0.1,
+    "recoil_h": -0.05,
+    "velocity": 0.03,
+    "ads_time": 0.02
+   },
+   "mult": {
+    "sound": 0.25,
+    "flash": 0.05,
+    "recoil_v": 0.9,
+    "recoil_h": 0.95,
+    "velocity": 1.03,
+    "ads_time": 1.08,
+    "radar": false,
+    "length": 0.165
+   },
+   "nodes": [],
+   "size": [
+    0.0396,
+    0.0396,
+    0.165
+   ],
+   "fits": [
+    "p9",
+    "vx9",
+    "ar14",
+    "m38",
+    "lr338"
+   ]
+  },
+  {
+   "id": "vgrip",
+   "slot": "underbarrel",
+   "name": "Vertical Grip",
+   "file": "attachments/vgrip.glb",
+   "mods": {
+    "recoil_v": -0.16,
+    "recoil_h": -0.1,
+    "ads_time": 0.01,
+    "sway": 0.95
+   },
+   "mult": {
+    "recoil_v": 0.84,
+    "recoil_h": 0.9,
+    "ads_time": 1.04,
+    "sway": 0.95
+   },
+   "nodes": [],
+   "size": [
+    0.0376,
+    0.1052,
+    0.046
+   ],
+   "fits": [
+    "ar14",
+    "vx9",
+    "m38",
+    "h12"
+   ]
+  }
+ ],
+ "camos": [
+  {
+   "id": "black",
+   "name": "Black cerakote",
+   "color": "#1b1c1d",
+   "roughness": 0.5,
+   "metalness": 0.15
+  },
+  {
+   "id": "woodland",
+   "name": "Woodland",
+   "color": "#4f5136",
+   "texture": "camos/woodland.png",
+   "scale": 0.12,
+   "roughness": 0.62,
+   "metalness": 0.05,
+   "pattern": "blotch"
+  },
+  {
+   "id": "multiterrain",
+   "name": "Multi-terrain",
+   "color": "#857a5a",
+   "texture": "camos/multiterrain.png",
+   "scale": 0.12,
+   "roughness": 0.64,
+   "metalness": 0.05,
+   "pattern": "blotch"
+  },
+  {
+   "id": "urban_digital",
+   "name": "Urban digital",
+   "color": "#6b6e70",
+   "texture": "camos/urban_digital.png",
+   "scale": 0.12,
+   "roughness": 0.6,
+   "metalness": 0.05,
+   "pattern": "digital"
+  },
+  {
+   "id": "desert_digital",
+   "name": "Desert digital",
+   "color": "#a48d68",
+   "texture": "camos/desert_digital.png",
+   "scale": 0.12,
+   "roughness": 0.62,
+   "metalness": 0.05,
+   "pattern": "digital"
+  },
+  {
+   "id": "tiger",
+   "name": "Tiger stripe",
+   "color": "#5d5a3a",
+   "texture": "camos/tiger.png",
+   "scale": 0.12,
+   "roughness": 0.6,
+   "metalness": 0.05,
+   "pattern": "stripe"
+  },
+  {
+   "id": "arctic",
+   "name": "Arctic",
+   "color": "#d7dade",
+   "texture": "camos/arctic.png",
+   "scale": 0.12,
+   "roughness": 0.58,
+   "metalness": 0.05,
+   "pattern": "blotch"
+  },
+  {
+   "id": "carbon",
+   "name": "Carbon weave",
+   "color": "#18191a",
+   "texture": "camos/carbon.png",
+   "scale": 0.12,
+   "roughness": 0.35,
+   "metalness": 0.05
+  },
+  {
+   "id": "fde",
+   "name": "Flat dark earth",
+   "color": "#8a7454",
+   "roughness": 0.58,
+   "metalness": 0.05
+  },
+  {
+   "id": "od",
+   "name": "OD green",
+   "color": "#4a4f36",
+   "roughness": 0.6,
+   "metalness": 0.05
+  },
+  {
+   "id": "wolf_grey",
+   "name": "Wolf grey",
+   "color": "#5c6064",
+   "roughness": 0.52,
+   "metalness": 0.1
+  },
+  {
+   "id": "bronze",
+   "name": "Burnt bronze",
+   "color": "#6b4d32",
+   "roughness": 0.38,
+   "metalness": 0.6
+  },
+  {
+   "id": "tungsten",
+   "name": "Tungsten",
+   "color": "#7d8084",
+   "roughness": 0.34,
+   "metalness": 0.7
+  }
+ ],
+ "gloves": [
+  {
+   "id": "coyote",
+   "name": "Coyote tactical",
+   "color": "#8b7556",
+   "texture": "arms/glove_coyote_col.png",
+   "material": "glove"
+  },
+  {
+   "id": "black",
+   "name": "Black tactical",
+   "color": "#1f2022",
+   "texture": "arms/glove_black_col.png",
+   "material": "glove"
+  }
+ ],
+ "sleeves": [
+  {
+   "id": "ranger_green",
+   "name": "Ranger Green",
+   "color": "#5a5e45",
+   "texture": "arms/sleeve_ranger_green_col.png",
+   "material": "sleeve"
+  },
+  {
+   "id": "coyote_tan",
+   "name": "Coyote Tan",
+   "color": "#9a8462",
+   "texture": "arms/sleeve_coyote_tan_col.png",
+   "material": "sleeve"
+  }
+ ]
+}

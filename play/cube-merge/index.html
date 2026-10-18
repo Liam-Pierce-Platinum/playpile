@@ -118,25 +118,45 @@
              file per game in site/guides/, written from the game's own
              code. The build pastes it in here; locally it is fetched. -->
         <article class="guide" id="guide"><h2>How to play</h2>
-<p>CUBE MERGE mixes the number puzzle 2048 with a snake game. You are a snake made of numbered cubes that look like cut gems, sliding around a crystal arena under a starry sky. The number on your <b>head</b> cube is what counts.</p>
+<p>CUBE MERGE mixes the number puzzle 2048 with a snake game. You are a snake made of numbered cubes that look like cut gems, sliding around a round crystal arena under a starry sky. The number on your <b>head</b> cube is what counts.</p>
 <p>Your snake steers towards the mouse pointer, or towards your finger if you drag on a phone. You can also turn with <kbd>A</kbd> and <kbd>D</kbd> or the arrow keys. Hold the mouse button or <kbd>Space</kbd> (or the BOOST button on a phone) to <b>dash</b>.</p>
-<p>Eat loose cubes that are worth <b>the same as or less than your head</b>. When two cubes of the same value meet, they <b>fuse</b> into one of double the value, just like in 2048: two 8s make a 16, two 16s make a 32, and so on. Reach the level target, starting at <b>128</b>, to move up a level.</p>
+<p>Eat loose cubes that are worth <b>the same as or less than your head</b>. A cube worth more than your head just bounces you away. Your snake keeps its cubes in order, biggest at the head, and whenever two cubes of the same value end up side by side they <b>fuse</b> into one of double the value, just like in 2048: two 8s make a 16, two 16s make a 32, and so on. One new cube can set off a whole chain of fusions. Reach the level target, starting at <b>128</b>, to move up a level.</p>
 
 <h2>Tips and strategy</h2>
-<p><b>Keep your chain in order.</b> Merges chain up best when your cubes run from biggest at the head to smallest at the tail. Eat the cube that matches your smallest one to set off a cascade.</p>
-<p><b>Size up every head.</b> You can <b>bite the tail</b> off a smaller snake and <b>ram a smaller head</b> to shatter it, and its cubes become food. But a bigger head can do the same to you, so steer clear of them.</p>
-<p><b>Dash to escape or to steal.</b> A dash gets you out of a bigger snake's path or onto a cube before a rival takes it.</p>
-<p><b>Expect a tougher arena.</b> Each level raises the target to the next power of two (128, 256, 512...) and the rival snakes get bigger and more aggressive.</p>
+<ul>
+<li><b>Feed the tail.</b> Because the snake sorts itself, the cube that grows your head fastest is the one that matches your smallest cube. It fuses, then fuses again with the next one up, all the way to the head.</li>
+<li><b>Size up every head.</b> Run your head into a smaller head and that snake shatters, leaving all its cubes as food. Run into a bigger head and it is you that shatters. Two heads of the same value just bounce off each other.</li>
+<li><b>Bite tails.</b> If your head is at least as big as a cube in another snake's body, touching that cube cuts the snake there. You swallow the cube you hit, and the rest of the cut-off tail spills out as loose cubes for anyone to grab. Touch a body cube bigger than your head and you are knocked aside.</li>
+<li><b>The dash runs on a meter.</b> Dashing raises your speed by about two thirds, but the meter drains in two seconds and takes over five to fill again. Save it for escaping a big head or snatching a cube from a rival.</li>
+<li><b>Use your head start.</b> You are safe from head-on hits for the first three seconds of a run, so use them to get away from the crowd.</li>
+<li><b>Mind the wall.</b> The edge of the arena turns you around. Getting trapped against it by a bigger snake is a common way to go.</li>
+</ul>
 
 <h2>What's in it</h2>
-<p>A level-by-level climb with targets that double each time, rival cube snakes that grow with you, and a result card when you are shattered, from which you can go straight back in. Your best score and the highest level you have unlocked are saved.</p>
+<p>A level-by-level climb. The target doubles each level (128, then 256, 512 and so on), and your snake starts each run with a single head cube that also grows with the level you start from. Nine rival snakes share the arena with you, with names like Quartzy, Opaline, Bismuth, Garnet and Topaz Tom. A rival you shatter comes back as a fresh snake a few seconds later. On higher levels the rivals start bigger and hunt more. When you level up, any rival far smaller than you is given a boost so the arena stays dangerous.</p>
+<p>When you are shattered, a result card shows who got you and how big their head was, your score, your biggest cube, your knockouts, your best score ever and the highest level you have unlocked. From there you can go straight back in.</p>
 <p>The cubes are shaded like gems, with chamfered edges, rainbow refraction and sparkling facets, on a crystal floor under a star dome. Broken snakes burst into star shards.</p>
 
+<h2>Behind the game</h2>
+<p>Each time a cube joins your snake, the whole chain is sorted from biggest to smallest and then checked for pairs. Every pair found doubles and the check runs again, which is how one small cube can ripple all the way up the snake. Loose food on the floor is kept topped up at all times, and its value is set by your level, mostly small cubes with the odd larger one.</p>
+<p>The rival snakes rethink about five times a second. Each one looks for the best cube it is allowed to eat, nearest first but pulled towards bigger ones. If a bigger head comes close it turns away and dashes. If a smaller snake is near, it may hunt it, aiming just in front of its head, and the chance that it does grows with every level. They also steer back towards the middle when they get near the wall.</p>
+<p>Your score is the total value of every cube you eat and every tail cube you bite off, so big bites count for much more than nibbling small cubes.</p>
+
 <h2>Questions</h2>
-<p><b>Do I need an account?</b> No. Your best score and level are saved in your browser.</p>
-<p><b>Do I need to know 2048?</b> No. Just remember that two cubes with the same number join into one with double the number.</p>
-<p><b>Is it violent?</b> No. It is numbers and crystals.</p>
-<p><b>Does it flash?</b> No. There are sparkles, but no screen flashes.</p></article>
+<h3>Do I need an account?</h3>
+<p>No. Your best score, your biggest cube and your highest unlocked level are saved in your browser.</p>
+<h3>Do I have to start from level 1 every time?</h3>
+<p>No. After you are shattered, the AGAIN button starts you one level below the highest level you have unlocked.</p>
+<h3>Can I play on a phone?</h3>
+<p>Yes. Drag a finger to steer and hold the BOOST button to dash.</p>
+<h3>Is it multiplayer?</h3>
+<p>No. The rival snakes are played by the computer.</p>
+<h3>Do I need to know 2048?</h3>
+<p>No. Just remember that two cubes with the same number join into one with double the number.</p>
+<h3>Is it violent?</h3>
+<p>No. It is numbers and crystals.</p>
+<h3>Does it flash?</h3>
+<p>No. There are sparkles and a little screen shake on big fusions, but no screen flashes.</p></article>
 
         <div id="ad-play-footer"></div>
 
@@ -164,12 +184,12 @@
       <div class="cols2">
         <div>
           <div class="brand">PLAY<b>PILE</b></div>
-          <p class="blurb">98 browser games, all of them written for this site. No sign-up,
+          <p class="blurb">100 browser games, all of them written for this site. No sign-up,
              no download, and your best scores stay in your own browser.</p>
         </div>
         <div class="fl"><b>Site</b>
           <a href="/">All games</a><a href="/site/about.html">About</a>
-          <a href="/site/updates.html">Updates</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/updates.html">Updates</a><a href="/devlog/">Dev log</a><a href="/articles/">Articles</a><a href="/site/contact.html">Contact</a>
           <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
         <div class="fl"><b>Legal</b>
           <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>

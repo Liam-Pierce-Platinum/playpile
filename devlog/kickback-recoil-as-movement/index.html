@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KICKBACK: when the gun is how you move - PLAYPILE</title>
+<meta name="description" content="Designing a 2D shooter where recoil is your jump, and the three invisible bugs that made its fights feel broken until we measured them.">
+<link rel="canonical" href="https://playpile.net/devlog/kickback-recoil-as-movement/">
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#050a14">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"KICKBACK: when the gun is how you move","description":"Designing a 2D shooter where recoil is your jump, and the three invisible bugs that made its fights feel broken until we measured them.","datePublished":"2026-09-22","author":{"@type":"Person","name":"Liam"},"publisher":{"@type":"Organization","name":"PLAYPILE"},"mainEntityOfPage":"https://playpile.net/devlog/kickback-recoil-as-movement/"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <div class="prose">
+      <p class="crumbs"><a href="/">Games</a> &rsaquo; <a href="/devlog/">Dev log</a></p>
+      <article>
+      <section class="hero"><h1>KICKBACK: when the gun is how you move</h1>
+        <p id="lede"><time datetime="2026-09-22">22 September 2026</time> &middot; 6 min read</p></section>
+<p><a href="/play/kickback/">KICKBACK</a> is a small pixel-art shooter set on six floors of an unfinished tower over the harbour, with downtown across the water. You carry a sawed-off shotgun with two shells in it, and the shells are your legs. This post is about how that idea works in numbers, and about three bugs that made the fights feel wrong for reasons nobody could see.</p>
+
+<h2>The gun is the movement system</h2>
+<p>Fire the gun and you get pushed the opposite way from where you aimed. In the code the kick is a single impulse of 10.8 against gravity of 27, applied directly against the aim. Shoot at the floor and you go up, about half a storey for one barrel. Fire both barrels quickly and you reach 27 metres a second, which clears a whole floor through the stairwell. Fire into a wall beside you and a muzzle-to-wall check adds up to 5 more, so a diagonal shot into concrete is a real wall jump rather than a nudge.</p>
+<p>Two rules keep that feeling good. First, walking never fights the recoil. Holding a direction can only push you up to walking pace, which is 4.2, so a shot that threw you across the room keeps you thrown. Second, and this is the asymmetry the whole game rests on: the people in the building carry the same gun and get none of the kick. They call the same firing code and the impulse is calculated and thrown away. They out-shoot you. You out-move them. The moment you run dry you are just a man standing on a floor.</p>
+<p>Two shells means every jump is a choice. A shell spent getting up a floor is a shell you do not have for the man at the top of the stairs, and reloading takes 0.95 seconds that you have to find somewhere.</p>
+
+<h2>Making the enemies fair to fight</h2>
+<p>The first version of the enemies swung a barrel round and fired the instant it lined up. That is not a duel, it is a hazard. You cannot see it coming, so nothing you do matters, and the best play is to stand still and trade shots, which is the opposite of a game about moving. Five rules fixed it:</p>
+<ol>
+<li><b>They wind up.</b> Feet plant and a red bracket closes over the head. It lasts three-quarters of a second on the first floor and shrinks floor by floor to a third.</li>
+<li><b>The aim is locked when the wind-up starts.</b> Anything you do afterwards beats it, and the only thing that moves you far enough in half a second is the gun. That one rule turns recoil from a way of getting around into your defence.</li>
+<li><b>One at a time.</b> Each floor hands out a single firing token. Four men firing at once is not four times as hard, it is a coin flip, and you can no longer tell which one is about to shoot.</li>
+<li><b>Being hit cancels it.</b> Shooting first wins the exchange.</li>
+<li><b>Reloading is the opening.</b> An empty enemy stands there for two seconds with two dots over his head.</li>
+</ol>
+<p>Those three marks, a yellow bang when he sees you, the closing red bracket and the two dots, are the entire combat interface. At 480 by 270 pixels you cannot read a pose from across a floor, so what somebody is doing has to be written above him.</p>
+
+<h2>Three bugs you could not see</h2>
+<p>By September the game looked right and felt wrong. Shots that should have landed did nothing, and enemies barely fought back. All three causes were invisible in a screenshot, which is exactly why they had shipped.</p>
+<h3>The columns ate every shot</h3>
+<p>In a 3D building you walk round a pillar. In 2D there is no round, so a full-height column between you and the stairs made a floor impossible to cross. We had fixed that by letting you walk through columns. But the columns still stopped bullets, and there was one every 4.4 metres across a 44-metre floor. Any level shot fired along a floor died on concrete, yours and theirs, and because you walk straight through a column there was nothing on screen to explain it. Columns now carry a second flag that tells bullets to ignore them. Shooting into one still throws you off it. This is a whole class of bug for us now: anything marked as walk-through has to be checked against bullets separately.</p>
+<h3>The barricades were taller than the barrel</h3>
+<p>The gun fires from 0.75 metres off the floor. The brick barricades were 0.95 metres tall, so seven pellets in ten hit the barricade at any range past four metres. They were also too tall to step over, so the only way past was to spend a shell. They are 0.62 metres now with a step height of 0.7, so you shoot over them standing and walk up onto them.</p>
+<h3>Nothing said you had hit anybody</h3>
+<p>Seven pellets and a health number going down somewhere off the side of the picture. There is now a hit marker on the crosshair, white for a hit and red for a kill.</p>
+<p>The enemies' line of sight used the same ray as bullets, so they had been half-blind too. Once that was fixed they started landing shots for the first time, and their damage had to come down from 38 a hit to 29. The crate at the top of each stair now heals 45, because six floors on one health bar was a coin flip rather than a run.</p>
+
+<h2>The range has to live on the screen</h2>
+<p>The view is 480 pixels at 32 pixels to the metre, which is fifteen metres across. The gun reached eighteen, and its damage stayed flat for the first half of that range, so everything you could actually see was a plateau. Point blank and the edge of the screen did the same damage. A shotgun that gives you no reason to get close is not a shotgun.</p>
+<p>The range is thirteen metres now. Damage is 74 at two metres, 65 at four, 52 at six, 29 at eight, 16 at ten and 7 at thirteen, then nothing. A first-floor thug has 48 health and a sixth-floor one has 93, so the same man is one shell at arm's length and four across the room. Enemies reach eleven metres, which means a man who can shoot you is always a man you can see. The crosshair shows the spread at the distance you are pointing, and its colour shows the falloff.</p>
+<p>An upgrade called Choke tightens the spread. Two of them used to turn 16 damage at twelve metres into 38 for free, which is not a choice, it is the right answer. Choke now costs kick, the thing you travel on.</p>
+
+<h2>Faces at seventeen pixels</h2>
+<p>The last fix this round was the faces. The heads are seventeen pixels across and they used to tilt with every feature rotated, so eyes came out as three stripes, the fringe made a domino mask when a figure turned round, and the jaw shadow covered 45 per cent of the head and read as a beard. Heads no longer rotate. Every feature sits on whole pixels, and the pupils follow the aim instead. The muzzle flash was also leaving from a third of the way down the barrel, because the gun was drawn longer than the point the pellets came from. The drawing and the shot now ask the same function where the end of the barrel is.</p>
+<p>The game's own test suite has 45 checks now, including the column, barricade and range cases above, so they cannot quietly come back.</p>
+      </article>
+      <h2>More from the dev log</h2>
+      <ul><li><a href="/devlog/one-script-for-every-phone/" style="color:var(--accent)">One script that makes every game work on a phone</a></li><li><a href="/devlog/designing-tension/" style="color:var(--accent)">Designing tension in three games: a crowd, a chase and a muzzle flash</a></li><li><a href="/devlog/how-we-check-every-game/" style="color:var(--accent)">How we check every game without playing each one by hand</a></li><li><a href="/devlog/southpaw-ten-boxers-ten-weaknesses/" style="color:var(--accent)">SOUTHPAW: ten boxers, and why mashing loses</a></li></ul>
+
+    </div>
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">100 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/devlog/">Dev log</a><a href="/articles/">Articles</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<script type="module">
+import { GAMES, mountShell, row } from '/site/shell.js';
+import { loadAds } from '/ads/ads.js';
+mountShell({ active: 'about' });
+document.getElementById('picks').innerHTML =
+  row('Start with one of these', GAMES.filter((g) => g.big).slice(0, 6), { seeAll: '/' });
+// no ad slots on this page, but it does load the ad script, so it owes
+// the visitor the same cookie notice as everywhere else
+loadAds();
+</script>
+</body>
+</html>

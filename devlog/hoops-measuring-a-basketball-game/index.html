@@ -52,12 +52,12 @@
       <article>
       <section class="hero"><h1>HOOPS: when the measurement disagrees with the player</h1>
         <p id="lede"><time datetime="2026-09-23">23 September 2026</time> &middot; 5 min read</p></section>
-<p><a href="/play/hoops/">HOOPS</a> became three games on 17 September: half-court streetball, a full court with two rings and a clock, and the original stand-still shootout. The other players run plays, stamina matters, and you can play a friend online with a four-letter room code. In the week since, most of our work on it has gone into one question: is it fair? This post is about how we tried to answer that with tests, and how the tests got it wrong before they got it right.</p>
+<p><a href="/play/hoops/">HOOPS</a> became three games on 17 September: half-court streetball, a full court with two rings and a clock, and the original stand-still shootout. In the week since, most of our work on it has gone into one question: is it fair? This post is about how we tried to answer that with tests, and how the tests got it wrong before they got it right.</p>
 
 <h2>"It's impossible not to get blocked"</h2>
 <p>The first serious complaint from playtesting was that shooting felt hopeless. Almost every shot seemed to be blocked. We had a test for exactly this. It took shots from 2.5, 5, 8 and 11 metres and failed if more than a quarter were blocked. It said 8 per cent. The test and the player disagreed, and when that happens the test is usually answering a different question.</p>
 <p>It was. The test fired through a debugging shortcut that gave every shot the perfect power and the perfect release. Nobody plays like that. A player holds the mouse button, drags back and lets go, and everything that can go wrong with a shot happens on that path: the gather, the travelling rule, letting go early or late, a hand in your face.</p>
-<p>The old test had a second, sillier flaw. A half-court game is first to 11, and the match could end partway through the test. Every attempt left after the final whistle counted as blocked. The same build measured 21 per cent blocked over twelve attempts and 68 per cent over thirty. It now restarts the match whenever the score reaches 8.</p>
+<p>The old test had a second flaw. A half-court game is first to 11, so the match could end partway through the test, and every attempt after the final whistle counted as blocked. The same build measured 21 per cent blocked over twelve attempts and 68 per cent over thirty. It now restarts the match whenever the score reaches 8.</p>
 
 <h2>Shooting the way a player shoots</h2>
 <p>So we wrote a new test that plays a possession properly. It takes the ball, lets the defender close out, drags the real mouse towards the real power and lets go. It also sorts what happens into three outcomes, because three different things all feel like "blocked" from the sofa, and they need three different fixes:</p>
@@ -66,8 +66,8 @@
 <li><b>Blocked</b>: it left, and somebody got it in the air.</li>
 <li><b>Missed</b>: it reached the ring on its own and did not go in.</li>
 </ul>
-<p>A fourth bucket, <b>short</b>, catches shots that never came within 2.2 metres of the ring. Those are the tester's fault, not the defence's. The targets are fewer than 6 per cent taken, fewer than 15 per cent blocked, and more than a third made.</p>
-<p>The first version of this test was a bad shooter. It read the ideal power once and dragged to it, and only one release in nineteen landed in the green band of the power meter. It made 10 per cent. A person does not shoot like that either. They watch the meter and correct. So the test now makes up to five corrections while it drags, the way someone watching the ring does.</p>
+<p>A fourth bucket, <b>short</b>, catches shots that never came within 2.2 metres of the ring. The targets are fewer than 6 per cent taken, fewer than 15 per cent blocked, and more than a third made.</p>
+<p>The first version of this test was a bad shooter. It read the ideal power once and dragged to it, and only one release in nineteen landed in the green band of the power meter. It made 10 per cent. People watch and correct, so the test now makes up to five corrections while it drags.</p>
 
 <h2>What the honest test found</h2>
 <p>With a test that played like a person, the problems were easy to see, and most of them were in the defence.</p>
@@ -81,14 +81,13 @@
 <p>The last change of the week is the simplest. For the first seven seconds of each possession nobody can block or swipe at you, and a bar over your player's legs counts that time down. We made it a clock rather than a lower chance of being blocked, because a clock is something you can see and plan around.</p>
 
 <h2>Keeping the computer players honest</h2>
-<p>The bots have rules too, and some of them came from tests that only watch. One script plays bots against each other and sorts every shot by distance: close, mid-range, inside the arc and long. That made one problem obvious. The bots were spending whole possessions throwing the ball from their own end. Now how keen a bot is to shoot depends on distance. It is most keen under 3.6 metres and barely interested more than 2.5 metres beyond the arc. It will not take a shot from more than 5 metres past the arc unless the shot clock is under 3.5 seconds.</p>
-<p>Bots also miss like people. Their release error grows with distance, with how closely they are guarded and with how tired they are. As the code puts it, a bot's hands are not a calculator. Before that was right, they had the opposite problem: they worked out their power for one arc and shot at another, and made 0 of 30.</p>
+<p>The bots have rules too, and some of them came from tests that only watch. One script plays bots against each other and sorts every shot by distance, which made one problem obvious: the bots were spending whole possessions throwing the ball from their own end. Now how keen a bot is to shoot depends on distance. It is most keen under 3.6 metres and barely interested more than 2.5 metres beyond the arc. It will not take a shot from more than 5 metres past the arc unless the shot clock is under 3.5 seconds.</p>
+<p>Bots also miss like people. Their release error grows with distance, with how closely they are guarded and with how tired they are. As the code puts it, a bot's hands are not a calculator. An earlier bug was worse: they worked out their power for one arc and shot at another, and made 0 of 30.</p>
 
 <h2>The referee</h2>
-<p>Two rules only happen when somebody does something wrong, so nothing else would check them. Travelling: once you start pulling back to shoot, the ball is gathered, and moving faster than 1.8 metres a second for more than 0.2 seconds after that is a turnover. The bots have to plant their feet too. A foul: landing on top of a player who is on the floor earns him a free throw. The first version whistled any contest jump that landed near a shooter and gave away about two dozen free throws in ten minutes. A dedicated test now holds the real keys and drags the real mouse to make sure both calls happen when they should, and only then.</p>
+<p>Two rules only happen when somebody does something wrong, so nothing else would check them. Travelling: once you start pulling back to shoot, the ball is gathered, and moving faster than 1.8 metres a second for more than 0.2 seconds after that is a turnover. The bots have to plant their feet too. A foul: landing on top of a player who is on the floor earns him a free throw. The first version whistled any contest jump that landed near a shooter and gave away about two dozen free throws in ten minutes. A dedicated test holds the real keys and drags the real mouse to make sure both calls are made.</p>
 
-<h2>What we took from it</h2>
-<p>Every number in this post came from a script, but the reason we went looking was a person saying the game felt wrong. The scripts were only useful once they played the way that person did. A test with a shortcut answers an easier question than the one you asked.</p>
+<p>Every number in this post came from a script, but the reason we went looking was a person saying the game felt wrong. The scripts were only useful once they played the way that person did.</p>
       </article>
       <h2>More from the dev log</h2>
       <ul><li><a href="/devlog/one-script-for-every-phone/" style="color:var(--accent)">One script that makes every game work on a phone</a></li><li><a href="/devlog/progress-lives-in-your-browser/" style="color:var(--accent)">Why your progress lives in your browser, and how levels and badges work</a></li><li><a href="/devlog/designing-tension/" style="color:var(--accent)">Designing tension in three games: a crowd, a chase and a muzzle flash</a></li><li><a href="/devlog/how-we-check-every-game/" style="color:var(--accent)">How we check every game without playing each one by hand</a></li></ul>

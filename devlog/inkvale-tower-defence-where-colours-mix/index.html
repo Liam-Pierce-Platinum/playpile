@@ -52,10 +52,10 @@
       <article>
       <section class="hero"><h1>INKVALE: a tower defence where the colours mix</h1>
         <p id="lede"><time datetime="2026-10-08">8 October 2026</time> &middot; 5 min read</p></section>
-<p><a href="/play/inkvale/">INKVALE</a> went on PLAYPILE on 7 October as a tower defence painted in ink and watercolour, twelve battles long. What arrived was not the game we had a few days earlier. The first version was a straightforward tower defence in the classic style: build towers beside a road, upgrade them, survive the waves. It looked lovely and played like a lot of other games. This post is about what we changed to make it its own thing.</p>
+<p><a href="/play/inkvale/">INKVALE</a> went on PLAYPILE on 7 October as a tower defence painted in ink and watercolour, twelve battles long. The first version was a straightforward tower defence in the classic style: build towers beside a road, upgrade them, survive the waves. This post is about what we changed to make it its own thing.</p>
 
 <h2>The brief for the rework</h2>
-<p>The notes for the rework were short: make it more distinct from the games it was inspired by, make it look better, make it harder, let two people play it on the website, and let the coins you win buy new warriors. Most of that is ordinary work. "More distinct" is the hard one, because a tower defence has a very settled shape. Towers shoot, enemies walk, numbers go down. We wanted one new rule that changes where you put things, not just more of the same.</p>
+<p>The notes for the rework were short: make it more distinct from the games it was inspired by, make it look better, make it harder, let two people play it on the website, and let the coins you win buy new warriors. "More distinct" is the hard one, because a tower defence has a very settled shape. We wanted one new rule that changes where you put things, not just more of the same.</p>
 
 <h2>Pigments</h2>
 <p>The rule we settled on comes straight from the art style. Every tower that attacks paints what it hits. Archers stain enemies ochre, mages ultramarine, and artillery vermilion. A stain lasts four seconds. If a second, different colour lands on an enemy that is still wet, the two colours mix, and the mix does something neither tower could do alone:</p>
@@ -64,10 +64,10 @@
 <li><b>Overgrowth</b> (yellow and blue): vines root the enemy to the spot for 1.3 seconds and do thorn damage. Flying enemies and bosses cannot be rooted, so they are slowed by half for two seconds instead.</li>
 <li><b>Flashfire</b> (yellow and red): a burst of fire that hits the stained enemy hard and spills onto every enemy of the same kind within a short radius.</li>
 </ul>
-<p>After a mix there is a cooldown of 1.4 seconds before that enemy can be stained again, so you cannot chain mixes on one target forever. The strength of a mix grows with the battle number and with the level of the tower that triggered it.</p>
-<p>The effect on play is that where you put towers becomes a palette. Two archer towers side by side are just two archer towers. An archer tower and a mage tower covering the same bend in the road is a root waiting to happen. A palette card in the corner of every battle shows the three mixes, so you never have to remember them.</p>
+<p>After a mix there is a cooldown of 1.4 seconds before that enemy can be stained again, so you cannot chain mixes on one target forever.</p>
+<p>The effect on play is that where you put towers becomes a palette. An archer tower and a mage tower covering the same bend in the road is a root waiting to happen. A palette card in the corner of every battle shows the three mixes, so you never have to remember them.</p>
 <h3>Two bugs that only a rule like this could have</h3>
-<p>Some of the mage paths fire a continuous beam, which deals a sliver of damage every frame. At first beams did not stain at all, so a whole branch of the mage tower could not take part in mixing. Now any direct hit from a tower stains, while damage that ticks over time with no tower behind it, such as poison or burning ground, still does not.</p>
+<p>One of the mage paths fires a continuous beam, which deals a sliver of damage every frame. At first beams did not stain at all, so a whole branch of the mage tower could not take part in mixing. Now any direct hit from a tower stains, while damage that ticks over time with no tower behind it, such as poison or burning ground, still does not.</p>
 <p>The second bug was older and worse. The damage code rounded every damage-over-time tick up to a whole point. That sounds harmless, but these ticks happen every frame, so poison, burning and beams were about ten times stronger than intended. We fixed the rounding on the same day as the rework.</p>
 
 <h2>Spells you draw</h2>
@@ -76,19 +76,19 @@
 <li><b>The Wash</b>: drag along the road. It shoves ground enemies 60 units back down the road, slows them by 40 per cent for three seconds, does a little magic damage, and stains them ultramarine. Because it paints, it can set up a mix with your towers. The stroke can be up to 220 pixels long, and the spell recharges in 42 seconds.</li>
 <li><b>Ink Wall</b>: drag across the road. Ground enemies have to hack through it, which holds them in front of your towers. Flyers pass over. It lasts 14 seconds.</li>
 </ul>
-<p>A plain click casts either one at the road under the pointer, so you are never forced to draw if you just want it there now.</p>
+<p>A plain click casts either one at the road under the pointer, so drawing is never required.</p>
 
 <h2>Making it harder, fairly</h2>
 <p>Balancing is done by a computer player that plays every battle, three runs each. Before the rework, a single toughness multiplier scaled every battle. The result was that the opening battles were still free and the late ones were impossible, because the curve was the wrong shape. That one multiplier is now a hand-set table, one value per battle.</p>
-<p>After the "make it harder" pass, the bot on Normal wins the first four battles while losing up to half its lives, scrapes battles six to eleven with five to fifteen lives left, and wins the final battle about one time in two. On Casual it wins everything. On Veteran it loses nearly every battle from the third on, which is intended: Veteran is for players who use the mixes, and the bot does not use them as well as a person can.</p>
+<p>After the "make it harder" pass, the bot on Normal wins the first four battles while losing up to half its lives, scrapes battles six to eleven with five to fifteen lives left, and wins the final battle about one time in two. On Casual it wins everything. On Veteran it loses nearly every battle from the third on, which is intended: Veteran is meant for players who use the mixes.</p>
 <p>Balancing also found a bug that would have frozen games. An enemy archer would stand and shoot at a soldier it could not reach, forever, so the wave never ended. It now gives up and walks on after five seconds.</p>
 
 <h2>Coins and the Hall</h2>
-<p>Every battle pays coins, win or lose. A win pays more for a higher battle number and for each star. A loss still pays a little for every wave you held, so a bad run is never wasted. Veteran pays half as much again. The coins hire five extra warriors in the Hall, from 250 coins for a blade fighter with a fast flurry up to 900 for a witch whose curse makes enemies take more damage and stops them healing.</p>
+<p>Every battle pays coins, win or lose. A win pays more for a higher battle number and for each star. A loss still pays a little for every wave you held, so a bad run is never wasted. Veteran pays half as much again. The coins hire five extra warriors in the Hall, from 250 coins for a blade fighter with a fast flurry up to 900 for a hero whose curse makes enemies take more damage and stops them healing.</p>
 
 <h2>Two Wardens, no server</h2>
-<p>PLAYPILE is a static website. There is no game server behind it, so two-player play has to happen between the two players' browsers. When you host, the game creates a room with a four-letter code. The code avoids I, O, 0 and 1, so it can be read aloud without confusion. A free public matchmaking service introduces the two browsers to each other, and after that everything goes directly between them.</p>
-<p>The host's browser runs the battle. The guest sends commands and gets a snapshot of the battlefield about twelve times a second. Snapshots that infrequent would make units jump, so the guest eases every unit towards its new position instead of snapping it there. Each player has their own gold, towers and hero, and the lives are shared. To keep it fair, each player gets 60 per cent of every bounty, so two players together earn a bit more than one but not double. Only two can join, and a third connection is turned away.</p>
+<p>PLAYPILE is a static website. There is no game server behind it, so two-player play has to happen between the two players' browsers. When you host, the game creates a room with a four-letter code. The code never uses I, O, 0 or 1, which are easy to confuse. A free public matchmaking service introduces the two browsers to each other, and after that everything goes directly between them.</p>
+<p>The host's browser runs the battle. The guest sends commands and gets a snapshot of the battlefield about twelve times a second. Snapshots that infrequent would make units jump, so the guest eases every unit towards its new position instead of snapping it there. Each player has their own gold, towers and hero, and the lives are shared. Each player gets 60 per cent of every bounty, so two players together earn a bit more than one but not double. Only two can join, and a third connection is turned away.</p>
 
 <h2>Painted by code</h2>
 <p>There are no image files in INKVALE. Everything is painted when the game loads. The watercolour look follows a technique the artist Tyler Hobbs has described: many layers of slightly warped, see-through shapes, with darker edges, paper grain and wobbly pen lines on top.</p>

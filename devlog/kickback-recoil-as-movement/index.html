@@ -56,13 +56,13 @@
 
 <h2>The gun is the movement system</h2>
 <p>Fire the gun and you get pushed the opposite way from where you aimed. In the code the kick is a single impulse of 10.8 against gravity of 27, applied directly against the aim. Shoot at the floor and you go up, about half a storey for one barrel. Fire both barrels quickly and you reach 27 metres a second, which clears a whole floor through the stairwell. Fire into a wall beside you and a muzzle-to-wall check adds up to 5 more, so a diagonal shot into concrete is a real wall jump rather than a nudge.</p>
-<p>Two rules keep that feeling good. First, walking never fights the recoil. Holding a direction can only push you up to walking pace, which is 4.2, so a shot that threw you across the room keeps you thrown. Second, and this is the asymmetry the whole game rests on: the people in the building carry the same gun and get none of the kick. They call the same firing code and the impulse is calculated and thrown away. They out-shoot you. You out-move them. The moment you run dry you are just a man standing on a floor.</p>
+<p>Two rules keep that feeling good. First, walking never fights the recoil. Holding a direction can only push you up to walking pace, which is 4.2, so a shot that threw you across the room keeps you thrown. Second, and this is the asymmetry the whole game rests on: the people in the building carry the same gun and get none of the kick. They out-shoot you; you out-move them. The moment you run dry you are just a man standing on a floor.</p>
 
 <h2>Making the enemies fair to fight</h2>
-<p>The first version of the enemies swung a barrel round and fired the instant it lined up. That is not a duel, it is a hazard. You cannot see it coming, so nothing you do matters, and the best play is to stand still and trade shots, which is the opposite of a game about moving. Five rules fixed it:</p>
+<p>The first version of the enemies swung a barrel round and fired the instant it lined up. That is not a duel, it is a hazard: you cannot see it coming, so the best play is to stand still and trade shots. Five rules fixed it:</p>
 <ol>
 <li><b>They wind up.</b> Feet plant and a red bracket closes over the head. It lasts three-quarters of a second on the first floor and shrinks floor by floor to a third.</li>
-<li><b>The aim is locked when the wind-up starts.</b> Anything you do afterwards beats it, and the only thing that moves you far enough in half a second is the gun. That one rule turns recoil from a way of getting around into your defence.</li>
+<li><b>The aim is locked when the wind-up starts.</b> Anything you do afterwards beats it, and the only thing that moves you far enough in half a second is the gun. That rule turns recoil into your defence.</li>
 <li><b>One at a time.</b> Each floor hands out a single firing token. Four men firing at once is not four times as hard, it is a coin flip, and you can no longer tell which one is about to shoot.</li>
 <li><b>Being hit cancels it.</b> Shooting first wins the exchange.</li>
 <li><b>Reloading is the opening.</b> An empty enemy stands there for two seconds with two dots over his head.</li>
@@ -76,12 +76,12 @@
 <h3>The barricades were taller than the barrel</h3>
 <p>The gun fires from 0.75 metres off the floor. The brick barricades were 0.95 metres tall, so seven pellets in ten hit the barricade at any range past four metres. They were also too tall to step over, so the only way past was to spend a shell. They are 0.62 metres now with a step height of 0.7, so you shoot over them standing and walk up onto them.</p>
 <h3>Nothing said you had hit anybody</h3>
-<p>Seven pellets and a health number going down somewhere off the side of the picture. There is now a hit marker on the crosshair, white for a hit and red for a kill.</p>
+<p>There is now a hit marker on the crosshair, white for a hit and red for a kill.</p>
 <p>The enemies' line of sight used the same ray as bullets, so they had been half-blind too. Once that was fixed they started landing shots for the first time, and their damage had to come down from 38 a hit to 29. The crate at the top of each stair now heals 45, because six floors on one health bar was a coin flip rather than a run.</p>
 
 <h2>The range has to live on the screen</h2>
 <p>The view is 480 pixels at 32 pixels to the metre, which is fifteen metres across. The gun reached eighteen, and its damage stayed flat for the first half of that range, so everything you could actually see was a plateau. Point blank and the edge of the screen did the same damage. A shotgun that gives you no reason to get close is not a shotgun.</p>
-<p>The range is thirteen metres now. Damage is 74 at two metres, 65 at four, 52 at six, 29 at eight, 16 at ten and 7 at thirteen, then nothing. A first-floor thug has 48 health and a sixth-floor one has 93, so the same man is one shell at arm's length and four across the room. Enemies reach eleven metres, which means a man who can shoot you is always a man you can see. The crosshair shows the spread at the distance you are pointing, and its colour shows the falloff.</p>
+<p>The range is thirteen metres now. Damage is 74 at two metres, 65 at four, 52 at six, 29 at eight, 16 at ten and 7 at thirteen, then nothing. A first-floor thug has 48 health and a sixth-floor one has 93, so the same man is one shell at arm's length and four across the room. Enemies reach eleven metres, which means a man who can shoot you is always a man you can see.</p>
 <p>An upgrade called Choke tightens the spread. Two of them used to turn 16 damage at twelve metres into 38 for free, which is not a choice, it is the right answer. Choke now costs kick, the thing you travel on.</p>
 
 <h2>Faces at seventeen pixels</h2>

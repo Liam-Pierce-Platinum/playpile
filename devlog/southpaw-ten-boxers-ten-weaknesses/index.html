@@ -55,9 +55,9 @@
 <p><a href="/play/southpaw/">SOUTHPAW</a> joined PLAYPILE on 7 October. It is arcade boxing in pixel art: ten opponents between you and the belt, a gym to spend your winnings in, a locker room, and two special modes for wrestling and sumo. This post is about the two things that decide whether a boxing game is any good. Every opponent has to be a puzzle, and the obvious cheap tactic has to fail.</p>
 
 <h2>A weakness has to be a number</h2>
-<p>It is easy to write "this fighter has a glass jaw" on a character card. It only matters if the game agrees. So every weakness in SOUTHPAW maps to a real value in the roster file: how much extra damage a fighter takes to the head or body or from a particular punch, how he defends, and any quirks in how he behaves. A few examples from the ten:</p>
+<p>A line like "this fighter has a glass jaw" only matters if the game agrees, so every weakness in SOUTHPAW maps to a real value in the roster file: how much extra damage a fighter takes to the head or body or from a particular punch, how he defends, and any quirks in how he behaves. A few examples from the ten:</p>
 <ul>
-<li><b>Tommy Ruiz</b>, the first opponent, takes body shots at 1.45 times normal damage and never guards low. He is there to teach you that body punches exist.</li>
+<li><b>Tommy Ruiz</b>, the first opponent, takes body shots at 1.45 times normal damage and never guards low.</li>
 <li><b>Big Lou Baker</b> has a big swing called the Mail Truck with a 0.62-second wind-up you can see coming. He tires after throwing it and drops his guard. Head shots do less to him, at 0.85, and uppercuts do more, at 1.25.</li>
 <li><b>Mickey Chen</b> has a glass jaw, taking 1.3 times damage to the head, and walks into uppercuts.</li>
 <li><b>Ivan Petrov</b> hates fighting up close. Uppercuts do 1.6 times damage to him.</li>
@@ -72,7 +72,7 @@
 <p>The ring is drawn at an angle, so you step across it as well as along it, with A and D for left and right and W and S for in and out. A punch only lands if you are lined up with the other fighter. The four arrow keys throw a jab, a cross, a lead hook and an uppercut. Holding Space sends every punch to the body, which costs stamina but goes under a high guard. A punch that connects can cancel into the next one, so tapping a rhythm throws combinations.</p>
 
 <h2>The mashing problem</h2>
-<p>Partway through building it we hit the problem every fighting game hits. Once an opponent was trapped in a corner, you could hold down one button and win. The stun from each hit lasted long enough for the next to land, and the fight became a stun-lock. That is not boxing, and it makes all ten opponents the same.</p>
+<p>Partway through building it we hit a familiar problem. Once an opponent was trapped in a corner, you could hold down one button and win. The stun from each hit lasted long enough for the next to land, and the fight became a stun-lock. That makes all ten opponents the same.</p>
 <p>The fix had to work on both sides of the exchange.</p>
 <h3>The defender recovers</h3>
 <ul>
@@ -85,7 +85,7 @@
 <p>The computer boxer has a reaction time, about a quarter of a second by default, and a memory of what you throw. If you hit the same spot two to four times in a row, the exact number depending on how fast that fighter learns, he covers it. He tries to guess when you will switch targets. If you throw three or more punches less than 0.32 seconds apart, he shells up. He only counters when there is a gap in your rhythm. And if you hide behind a high guard, he waits a moment and then goes to the body.</p>
 
 <h2>Proving it with a script</h2>
-<p>A feeling that mashing is weaker is not proof, so the game ships with a test that plays two kinds of player against the real fight code. The masher walks the opponent down and throws the same straight to the head every 0.08 seconds, as fast as the game accepts it. The mixer throws straights and hooks, alternating head and body, at a steadier and less regular rhythm. Each plays three 30-second rounds against four opponents: Ruiz, Chen, Hale and Carter. The rule is simple: mashing must lose.</p>
+<p>A feeling that mashing is weaker is not proof, so the game ships with a test that plays two kinds of player against the real fight code. The masher walks the opponent down and throws the same straight to the head every 0.08 seconds, as fast as the game accepts it. The mixer throws straights and hooks, alternating head and body, at a slower, varied rhythm. Each plays three 30-second rounds against four opponents: Ruiz, Chen, Hale and Carter. The rule is simple: mashing must lose.</p>
 <p>Here is what the current version prints, as damage dealt per 30 seconds and the share of punches that landed:</p>
 <ul>
 <li><b>Ruiz</b>: mashing lands 11 per cent for 107 damage. Mixing lands 44 per cent for 196.</li>
@@ -94,13 +94,13 @@
 <li><b>Carter</b>: mashing lands 14 per cent for 39. Mixing lands 22 per cent for 53.</li>
 </ul>
 <p>Against Ruiz the masher had 237 punches blocked over three rounds, against 41 for the mixer. The test also records the longest unbroken string of hits, because a stun-lock shows up there as a huge number. It now tops out at seven.</p>
-<p>The gap is biggest against the early fighters and smallest against Carter, which is what we want. Against the champion nothing is easy, but variety still wins.</p>
+<p>The gap is widest against Ruiz and narrower against the later fighters. Against the champion nothing is easy, but variety still wins.</p>
 
 <h2>Wrestling and sumo</h2>
-<p>The two special modes reuse the same fighters with different rules. In the wrestling bowl you bounce off the ropes for lariats and dropkicks, and a lock-up is a timing meter rather than a button race, for the same reason as above. A pin is a three-count. In the sumo ring you charge on the call, and your balance is your health bar, over the best of three bouts.</p>
+<p>The two special modes change the rules. In the wrestling bowl you bounce off the ropes for lariats and dropkicks, and a lock-up is a timing meter rather than a button race, for the same reason as above. A pin is a three-count. In the sumo ring you charge on the call, and your balance is your health bar, over the best of three bouts.</p>
 
-<h2>Getting stronger without grinding</h2>
-<p>Wins pay points to spend in the gym on eleven stats, each from 0 to 10. A level costs its own number in points, so level one costs one and level ten costs ten. You start with three points and a campaign win pays at least four. Spreading points thinly is cheap and pushing one stat to the top is expensive, so the gym nudges you towards a rounded fighter. The locker room is purely about looks: build, skin, hair, trunks, gloves and boots.</p>
+<h2>The gym</h2>
+<p>Wins pay points to spend in the gym on eleven stats, each from 0 to 10. A level costs its own number in points, so level one costs one and level ten costs ten. You start with three points and a campaign win pays at least four. Spreading points thinly is cheap and pushing one stat to the top is expensive, so the gym nudges you towards a rounded fighter.</p>
 <p>One honest note: the original game also has online play, but it relies on a small server that a static website does not have, so the version on PLAYPILE is single-player. The guide under the game says so.</p>
       </article>
       <h2>More from the dev log</h2>

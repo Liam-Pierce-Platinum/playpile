@@ -1128,9 +1128,9 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     cat: 'Driving', tags: ['racing', 'f1', 'cars', 'simulation', '3d', 'track',
                            'rain', 'pit stops', 'damage', 'career'],
     blurb: 'Thirty-three real circuits, twenty-four cars, and air that decides the overtake.',
-    about: `Every circuit on the calendar and a good many that are not, each laid out
-    from its real corner sequence and solved until the lap closes to under a metre and
-    measures the published distance. The car makes its own grip out of air - about its
+    about: `Every circuit on the calendar and a good many that are not, each built
+    from survey data of the real track, smoothed and checked against the published
+    distance. The car makes its own grip out of air - about its
     own weight again in downforce by 200 km/h - so it corners harder the faster it is
     going, and the body heaves, pitches and rolls on four real springs rather than on
     a formula. Twelve teams, two cars each, and the air behind them matters: sit in

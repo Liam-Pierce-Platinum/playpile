@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Rooftop Duel</title>
+<link rel="stylesheet" href="./style.css">
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js" } }</script>
+</head><body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="side l"><div class="nm" id="n1">YOU</div><div class="pips" id="p1"></div></div>
+  <div class="mid"><div id="wep"></div></div>
+  <div class="side r"><div class="nm" id="n2"></div><div class="pips" id="p2"></div></div>
+</div>
+<button id="menuBtn" aria-label="menu">MENU</button>
+<div id="banner"></div>
+<div id="hint"><b>W</b> / <b>SPACE</b> jump &nbsp; <b>D</b> / <b>J</b> fire &nbsp; &middot; &nbsp; knock them off the roof</div>
+<div id="panel" class="hide"></div>
+<div id="touch">
+  <div class="tb a" data-k="0j">JUMP</div><div class="tb b" data-k="0s">FIRE</div>
+  <div class="tb c" data-k="1s">FIRE</div><div class="tb d" data-k="1j">JUMP</div>
+</div>
+<script type="module" src="./src/main.js"></script>
+</body></html>

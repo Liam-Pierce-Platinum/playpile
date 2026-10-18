@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>STICK SWING</title><link rel="stylesheet" href="./style.css">
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+</head><body>
+<canvas id="c"></canvas><div id="grain"></div>
+<div id="hud"><div id="lv">LEVEL 1</div><div id="prog"><div id="bar"></div></div><div id="tm">0.0s</div>
+<div id="btns"><button id="bmute">♪</button><button id="brst">↻</button><button id="bmenu">☰</button></div></div>
+<div id="toast"></div>
+<div id="win" class="hide card"><h2>FOLDED!</h2><div id="wst"></div><p id="wtime"></p><p id="wun"></p>
+<div class="row"><button id="wagain">Retry</button><button id="wnext" class="main">Next ›</button></div><small>tap anywhere to continue</small></div>
+<div id="menu" class="hide"><div class="card"><h1>STICK<br>SWING</h1><p class="sub">an origami hook-and-swing</p>
+<button id="play" class="main big">Play</button><div id="grid"></div><p class="sub">Papers</p><div id="skins"></div>
+<p class="sub">Hold mouse / touch / Space to hook. Let go to fly.</p></div></div>
+<script type="module" src="./src/main.js"></script>
+</body></html>

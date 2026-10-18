@@ -1,0 +1,48 @@
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#12031f;color:#fff;font-family:"Trebuchet MS",Verdana,sans-serif;user-select:none;-webkit-user-select:none;touch-action:none}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+#hud{position:fixed;inset:0;pointer-events:none}
+.hide{display:none!important}
+#topl{position:absolute;left:16px;top:12px;font-weight:bold;letter-spacing:2px}
+#cash{font-size:26px;color:#7ff6ff;text-shadow:0 0 10px #0ff,2px 2px 0 #b0177a}
+#prog{font-size:13px;color:#ffb3ec}
+#chal{position:absolute;left:50%;top:12px;transform:translateX(-50%);text-align:center;background:linear-gradient(90deg,#ff3fa466,#7a3cff66);padding:6px 22px;border:1px solid #ff9ee0;border-radius:4px}
+#chName{font-size:20px;font-weight:bold;letter-spacing:3px;font-style:italic}
+#chGoal{font-size:13px;color:#ffe0f7}
+#chTime{font-size:22px;color:#fff36b;font-weight:bold}
+#next{position:absolute;right:16px;top:14px;font-size:14px;color:#ffd6f4;letter-spacing:1px;text-align:right;max-width:46vw}
+#arrow{display:inline-block;color:#7ff6ff;font-size:18px}
+#pop{position:absolute;left:50%;top:30%;transform:translateX(-50%);font-size:24px;font-weight:bold;font-style:italic;text-align:center;color:#fff36b;text-shadow:0 0 12px #ff3fa4,3px 3px 0 #5b0c8a;white-space:nowrap;transition:opacity .3s}
+#combo{position:absolute;left:50%;top:calc(30% + 34px);transform:translateX(-50%);font-size:16px;color:#7ff6ff}
+#big{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);font-size:64px;font-weight:900;font-style:italic;color:#fff;text-shadow:0 0 20px #ff3fa4,5px 5px 0 #5b0c8a}
+#spd{position:absolute;right:20px;bottom:18px;text-align:right}
+#kmh{font-size:48px;font-style:italic;background:linear-gradient(#fff,#ff8fd8 55%,#7a3cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+#spd small{display:block;font-size:11px;letter-spacing:3px;color:#ffb3ec}
+#nos{width:160px;height:8px;border:1px solid #7ff6ff;margin-top:4px;margin-left:auto}
+#nos i{display:block;height:100%;width:50%;background:linear-gradient(90deg,#00e5ff,#ff3fa4)}
+#hint{position:absolute;left:16px;bottom:14px;font-size:12px;color:#ffd6f4cc;max-width:52vw;transition:opacity 1s}
+.btn{pointer-events:auto;font:bold 18px "Trebuchet MS",sans-serif;letter-spacing:3px;color:#fff;padding:10px 26px;border:2px solid #ff9ee0;background:linear-gradient(#ff3fa4,#7a3cff);border-radius:3px;cursor:pointer;font-style:italic;box-shadow:0 0 14px #ff3fa488}
+.btn.ghost{background:transparent}
+.btn.sm{font-size:12px;padding:5px 12px;letter-spacing:2px}
+#garBtn{position:absolute;left:16px;top:68px}
+#card,#garage,#title{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;background:linear-gradient(#2a0a45ee,#12031fee);border:2px solid #ff9ee0;padding:24px 30px;border-radius:6px;box-shadow:0 0 40px #ff3fa455;max-width:calc(100vw - 32px)}
+#card h2,#garage h2{font-size:30px;font-style:italic;letter-spacing:4px;color:#fff36b;text-shadow:3px 3px 0 #b0177a;margin-bottom:8px}
+#card p{margin-bottom:16px;color:#ffd6f4}
+#title{background:none;border:none;box-shadow:none}
+#title h1{font-size:min(19vw,120px);line-height:.9;font-style:italic;font-weight:900;background:linear-gradient(#fff 10%,#ffd1f1 40%,#ff3fa4 52%,#5b0c8a 54%,#7ff6ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(4px 4px 0 #2a0a45)}
+#title p{margin:10px 0 22px;color:#ffd6f4;letter-spacing:2px}
+#garList{display:grid;gap:8px;margin:10px 0 16px;min-width:min(380px,80vw)}
+.gi{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 10px;border:1px solid #ff9ee055;text-align:left}
+.gi b{color:#7ff6ff}
+.gi .btn{font-size:13px;padding:5px 12px}
+.sw{display:inline-block;width:18px;height:18px;border-radius:50%;border:2px solid #fff;margin-right:4px;cursor:pointer;pointer-events:auto;vertical-align:middle}
+.sw.on{box-shadow:0 0 0 2px #fff36b}
+#touch{display:none}
+body.touch #touch{display:block}
+body.touch #hint{display:none}
+.tb{position:fixed;width:74px;height:74px;border-radius:50%;border:2px solid #ff9ee0aa;background:#ff3fa433;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;color:#fff;touch-action:none}
+.tb.on{background:#ff3fa499}
+#tL{left:16px;bottom:24px}#tR{left:104px;bottom:24px}
+#tB{right:104px;bottom:110px}#tG{right:16px;bottom:110px}#tN{right:16px;bottom:196px;width:60px;height:60px;font-size:14px;border-color:#7ff6ff}
+body.touch #spd{bottom:auto;top:56px;right:16px}
+body.touch #spd b{font-size:30px}

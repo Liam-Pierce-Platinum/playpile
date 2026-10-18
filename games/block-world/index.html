@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>BLOCK WORLD</title>
+<meta name="description" content="Voxel parkour in a painted sky. Jump, bounce and build your way to the golden beacon.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="flash"></div>
+<div id="vig"></div>
+
+<div id="hud" class="hidden">
+  <div id="cross"></div>
+  <div id="tl"><div id="lvlName">1. FIRST STEPS</div><div id="timer">0:00.0</div></div>
+  <div id="tr">
+    <div id="gemBox" class="pill"><span class="gemIco"></span><b id="gems">0/0</b></div>
+    <div class="pill"><span class="skull">&#10006;</span><b id="deaths">0</b></div>
+    <button id="muteBtn" class="ib" title="Mute (M)">&#9835;</button>
+    <button id="pauseBtn" class="ib" title="Pause (Esc)">II</button>
+  </div>
+  <div id="buildBox" class="hidden"><span class="sw t8"></span><b id="build">0</b> blocks <em>RMB / F place &middot; LMB / Q take back</em></div>
+  <div id="hotbar" class="hidden"></div>
+  <div id="toast"></div>
+  <div id="tip" class="hidden"></div>
+  <div id="lockHint">Click to look around</div>
+</div>
+
+<div id="touch" class="hidden">
+  <div id="stick"><div id="knob"></div></div>
+  <button id="tJump" class="tb big">JUMP</button>
+  <button id="tPlace" class="tb">BUILD</button>
+  <button id="tBreak" class="tb">TAKE</button>
+</div>
+
+<div id="menu" class="screen hidden">
+  <div class="logo"><span>BLOCK</span><span>WORLD</span></div>
+  <div class="tag">Hop, bounce and build across the sky.</div>
+  <button id="playBtn" class="big">PLAY</button>
+  <div class="stars">&#9733; <span id="totStars">0</span></div>
+  <div id="levels"></div>
+  <button id="sandBtn" class="mid">SANDBOX BUILD</button>
+  <div class="foot">WASD move &middot; Space jump &middot; Mouse look &middot; RMB build &middot; LMB take &middot; R respawn &middot; Esc pause</div>
+</div>
+
+<div id="pause" class="screen hidden">
+  <div class="card"><h2>PAUSED</h2>
+  <button id="resumeBtn" class="big">RESUME</button>
+  <button id="restartBtn" class="mid">RESTART COURSE</button>
+  <button id="pMenu" class="mid">COURSES</button></div>
+</div>
+
+<div id="result" class="screen hidden">
+  <div class="card">
+    <h2 id="rTitle">COURSE CLEAR!</h2>
+    <div id="rStars"></div>
+    <div id="rStats"></div>
+    <div class="row"><button id="retryBtn" class="mid">RETRY</button><button id="nextBtn" class="big">NEXT</button></div>
+    <button id="menuBtn" class="mid">COURSES</button>
+  </div>
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

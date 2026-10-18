@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>ARCHER DUEL</title>
+<meta name="description" content="Woodcut ragdoll archery duel. Pull, loose, pin your rival.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="bar l"><span id="n0">YOU</span><div class="hp"><i id="hp0"></i></div></div>
+  <div id="mid"><div id="stage">STAGE 1</div><div id="wind">calm</div></div>
+  <div class="bar r"><span id="n1">RIVAL</span><div class="hp"><i id="hp1"></i></div></div>
+</div>
+<div id="tip">drag back &amp; release to shoot</div>
+<div id="pop"></div>
+<button id="menuBtn">&#9776;</button>
+<button id="muteBtn">&#9834;</button>
+<div id="panel" class="hidden"></div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>EGG WARS</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="game"></div>
+<div id="hud">
+  <div id="top"><span id="timer">2:30</span><span id="score"></span></div>
+  <div id="lvl"></div><div id="net"></div>
+  <div id="feed"></div>
+  <div id="cross"></div><div id="hitm"></div>
+  <div id="hp"><div id="hpbar"></div><span id="hpn">100</span></div>
+  <div id="ammo"><b id="wname"></b><span id="ammon"></span></div>
+  <div id="toast"></div><div id="dead"></div>
+  <div id="hint">Click to aim &middot; M for menu</div>
+  <div id="scope"></div><div id="hurt"></div>
+</div>
+<div id="board" class="hidden"></div>
+<div id="results" class="panel hidden"></div>
+<div id="menu" class="panel hidden"></div>
+<div id="touch" class="hidden">
+  <div id="stick"><div id="nub"></div></div>
+  <button id="tFire">FIRE</button><button id="tJump">JUMP</button><button id="tSwap">SWAP</button><button id="tRel">R</button><button id="tZoom">SCOPE</button>
+</div>
+<div id="grain"></div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

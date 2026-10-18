@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>MOTO STUNT</title>
+<link rel="stylesheet" href="./style.css">
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js" } }</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="box lvbox"><span id="lvname"></span><div class="prog"><div id="progbar"></div></div></div>
+  <div class="box tm"><span id="time">0.00</span><small id="flips">FLIPS 0</small></div>
+  <button id="bPause" class="box pz" aria-label="Pause">II</button>
+</div>
+<div id="pops"></div>
+<div id="touchui">
+  <div class="tl"><button data-t="back">&#8634;</button><button data-t="fwd">&#8635;</button></div>
+  <div class="tr"><button data-t="brake">&#9660;</button><button data-t="gas" class="gas">GO</button></div>
+</div>
+<div id="result" class="panel" hidden>
+  <h1 id="rTitle">STAGE CLEAR!</h1>
+  <div id="rStars"></div>
+  <p id="rStats"></p>
+  <div class="row"><button id="bRetry">RETRY</button><button id="bLevels">LEVELS</button><button id="bNext" class="hot">NEXT &#9654;</button></div>
+</div>
+<div id="pause" class="panel" hidden>
+  <h1>PAUSED</h1>
+  <div class="row"><button id="bResume" class="hot">RESUME</button><button id="bQuit">LEVELS</button></div>
+</div>
+<div id="menu" class="panel" hidden>
+  <h1 class="logo">MOTO<br>STUNT!</h1>
+  <p class="sub">FLIP FOR TIME. DON&#39;T LAND ON YOUR HEAD. <span id="starTotal"></span></p>
+  <div id="grid"></div>
+  <p class="keys">&#8593; / W gas &nbsp; &#8595; / S brake &nbsp; &#8592; &#8594; / A D lean &amp; flip &nbsp; R restart &nbsp; P pause</p>
+</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>PAPER LAND</title>
+<link rel="stylesheet" href="./style.css">
+</head><body>
+<canvas id="c"></canvas>
+<div id="hud" class="hide">
+  <div id="lvl">LEVEL 1</div>
+  <div id="bar"><div id="fill"></div><div id="goal"></div><span id="pct">0%</span></div>
+  <ol id="board"></ol>
+  <button id="mute" title="sound">&#9834;</button>
+</div>
+<div id="pops"></div>
+<div id="card" class="hide"><div class="sheet"><h1 id="ctitle">PAPER LAND</h1><p id="ctext"></p><div id="skins"></div><button id="cbtn">PLAY</button><div class="hint">Mouse / WASD / drag to steer. Loop back home to claim land. Cut rival trails. Never cross your own.</div></div></div>
+<script type="module" src="./src/main.js"></script>
+</body></html>

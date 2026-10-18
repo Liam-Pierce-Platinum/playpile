@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>HOLE FEAST</title><link rel="icon" href="data:,">
+<link rel="stylesheet" href="./style.css">
+</head><body>
+<div id="app"></div>
+<div id="tags"></div><div id="pops"></div>
+<div id="hud">
+  <div id="timer">2:00</div>
+  <ol id="board"></ol>
+  <div id="sizebox"><span id="lvl">SIZE 1</span><div id="track"><div id="bar"></div></div></div>
+  <div id="combo"></div>
+  <div id="msg"></div>
+  <div id="joy"><div id="knob"></div></div>
+</div>
+<button id="mute" aria-label="mute">🔊</button>
+<div id="menu" class="hide overlay">
+  <div class="panel">
+    <h1>HOLE<em>FEAST</em></h1>
+    <p class="sub">Be the hole. Eat the town. Gulp your rivals before the clock runs out.</p>
+    <h3>City</h3><div id="cities"></div>
+    <h3>Hole skin <small id="total"></small></h3><div id="skins"></div>
+    <button id="play" class="big">PLAY</button>
+    <p class="help">Mouse: steer toward the cursor · Keys: WASD / arrows · Touch: drag anywhere · M: mute</p>
+  </div>
+</div>
+<div id="res" class="hide overlay">
+  <div class="panel">
+    <h2 id="rplace"></h2><p id="rcity" class="sub"></p>
+    <div id="rstats"></div><ol id="rboard"></ol>
+    <p id="runlock"></p>
+    <div class="row"><button id="ragain" class="big">AGAIN</button><button id="rnext" class="big">NEXT CITY</button><button id="rmenu">MENU</button></div>
+  </div>
+</div>
+<script type="module" src="./src/main.js"></script>
+</body></html>

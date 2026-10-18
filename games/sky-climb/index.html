@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>SKY CLIMB</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<div id="hud">
+  <div id="alt"><b id="h">0</b><span>m</span><small id="best">best 0m</small></div>
+  <div id="bar"><i id="barfill"></i><em id="barbest"></em></div>
+  <div id="right"><div id="shards">◆ 0</div><div id="pins">⚑ 0</div></div>
+  <div id="zone"></div><div id="pops"></div>
+  <div id="hint">WASD move · Space jump · Shift sprint · mouse look · F plant pin · R return · M mute</div>
+</div>
+<div id="touchui"><div id="stick"><i></i></div><button id="tj">⤒</button><button id="tp">⚑</button></div>
+<div id="menu" class="hide"><div class="card"><h1>SKY CLIMB</h1><p>A tower of forgotten things drifts above the clouds. At the top, a bell nobody has rung.</p>
+  <button id="play">Climb</button><p class="small">WASD · Space · Shift · Mouse — falling costs height, not lives</p></div></div>
+<div id="win" class="hide"><div class="card"><h1>The bell rings</h1><div id="wstats"></div><button id="again">Climb again</button></div></div>
+<script type="module" src="./src/main.js"></script>
+</body></html>

@@ -1,0 +1,43 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #1b1026; font-family: Impact, 'Arial Black', 'Helvetica Neue', sans-serif; color: #1b1026; user-select: none; -webkit-user-select: none; touch-action: none; }
+#c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+.box { background: #fff8e6; border: 3px solid #1b1026; box-shadow: 4px 4px 0 #1b1026; padding: 6px 12px; }
+#hud { position: fixed; inset: 0; pointer-events: none; }
+#hud .lvbox { position: absolute; left: 12px; top: 12px; font-size: 18px; letter-spacing: 1px; transform: rotate(-1.5deg); min-width: 180px; }
+.prog { height: 8px; border: 2px solid #1b1026; margin-top: 5px; background: #fff; }
+#progbar { height: 100%; width: 0; background: repeating-linear-gradient(45deg, #ff3a5a 0 6px, #ffd23a 6px 12px); }
+#hud .tm { position: absolute; left: 50%; top: 12px; transform: translateX(-50%) rotate(1deg); text-align: center; background: #ffd23a; }
+#time { font-size: 34px; display: block; line-height: 1; }
+#flips { font-size: 13px; letter-spacing: 1px; }
+#hud .pz { position: absolute; right: 12px; top: 12px; pointer-events: auto; font: inherit; font-size: 18px; cursor: pointer; }
+#pops { position: fixed; left: 0; right: 0; top: 26%; display: flex; flex-direction: column; align-items: center; pointer-events: none; gap: 4px; }
+.pop { font-size: 46px; color: #ffd23a; -webkit-text-stroke: 3px #1b1026; paint-order: stroke fill; text-shadow: 5px 5px 0 #1b1026; transform: rotate(var(--r)); animation: pop 1.3s ease-out forwards; letter-spacing: 2px; }
+.pop.flip { color: #52e0ff; } .pop.bad { color: #ff3a5a; font-size: 56px; } .pop.big { color: #ff8a1a; font-size: 72px; } .pop.ok { color: #52e06a; font-size: 32px; }
+@keyframes pop { 0% { transform: scale(0.2) rotate(var(--r)); opacity: 0; } 15% { transform: scale(1.25) rotate(var(--r)); opacity: 1; } 30% { transform: scale(1) rotate(var(--r)); } 80% { opacity: 1; } 100% { transform: translateY(-40px) scale(1) rotate(var(--r)); opacity: 0; } }
+.panel { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-1deg); background: #fff8e6; border: 4px solid #1b1026; box-shadow: 8px 8px 0 #1b1026; padding: 22px 26px; text-align: center; width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto;
+  background-image: radial-gradient(#f3c9a0 22%, transparent 24%); background-size: 10px 10px; }
+.panel h1 { font-size: 44px; color: #ff3a5a; -webkit-text-stroke: 2px #1b1026; paint-order: stroke fill; text-shadow: 4px 4px 0 #1b1026; letter-spacing: 2px; }
+.panel h1.logo { font-size: 64px; line-height: 0.9; color: #ffd23a; transform: rotate(-4deg); margin: 4px 0 10px; }
+.panel p { margin: 10px 0; font-family: 'Trebuchet MS', Arial, sans-serif; font-weight: bold; font-size: 15px; line-height: 1.5; }
+.panel p b { font-family: Impact, 'Arial Black', sans-serif; font-weight: normal; font-size: 19px; } .panel p i { color: #ff3a5a; }
+.row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+button { font: inherit; }
+.row button, .lv { background: #fff; border: 3px solid #1b1026; box-shadow: 3px 3px 0 #1b1026; padding: 8px 16px; font-size: 20px; cursor: pointer; color: #1b1026; }
+.row button:hover, .lv:not(.locked):hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 #1b1026; }
+.row button.hot { background: #ffd23a; }
+#rStars { font-size: 64px; height: 76px; }
+.st { color: #d8cfc0; -webkit-text-stroke: 2px #1b1026; display: inline-block; }
+.st.on { color: #ffd23a; animation: star 0.4s backwards cubic-bezier(.3,1.8,.5,1); }
+@keyframes star { from { transform: scale(0) rotate(-90deg); } }
+#grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; }
+.lv { display: flex; flex-direction: column; align-items: center; padding: 6px 4px; font-size: 14px; }
+.lv .n { font-size: 26px; line-height: 1; } .lv .t { font-family: 'Trebuchet MS', Arial, sans-serif; font-weight: bold; font-size: 11px; } .lv .s { color: #ff8a1a; letter-spacing: 1px; }
+.lv.locked { opacity: 0.4; cursor: default; }
+.keys { font-size: 12px !important; opacity: 0.8; }
+#touchui { display: none; position: fixed; left: 0; right: 0; bottom: 0; padding: 16px; justify-content: space-between; pointer-events: none; }
+body.touch #touchui { display: flex; }
+#touchui div { display: flex; gap: 14px; }
+#touchui button { pointer-events: auto; width: 74px; height: 74px; border-radius: 50%; background: rgba(255,248,230,0.85); border: 3px solid #1b1026; box-shadow: 3px 3px 0 #1b1026; font-size: 30px; color: #1b1026; }
+#touchui button.gas { width: 90px; height: 90px; background: #ffd23a; font-size: 26px; }
+#touchui button.on { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #1b1026; background: #52e0ff; }
+@media (max-width: 520px) { .pop { font-size: 32px; } .pop.big { font-size: 48px; } .panel h1.logo { font-size: 46px; } #grid { grid-template-columns: repeat(3, 1fr); } #hud .lvbox { font-size: 14px; min-width: 120px; } #time { font-size: 26px; } }

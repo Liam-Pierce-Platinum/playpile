@@ -1,0 +1,35 @@
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:#cfc7d3;font-family:"Segoe UI",system-ui,sans-serif;color:#fff;user-select:none;-webkit-user-select:none;touch-action:none}
+canvas{display:block;position:fixed;inset:0;width:100%;height:100%}
+#hud{position:fixed;inset:0;pointer-events:none;text-shadow:0 1px 8px rgba(60,40,70,.45)}
+#alt{position:absolute;left:58px;top:22px;display:flex;align-items:baseline;gap:4px}
+#alt b{font:300 54px/1 Georgia,serif;letter-spacing:1px}#alt span{font-size:20px;opacity:.8}
+#alt small{display:block;position:absolute;top:58px;left:2px;font-size:13px;opacity:.75;letter-spacing:2px;white-space:nowrap}
+#bar{position:absolute;left:26px;top:24px;bottom:24px;width:4px;background:rgba(255,255,255,.22);border-radius:2px}
+#barfill{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(#fff,#f3d9c0);border-radius:2px}
+#barbest{position:absolute;left:-5px;width:14px;height:2px;background:#ffd9a0}
+#right{position:absolute;right:22px;top:22px;text-align:right;font-size:18px;letter-spacing:2px;line-height:1.6}
+#shards{color:#ffe8c4}
+#zone{position:absolute;left:50%;top:16%;transform:translate(-50%,10px);text-align:center;opacity:0;transition:opacity .8s,transform .8s}
+#zone.on{opacity:1;transform:translate(-50%,0)}
+#zone b{display:block;font:300 40px Georgia,serif;letter-spacing:6px}#zone span{font-size:14px;letter-spacing:3px;opacity:.8}
+#pops{position:absolute;left:50%;top:44%}
+.pop{position:absolute;transform:translateX(-50%);white-space:nowrap;font:italic 26px Georgia,serif;color:#fde;animation:pop 1.6s ease-out forwards}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,10px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-50px)}}
+#hint{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);font-size:13px;letter-spacing:2px;opacity:.85;transition:opacity 4s 6s;white-space:nowrap}
+#hint.dim{opacity:0}
+#touchui{display:none}
+.touch #touchui{display:block}
+#stick{position:fixed;left:30px;bottom:40px;width:110px;height:110px;border-radius:50%;border:2px solid rgba(255,255,255,.5);opacity:.35;pointer-events:none}
+#stick i{position:absolute;left:35px;top:35px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.7)}
+#tj,#tp{position:fixed;border-radius:50%;border:2px solid rgba(255,255,255,.6);background:rgba(255,255,255,.18);color:#fff;font-size:30px}
+#tj{right:28px;bottom:40px;width:86px;height:86px}#tp{right:128px;bottom:30px;width:56px;height:56px;font-size:22px}
+#menu,#win{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(rgba(240,230,235,.25),rgba(120,110,140,.45))}
+.hide{display:none!important}
+.card{max-width:min(460px,92vw);padding:34px 30px;text-align:center;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.4);border-radius:18px;backdrop-filter:blur(10px)}
+.card h1{font:300 46px Georgia,serif;letter-spacing:10px;margin-bottom:14px}
+.card p{opacity:.9;line-height:1.5;margin-bottom:22px}.card .small{font-size:12px;letter-spacing:2px;margin:18px 0 0;opacity:.7}
+.card button{font:18px Georgia,serif;letter-spacing:5px;padding:12px 40px;border-radius:30px;border:1px solid #fff;background:rgba(255,255,255,.25);color:#fff;cursor:pointer}
+.card button:hover{background:rgba(255,255,255,.4)}
+#wstats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:6px 0 26px}#wstats b{display:block;font:300 30px Georgia,serif}#wstats span{font-size:12px;letter-spacing:2px;opacity:.75}
+@media (max-width:600px){#alt b{font-size:40px}#zone b{font-size:26px;letter-spacing:3px}#hint{font-size:11px;white-space:normal;width:90%;text-align:center}}

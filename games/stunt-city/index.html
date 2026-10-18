@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>STUNT CITY</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+</head><body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div id="topl"><div id="cash">$0</div><div id="prog">0/8</div></div>
+  <div id="chal" class="hide"><div id="chName"></div><div id="chGoal"></div><div id="chTime"></div></div>
+  <div id="next"><span id="arrow">&#9650;</span> <span id="nextTxt"></span></div>
+  <div id="pop"></div><div id="combo"></div><div id="big"></div>
+  <div id="spd"><b id="kmh">0</b><small>KM/H</small><div id="nos"><i></i></div></div>
+  <div id="hint">WASD / arrows drive &middot; SHIFT nitro &middot; SPACE drift &middot; in air: W/S flip, A/D spin, Q/E roll &middot; ENTER next challenge &middot; G garage &middot; R reset &middot; M mute</div>
+  <button id="garBtn" class="btn sm">GARAGE</button>
+</div>
+<div id="touch">
+  <div class="tb" id="tL" data-k="left">&#9664;</div><div class="tb" id="tR" data-k="right">&#9654;</div>
+  <div class="tb" id="tB" data-k="down">BRK</div><div class="tb" id="tG" data-k="up">GAS</div><div class="tb" id="tN" data-k="nitro">NOS</div>
+</div>
+<div id="card" class="hide"><h2 id="cardH"></h2><p id="cardP"></p><div><button id="cardA" class="btn"></button> <button id="cardB" class="btn ghost"></button></div></div>
+<div id="garage" class="hide"><h2>GARAGE</h2><div id="garList"></div><button id="garClose" class="btn">DRIVE</button></div>
+<div id="title" class="hide"><h1>STUNT<br>CITY</h1><p>a chrome stunt park at the end of the world</p><button id="playBtn" class="btn">DRIVE</button></div>
+<script type="module" src="src/main.js"></script>
+</body></html>

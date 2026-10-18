@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Drift Tower</title><link rel="stylesheet" href="./style.css"></head>
+<body>
+<div id="sky"></div>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div id="score">0</div>
+  <div id="best">BEST 0</div>
+  <div id="coins"><span class="gem"></span><b id="coinN">0</b></div>
+  <div id="zone"></div>
+  <div id="hint">HOLD to drift left &middot; RELEASE to drift right</div>
+</div>
+<div id="over" class="panel hide">
+  <h2>FELL OFF!</h2>
+  <div class="row"><div><small>SCORE</small><b id="oScore">0</b></div><div><small>BEST</small><b id="oBest">0</b></div><div><small>GEMS</small><b id="oGems">0</b></div></div>
+  <div id="newBest" class="hide">NEW BEST!</div>
+  <button id="retry">DRIVE AGAIN</button>
+  <button id="toGarage" class="ghost">GARAGE</button>
+</div>
+<div id="menu" class="panel hide">
+  <h1>DRIFT<br>TOWER</h1>
+  <p class="sub">one button &middot; endless sky road</p>
+  <div id="garage"></div>
+  <div id="wallet"></div>
+  <button id="play">PLAY</button>
+</div>
+<button id="muteBtn" title="sound">&#9834;</button>
+<script type="module" src="./src/main.js"></script>
+</body></html>

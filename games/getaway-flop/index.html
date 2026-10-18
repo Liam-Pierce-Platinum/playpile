@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Getaway Flop</title>
+<link rel="stylesheet" href="./style.css">
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js" } }</script>
+</head>
+<body>
+<div id="app"></div>
+<div id="hud">
+  <div id="pips"></div>
+  <div id="track"><div id="lane"></div><div id="carmark">CAR</div></div>
+</div>
+<div id="weap"></div>
+<div id="say"></div>
+<div id="card" class="hide"></div>
+<div id="touch">
+  <button id="tl" aria-label="hop left">&#9664;</button>
+  <button id="tf" aria-label="fire">BANG</button>
+  <button id="tr" aria-label="hop right">&#9654;</button>
+</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

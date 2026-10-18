@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>KART CLASH</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="tags"></div>
+<div id="hud" class="hide">
+  <div id="tl"><div id="timer">2:00</div><div id="ko">0 KO</div></div>
+  <div id="board"></div>
+  <div id="feed"></div>
+  <div id="bottom"><div id="weapon" class="empty"><b>GRAB A ? BOX</b></div><div id="hpw"><div id="hp"></div></div></div>
+  <div id="respawn" class="hide"></div>
+  <div id="help">WASD / arrows drive &middot; SPACE fire &middot; ESC menu</div>
+</div>
+<div id="banner"></div>
+<div id="menu" class="hide panel-wrap">
+  <div class="panel">
+    <h1>KART<span>CLASH</span></h1>
+    <p class="sub">Toy-kart arena brawl. Grab ? boxes, bonk everyone.</p>
+    <div id="mlv"></div>
+    <h3>PAINT JOB</h3>
+    <div id="paints"></div>
+    <button id="play" class="big">PLAY</button>
+    <p class="keys">WASD / arrows drive &middot; SPACE fire &middot; touch: stick + FIRE</p>
+  </div>
+</div>
+<div id="result" class="hide panel-wrap">
+  <div class="panel">
+    <h2 id="rtitle">RESULTS</h2>
+    <div id="rlist"></div>
+    <div id="rxp"></div>
+    <div class="btns"><button id="again" class="big">NEXT MATCH</button><button id="garage">GARAGE</button></div>
+  </div>
+</div>
+<div id="touchui"><div id="stick"><div id="knob"></div></div><button id="firebtn">FIRE</button></div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

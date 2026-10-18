@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>SNAKE ARENA</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<div id="app"></div><div id="vig"></div><div id="flash"></div>
+<div id="hud" class="hide">
+  <div id="stats"><b id="len">10</b><span>length</span><i id="rank">#1</i><i id="kills">0 devoured</i></div>
+  <div id="lb"></div><canvas id="mini" width="132" height="132"></canvas>
+  <div id="pops"></div><div id="hint">Steer with the mouse &middot; hold click / Space to surge</div>
+  <button id="boost">SURGE</button>
+</div>
+<div id="menu" class="hide"><div class="panel">
+  <h1>SNAKE<br>ARENA</h1><p class="sub">a glow in the abyss</p>
+  <div id="skins"></div><div id="skinname"></div>
+  <button id="play" class="big">DIVE</button>
+  <p id="mstats"></p></div></div>
+<div id="card" class="hide"><div class="panel">
+  <h2>YOU WERE DEVOURED</h2><p id="cwhy"></p>
+  <div class="row"><div><b id="clen">0</b><span>length</span></div><div><b id="ckills">0</b><span>devoured</span></div><div><b id="cbest">0</b><span>best</span></div></div>
+  <p id="cpearl"></p><div class="bar"><i id="cbar"></i></div><p id="crank"></p><p id="cunlock"></p>
+  <button id="again" class="big">SWIM AGAIN</button> <button id="tomenu">MENU</button></div></div>
+<script type="module" src="src/main.js"></script>
+</body></html>

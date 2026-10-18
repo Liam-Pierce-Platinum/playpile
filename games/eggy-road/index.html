@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>EGGY ROAD</title>
+<meta name="description" content="Drive a little truck over painted hills without dropping the egg.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud" class="hidden">
+  <div id="dist">0 m</div>
+  <div id="sub"><span id="coins">0</span> drops &middot; best <span id="best">0</span> m</div>
+  <div id="biome"></div>
+  <button id="muteBtn" title="Sound">&#9834;</button>
+</div>
+<div id="banner"></div>
+<div id="hint" class="hidden">Hold <b>&rarr;</b> / <b>D</b> to drive &middot; <b>&larr;</b> / <b>A</b> to brake<br><small>Tap right side to drive, left side to brake</small></div>
+<div id="pedals" class="hidden"><div id="pBrake">BRAKE</div><div id="pGas">GAS</div></div>
+
+<div id="menu" class="card hidden">
+  <h1>EGGY ROAD</h1>
+  <p class="tag">a gentle drive with a fragile passenger</p>
+  <button id="mPlay" class="big">Drive</button>
+  <button id="mGarage">Garage</button>
+  <p class="small">best <span id="mBest">0</span> m &middot; <span id="mCoins">0</span> drops</p>
+</div>
+
+<div id="over" class="card hidden">
+  <h2 id="oTitle">Cracked!</h2>
+  <div id="oDist" class="bignum">0 m</div>
+  <p id="oInfo"></p>
+  <button id="oRetry" class="big">Again</button>
+  <button id="oGarage">Garage</button>
+</div>
+
+<div id="garage" class="card hidden">
+  <h2>Garage</h2>
+  <p class="small"><span id="gCoins">0</span> drops to spend</p>
+  <div id="gList"></div>
+  <button id="gBack" class="big">Drive</button>
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

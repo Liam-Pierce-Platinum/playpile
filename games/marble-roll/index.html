@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Marble Roll</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <button id="bPause" class="ic" aria-label="menu">&#9776;</button>
+  <div class="mid"><div id="lvl">I</div><div class="bar"><i id="fill"></i></div></div>
+  <div class="right"><span id="gems">&#9670; 0</span><button id="bMute" class="ic" aria-label="sound">&#9835;</button></div>
+</div>
+<div id="hint">Hold to roll &middot; drag to steer<br><small>W A S D / arrows</small></div>
+<div id="flash"></div>
+<div id="menu" class="ov hide"><div class="card wide">
+  <h1>MARBLE ROLL</h1><p class="sub">Glass and stone, high above the clouds.</p>
+  <button id="bPlay" class="pri big">Play</button>
+  <h3>Levels</h3><div id="grid"></div>
+  <h3>Marbles <span id="mGems"></span></h3><div id="skins"></div>
+  <p class="keys">Hold mouse or touch to roll, drag sideways to steer &middot; WASD / arrows &middot; R restart &middot; M mute</p>
+</div></div>
+<div id="done" class="ov hide"><div class="card">
+  <h2 id="dTitle">Cleared</h2><div id="dStars"></div><p id="dInfo"></p>
+  <div class="row"><button id="bMenu2">Menu</button><button id="bRetry">Retry</button><button id="bNext" class="pri">Next &#9654;</button></div>
+</div></div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

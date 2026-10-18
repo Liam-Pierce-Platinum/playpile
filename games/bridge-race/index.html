@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Bridge Race</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app"></div>
+<div id="hud">
+  <div id="lvl">LEVEL 1</div>
+  <div id="race"></div>
+  <div id="right"><span id="coins">0</span><button id="menuBtn" aria-label="menu">II</button></div>
+</div>
+<div id="bubble">0</div>
+<div id="hint">Collect <b>your colour</b> bricks, then walk up a bridge to build it</div>
+<div id="joy"><div id="knob"></div></div>
+<div id="end" class="panel hide">
+  <h1 id="endT">1st!</h1><p id="endS"></p>
+  <div class="row"><button id="nextBtn" class="big">Next</button><button id="endMenu">Menu</button></div>
+</div>
+<div id="menu" class="panel hide">
+  <h1 class="logo">BRIDGE<br>RACE</h1>
+  <p class="sub">Coins: <b id="mCoins">0</b> &middot; Level <b id="mLvl">1</b></p>
+  <div id="hats"></div>
+  <button id="playBtn" class="big">Play</button>
+  <p class="keys">WASD / arrows / drag to move &middot; M mute</p>
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

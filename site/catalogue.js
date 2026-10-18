@@ -12,6 +12,345 @@
 //                     port. The page frames http://localhost:<port>.
 //         'unity'   - a Unity WebGL build under games/<slug>/build.
 export const GAMES = [
+  // ---- 2026-10-18: BLADE DASH: CASTLE + 25 3D games from the session hub ----
+  {
+    slug: "blade-dash-story", title: "BLADE DASH: CASTLE", how: 'mounted', port: 8402, url: "/",
+    content: "Ink-and-paper sword fighting: enemies are cut down with ink splats, and the final boss is cut in half in a stylised ink finish. Spring-spike plates flash red before they fire, and there is slow-motion and screen shake.",
+    web: "blade-dash-story/",
+    tag: "Story dash-slash", big: true, added: '2026-10-18',
+    cat: "Action", tags: ["new","action","samurai","ninja","story","boss","ink","mobile"],
+    blurb: "BLADE DASH with a story: smash in through the windows of a fifteen-storey castle, dash-slash your way up floor by floor and beat the rival ninja on the roof to save the princess.",
+    about: `The story version of BLADE DASH. On the night of the red moon, Kage the shadow blade has carried Princess Hana to the roof of Tenshu Castle. You climb the outside of the tower, smash in through a window on every floor, and cut your way across it room by room to the stairs.
+
+Each floor is two to six rooms in a row. Every doorway is a paper door sealed with a talisman until that room's guards are down: grunts, lanterns, archers, shields, bombers and generals. Earn up to three stars and coins per floor, spend the coins on hats, masks, robes, patterns and sashes, and face Kage on the roof: dodge his dash, then strike while he recovers.`,
+    controls: [["Click / tap","dash 300 px that way (aim snaps onto a nearby enemy)"],["Hold Space","slow-mo while the meter lasts"],["J / K / Enter","dash toward the mouse"],["R","back to the start of this room"],["Esc","pause"],["Touch","tap to dash, the 集中 button for slow-mo"]],
+    tips: "You have two dash charges and a kill refills both, so chain kill to kill without touching the floor. Against Kage, dodge first and only strike while he staggers: hit him at any other time and he parries.",
+  },
+  {
+    slug: "egg-wars", title: "EGG WARS", how: 'mounted', port: 8403, url: "/",
+    content: "A first-person shooter with clay eggs: eggs crack and break apart, nobody bleeds. Cartoon weapons. Optional online play with friends via a 4-letter room code; there is no text chat.",
+    web: "egg-wars/",
+    tag: "Claymation egg FPS", big: true, added: '2026-10-18',
+    cat: "Shooter", tags: ["new","shooter","fps","eggs","clay","online","3d","mobile"],
+    blurb: "A claymation egg shooter. Crack the other eggs in a free-for-all against five bots, aim for the yolk for a YOLKSHOT, and level up to unlock new guns, shell colours and hats.",
+    about: `A stop-motion clay first-person shooter where everyone is an egg. Every match is a free-for-all against five bots: the first egg to 15 cracks, or the leader when the 2:30 clock runs out, wins. Headshots are YOLKSHOTS and do double damage, shells visibly crack as eggs take damage, and the last kill plays in slow motion.
+
+Matches earn XP. Levels unlock the Yolker shotgun at level 2 and the Whisk sniper at level 4, plus shell colours and hats, and the bots get sharper as you level up. You can also host an online room and give friends the 4-letter code.`,
+    controls: [["WASD","move"],["Mouse","aim (click to lock the pointer)"],["Click","shoot"],["Right mouse","Whisk scope"],["Space","jump"],["R","reload"],["1-3 / Q / wheel","swap weapon"],["Tab","scoreboard"],["M","menu"],["Touch","left stick moves, drag the right side to look, FIRE / JUMP / R / SWAP / SCOPE buttons"]],
+    tips: "Aim at the top of the egg: a YOLKSHOT does double damage. Keep moving and jumping between shots, and reload behind cover instead of in the open.",
+  },
+  {
+    slug: "kart-clash", title: "KART CLASH", how: 'mounted', port: 8404, url: "/",
+    content: "Toy karts bump and blast each other with cartoon rockets, gumballs and mines in a plastic toy arena. Knocked-out karts just respawn; nobody is hurt.",
+    web: "kart-clash/",
+    tag: "Toy kart battle", big: true, added: '2026-10-18',
+    cat: "Driving", tags: ["new","driving","karts","battle","arena","toys","3d","mobile"],
+    blurb: "Glossy toy-plastic kart battles. Grab ? boxes for rockets, gumball guns, mines and shockwaves, and knock out the most karts in two minutes.",
+    about: `A battle-arena kart game in shiny toy plastic, against five bots, on a baseplate arena surrounded by giant toys. Drive over the ? boxes to pick up an item and fire it with Space: a homing ROCKET, a GUMBALL GUN with 12 shots, two POP MINES that drop behind you, or a BOING WAVE that blasts karts away from you at close range.
+
+Each match lasts two minutes and the most KOs wins. KOs and your finishing place earn XP, levels unlock new paint jobs, and the bots get sharper as your level rises.`,
+    controls: [["WASD / arrows","drive"],["Space / J","fire your item"],["Esc","garage menu"],["Touch","left stick drives, FIRE button"]],
+    tips: "Keep moving between ? boxes so you are never empty-handed. Save the BOING WAVE for when a kart is right on you, and drop POP MINES when someone is chasing you.",
+  },
+  {
+    slug: "slope-rush", title: "SLOPE RUSH", how: 'mounted', port: 8405, url: "/",
+    content: "A glowing ball on a neon track; no characters and no violence. The screen flashes when you crash and when the colours change every 400 m, with glow, scanlines and screen shake.",
+    web: "slope-rush/",
+    tag: "Endless neon slope", big: false, added: '2026-10-18',
+    cat: "Arcade", tags: ["new","arcade","endless","ball","runner","synthwave","3d","mobile"],
+    blurb: "Roll a glowing ball down an endless synthwave slope. Steer round holes and red blocks while the speed keeps climbing.",
+    about: `Roll a glowing ball down an endless, twisting neon slope under a striped synthwave sun. Steer left and right to stay on the track, avoid the red blocks and the holes, and keep going as the speed climbs. Fall off or hit a red block and the run is over.
+
+Every 400 m is a new sector with a new colour palette and a narrower track, more holes, drop-offs, red blocks and narrow bridges. Score is your distance plus bonuses for gold shards and close passes, and shards unlock new ball skins.`,
+    controls: [["A D / Left Right","steer"],["Space / tap","retry"],["P / Esc","pause"],["M","mute"],["Touch","hold the left or right half of the screen"]],
+    tips: "Small, early steering beats late swerves. Look further down the track as the speed rises, and only chase shards that are already on your line.",
+  },
+  {
+    slug: "tunnel-dive", title: "TUNNEL DIVE", how: 'mounted', port: 8406, url: "/",
+    content: "Abstract black-and-white tunnel; no characters, no violence. Strong high-contrast patterns (checkerboards, moire, spirals) rush and rotate all the time, and the screen flashes on a crash and at each new zone. Not suitable for anyone sensitive to patterns or flashing.",
+    web: "tunnel-dive/",
+    tag: "Op-art tunnel runner", big: false, added: '2026-10-18',
+    cat: "Arcade", tags: ["new","arcade","endless","tunnel","reflex","black and white","3d","mobile"],
+    blurb: "Dive down a spinning black-and-white op-art tunnel. Rotate the whole tunnel to thread the gaps as it gets faster and narrower.",
+    about: `A kaleidoscope tunnel runner in stark black and white. You fly down the tunnel on your own; your job is to rotate the whole tunnel left or right so the gap in each gate comes round to meet you. Clip a barrier and the run ends.
+
+Clean gates raise your multiplier from x1 up to x8. Close calls and prisms pay bonus points, and every 700 m a new zone makes it faster, narrows the gaps, adds spinning gates and switches the tunnel's pattern.`,
+    controls: [["A D / Left Right","rotate the tunnel"],["Space / Enter / tap","retry"],["P / Esc","pause"],["M","mute"],["Touch","hold the left or right half of the screen"]],
+    tips: "Look at the next gate, not the one you are in, and start turning early. Your multiplier is the real score, so a clean run beats a risky prism.",
+  },
+  {
+    slug: "bridge-race", title: "BRIDGE RACE", how: 'mounted', port: 8407, url: "/",
+    content: "Pastel clay figures race and bump each other to knock bricks loose; nobody is hurt. Confetti and gentle camera shake; no flashing.",
+    web: "bridge-race/",
+    tag: "Brick stacking race", big: false, added: '2026-10-18',
+    cat: "Arcade", tags: ["new","arcade","race","bricks","casual","pastel","3d","mobile"],
+    blurb: "Collect bricks in your colour, lay them as steps up a bridge and reach the golden top floor before three rivals. Bump them to knock their bricks loose.",
+    about: `A pastel sky-island race. Run around the floor picking up bricks in your colour (pink), then walk up a bridge to lay them down as steps. Run out of bricks halfway up and you are stuck, so collect enough before you climb. Reach the golden top floor before the three rivals to win.
+
+Bump into a rival who carries fewer bricks than you and their stack falls off as white bricks that anyone can grab. Later levels add more floors and faster rivals. Coins from each race buy hats.`,
+    controls: [["WASD / arrows","move"],["Drag anywhere","touch joystick"],["Esc / II","menu and hat shop"],["Enter / Space","next level from the results"],["M","mute"]],
+    tips: "Count your bricks against the bridge before you climb. Carry a bigger stack than the rival you bump, or it is you who loses your bricks.",
+  },
+  {
+    slug: "hole-feast", title: "HOLE FEAST", how: 'mounted', port: 8408, url: "/",
+    content: "A hole in the ground swallows toy-like props, cars, buildings and tiny people in a miniature model town; they simply drop out of sight. No blood and no flashing.",
+    web: "hole-feast/",
+    tag: "Swallow the city", big: true, added: '2026-10-18',
+    cat: "Arcade", tags: ["new","arcade","hole","io","city","miniature","3d","mobile"],
+    blurb: "Steer a hole through a tilt-shift model city and swallow everything smaller than you, from cones to skyscrapers, before the clock runs out.",
+    about: `A hole-in-the-ground arena game in a tilt-shift miniature look, like a model town on a table. Steer your hole around the streets and swallow anything smaller than it: people, cones, cars, buses, houses, towers and finally skyscrapers. Everything you swallow makes you bigger.
+
+Five rival holes are doing the same. A hole 20% bigger than another can swallow it for a bonus. When the clock hits zero, the highest score wins. Finishing first unlocks the next city, and lifetime points unlock hole skins.`,
+    controls: [["Mouse","the hole steers toward the cursor (further = faster)"],["WASD / arrows","steer"],["Touch","drag anywhere"],["Enter / Space","play again from the results"],["M","mute"]],
+    tips: "Grow on small things first and keep combos going. Stay away from bigger holes, and hunt a rival only when you are clearly more than a fifth bigger.",
+  },
+  {
+    slug: "stick-swing", title: "STICK SWING", how: 'mounted', port: 8409, url: "/",
+    content: "A folded-paper figure swings on a rope; obstacles just knock it back and falling restarts the level. No blood, no flashing.",
+    web: "stick-swing/",
+    tag: "Paper hook and swing", big: false, added: '2026-10-18',
+    cat: "Arcade", tags: ["new","arcade","swing","physics","levels","paper","3d","mobile"],
+    blurb: "Hold to hook the nearest star, let go to fly. Swing a folded-paper figure through 30 levels across five paper worlds.",
+    about: `A one-button swinging game in folded paper. Hold the mouse, a finger or Space to hook the nearest star and swing on it, and let go to fly. Hook the next star, swing and let go again, all the way to the finish.
+
+There are 30 levels across five paper worlds, with bounce pads, floor pillars, hanging blades and moving hooks. Each level gives stars for your time, and every five levels unlocks a new paper skin.`,
+    controls: [["Hold mouse / touch / Space","hook the nearest star"],["Release","let go and fly"],["R","restart"],["Esc","menu"],["M","mute"]],
+    tips: "Let go just after the bottom of the swing, on the way up, to fly forward and high. Short swings are often faster than big ones.",
+  },
+  {
+    slug: "moto-stunt", title: "MOTO STUNT", how: 'mounted', port: 8410, url: "/",
+    content: "A cartoon stunt rider in a comic-book style crashes into barrels, hammers and spike pits and simply respawns at the last flag; no injuries are shown. Comic 'boom' bursts flash on crashes, with screen shake.",
+    web: "moto-stunt/",
+    tag: "Comic stunt bike", big: false, added: '2026-10-18',
+    cat: "Driving", tags: ["new","driving","motorbike","stunts","flips","comic","3d","mobile"],
+    blurb: "Side-view stunt bike in a comic-book style. Flip over jumps, dodge barrels and swinging hammers, and finish 12 levels fast for three stars.",
+    about: `A side-view stunt bike game drawn like a comic book, with halftone dots, ink outlines and sunburst skies. Ride over hills and jumps, lean back and forward to flip in the air, and land on your wheels.
+
+There are 12 levels with jumps, hills, barrels, swinging hammers and spike pits, and checkpoint flags along the way. Every full flip takes one second off your time, so flips are the way to three stars.`,
+    controls: [["Up / W","gas"],["Down / S","brake / reverse"],["Left / A","lean back (backflip)"],["Right / D","lean forward (frontflip)"],["R","restart"],["P / Esc","pause"],["Touch","on-screen lean, GO and brake buttons"]],
+    tips: "Each full flip takes a second off your time, but only if you land it. Lean to level the bike before touching down.",
+  },
+  {
+    slug: "drift-tower", title: "DRIFT TOWER", how: 'mounted', port: 8411, url: "/",
+    content: "A little clay car drifts along a zigzag road in the sky; falling off just ends the run. No characters hurt, no flashing.",
+    web: "drift-tower/",
+    tag: "One-button drift", big: false, added: '2026-10-18',
+    cat: "Driving", tags: ["new","driving","drift","one button","endless","clay","3d","mobile"],
+    blurb: "One button, one zigzag road above the clouds. Hold to drift left, let go to drift right, and do not fall off.",
+    about: `A one-button drifting game on a zigzag clay road floating on pastel towers above the clouds. Hold to drift left, let go to drift right, and turn every corner before you run off the edge. Fall off and the run is over.
+
+Every corner cleared is a point. The car speeds up and the straights get shorter as your score climbs, and the colours change every 20 points. Gems on the road are banked between runs and buy new car colours in the garage.`,
+    controls: [["Hold mouse / touch / Space","drift left"],["Release","drift right"],["Left / Up / A","also drift left while held"],["Tap / DRIVE AGAIN","go again after a fall"]],
+    tips: "Turn at the corner, not before it: watch where the road bends and switch just as the car reaches the bend. Rhythm matters more than reaction once the straights get short.",
+  },
+  {
+    slug: "eggy-road", title: "EGGY ROAD", how: 'mounted', port: 8412, url: "/",
+    content: "A truck carries a loose egg over painted hills; if the egg touches the ground it cracks and the run ends. No characters hurt. A short bright flash and a moment of slow motion when the egg cracks.",
+    web: "eggy-road/",
+    tag: "Watercolour egg truck", big: false, added: '2026-10-18',
+    cat: "Driving", tags: ["new","driving","physics","hills","egg","watercolour","3d","mobile"],
+    blurb: "Drive a little truck over hand-painted watercolour hills with an egg rolling loose in the back. Go as far as you can before it cracks.",
+    about: `A physics driving game in a hand-painted watercolour style. Your little truck has an egg sitting loose in its bed. Drive over the hills as far as you can, and if the egg falls out and touches the ground, it cracks and the run is over.
+
+Collect golden drops along the way and spend them in the Garage on Engine, Soft springs, Basket wall and Tyres, five levels each. Every 350 m you cross into a new painted region.`,
+    controls: [["Right / D / W","gas"],["Left / A / S","brake / reverse"],["Gas in the air","leans the truck back"],["R","restart"],["Space / Enter","retry"],["Touch","hold the right half for gas, the left half to brake"]],
+    tips: "Slow over crests and smooth on landings: the egg leaves the bed when the truck kicks up. Upgrade the Basket wall and Soft springs early.",
+  },
+  {
+    slug: "stunt-city", title: "STUNT CITY", how: 'mounted', port: 8413, url: "/",
+    content: "A chrome car in a free-roam neon stunt park with ramps and loops. Wipe-outs just reset the car; no people. Neon colours but no flashing.",
+    web: "stunt-city/",
+    tag: "Vaporwave stunt park", big: true, added: '2026-10-18',
+    cat: "Driving", tags: ["new","driving","stunts","free roam","loops","vaporwave","3d","mobile"],
+    blurb: "Drive a chrome car around a vaporwave stunt park. Flip, spin and barrel-roll off ramps and loops, clear eight challenges and upgrade your ride.",
+    about: `A free-roam stunt park in vaporwave colours: a chrome car on a mirror-grid floor under a striped sunset, full of ramps, loops and rings. Drive anywhere, launch off anything, and flip, spin and barrel-roll in the air. Land wheels-down or wipe out.
+
+Eight challenges run in order: rings, loops, big air, a backflip, a gap jump and a stunt show. Stunts and challenges pay cash, which buys engine and nitro upgrades and chrome paints in the garage.`,
+    controls: [["WASD / arrows","drive"],["Shift","nitro"],["Space","handbrake drift"],["W / S in the air","front / back flip"],["A / D in the air","spin"],["Q / E in the air","barrel roll"],["Enter","warp to the next challenge"],["R","reset to the last safe spot"],["G","garage"],["M","mute"],["Esc","quit a challenge"],["Touch","steer, GAS, BRK and NOS buttons"]],
+    tips: "Stop rotating a moment before you land so the car settles wheels-down. Use nitro on the run-up to ramps for bigger air and more cash.",
+  },
+  {
+    slug: "crazy-cattle", title: "CRAZY CATTLE", how: 'mounted', port: 8414, url: "/",
+    content: "Knitted toy sheep ram each other off a floating quilt; they fall away in a puff of wool. Cartoon bonks and baas, no injuries, no flashing.",
+    web: "crazy-cattle/",
+    tag: "Knitted sheep royale", big: false, added: '2026-10-18',
+    cat: "Action", tags: ["new","action","battle royale","sheep","ram","knitted","3d","mobile"],
+    blurb: "A knitted-sheep battle royale on a quilt in the sky. Ram the flock off the edge while the quilt unravels, and be the last sheep standing.",
+    about: `A battle royale for knitted sheep, played on a patchwork quilt floating in the sky. Run around, dash into other sheep to ram them, and knock them off the edge. The quilt unravels patch by patch from the outside in, so the field keeps shrinking. Be the last sheep standing to clear the field.
+
+Every sheep you ram off earns yarn, which buys new wool coats. Later fields bring bigger, more aggressive flocks.`,
+    controls: [["WASD / arrows","move"],["Space / Shift / J","RAM dash"],["Enter","next round"],["Touch","left stick moves, RAM button"]],
+    tips: "Stay near the middle as the quilt unravels and let the others fight at the edges. Sheep that have been rammed a lot fly further, so finish off the flustered ones.",
+  },
+  {
+    slug: "freeze-run", title: "FREEZE RUN", how: 'mounted', port: 8415, url: "/",
+    content: "A pastel red-light, green-light game: runners caught moving pop into confetti and paint splats. Cartoon only, no blood, no flashing.",
+    web: "freeze-run/",
+    tag: "Red light, green light", big: false, added: '2026-10-18',
+    cat: "Arcade", tags: ["new","arcade","red light green light","runner","timing","pastel","3d","mobile"],
+    blurb: "Run while giant Marigold sings with her back turned, and freeze the moment she turns round. Move while she watches and you pop into confetti.",
+    about: `A 3D red-light, green-light game in a pastel flat-shape style. Giant Marigold sings with her back to the field. While she sings, hold to run across the playground towards her. When she turns round, let go and freeze. Anyone still moving while she watches pops into confetti.
+
+There are 12 tuned levels and then endless ones: longer fields, more runners, shorter songs, longer stares, mushroom bumpers from level 3 and fake half-turns from level 5. Finish before the timer for one to three stars.`,
+    controls: [["Hold Space / W / Up","run"],["Release","freeze"],["A / D / arrows","steer"],["Hold mouse / touch","run (drag to steer)"],["Enter / Space","next or retry on the result card"],["R","retry"],["M","mute"]],
+    tips: "Listen to the song: it resolves to a low home note right before she turns. From level 5 she sometimes only half-turns, so do not start running the instant she moves.",
+  },
+  {
+    slug: "archer-duel", title: "ARCHER DUEL", how: 'mounted', port: 8416, url: "/",
+    content: "Archers shoot each other with arrows in a woodcut-print style: arrows stick in limbs, struck limbs go limp and a defeated archer ragdolls with ink splats and slow motion. Stylised, no realistic blood. No flashing.",
+    web: "archer-duel/",
+    tag: "Woodcut archery duel", big: false, added: '2026-10-18',
+    cat: "Shooter", tags: ["new","shooter","archery","bow","duel","2 player","3d","mobile"],
+    blurb: "A woodcut-print archery duel. Drag back, aim the arc and loose. Head shots hit hardest, and a ladder of rivals gets tougher with wind.",
+    about: `A ragdoll archery duel drawn like a woodcut print, with carved hatching, ink outlines and a ringed sun. Press anywhere, drag back and release to shoot. The further you drag, the more power, and a dotted guide shows the arc.
+
+In the 1P LADDER you face rival archers in real time; wind starts at stage 3, and each win lets you pick one of three perks. In 2P DUEL two people share the screen and take turns.`,
+    controls: [["Mouse / touch","press, drag back, release to shoot"],["Drag length","power"],["Bottom-left button","menu"],["Bottom-right button","mute"]],
+    tips: "Head shots are worth the most. Fire a quick first arrow to find the range, then adjust; from stage 3 allow for the wind.",
+  },
+  {
+    slug: "rooftop-duel", title: "ROOFTOP DUEL", how: 'mounted', port: 8417, url: "/",
+    content: "Chunky voxel fighters shoot each other with cartoon guns to knock each other off a rooftop; a hit fighter flashes and is pushed back. No blood.",
+    web: "rooftop-duel/",
+    tag: "Wobbly rooftop duels", big: true, added: '2026-10-18',
+    cat: "Shooter", tags: ["new","shooter","duel","2 player","physics","voxel","3d","mobile"],
+    blurb: "Two buttons, one wobbly fighter. Jump, time your swaying gun and knock your rival off the roof. Beat an eight-rival ladder or duel a friend.",
+    about: `A two-button rooftop duel with chunky, wobbly voxel fighters. One button jumps (you jump the way you are leaning) and the other fires, but your gun sways on its own, so every shot is about timing. Hits push your rival back; knock them off the roof to win the round.
+
+The weapon changes every round between a revolver, a shotgun, a sniper, the automatic burp gun and the lobbed boom tube, across five rooftops. Play the arcade ladder of eight rivals, a quick duel, or two players on one keyboard.`,
+    controls: [["W / Space / Up","jump (1 player)"],["D / J / F / Enter","fire (1 player)"],["P1: W / D","jump / fire (2 players)"],["P2: Up / Left","jump / fire (2 players)"],["Esc / P","menu"],["Touch","JUMP and FIRE buttons (four in 2P)"]],
+    tips: "Wait for the gun to sway onto your rival, then fire. Do not jump wildly: land badly and you fall over, and a fighter on the floor is an easy target.",
+  },
+  {
+    slug: "snake-arena", title: "SNAKE ARENA", how: 'mounted', port: 8418, url: "/",
+    content: "Glowing sea snakes on a dark sea; a snake that crashes bursts into glowing orbs. No blood. A pink flash over the screen when you die.",
+    web: "snake-arena/",
+    tag: "Glowing snake brawl", big: false, added: '2026-10-18',
+    cat: "Arcade", tags: ["new","arcade","snake","io","grow","neon","3d","mobile"],
+    blurb: "A glowing snake brawl on a dark sea. Eat orbs to grow, cut off the other snakes so they crash into you, and climb from Plankton to Leviathan.",
+    about: `A snake brawl on a dark, bioluminescent sea, against 24 computer snakes. Steer toward the cursor and eat glowing orbs to grow. Any head that touches another snake's body dies and bursts into orbs, so the trick is to cut across the others and make them crash into you. Leave the pink ring and you die too.
+
+Hold to SURGE for speed, at the cost of shedding length. Every run earns pearls that raise your rank from Plankton to Leviathan and unlock new skins.`,
+    controls: [["Mouse","steer toward the cursor"],["Hold click / Space / W / Up","SURGE (faster, sheds length)"],["A D / Left Right","turn"],["Touch","drag to steer, SURGE button"]],
+    tips: "Never cross in front of a bigger snake. Surge to get ahead of a rival and curl across its path, then eat the orbs it bursts into.",
+  },
+  {
+    slug: "paper-land", title: "PAPER LAND", how: 'mounted', port: 8419, url: "/",
+    content: "Folded-paper tokens cut out territory on a sheet of paper; a token that is caught is snipped off the sheet. No violence, no flashing.",
+    web: "paper-land/",
+    tag: "Cut-paper territory", big: false, added: '2026-10-18',
+    cat: "Strategy", tags: ["new","strategy","territory","io","paper","casual","3d","mobile"],
+    blurb: "Leave your land, draw a paper strip and loop back home to cut out everything inside. Snip rivals' strips, and claim the target share of the sheet.",
+    about: `A territory game made of cut paper. Your folded-paper token starts on a small sheet of your colour. Leave it and you draw a paper strip behind you; loop back home and everything inside the loop becomes yours. But while your strip is out, anyone who crosses it snips you off the sheet, and if you touch your own strip you tear.
+
+Each level adds a rival, makes the rivals faster and sharper, and raises the share of the board you need to claim, from 20% to 60%. Clearing a level unlocks a new paper colour.`,
+    controls: [["Mouse","your token steers toward the cursor"],["WASD / arrows","8-way steering"],["Touch","drag anywhere to steer"]],
+    tips: "Take small, quick bites close to home: the longer your strip is out, the more chances a rival has to snip it. Cut a rival's strip while it is out to knock them off the sheet.",
+  },
+  {
+    slug: "cube-merge", title: "CUBE MERGE", how: 'mounted', port: 8420, url: "/",
+    content: "Number cubes made of glowing crystal merge and shatter into star shards. No characters and no violence. Bright sparkles but no screen flashing.",
+    web: "cube-merge/",
+    tag: "2048 cube snake", big: false, added: '2026-10-18',
+    cat: "Puzzle", tags: ["new","puzzle","2048","merge","snake","numbers","3d","mobile"],
+    blurb: "A 2048 snake made of crystal number cubes. Eat cubes, fuse equal numbers and bite smaller snakes to reach 128, 256, 512 and beyond.",
+    about: `A number-cube snake brawl in a faceted crystal arena, mixing 2048 with a snake game. Your snake is a chain of numbered gem cubes. Eat loose cubes worth no more than your head, and equal values fuse into the next power of two, 2048-style.
+
+Other cube snakes roam the arena too. Bite the tails off smaller snakes, ram smaller heads to shatter them, and keep away from bigger heads. Reach the level target (128, then 256, then 512 and so on) to level up; the rival snakes get bigger and meaner each time.`,
+    controls: [["Mouse / touch drag","steer toward the pointer"],["A D / arrows","turn"],["Hold click / Space","dash"],["Touch","drag to steer, BOOST button to dash"]],
+    tips: "Only eat cubes that help a merge: a tail in descending order (64, 32, 16...) fuses fastest. Check a rival's head value before you go near it.",
+  },
+  {
+    slug: "getaway-flop", title: "GETAWAY FLOP", how: 'mounted', port: 8421, url: "/",
+    content: "1930s rubber-hose cartoon crooks knock each other off rooftops with popguns, blunderbusses and cream pies, old-cartoon style. No blood. Old-film flicker and scratches throughout.",
+    web: "getaway-flop/",
+    tag: "Rubber-hose heist race", big: true, added: '2026-10-18',
+    cat: "Action", tags: ["new","action","race","cartoon","1930s","2 player","3d","mobile"],
+    blurb: "A wobbly 1930s cartoon heist race. Hop across the rooftops to the getaway car, grab popguns and cream pies, and knock the other crooks off.",
+    about: `A wobbly rubber-hose heist race drawn like a 1930s cartoon, with bendy limbs, ink hatching, film grain and an iris wipe. Four crooks hop across the city rooftops to reach the getaway car, picking up popguns, blunderbusses and cream pies to knock each other off the roofs. The first to make three getaways wins the match.
+
+Play the single-player campaign of heists against three bots, which get sharper and unlock hats as you go, or two players on one keyboard against two bots. Your body tilt steers each hop and your aim, and if you land too tilted you flop flat.`,
+    controls: [["P1: A / D","hop left / right (tap again mid-air for a second hop)"],["P1: W / S / Space","fire"],["P2: Left / Right","hop"],["P2: Up / Down","fire"],["Esc","menu"],["Touch","on-screen hop buttons and BANG"]],
+    tips: "Short, controlled hops beat big ones: a tilted landing makes you flop. Grab a weapon before the big gaps and use it on whoever is ahead.",
+  },
+  {
+    slug: "block-world", title: "BLOCK WORLD", how: 'mounted', port: 8422, url: "/",
+    content: "First-person block parkour in a painted sky; falling or touching lava just respawns you at the checkpoint with a soft warm screen flash. No violence.",
+    web: "block-world/",
+    tag: "Voxel parkour", big: true, added: '2026-10-18',
+    cat: "Adventure", tags: ["new","adventure","parkour","voxel","blocks","build","3d","mobile"],
+    blurb: "First-person voxel parkour in a painted sky. Jump, build your own blocks across gaps and reach the golden beacon in 12 courses, plus a sandbox.",
+    about: `First-person parkour over block courses floating in a painted sky. Hop across gaps, balance along beams, bounce on pads, slide on ice, cross lava stepping stones and ride moving lifts to the golden beacon at the end of each course. Some gaps can only be crossed by building: you get a limited number of clay blocks per course to place and take back.
+
+There are 12 courses with gold checkpoints and gems, stars for your time against par, and a sandbox build mode that unlocks after course 2.`,
+    controls: [["WASD","move"],["Space","jump"],["Mouse","look (click to lock)"],["Shift","walk"],["Right click / F","build a clay block"],["Left click / Q","take a placed block back"],["R","respawn at the checkpoint"],["Esc / P","pause"],["M","mute"],["1-9 / wheel","pick a block in the sandbox"],["Touch","left stick, right side looks, JUMP / BUILD / TAKE buttons"]],
+    tips: "Hold Shift to walk on narrow beams and ice. On build gaps, place a block, take back the one behind you, and you can cross with only a couple of blocks.",
+  },
+  {
+    slug: "sky-climb", title: "SKY CLIMB", how: 'mounted', port: 8423, url: "/",
+    content: "A calm, hazy platform climb up a floating tower of junk. Falling costs height, not lives. No violence and no flashing.",
+    web: "sky-climb/",
+    tag: "Dreamy junk tower climb", big: false, added: '2026-10-18',
+    cat: "Adventure", tags: ["new","adventure","climb","platformer","parkour","dreamy","3d","mobile"],
+    blurb: "Climb a giant floating tower of junk into a hazy, dreamy sky and ring the bell at the top. Falling costs height, not lives.",
+    about: `A third-person climbing game up a huge tower of floating junk, into a soft, hazy sky. Jump between crates, pipes, laundry lines and books through six zones, and ring the Bell of Stillness at the very top. There are no lives: if you fall, you drop back down into the clouds, and you return to your pin or the start.
+
+You get a pin to plant in each new zone, which saves your place. Sky shards hidden on the way are kept between climbs and unlock Scarf Glide and new scarf weaves.`,
+    controls: [["WASD / arrows","move"],["Space","jump (hold for full height)"],["Shift","sprint"],["Mouse","look (click to lock)"],["Wheel","zoom"],["F","plant a pin"],["R","return to pin or start"],["M","mute"],["Touch","left half stick, right half look, jump and pin buttons"]],
+    tips: "Plant your pin as soon as you reach solid ground in a new zone. Tap Space for short hops and hold it only for the big gaps.",
+  },
+  {
+    slug: "golf-orbit", title: "GOLF ORBIT", how: 'mounted', port: 8424, url: "/",
+    content: "A golf ball bounces across sunny tropical islands with palms and beach balls. No characters, no violence, no flashing.",
+    web: "golf-orbit/",
+    tag: "Island-hopping golf drive", big: false, added: '2026-10-18',
+    cat: "Sport", tags: ["new","sport","golf","one button","upgrades","tropical","3d","mobile"],
+    blurb: "Drive a golf ball across a chain of tiny resort-island planets. Lock the angle, lock the power, skip over the sea and upgrade your swing.",
+    about: `A one-button golf drive across a chain of tiny resort islands that curve like little planets, in a sunny postcard style with palms, umbrellas, starfish and pool floaties. Tap once to lock the angle and again to lock the power, and hit the dashed sweet spot for a PERFECT shot.
+
+The ball skips off the sea, slows in the sand and bounces hard off giant beach balls. Floaties give a boost, and starfish are coins you spend on upgrades. The run ends when the ball stops, stalls or sinks.`,
+    controls: [["Tap / Space","lock the angle, then lock the power"],["Tap / Space in flight","fire the Pocket Rocket (once bought)"],["M","mute"]],
+    tips: "Hit the dashed sweet spot for PERFECT (+15%). A low, fast angle skips off the sea better than a high lob.",
+  },
+  {
+    slug: "time-shooter", title: "STILLSHOT", how: 'mounted', port: 8425, url: "/",
+    content: "A first-person shooter in a white room against red crystal figures that shatter into shards when hit; no blood. One hit and you are out, and the level restarts. Muzzle flashes and a brief screen flash when you are hit.",
+    web: "time-shooter/",
+    tag: "Time moves when you move", big: true, added: '2026-10-18',
+    cat: "Shooter", tags: ["new","shooter","fps","slow motion","puzzle","minimal","3d","mobile"],
+    blurb: "Time moves only when you move. Step, aim and shoot your way through red crystal enemies in a stark white room, one frozen moment at a time.",
+    about: `A first-person shooter where time only moves when you do. Stand still and the bullets hang in the air; walk and the world speeds up with you. Looking around lets time trickle forward, and firing gives it a short burst. The enemies are red crystal figures in a stark white room, and they shatter when hit.
+
+One hit from an enemy and you are out. Levels are endless, with more enemies and waves as you go: melee runners from level 3, the SCATTER gun at level 4 and RAPID at level 7.`,
+    controls: [["WASD","move (time flows)"],["Mouse","look (time trickles)"],["Click","shoot (a short burst of time)"],["Q / 1-3","switch weapon"],["R","retry"],["M","mute"],["Touch","left stick moves, drag the right side to look, FIRE and GUN buttons"]],
+    tips: "Stop and look before every step: time is frozen while you stand still, so plan where every bullet is going. Step sideways out of a bullet's path rather than backwards.",
+  },
+  {
+    slug: "subway-run", title: "SUBWAY RUN", how: 'mounted', port: 8426, url: "/",
+    content: "A cartoon runner dodges trains and barriers in a graffiti train yard; a crash shows a BUSTED card, nobody is hurt. The screen flashes red on a crash and orange on a stumble.",
+    web: "subway-run/",
+    tag: "Graffiti train-yard runner", big: true, added: '2026-10-18',
+    cat: "Arcade", tags: ["new","arcade","runner","endless","trains","graffiti","3d","mobile"],
+    blurb: "An endless three-lane run through a graffiti train yard. Jump, roll and switch lanes past trains, run along the roofs and grab spray-can power-ups.",
+    about: `An endless three-lane runner through a sunset train yard covered in graffiti, in a cel-shaded spray-paint style. Switch lanes, jump over low hurdles, roll under high bars and dodge trains, some of which come towards you sounding their horns. Ramps lead up onto the train roofs, where coins wait.
+
+Spray-can power-ups give you MAGNET, SPRING KICKS for big jumps onto trains, and 2X SCORE. Complete three crew tags (missions) to rank up and raise your score multiplier, and bank coins to make power-ups last longer.`,
+    controls: [["Left / Right / A / D","switch lane"],["Up / W / Space","jump"],["Down / S","roll (fast-drop in the air)"],["M","mute"],["Touch","swipe left, right, up or down; tap to jump"]],
+    tips: "Clipping the side of a train only makes you stumble, but a second stumble within 3.5 seconds ends the run, so play safe right after one. Get up on the roofs when you can.",
+  },
+  {
+    slug: "marble-roll", title: "MARBLE ROLL", how: 'mounted', port: 8427, url: "/",
+    content: "A glass marble rolls along stone courses above the clouds; falling off returns it to the last checkpoint. No characters, no violence, no flashing.",
+    web: "marble-roll/",
+    tag: "Glass marble sky courses", big: false, added: '2026-10-18',
+    cat: "Arcade", tags: ["new","arcade","marble","ball","balance","levels","3d","mobile"],
+    blurb: "Roll a glass cat's-eye marble along polished-stone sky courses. Dodge sweepers and pushers, cross narrow beams and reach the swirl portal in 15 courses.",
+    about: `Roll a glass cat's-eye marble along polished-stone courses floating above a sea of clouds. Hold to roll forward and drag to steer, across narrow beams, diagonal shifts, zigzags, drops and jump gaps, past sweepers, pushers and pillar walls, to the swirl portal at the finish.
+
+There are 15 courses in four sky themes, Dawn, Noon, Sunset and Dusk. Checkpoint arches catch you when you fall, stars depend on how few falls you take, and gems buy six glass marbles.`,
+    controls: [["Hold mouse / finger","roll forward"],["Drag sideways","steer"],["W / Up","roll"],["A D / Left Right","steer"],["S / Down","brake"],["R","restart"],["Esc","menu"],["M","mute"]],
+    tips: "Brake before narrow beams and steer gently: the marble keeps its momentum. Wait for sweepers to pass, then roll through behind them.",
+  },
   // ---- 2026-10-14 (later): RUSH HOUR ----
   {
     slug: "rush-hour", title: "RUSH HOUR", how: 'mounted', port: 8401, url: "/",

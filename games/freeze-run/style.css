@@ -1,0 +1,44 @@
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#f6d9e4;font-family:"Trebuchet MS","Arial Rounded MT Bold",system-ui,sans-serif;color:#3b2d4a;user-select:none;-webkit-user-select:none;touch-action:none}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+#edge{position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 0 0 transparent;transition:box-shadow .25s}
+#edge.green{box-shadow:inset 0 0 0 8px #8fe0b4}
+#edge.red{box-shadow:inset 0 0 90px 14px rgba(255,92,120,.55),inset 0 0 0 8px #ff7a93}
+#hud{position:fixed;inset:0;pointer-events:none}
+#lvl,#alive{position:absolute;top:14px;padding:6px 14px;border-radius:999px;background:#fff8ef;border:3px solid #3b2d4a;font-weight:900;font-size:16px;letter-spacing:1px}
+#lvl{left:14px}#alive{right:14px}
+#timer{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-size:34px;font-weight:900;color:#fff8ef;-webkit-text-stroke:3px #3b2d4a;paint-order:stroke}
+#timer.low{color:#ff7a93}
+#track{position:absolute;top:64px;left:50%;transform:translateX(-50%);width:min(60vw,420px);height:12px;border-radius:99px;background:#fff8ef;border:3px solid #3b2d4a;overflow:visible}
+#trackFill{height:100%;width:0;background:#ffb38a;border-radius:99px}
+#trackDot{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:#ff7a93;border:3px solid #3b2d4a;transform:translate(-50%,-50%);left:0}
+#trackEnd{position:absolute;right:-12px;top:50%;width:22px;height:22px;border-radius:50%;background:#ffd36e;border:3px solid #3b2d4a;transform:translateY(-50%)}
+#feed{position:absolute;right:14px;top:58px;text-align:right;font-weight:800;font-size:13px}
+#feed div{background:#fff8efcc;border-radius:8px;padding:2px 8px;margin-top:4px;display:inline-block;clear:both;float:right;animation:fd 2.4s forwards}
+@keyframes fd{0%{transform:translateX(30px);opacity:0}10%{transform:none;opacity:1}80%{opacity:1}100%{opacity:0}}
+#banner{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%) scale(1);font-size:min(16vw,110px);font-weight:900;color:#fff8ef;-webkit-text-stroke:5px #3b2d4a;paint-order:stroke;pointer-events:none;opacity:0;white-space:nowrap;letter-spacing:2px}
+#banner.pop{animation:pop .9s ease-out forwards}
+#banner.red{color:#ff7a93}#banner.green{color:#8fe0b4}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,-50%) scale(.4) rotate(-6deg)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.12) rotate(2deg)}30%{transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1.04)}}
+#hint{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#fff8efdd;border:3px solid #3b2d4a;border-radius:999px;padding:8px 16px;font-weight:800;font-size:13px;white-space:nowrap;pointer-events:none;transition:opacity .5s}
+#hint.off{opacity:0}
+#card,#menu{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff8ef;border:4px solid #3b2d4a;border-radius:28px;padding:24px 28px;text-align:center;box-shadow:0 10px 0 #3b2d4a;min-width:min(86vw,320px)}
+#card.hide,#menu.hide{display:none}
+#cardTitle{font-size:46px;font-weight:900;letter-spacing:2px}
+#cardStars{font-size:40px;margin:4px 0;letter-spacing:6px;color:#ffc64a;-webkit-text-stroke:2px #3b2d4a}
+#cardStars i{font-style:normal;color:#e8dccf}
+#cardSub{font-weight:800;margin-bottom:14px;line-height:1.4}
+.row{display:flex;gap:10px;justify-content:center}
+button{font:inherit;font-weight:900;font-size:18px;padding:10px 20px;border-radius:16px;border:3px solid #3b2d4a;background:#c9e9ff;color:#3b2d4a;cursor:pointer;box-shadow:0 4px 0 #3b2d4a}
+button:active{transform:translateY(3px);box-shadow:0 1px 0 #3b2d4a}
+button.main{background:#ffb38a}
+button.ghost{background:none;box-shadow:none;border:none;margin-top:8px;font-size:14px;text-decoration:underline}
+#logo{font-size:56px;font-weight:900;line-height:.9;color:#ff7a93;-webkit-text-stroke:3px #3b2d4a;paint-order:stroke}
+#logo span{display:block;color:#8fe0b4}
+#tag{font-weight:800;margin:10px 0 14px}
+#levels{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+#levels button{padding:8px 0;font-size:16px}
+#levels button small{display:block;font-size:10px;color:#c98a00}
+#levels button[disabled]{opacity:.35}
+#totStars{font-weight:800;margin-bottom:12px}
+@media (max-width:600px){#hint{font-size:11px}#lvl,#alive{font-size:13px}#timer{font-size:28px}}

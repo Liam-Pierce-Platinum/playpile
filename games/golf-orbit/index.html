@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Golf Orbit</title>
+<link rel="stylesheet" href="./style.css">
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js" } }</script>
+</head>
+<body>
+<div id="card">
+  <canvas id="c"></canvas>
+  <div id="grain"></div>
+  <div id="hud">
+    <div id="dist">0<small> m</small></div>
+    <div id="best">best 0 m</div>
+    <div id="coins"><span class="star">&#9733;</span> <b id="coinN">0</b></div>
+    <div id="rockets"></div>
+  </div>
+  <div id="stamp"><div class="st-in"><div id="stampName">Tee Island</div><div class="st-sub">AIR MAIL</div></div></div>
+  <div id="toast"></div>
+  <div id="meter" class="hide"><div id="meterLbl">ANGLE</div><div id="bar"><div id="fill"></div><div id="sweet"></div></div><div id="hint">tap / space</div></div>
+  <div id="panel" class="hide">
+    <div class="greet">Greetings from</div>
+    <h1 id="ptitle">GOLF ORBIT</h1>
+    <div id="presult"></div>
+    <div id="shop"></div>
+    <button id="go">Tee off &#9654;</button>
+  </div>
+</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

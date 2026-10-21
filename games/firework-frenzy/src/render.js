@@ -1,6 +1,7 @@
 // Everything drawn at a low internal resolution (H=180) and scaled up with nearest-neighbour.
 import { GROUND } from './levels.js';
 import { text } from './font.js';
+import { DEFAULT_LOOK, buildSprite, skinFrames, FLAMES, RAINBOW_HUES, hsl } from './cosmetics.js';
 
 export const H = 180;
 const INK = '#0b0716';
@@ -180,33 +181,33 @@ export function drawRings(ctx, s, camX, t) {
   }
 }
 
+// ---------- the equipped look (garage) ----------
+export let LOOK = { ...DEFAULT_LOOK };
+let clock = 0;
+export function setLook(l) { LOOK = { ...DEFAULT_LOOK, ...l }; }
+export function setClock(t) { clock = t; }
+const RAINBOW = RAINBOW_HUES.map((h) => ramp(hsl(h, 0.95, 0.58)));
+const rainbowRamp = (i = 0) => RAINBOW[(Math.floor(clock * 12) + i) % RAINBOW.length];
+const flameDef = (look = LOOK) => FLAMES[look.flame] || FLAMES.classic;
+
 // ---------- rocket (pixel sprite rotated by nearest sampling, then outlined) ----------
-const ROCKET = [
-  '...Y...',
-  '..RRr..',
-  '..RRr..',
-  '..WWw..',
-  '..BBb..',
-  '..WWw..',
-  '..BBb..',
-  '..WWw..',
-  '..RRr..',
-  '.oRRro.',
-  'ooRRroo',
-  'o.kkk.o',
-  '...s...',
-  '...s...',
-  '...S...',
-];
-const RC = { Y: '#ffe066', R: '#ff5a5f', r: '#b8283a', W: '#fff6ea', w: '#c9bcd6', B: '#4fb0ff', b: '#2a6ad0', o: '#ff9a3c', k: '#3a3048', s: '#c9a070', S: '#8a6a4a' };
+const sprCache = new Map();
+export function spriteFor(look = LOOK) {
+  const fr = skinFrames(look), f = fr > 1 ? Math.floor(clock * 10) % fr : 0;
+  const key = look.skin + '|' + look.nose + '|' + look.fins + '|' + f;
+  let g = sprCache.get(key);
+  if (!g) { g = buildSprite(look, f); if (sprCache.size > 400) sprCache.clear(); sprCache.set(key, g); }
+  return g;
+}
 const RN = 10, RG = new Array((RN * 2 + 1) ** 2);
-export function drawRocket(ctx, x, y, a, flash) {
+export function drawRocket(ctx, x, y, a, flash, look = LOOK) {
+  const spr = spriteFor(look);
   const X0 = Math.floor(x), Y0 = Math.floor(y), fx = x - X0, fy = y - Y0, ca = Math.cos(a), sa = Math.sin(a), N = RN * 2 + 1;
   for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
     const dx = i - RN + 0.5 - fx, dy = j - RN + 0.5 - fy;
     const sx = Math.floor(dx * ca + dy * sa + 3.5), sy = Math.floor(-dx * sa + dy * ca + 7.5);
-    const ch = sy >= 0 && sy < 15 && sx >= 0 && sx < 7 ? ROCKET[sy][sx] : '.';
-    RG[j * N + i] = ch === '.' ? null : (flash ? '#ffffff' : RC[ch]);
+    const c = sy >= 0 && sy < 15 && sx >= 0 && sx < 7 ? spr[sy][sx] : null;
+    RG[j * N + i] = c ? (flash ? '#ffffff' : c) : null;
   }
   ctx.fillStyle = INK;
   for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
@@ -214,6 +215,20 @@ export function drawRocket(ctx, x, y, a, flash) {
     if ((i > 0 && RG[j * N + i - 1]) || (i < N - 1 && RG[j * N + i + 1]) || (j > 0 && RG[(j - 1) * N + i]) || (j < N - 1 && RG[(j + 1) * N + i])) ctx.fillRect(X0 + i - RN, Y0 + j - RN, 1, 1);
   }
   for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) { const c = RG[j * N + i]; if (c) { ctx.fillStyle = c; ctx.fillRect(X0 + i - RN, Y0 + j - RN, 1, 1); } }
+}
+
+// The short jet of flame pixels right behind the nozzle, plus its glow.
+export function drawJet(ctx, r, cx, look = LOOK) {
+  const fx = Math.sin(r.a), fy = -Math.cos(r.a), fd = flameDef(look);
+  if (r.thr) {
+    const cols = fd.rainbow ? rainbowRamp() : fd.cols;
+    for (let k = 0; k < 5; k++) {
+      const fl = Math.random() * 1.5;
+      ctx.fillStyle = fd.rainbow ? RAINBOW[(k + Math.floor(clock * 14)) % RAINBOW.length][Math.min(3, k > 1 ? 2 : 1)] : cols[Math.min(6, k + (Math.random() < 0.3 ? 1 : 0))];
+      ctx.fillRect(Math.round(r.x - fx * (6 + k * 1.6 + fl) - cx), Math.round(r.y - fy * (6 + k * 1.6 + fl)), k < 2 ? 2 : 1, k < 2 ? 2 : 1);
+    }
+    glow(ctx, r.x - fx * 8 - cx, r.y - fy * 8, 10, fd.rainbow ? rainbowRamp()[2] : fd.glow, 0.5);
+  } else glow(ctx, r.x - fx * 5 - cx, r.y - fy * 5, 5, fd.rainbow ? rainbowRamp()[1] : fd.cols[2], 0.25);
 }
 
 // ---------- glow (blocky, posterized) ----------
@@ -240,7 +255,7 @@ export function sparks(x, y, n, sp, cols, o = {}) {
     const a = o.dir != null ? o.dir + (Math.random() - 0.5) * (o.spread || 0.6) : Math.random() * Math.PI * 2;
     const v = sp * (o.even ? 0.85 + Math.random() * 0.15 : 0.3 + Math.random() * 0.7);
     const life = (o.life || 0.8) * (0.6 + Math.random() * 0.5);
-    spawn({ x, y, vx: Math.cos(a) * v + (o.vx || 0), vy: Math.sin(a) * v + (o.vy || 0), life, max: life, c: cols, g: o.g ?? 60, drag: o.drag ?? 2.2, sz: o.sz || 1, crackle: o.crackle || 0, trail: o.trail || 0 });
+    spawn({ x, y, vx: Math.cos(a) * v + (o.vx || 0), vy: Math.sin(a) * v + (o.vy || 0), life, max: life, c: typeof cols === 'function' ? cols() : cols, g: o.g ?? 60, drag: o.drag ?? 2.2, sz: o.sz || 1, crackle: o.crackle || 0, trail: o.trail || 0, shape: o.shape, nolight: o.nolight });
   }
 }
 export function firework(x, y, c, big = 1) {
@@ -250,14 +265,119 @@ export function firework(x, y, c, big = 1) {
   sparks(x, y, Math.round(10 * big), 70 * big, ['#ffffff', '#fff3a0', '#ffd23f'], { life: 1.4, g: 50, crackle: 1 });
   spawn({ x, y, vx: 0, vy: 0, life: 0.16, max: 0.16, flash: 20 * big, c: [c] });
 }
+// Sparks thrown out along a shape (unit points), all at the same speed, so the shape holds as it grows.
+function shapeBurst(x, y, pts, sp, cols, o = {}) {
+  for (const [ux, uy] of pts) {
+    const life = (o.life || 1.2) * (0.92 + Math.random() * 0.12), j = 1 + (Math.random() - 0.5) * 0.04;
+    spawn({ x, y, vx: ux * sp * j, vy: uy * sp * j, life, max: life, c: typeof cols === 'function' ? cols() : cols, g: o.g ?? 22, drag: o.drag ?? 1.7, sz: 1, trail: o.trail || 0, crackle: o.crackle || 0 });
+  }
+}
+const ringPts = (n, r = 1) => Array.from({ length: n }, (_, i) => [Math.cos(i / n * Math.PI * 2) * r, Math.sin(i / n * Math.PI * 2) * r]);
+const HEART_PTS = Array.from({ length: 40 }, (_, i) => { const t = i / 40 * Math.PI * 2; return [Math.sin(t) ** 3, -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) / 16]; });
+const SMILE_PTS = [...ringPts(30), [-0.35, -0.3], [-0.35, -0.38], [0.35, -0.3], [0.35, -0.38], ...Array.from({ length: 9 }, (_, i) => { const t = Math.PI * (0.2 + 0.6 * i / 8); return [Math.cos(t) * 0.55, Math.sin(t) * 0.5]; })];
+const GOLD = ['#ffffff', '#fff3a0', '#ffd23f', '#e8a93a', '#b8792a', '#6a3a1a'];
+const SILVER = ['#ffffff', '#ffffff', '#e8eef8', '#c9d4e8', '#8e9ab8', '#4a5068'];
+const randRainbow = () => RAINBOW[Math.floor(Math.random() * RAINBOW.length)];
+// The burst style YOU equipped: used for the fireworks your rocket sets off.
+export function burst(x, y, c, big = 1, style = LOOK.burst) {
+  switch (style) {
+    case 'ring':
+      shapeBurst(x, y, ringPts(44), 88 * big, ramp(c), { life: 1.2, trail: 1 });
+      shapeBurst(x, y, ringPts(24), 46 * big, ['#ffffff', '#ffffff', '#fff3a0', shade(c, 1.5), c, shade(c, 0.5)], { life: 1.0 });
+      spawn({ x, y, vx: 0, vy: 0, life: 0.16, max: 0.16, flash: 20 * big, c: [c] }); break;
+    case 'willow':
+      sparks(x, y, Math.round(56 * big), 72 * big, GOLD, { even: true, life: 2.1, g: 58, drag: 1.5, trail: 1 });
+      sparks(x, y, Math.round(14 * big), 30 * big, GOLD, { life: 1.4, g: 40 });
+      spawn({ x, y, vx: 0, vy: 0, life: 0.2, max: 0.2, flash: 22 * big, c: ['#ffd23f'] }); break;
+    case 'heart': {
+      const pink = ['#ffffff', '#ffd0e0', '#ff8ab0', '#ff4f8d', '#c02a6a', '#6a1040'];
+      shapeBurst(x, y, HEART_PTS, 62 * big, pink, { life: 1.3, trail: 1 });
+      shapeBurst(x, y, HEART_PTS.filter((_, i) => i % 3 === 0), 30 * big, ['#ffffff', '#ffffff', '#ffd0e0', '#ff8ab0', '#ff4f8d'], { life: 1.0 });
+      spawn({ x, y, vx: 0, vy: 0, life: 0.16, max: 0.16, flash: 18 * big, c: ['#ff4f8d'] }); break;
+    }
+    case 'smiley': {
+      const yel = ['#ffffff', '#fff3a0', '#ffe066', '#ffd23f', '#e8a93a', '#8a5a1a'];
+      shapeBurst(x, y, SMILE_PTS, 70 * big, yel, { life: 1.35, g: 14 });
+      spawn({ x, y, vx: 0, vy: 0, life: 0.16, max: 0.16, flash: 18 * big, c: ['#ffd23f'] }); break;
+    }
+    case 'glitter':
+      sparks(x, y, Math.round(40 * big), 80 * big, SILVER, { even: true, life: 1.2, g: 35, drag: 2, crackle: 1 });
+      sparks(x, y, Math.round(30 * big), 60 * big, SILVER, { life: 1.6, g: 25, crackle: 1 });
+      sparks(x, y, Math.round(10 * big), 50 * big, ['#ffffff', '#fff3a0', '#c9b8ff'], { life: 1.1, g: 10, shape: 'star' });
+      spawn({ x, y, vx: 0, vy: 0, life: 0.16, max: 0.16, flash: 20 * big, c: ['#ffffff'] }); break;
+    case 'rainbow':
+      sparks(x, y, Math.round(50 * big), 95 * big, randRainbow, { even: true, life: 1.15, g: 40, drag: 2.0, trail: 1 });
+      sparks(x, y, Math.round(24 * big), 45 * big, randRainbow, { life: 0.9, g: 30 });
+      spawn({ x, y, vx: 0, vy: 0, life: 0.16, max: 0.16, flash: 22 * big, c: [RAINBOW[Math.floor(Math.random() * RAINBOW.length)][2]] }); break;
+    case 'supernova': {
+      shapeBurst(x, y, ringPts(56), 110 * big, () => randRainbow(), { life: 1.1, trail: 1 });
+      sparks(x, y, Math.round(20 * big), 50 * big, ['#ffffff', '#ffffff', '#fff3a0', '#ffd23f'], { life: 0.8, g: 20 });
+      for (let i = 0; i < 7; i++) { const a = i / 7 * Math.PI * 2 + Math.random() * 0.4, v = 55 * big, l = 0.45 + Math.random() * 0.15; spawn({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: l, max: l, c: ['#ffffff', '#fff3a0', '#ffd23f'], g: 30, drag: 1.5, sz: 2, pop: 1 }); }
+      spawn({ x, y, vx: 0, vy: 0, life: 0.22, max: 0.22, flash: 30 * big, c: ['#ffffff'] }); break;
+    }
+    default: firework(x, y, c, big);
+  }
+}
 export function smoke(x, y, n) { for (let i = 0; i < n; i++) { const l = 0.8 + Math.random() * 0.8; spawn({ x: x + (Math.random() - 0.5) * 6, y: y + (Math.random() - 0.5) * 6, vx: (Math.random() - 0.5) * 20, vy: -10 - Math.random() * 15, life: l, max: l, c: SMOKE, g: -5, drag: 1.5, sz: 2, nolight: 1 }); } }
-export function flame(x, y, dir, vx, vy, n) { sparks(x, y, n, 110, FIRE, { dir, spread: 0.55, life: 0.35, g: 20, drag: 3, vx: vx * 0.5, vy: vy * 0.5 }); }
+export function flame(x, y, dir, vx, vy, n, look = LOOK) {
+  const fd = flameDef(look);
+  sparks(x, y, n, 110, fd.rainbow ? () => rainbowRamp(Math.floor(Math.random() * 3)) : fd.cols, { dir, spread: 0.55, life: 0.35, g: 20, drag: 3, vx: vx * 0.5, vy: vy * 0.5 });
+  if (fd.shape === 'heart' && Math.random() < 0.18 * n) sparks(x, y, 1, 55, ['#ffffff', '#ffd0e0', '#ff8ab0', '#ff4f8d', '#c02a6a'], { dir, spread: 0.8, life: 0.7, g: -25, drag: 3, vx: vx * 0.4, vy: vy * 0.4, shape: 'heart' });
+  if (fd.shape === 'star' && Math.random() < 0.3 * n) sparks(x, y, 1, 70, ['#ffffff', '#ffffff', '#fff3a0', '#ffd23f', '#c9b8ff'], { dir, spread: 1.4, life: 0.5, g: 30, drag: 2.5, vx: vx * 0.4, vy: vy * 0.4, shape: 'star' });
+}
+// the little embers that drip from the nozzle while you coast
+export function idleSpark(x, y, look = LOOK) { const fd = flameDef(look), c = fd.rainbow ? rainbowRamp() : fd.cols; sparks(x, y, 1, 15, [c[1], c[3], c[5]], { life: 0.3, g: 30 }); }
 export { FIRE };
+
+// ---------- trails (behind the rocket while it flies) ----------
+let ribbon = [];
+export function resetTrail() { ribbon = []; }
+export function trail(r, dt, alive, look = LOOK) {
+  const fx = Math.sin(r.a), fy = -Math.cos(r.a), tx = r.x - fx * 8, ty = r.y - fy * 8;
+  const st = look.trail;
+  for (const p of ribbon) p.age += dt;
+  while (ribbon.length && ribbon[0].age > (st === 'comet' ? 0.75 : 0.55)) ribbon.shift();
+  if (!alive) return;
+  if (st === 'smoke') { if (r.thr && Math.random() < dt * 8) smoke(tx, ty, 1); }
+  else if (st === 'puffs') { if (r.thr && Math.random() < dt * 11) { const l = 1.1 + Math.random() * 0.6; spawn({ x: tx + (Math.random() - 0.5) * 4, y: ty + (Math.random() - 0.5) * 4, vx: (Math.random() - 0.5) * 10, vy: -6 - Math.random() * 6, life: l, max: l, c: ['#ffffff', '#ece6f6', '#c8bede', '#9a8ab8'], g: -3, drag: 1.5, sz: 3, nolight: 1, alpha: 0.85 }); } }
+  else if (st === 'bubbles') { if (Math.random() < dt * 10) { const l = 1.0 + Math.random() * 0.6; spawn({ x: tx + (Math.random() - 0.5) * 4, y: ty, vx: (Math.random() - 0.5) * 12, vy: -8 - Math.random() * 8, life: l, max: l, c: ['#e8fbff', '#9de8ff', '#7ad7ff', '#3fa0d0'], g: -12, drag: 1.2, sz: 1, shape: 'ring', nolight: 1, alpha: 1 }); } }
+  else if (st === 'stardust') { if (Math.random() < dt * 34) { const l = 0.7 + Math.random() * 0.7; spawn({ x: tx + (Math.random() - 0.5) * 5, y: ty + (Math.random() - 0.5) * 5, vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8, life: l, max: l, c: ['#ffffff', '#fff3a0', '#c9b8ff', '#8e7fb8', '#4a3e70'], g: 3, drag: 2, sz: 1, shape: Math.random() < 0.25 ? 'star' : undefined }); } }
+  else if (st === 'ribbon' || st === 'comet') {
+    const last = ribbon[ribbon.length - 1];
+    if (!last || Math.hypot(last.x - tx, last.y - ty) > 0.8) ribbon.push({ x: tx, y: ty, age: 0 });
+    if (st === 'comet' && Math.random() < dt * 30) sparks(tx, ty, 1, 18, GOLD, { life: 0.5, g: 15 });
+  }
+}
+const RIBBON_COLS = ['#ffffff', '#ffd0f0', '#ff8ad8', '#ff4fd8', '#c77dff', '#7a2fd0', '#3a1a70'];
+const COMET_COLS = ['#ffffff', '#fff3a0', '#ffd23f', '#ff9a3c', '#ff4f3c', '#b8283a', '#4a1430'];
+export function drawTrail(ctx, camX, look = LOOK) {
+  if (ribbon.length < 2) return;
+  const comet = look.trail === 'comet', cols = comet ? COMET_COLS : RIBBON_COLS, maxAge = comet ? 0.75 : 0.55;
+  const op = ctx.globalCompositeOperation; ctx.globalCompositeOperation = 'lighter';
+  for (let i = ribbon.length - 1; i > 0; i--) {
+    const a = ribbon[i], b = ribbon[i - 1], k = a.age / maxAge;
+    ctx.fillStyle = cols[Math.min(cols.length - 1, Math.floor(k * cols.length))];
+    const w = k < (comet ? 0.35 : 0.2) ? 2 : 1, n = Math.max(1, Math.ceil(Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y))));
+    for (let j = 0; j < n; j++) ctx.fillRect(Math.round(a.x + (b.x - a.x) * j / n - camX - (w >> 1)), Math.round(a.y + (b.y - a.y) * j / n - (w >> 1)), w, w);
+    if (comet && k < 0.5 && i % 3 === 0) glow(ctx, a.x - camX, a.y, 4, '#ff9a3c', 0.35 * (1 - k));
+  }
+  ctx.globalCompositeOperation = op;
+}
+
+const SHAPES = { heart: ['.x.x.', 'xxxxx', '.xxx.', '..x..'], star: ['.x.', 'xxx', '.x.'], ring: ['.x.', 'x.x', '.x.'] };
+function drawShape(ctx, p, x, y) {
+  const sh = SHAPES[p.shape], w = sh[0].length, h = sh.length, x0 = Math.round(x) - (w >> 1), y0 = Math.round(y) - (h >> 1);
+  for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) if (sh[j][i] === 'x') ctx.fillRect(x0 + i, y0 + j, 1, 1);
+  if (p.shape === 'star' && p.life > p.max * 0.5) { ctx.fillStyle = '#ffffff'; ctx.fillRect(x0 + 1, y0 + 1, 1, 1); }
+}
 
 export function updateParticles(dt) {
   for (let i = P.length - 1; i >= 0; i--) {
     const p = P[i]; p.life -= dt;
-    if (p.life <= 0) { P[i] = P[P.length - 1]; P.pop(); continue; }
+    if (p.life <= 0) {
+      if (p.pop) { const c = randRainbow(); sparks(p.x, p.y, 16, 42, c, { even: true, life: 0.7, g: 30, drag: 2 }); spawn({ x: p.x, y: p.y, vx: 0, vy: 0, life: 0.12, max: 0.12, flash: 10, c: [c[2]] }); }
+      P[i] = P[P.length - 1]; P.pop(); continue;
+    }
     const d = 1 - (p.drag || 0) * dt; p.vx *= d; p.vy *= d; p.vy += (p.g || 0) * dt;
     p.x += p.vx * dt; p.y += p.vy * dt;
     if (p.trail && Math.random() < 0.35) spawn({ x: p.x, y: p.y, vx: 0, vy: 0, life: 0.25, max: 0.25, c: p.c.slice(2), g: 15, drag: 0 });
@@ -266,14 +386,17 @@ export function updateParticles(dt) {
 }
 export function drawParticles(ctx, camX) {
   ctx.globalCompositeOperation = 'source-over';
-  for (const p of P) if (p.nolight) { const k = 1 - p.life / p.max; ctx.fillStyle = p.c[Math.min(p.c.length - 1, Math.floor(k * p.c.length))]; ctx.globalAlpha = 0.5 * (1 - k); ctx.fillRect(Math.round(p.x - camX), Math.round(p.y), p.sz, p.sz); }
+  for (const p of P) if (p.nolight) {
+    const k = 1 - p.life / p.max; ctx.fillStyle = p.c[Math.min(p.c.length - 1, Math.floor(k * p.c.length))]; ctx.globalAlpha = (p.alpha || 0.5) * (1 - k);
+    if (p.shape) drawShape(ctx, p, p.x - camX, p.y); else ctx.fillRect(Math.round(p.x - camX), Math.round(p.y), p.sz, p.sz);
+  }
   ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'lighter';
   for (const p of P) {
     if (p.nolight) continue;
     if (p.flash) { glow(ctx, p.x - camX, p.y, p.flash * (0.6 + p.life / p.max), p.c[0], p.life / p.max); glow(ctx, p.x - camX, p.y, p.flash * 0.4, '#ffffff', p.life / p.max); continue; }
     const k = 1 - p.life / p.max;
     ctx.fillStyle = p.c[Math.min(p.c.length - 1, Math.floor(k * p.c.length))];
-    ctx.fillRect(Math.round(p.x - camX), Math.round(p.y), p.sz, p.sz);
+    if (p.shape) drawShape(ctx, p, p.x - camX, p.y); else ctx.fillRect(Math.round(p.x - camX), Math.round(p.y), p.sz, p.sz);
   }
   ctx.globalCompositeOperation = 'source-over';
 }
@@ -299,3 +422,35 @@ export function starIcon(ctx, x, y, on, sc = 1) {
   for (let j = 0; j < 5; j++) for (let i = 0; i < 5; i++) if (S[j][i] === 'x') { ctx.fillStyle = on ? (j < 2 ? '#fff3a0' : '#ffd23f') : '#4a3a66'; ctx.fillRect(x + i * sc, y + j * sc, sc, sc); }
 }
 export { text };
+// A little gold coin. frame 0-3 spins it (full, narrow, edge, narrow).
+export function coinIcon(ctx, x, y, frame = 0, sc = 1) {
+  const w = [5, 3, 1, 3][frame & 3], x0 = Math.round(x + (5 - w) / 2 * sc), y0 = Math.round(y);
+  const px = (i, j, c) => { ctx.fillStyle = c; ctx.fillRect(x0 + i * sc, y0 + j * sc, sc, sc); };
+  for (let j = 0; j < 5; j++) for (let i = 0; i < w; i++) { if (w === 5 && (j === 0 || j === 4) && (i === 0 || i === 4)) continue; ctx.fillStyle = INK; ctx.fillRect(x0 + i * sc + sc, y0 + j * sc + sc, sc, sc); }
+  for (let j = 0; j < 5; j++) for (let i = 0; i < w; i++) {
+    if (w === 5 && (j === 0 || j === 4) && (i === 0 || i === 4)) continue;
+    px(i, j, w === 1 ? '#b8792a' : i === 0 ? '#fff3a0' : i === w - 1 ? '#b8792a' : j === 0 ? '#fff3a0' : '#ffd23f');
+  }
+  if (w === 5) { px(2, 1, '#e8a93a'); px(2, 2, '#e8a93a'); px(2, 3, '#e8a93a'); }
+}
+export function lockIcon(ctx, x, y, c = '#8e7fb8') {
+  ctx.fillStyle = INK; ctx.fillRect(x, y + 3, 7, 6); ctx.fillRect(x + 1, y - 1, 5, 4);
+  ctx.fillStyle = c; ctx.fillRect(x + 1, y + 4, 5, 4); ctx.fillRect(x + 1, y, 1, 4); ctx.fillRect(x + 5, y, 1, 4); ctx.fillRect(x + 2, y, 3, 1);
+  ctx.fillStyle = INK; ctx.fillRect(x + 3, y + 5, 1, 2);
+}
+// Tiny picture of a burst style for the garage thumbnails.
+export function burstIcon(ctx, style, cx, cy) {
+  cx = Math.round(cx); cy = Math.round(cy);
+  const dot = (x, y, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(cx + x), Math.round(cy + y), 1, 1); };
+  const rb = (i) => RAINBOW[i % RAINBOW.length][2];
+  switch (style) {
+    case 'ring': ringPts(18).forEach(([x, y]) => dot(x * 8, y * 8, '#3fd0ff')); ringPts(10).forEach(([x, y]) => dot(x * 4, y * 4, '#ffffff')); break;
+    case 'willow': for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2; for (let k = 1; k < 7; k++) dot(Math.cos(a) * k * 1.3, Math.sin(a) * k * 1.1 + k * k * 0.14 - 2, GOLD[Math.min(5, k - 1)]); } break;
+    case 'heart': HEART_PTS.forEach(([x, y], i) => i % 2 || dot(x * 8, y * 8 - 1, '#ff6aa0')); dot(0, 0, '#ffffff'); break;
+    case 'smiley': SMILE_PTS.forEach(([x, y]) => dot(x * 8, y * 8, '#ffe066')); break;
+    case 'glitter': for (let i = 0; i < 14; i++) { const a = i * 2.4, r = 2 + (i * 37 % 7); dot(Math.cos(a) * r, Math.sin(a) * r, i % 3 ? '#c9d4e8' : '#ffffff'); } [[-5, -4], [4, 3], [3, -5]].forEach(([x, y]) => { dot(x, y, '#ffffff'); dot(x - 1, y, '#c9d4e8'); dot(x + 1, y, '#c9d4e8'); dot(x, y - 1, '#c9d4e8'); dot(x, y + 1, '#c9d4e8'); }); break;
+    case 'rainbow': ringPts(21).forEach(([x, y], i) => dot(x * 8, y * 8, rb(i))); ringPts(12).forEach(([x, y], i) => dot(x * 4, y * 4, rb(i + 3))); break;
+    case 'supernova': ringPts(20).forEach(([x, y], i) => dot(x * 8, y * 8, rb(i))); for (let j = 0; j < 4; j++) { const a = j * Math.PI / 2 + 0.6; ringPts(6).forEach(([x, y]) => dot(Math.cos(a) * 4 + x * 2, Math.sin(a) * 4 + y * 2, '#ffffff')); } break;
+    default: for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; for (let k = 2; k < 9; k += 2) dot(Math.cos(a) * k, Math.sin(a) * k, k > 6 ? '#b8283a' : k > 4 ? '#ff4f6d' : '#ffb0c0'); } dot(0, 0, '#ffffff');
+  }
+}

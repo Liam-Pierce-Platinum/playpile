@@ -18,6 +18,7 @@
   <div id="combo"></div>
 </div>
 <button id="mute" aria-label="mute">🔊</button>
+<div id="pads"><div class="pad l"><b>SLIDE</b><small>hold</small></div><div class="pad r"><b>JUMP</b><small>tap</small></div></div>
 <button id="pause" class="hidden">PAUSED<small>tap to resume</small></button>
 
 <div id="title" class="panel hidden">
@@ -26,7 +27,10 @@
   <button id="playBtn" class="big">PLAY</button>
   <button id="shopBtn">RUNNERS</button>
   <p class="stats">BEST <b id="tBest">0</b> m &nbsp;·&nbsp; <span class="coin"></span> <b id="tCoins">0</b></p>
-  <p class="keys">TAP / SPACE = jump &nbsp;·&nbsp; HOLD = slide &nbsp;·&nbsp; hold in air = drop fast</p>
+  <div class="ctrl">
+    <p class="desk"><b>SPACE / W / ↑ / CLICK</b> = jump &nbsp;·&nbsp; <b>HOLD S / ↓ / SHIFT</b> = slide &nbsp;·&nbsp; slide in the air = drop fast</p>
+    <div class="mob"><div><b>HOLD LEFT</b><span>slide under signs</span></div><div><b>TAP RIGHT</b><span>jump gaps + boxes</span></div></div>
+  </div>
 </div>
 
 <div id="dead" class="panel hidden">
@@ -37,7 +41,7 @@
   <p id="dNext"></p>
   <button id="retryBtn" class="big">RUN AGAIN</button>
   <div class="row"><button id="dShopBtn">RUNNERS</button><button id="homeBtn">HOME</button></div>
-  <p class="keys">SPACE to retry</p>
+  <p class="keys desk">SPACE to retry</p>
 </div>
 
 <div id="shop" class="panel hidden">

@@ -183,8 +183,13 @@ function blocked(r, c) {
   return !!(lane && lane.trees && lane.trees.has(c));
 }
 
+// A press made mid-hop is kept and played the moment the hop lands, so
+// quick double-taps never get swallowed (that read as "controls ignore me").
+let queued = null, hops = 0;
 function hop(dx, dy) {
-  if (over || player.hop > 0 || player.dead || !started) return;
+  if (over || player.dead || !started) return;
+  if (player.hop > 0) { queued = [dx, dy]; return; }
+  hops++;
   const nr = player.r + dy;
   if (nr < 0) return;
   ensureRows(nr + VIEW + 3);
@@ -520,14 +525,31 @@ function step(dt, g) {
         player.x += (c * CELL - player.x) * Math.min(1, dt * 14);
       }
     }
+    if (!over && player.hop <= 0 && queued) { const q = queued; queued = null; hop(q[0], q[1]); }
   }
 
   draw(g);
+  if (started && !over && hops < 6 && D.t - startedAt < 9) legend(g);
 
   // A press during the run is not a press on the card that follows it:
   // drained every frame, so only one made after the card is up counts.
   if (!over) D.tapped();
   else if (D.t - dead > 0.7 && D.tapped()) toBoard();
+}
+
+// The controls, on screen for the first few hops of every run.
+function legend(g) {
+  const touchy = matchMedia('(pointer: coarse)').matches;
+  const cx = W / 2, y = TOP + 8;
+  g.fillStyle = 'rgba(10,8,20,.82)'; g.fillRect(cx - 230, y, 460, 86);
+  if (touchy) {
+    D.text('TAP anywhere  =  hop FORWARD', cx, y + 22, 15, '#fff', 'center');
+    D.text('SWIPE  ←  →  =  step sideways      SWIPE  ↓  =  step back', cx, y + 44, 12, '#ffd23f', 'center');
+  } else {
+    D.text('↑ / W  =  hop FORWARD', cx, y + 22, 15, '#fff', 'center');
+    D.text('← → / A D  =  step sideways      ↓ / S  =  step back', cx, y + 44, 12, '#ffd23f', 'center');
+  }
+  D.text('one press = one square · the screen bottom chases you, keep moving', cx, y + 68, 11, '#9fd3ff', 'center');
 }
 
 const board = new Board('crossing', { unit: 'ROWS' });
@@ -550,7 +572,7 @@ window.__home = ui;
 let startedAt = -1;
 
 function start() {
-  reset(); started = true; startedAt = D.t;
+  reset(); started = true; startedAt = D.t; queued = null; hops = 0;
   D.tapped();                                    // the press that started it
 }
 D.onReset = () => { if (ui.mode !== 'entry') start(); };
@@ -653,7 +675,7 @@ function front() {
     y += 52;
 
     panel(lx, y, lw, 48, P.ink, P.ink3);
-    const keys = [['ARROWS / WASD', 'HOP'], ['SWIPE', 'HOP ON A PHONE'], ['P', 'PAUSE'], ['R', 'RESTART']];
+    const keys = [['UP / W  ·  TAP', 'HOP FORWARD'], ['ARROWS  ·  SWIPE', 'SIDESTEP / BACK'], ['P', 'PAUSE'], ['R', 'RESTART']];
     keys.forEach(([k, w], i) => {
       A.text(bc, k, lx + 7, y + 7 + i * 10, P.ui3, 1);
       A.text(bc, w, lx + lw - 7, y + 7 + i * 10, P.uiDim, 1, 'right');

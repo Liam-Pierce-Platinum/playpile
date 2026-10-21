@@ -65,6 +65,13 @@ export function sfx(k, n = 1) {
     case 'nofuel': tone(300, 120, 0.35, 0.12, 'square'); break;
     case 'clear': [523, 659, 784, 659, 784, 1047].forEach((f, i) => tone(f, f, 0.14, 0.09, 'square', i * 0.09)); break;
     case 'star': tone(1047 * n, 1568 * n, 0.15, 0.08, 'square'); break;
+    case 'coin': { const k = Math.pow(1.06, Math.min(n, 12)); tone(988 * k, 988 * k, 0.05, 0.07, 'square'); tone(1319 * k, 1319 * k, 0.12, 0.07, 'square', 0.05); break; }
+    case 'tick': tone(1568 + n * 8, 1568 + n * 8, 0.025, 0.04, 'square'); break;
+    case 'kaching': burst(0.12, 7000, 4000, 0.18, 'highpass', 1); [1319, 1568, 2093].forEach((f, i) => tone(f, f, 0.16, 0.07, 'square', 0.04 + i * 0.06)); tone(2637, 2637, 0.35, 0.05, 'triangle', 0.22); break;
+    case 'equip': tone(440, 880, 0.08, 0.07, 'square'); tone(660, 1320, 0.1, 0.05, 'triangle', 0.06); break;
+    case 'deny': tone(180, 140, 0.16, 0.12, 'square'); tone(150, 110, 0.18, 0.1, 'square', 0.1); break;
+    case 'unlock': [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => tone(f, f, 0.14, 0.08, 'square', i * 0.07)); break;
+    case 'swish': burst(0.1, 3000, 900, 0.08, 'bandpass', 1.5); break;
     case 'ui': tone(660, 880, 0.05, 0.06, 'square'); break;
     case 'land': burst(0.12, 900, 120, 0.25, 'lowpass', 0.8); tone(120, 70, 0.1, 0.15, 'triangle'); break;
     case 'boom': burst(0.7, 1500, 100, 0.35, 'lowpass', 0.8); for (let i = 0; i < 4; i++) burst(0.03, 6000, 3000, 0.08, 'highpass', 1, 0.15 + Math.random() * 0.4); break;

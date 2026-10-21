@@ -61,6 +61,12 @@ export class Audio {
       case 'focusOut': this.noiseHit(0.3, 300, 0.25, 'bandpass', 4); this.tone(110, 0.3, 'sine', 0.12, 0, this.sfxBus, 2); break;
       case 'click': this.tone(660, 0.05, 'triangle', 0.1); break;
       case 'combo': this.tone(880 * pitch, 0.12, 'triangle', 0.1, 0, this.sfxBus, 1.5); break;
+      case 'coin': this.tone(1976 * pitch, 0.07, 'square', 0.035); this.tone(2637 * pitch, 0.16, 'triangle', 0.08, 0.05, this.sfxBus, 0, true); break;
+      case 'buy': [784, 988, 1175, 1568].forEach((f, i) => this.tone(f, 0.25, 'triangle', 0.12, i * 0.06, this.sfxBus, 0, true)); this.taiko(0, 0.6); break;
+      case 'gong': this.tone(110, 2.2, 'sine', 0.35, 0, this.sfxBus, 0.98, true); this.tone(163, 1.8, 'sine', 0.16, 0, this.sfxBus, 0.99, true); this.tone(331, 1.2, 'triangle', 0.06, 0, this.sfxBus, 0.99, true); this.noiseHit(0.3, 700, 0.3, 'lowpass'); break;
+      case 'flame': this.noiseHit(0.6, 600, 0.35, 'bandpass', 2.5, 0, 0.6); break;
+      case 'hop': this.noiseHit(0.12, 1400, 0.2, 'bandpass', 2); break;
+      case 'thunder': this.noiseHit(1.6, 220, 0.5, 'lowpass', 0.4); break;
     }
   }
   taiko(when, vol = 0.6, bus = this.sfxBus) {

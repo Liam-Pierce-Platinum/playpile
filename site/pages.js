@@ -45,7 +45,7 @@ export const pageTitle = (g) => g.title + ' — free ' + catOf(g).toLowerCase()
   + ' game in your browser — PLAYPILE';
 
 // the card, identical to shell.js's so a pre-rendered row is the same row
-const shot = (g) => '<img src="/shots/' + g.slug + '.png" alt="' + esc(g.title) + '" loading="lazy" onerror="this.remove()"'
+const shot = (g) => '<img src="/shots/t/' + g.slug + '.webp" alt="' + esc(g.title) + '" width="640" height="360" loading="lazy" decoding="async" onerror="this.remove()"'
   + ' onload="if(this.naturalHeight>this.naturalWidth)this.classList.add(\'tall\')">';
 export const cardHtml = (g) => '<a class="card" href="/play/' + g.slug + '/" title="' + esc(g.title) + '">'
   + '<span class="thumb"><span class="ph">' + esc(g.title.slice(0, 2)) + '</span>' + shot(g)
@@ -99,7 +99,7 @@ export function related(g, GAMES, n = 5) {
   return [...same, ...others.filter((x) => catOf(x) !== catOf(g))].slice(0, n);
 }
 export const miniHtml = (x) => '<a class="mini" href="/play/' + x.slug + '/">'
-  + '<span class="th" style="background-image:url(\'/shots/' + x.slug + '.png\')"></span>'
+  + '<span class="th" style="background-image:url(\'/shots/t/' + x.slug + '.webp\')"></span>'
   + '<span><b>' + esc(x.title) + '</b><small>' + esc(catOf(x)) + '</small></span></a>';
 
 // ---------------------------------------------------------------------

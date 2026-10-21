@@ -293,7 +293,7 @@ export function toast(title, sub, icon) {
 // ---------------------------------------------------------------------
 // shared bits of markup
 // ---------------------------------------------------------------------
-const shot = (g) => '<img src="/shots/' + g.slug + '.png" alt="" loading="lazy" onerror="this.remove()">';
+const shot = (g) => '<img src="/shots/t/' + g.slug + '.webp" alt="" width="640" height="360" loading="lazy" decoding="async" onerror="this.remove()">';
 function miniCard(g, meta) {
   return '<a class="card" href="/play/' + g.slug + '/" title="' + esc(g.title) + '">'
     + '<span class="thumb"><span class="ph">' + esc(g.title.slice(0, 2)) + '</span>' + shot(g)

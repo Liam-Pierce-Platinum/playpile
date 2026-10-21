@@ -138,21 +138,20 @@ function slideOn() {
 }
 function slideOff() { P.fast = false; if (P.slide) { if (signOver()) P.wantStand = true; else P.slide = false; } }
 
-// one-button: press -> after HOLD_T becomes slide/fast-fall; quick release = jump
+// two actions: jump fires the instant it is pressed (buffered if it can't yet); slide is held (in the air it drops you fast)
 function press() {
   wake();
   if (S.mode !== 'play') return;
-  if (I.held) return;
-  I.held = true; I.at = S.t; I.converted = false;
-  if (!P.ground && P.coyote <= 0 && P.rd.djump && !P.djump && P.airT > 0.08) { doJump(); I.converted = true; I.dj = true; }
+  I.ctl = 0;
+  if (!doJump()) I.buf = 0.22;
 }
-function release() {
-  if (!I.held) return;
-  I.held = false;
-  if (I.dj) { I.dj = false; return; }
-  if (!I.converted) { if (!doJump()) I.buf = 0.14; }
-  else slideOff();
+function release() {}
+function slidePress() {
+  wake();
+  if (S.mode !== 'play' || I.held) return;
+  I.held = true; I.ctl = 0; slideOn();
 }
+function slideRelease() { if (!I.held) return; I.held = false; slideOff(); }
 
 // ---------- juice helpers ----------
 function dust(x, y, n) { for (let i = 0; i < n; i++) parts.push({ x: x + R(-8, 8), y: y - 2, vx: R(-120, 40) - P.speed * 0.15, vy: R(-90, -10), life: R(0.25, 0.5), max: 0.5, s: R(3, 6), c: 'rgba(255,225,200,0.6)', g: 200, dust: 1 }); }
@@ -198,11 +197,10 @@ function step(dt) {
   P.speed = speedAt(m) + P.boost;
   if (S.comboT > 0) { S.comboT -= dt; if (S.comboT <= 0) S.combo = 0; }
   if (I.buf > 0) I.buf -= dt;
-  if (I.held && !I.converted && S.t - I.at > HOLD_T) { I.converted = true; slideOn(); }
-  if (I.held && I.converted && P.ground && !P.slide) slideOn();
+  if (I.held && P.ground && !P.slide) slideOn();
   if (bot) botStep();
   if (P.wantStand && !signOver()) { P.slide = false; P.wantStand = false; }
-  if (I.buf > 0 && P.ground && !I.held && doJump()) I.buf = 0; // tap buffered under a sign fires as soon as it clears
+  if (I.buf > 0 && P.ground && doJump()) I.buf = 0; // tap buffered under a sign fires as soon as it clears
 
   const py = P.y;
   P.x += P.speed * dt;
@@ -210,7 +208,7 @@ function step(dt) {
   P.sq *= Math.pow(0.0005, dt);
   let b = under(P.x);
   if (P.ground) {
-    if (!b || b.y !== P.y) { P.ground = false; P.coyote = 0.09; P.vy = 0; P.slide = false; P.airT = 0; }
+    if (!b || b.y !== P.y) { P.ground = false; P.coyote = 0.13; P.vy = 0; P.slide = false; P.airT = 0; }
     else if (P.slide && S.t % 0.06 < dt) dust(P.x + 14, P.y, 1);
   }
   if (!P.ground) {
@@ -277,8 +275,8 @@ function land(b) {
   dust(P.x, P.y, 5 + (hard * 8) | 0); sfx.land(hard);
   if (hard > 0.7) S.shake = Math.max(S.shake, 4);
   if (b !== P.lastB) { const edge = P.x - b.x; action(edge < 26 ? 'EDGE!' : 'GAP', edge < 26 ? '#ff7a3d' : '#ffffff'); P.lastB = b; }
-  if (I.buf > 0) { I.buf = 0; doJump(); }
-  else if (I.held && I.converted) slideOn();
+  if (I.buf > 0 && doJump()) I.buf = 0;
+  else if (I.held) slideOn();
 }
 function deadStep(dt) {
   P.deadT += dt;
@@ -576,8 +574,8 @@ function hints(C) {
   const tip = (text, x, y) => { C.font = '900 15px "Arial Black", sans-serif'; C.textAlign = 'center'; const a = 0.6 + 0.4 * Math.sin(S.t * 10); C.globalAlpha = a; C.lineWidth = 4; C.strokeStyle = '#1a0d24'; C.strokeText(text, x, y); C.fillStyle = '#fff'; C.fillText(text, x, y); C.globalAlpha = 1; C.textAlign = 'left'; };
   const touch = matchMedia('(pointer: coarse)').matches;
   const next = b.obs.find((o) => o.x + o.w > P.x);
-  if (next && next.x - P.x < 420) tip(next.t === 'box' ? (touch ? 'TAP = JUMP' : 'TAP SPACE = JUMP') : (touch ? 'HOLD = SLIDE' : 'HOLD SPACE = SLIDE'), next.x + next.w / 2, b.y - (next.t === 'box' ? 120 : 240));
-  else if (b.x + b.w - P.x < 420 && b.x + b.w - P.x > 0) tip('JUMP THE GAP!', b.x + b.w, b.y - 120);
+  if (next && next.x - P.x < 420) tip(next.t === 'box' ? (touch ? 'TAP RIGHT = JUMP' : 'SPACE = JUMP') : (touch ? 'HOLD LEFT = SLIDE' : 'HOLD DOWN = SLIDE'), next.x + next.w / 2, b.y - (next.t === 'box' ? 120 : 240));
+  else if (b.x + b.w - P.x < 420 && b.x + b.w - P.x > 0) tip(touch ? 'TAP RIGHT = JUMP THE GAP!' : 'JUMP THE GAP!', b.x + b.w, b.y - 120);
   else if (b.tower && !b.tower.b0 && b.tower.x0 - P.x < 450) tip('SMASH THROUGH!', b.tower.x0, b.y - CEIL - 30);
   if (P.x / M > 260) S.hint = 0;
 }
@@ -591,7 +589,7 @@ function hud() {
   if (S.combo >= 2) { cm.style.opacity = 1; cm.textContent = 'COMBO x' + S.combo + (coinMult() > 1 ? '  ·  COINS x' + coinMult() : ''); cm.style.setProperty('--w', clamp(S.comboT / 3.2, 0, 1)); }
   else cm.style.opacity = 0;
 }
-function show(id) { for (const p of ['title', 'dead', 'shop']) $(p).classList.toggle('hidden', p !== id); $('hud').classList.toggle('hidden', id === 'title' || id === 'shop'); }
+function show(id) { document.body.classList.toggle('menu', !!id); for (const p of ['title', 'dead', 'shop']) $(p).classList.toggle('hidden', p !== id); $('hud').classList.toggle('hidden', id === 'title' || id === 'shop'); }
 function endRun() {
   S.deadShown = true; S.mode = 'dead';
   const m = Math.floor(Math.max(0, P.x) / M), nb = m > save.best;
@@ -607,7 +605,7 @@ function endRun() {
   S.deadAt = performance.now();
   show('dead');
 }
-function startRun() { bot = Q.has('bot'); botS.sliding = false; newRun(); S.mode = 'play'; show(null); sfx.click(); }
+function startRun() { $('pads').classList.remove('fade'); clearTimeout(S.padT); S.padT = setTimeout(() => $('pads').classList.add('fade'), 12000);bot = Q.has('bot'); botS.sliding = false; I.held = false; I.buf = 0; ptrs.clear(); newRun(); S.mode = 'play'; show(null); sfx.click(); }
 function openShop(from) {
   S.shopFrom = from; show('shop');
   const list = $('shopList'); list.innerHTML = '';
@@ -631,9 +629,19 @@ function openShop(from) {
 
 // ---------- input ----------
 const isUI = (e) => e.target.closest && e.target.closest('button, .panel');
-addEventListener('pointerdown', (e) => { wake(); if (isUI(e)) return; if (S.mode === 'play') { e.preventDefault(); press(); } });
-addEventListener('pointerup', (e) => { if (S.mode === 'play') release(); });
-addEventListener('pointercancel', () => release());
+// touch / mouse: left 40% of the screen = SLIDE (hold), the rest = JUMP (tap). Each finger is tracked on its own.
+const ptrs = new Map();
+addEventListener('pointerdown', (e) => {
+  wake(); if (isUI(e)) return;
+  if (S.mode !== 'play') return;
+  e.preventDefault();
+  const kind = e.pointerType !== 'mouse' && e.clientX < innerWidth * 0.4 ? 'slide' : 'jump';
+  ptrs.set(e.pointerId, kind);
+  if (kind === 'slide') slidePress(); else press();
+});
+const ptrUp = (e) => { const k = ptrs.get(e.pointerId); ptrs.delete(e.pointerId); if (k === 'slide' && ![...ptrs.values()].includes('slide')) slideRelease(); };
+addEventListener('pointerup', ptrUp);
+addEventListener('pointercancel', ptrUp);
 addEventListener('keydown', (e) => {
   wake();
   if (e.repeat) { if (e.code === 'Space') e.preventDefault(); return; }
@@ -642,15 +650,13 @@ addEventListener('keydown', (e) => {
   if (S.mode === 'title' && (e.code === 'Space' || e.code === 'Enter')) { e.preventDefault(); startRun(); return; }
   if (S.mode !== 'play') return;
   if (e.code === 'KeyP' || e.code === 'Escape') { S.paused = !S.paused; $('pause').classList.toggle('hidden', !S.paused); return; }
-  if (e.code === 'Space') { e.preventDefault(); press(); }
-  else if (e.code === 'ArrowUp' || e.code === 'KeyW') { e.preventDefault(); if (!doJump()) I.buf = 0.14; }
-  else if (e.code === 'ArrowDown' || e.code === 'KeyS' || e.code === 'ShiftLeft') { e.preventDefault(); I.down = true; slideOn(); }
+  if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') { e.preventDefault(); press(); }
+  else if (e.code === 'ArrowDown' || e.code === 'KeyS' || e.code === 'ShiftLeft' || e.code === 'ShiftRight') { e.preventDefault(); slidePress(); }
 });
 addEventListener('keyup', (e) => {
-  if (e.code === 'Space') release();
-  else if (e.code === 'ArrowDown' || e.code === 'KeyS' || e.code === 'ShiftLeft') { I.down = false; slideOff(); }
+  if (e.code === 'ArrowDown' || e.code === 'KeyS' || e.code === 'ShiftLeft' || e.code === 'ShiftRight') slideRelease();
 });
-addEventListener('blur', () => { I.held = false; if (P && P.slide) slideOff(); });
+addEventListener('blur', () => { ptrs.clear(); slideRelease(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden && S.mode === 'play') { S.paused = true; $('pause').classList.remove('hidden'); } });
 $('pause').onclick = () => { S.paused = false; $('pause').classList.add('hidden'); };
 $('playBtn').onclick = () => startRun();
@@ -686,6 +692,6 @@ requestAnimationFrame(frame);
 window.__G = {
   get P() { return P; }, get S() { return S; }, get B() { return B; }, save, RUNNERS,
   fast(sec, dt = DT) { const n = Math.round(sec / dt); for (let i = 0; i < n; i++) { if (S.mode === 'dead') break; step(dt); } },
-  setBot(v) { bot = v; }, start: startRun, press, release, newRun, endRun,
+  setBot(v) { bot = v; }, start: startRun, press, release, slidePress, slideRelease, newRun, endRun,
   setSeed(s) { seed = s; },
 };

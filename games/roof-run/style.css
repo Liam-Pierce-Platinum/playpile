@@ -43,3 +43,21 @@ h2 { font-size: clamp(34px, 8vw, 60px); color: #ff7a3d; text-shadow: 0 5px 0 #1a
 .panel button.card.sel { border-color: #ffd23f; }
 .card.locked { opacity: .55; }
 @media (max-height: 460px) { .panel { gap: 6px; } h1 { font-size: 54px; } .panel button.big { padding: 8px 34px; } }
+/* controls: desktop keys vs touch zones */
+.ctrl { font-family: system-ui, sans-serif; font-size: 13px; text-align: center; max-width: 92vw; }
+.ctrl .desk { opacity: .75; }
+.ctrl .mob { display: none; gap: 10px; }
+.ctrl .mob div { flex: 1; background: rgba(255,255,255,.1); border: 2px dashed rgba(255,255,255,.45); border-radius: 12px; padding: 8px 10px; display: flex; flex-direction: column; gap: 3px; min-width: 130px; }
+.ctrl .mob b { font-family: "Arial Black", sans-serif; font-size: 15px; color: #ffd23f; }
+.ctrl .mob span { font-size: 12px; opacity: .85; }
+#pads { display: none; position: fixed; inset: 0; pointer-events: none; z-index: 2; }
+#pads .pad { position: absolute; bottom: 0; top: 30%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: max(18px, env(safe-area-inset-bottom)); color: #fff; font-family: "Arial Black", sans-serif; text-shadow: 0 2px 0 #1a0d24; opacity: .5; }
+#pads .pad.l { left: 0; width: 40%; border-right: 2px dashed rgba(255,255,255,.25); }
+#pads .pad.r { right: 0; width: 60%; }
+#pads .pad b { font-size: 20px; } #pads .pad small { font-family: system-ui, sans-serif; font-size: 12px; }
+#pads.fade { opacity: .35; transition: opacity 1.5s; }
+@media (pointer: coarse) {
+  .ctrl .desk, .keys.desk { display: none; }
+  .ctrl .mob { display: flex; }
+  body:not(.menu) #pads { display: block; }
+}

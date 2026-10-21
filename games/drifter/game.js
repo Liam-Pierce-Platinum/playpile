@@ -33,37 +33,29 @@ let rings = [], shake = 0;   // SHIFT is a press, not a hold - see hyperspace be
 // ---- TOUCH ----------------------------------------------------------
 //
 // Turning was keys only, so on a phone the ship pointed one way for
-// ever. Every finger counts, so one thumb can turn while the other
-// thrusts: the LEFT and RIGHT THIRDS turn, the MIDDLE of the lower half
-// thrusts, and a quick TAP anywhere fires. Only a quick tap - the cabinet
-// counts every touch as a press, and a finger put down to turn should not
-// spend 6 fuel on a shot nobody asked for.
+// ever. Four columns, drawn on screen as buttons so nobody has to guess:
+// left thumb = TURN LEFT | TURN RIGHT, right thumb = THRUST (hold) | FIRE
+// (fires the moment the finger lands). Every finger counts, so you can
+// turn and thrust at once. The old "quick tap anywhere fires" rule was
+// invisible and fired shots when a turn was only a short press.
 let touchMode = false, fingers = [], touchShots = 0;
-const downAt = new Map();
-const readFingers = (e) => {
-  const r = D.cv.getBoundingClientRect();
-  fingers = [...e.touches].map((t) => ({ x: (t.clientX - r.left) / r.width * D.W,
-                                         y: (t.clientY - r.top) / r.height * D.H }));
-};
+const zone = (x) => x < D.W * 0.25 ? 'L' : x < D.W * 0.5 ? 'R' : x < D.W * 0.75 ? 'T' : 'F';
+const toCanvas = (t) => { const r = D.cv.getBoundingClientRect();
+  return { x: (t.clientX - r.left) / r.width * D.W, y: (t.clientY - r.top) / r.height * D.H }; };
+const readFingers = (e) => { fingers = [...e.touches].map(toCanvas); };
 D.cv.addEventListener('touchstart', (e) => {
   touchMode = true; readFingers(e);
-  for (const t of e.changedTouches) downAt.set(t.identifier, performance.now());
+  for (const t of e.changedTouches) if (zone(toCanvas(t).x) === 'F') touchShots++;
 });
 D.cv.addEventListener('touchmove', readFingers);
-addEventListener('touchend', (e) => {
-  readFingers(e);
-  for (const t of e.changedTouches) {
-    if (performance.now() - (downAt.get(t.identifier) || 0) < 220) touchShots++;
-    downAt.delete(t.identifier);
-  }
-});
-addEventListener('touchcancel', (e) => { readFingers(e); downAt.clear(); });
+addEventListener('touchend', readFingers);
+addEventListener('touchcancel', readFingers);
 addEventListener('mousedown', () => { touchMode = false; });
 addEventListener('keydown', () => { touchMode = false; });
 const finger = (f) => fingers.some(f);
 
 function reset(full) {
-  if (full) { score = 0; wave = 1; lives = 3; }
+  if (full) { score = 0; wave = 1; lives = 3; playT = 0; }
   ship = { x: D.W / 2, y: D.H / 2, vx: 0, vy: 0, a: -Math.PI / 2, fuel: 100 };
   rocks = []; shots = []; bits = []; rings = []; over = false; inv = 2.2; touchShots = 0;
   // three depths of star, drifting at three speeds, so space has depth
@@ -126,12 +118,10 @@ function step(dt, g) {
   }
 
   // ---- ship ---------------------------------------------------------
-  const third = D.W / 3;
-  if (D.held('a', 'A', 'ArrowLeft') || finger((f) => f.x < third)) ship.a -= 3.4 * dt;
-  if (D.held('d', 'D', 'ArrowRight') || finger((f) => f.x > third * 2)) ship.a += 3.4 * dt;
-  const wantThrust = D.held('w', 'W', 'ArrowUp') || (touchMode
-    ? finger((f) => f.x >= third && f.x <= third * 2 && f.y > D.H * 0.5)
-    : D.mouse.down && D.mouse.y > D.H * 0.5);
+  playT += dt;
+  if (D.held('a', 'A', 'ArrowLeft') || finger((f) => zone(f.x) === 'L')) ship.a -= 3.4 * dt;
+  if (D.held('d', 'D', 'ArrowRight') || finger((f) => zone(f.x) === 'R')) ship.a += 3.4 * dt;
+  const wantThrust = D.held('w', 'W', 'ArrowUp') || (touchMode && finger((f) => zone(f.x) === 'T'));
   ship.thrusting = wantThrust && ship.fuel > 1;
   if (ship.thrusting) {
     ship.vx += Math.cos(ship.a) * 250 * dt;
@@ -331,8 +321,42 @@ function draw(g) {
   }
   D.text(low ? 'FUEL LOW' : 'FUEL', D.W - fw - 20, 46, 10, low ? '#ff6b8b' : '#7d8aa0', 'right');
 
+  if (started && !over) controls(g);
   D.hud('SCORE ' + score + '   WAVE ' + wave,
         '▲ '.repeat(Math.max(0, lives)) + '  BEST ' + D.best);
+}
+
+// On-screen controls: touch gets four labelled buttons along the bottom
+// (lit while pressed); keyboard gets a key legend for the first seconds
+// of every run, plus the one rule that matters - shots and thrust burn fuel.
+let playT = 0;
+function controls(g) {
+  const touch = touchMode || matchMedia('(pointer: coarse)').matches;
+  if (touch) {
+    const btns = [['L', '◀', 'TURN'], ['R', '▶', 'TURN'], ['T', '▲', 'THRUST · hold'], ['F', '●', 'FIRE · tap']];
+    btns.forEach(([z, icon, label], i) => {
+      const cx = D.W * (0.125 + i * 0.25), cy = D.H - 62, on = finger((f) => zone(f.x) === z);
+      g.globalAlpha = on ? 0.55 : 0.22;
+      g.fillStyle = z === 'F' ? '#ff6b8b' : z === 'T' ? '#ff9f43' : '#4dc9ff';
+      g.beginPath(); g.arc(cx, cy, 34, 0, Math.PI * 2); g.fill();
+      g.globalAlpha = on ? 1 : 0.75;
+      D.text(icon, cx, cy + 8, 22, '#fff', 'center');
+      D.text(label, cx, cy + 52, 10, '#c9d3e3', 'center');
+    });
+    g.globalAlpha = 0.12; g.fillStyle = '#fff';
+    for (let i = 1; i < 4; i++) g.fillRect(D.W * i / 4 - 0.5, D.H * 0.55, 1, D.H * 0.45);
+    g.globalAlpha = 1;
+  }
+  if (playT < 8) {
+    g.globalAlpha = Math.min(1, (8 - playT) / 1.5);
+    g.fillStyle = 'rgba(5,7,12,.8)'; g.fillRect(D.W / 2 - 250, 70, 500, touch ? 46 : 64);
+    if (!touch) {
+      D.text('A / D  or  ◀ ▶   TURN      W / ▲   THRUST', D.W / 2, 92, 13, '#fff', 'center');
+      D.text('SPACE   FIRE      SHIFT   HYPERSPACE (30 fuel)', D.W / 2, 112, 13, '#fff', 'center');
+    } else D.text('left thumb TURNS · right thumb THRUSTS and FIRES', D.W / 2, 92, 13, '#fff', 'center');
+    D.text('every shot and every second of thrust burns FUEL', D.W / 2, touch ? 108 : 128, 11, '#4dc9ff', 'center');
+    g.globalAlpha = 1;
+  }
 }
 
 const board = new Board('drifter', { unit: 'SCORE' });
@@ -344,8 +368,8 @@ const home = new Home(D, {
   board,
   buttons: [{ label: 'FLY', sub: 'three ships, waves until they get you', fn: () => { started = true; reset(true); } }],
   hint: matchMedia('(pointer: coarse)').matches
-    ? 'HOLD a side to turn · HOLD bottom middle to thrust · TAP to fire'
-    : 'A D turn · W thrust · SPACE fire · SHIFT hyperspace · P pause',
+    ? 'left thumb: ◀ ▶ turn · right thumb: ▲ thrust (hold) · ● fire (tap)'
+    : 'A D or ◀ ▶ turn · W or ▲ thrust · SPACE fire · SHIFT hyperspace · P pause',
 });
 
 reset(true); started = false;

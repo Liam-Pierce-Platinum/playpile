@@ -130,7 +130,7 @@ export function remember(slug) {
 // file is missing - so a game with no screenshot yet still shows a
 // deliberate looking tile instead of a broken image icon.
 const shot = (g) =>
-  '<img src="/shots/' + g.slug + '.png" alt="" loading="lazy" onerror="this.remove()"'
+  '<img src="/shots/t/' + g.slug + '.webp" alt="" width="640" height="360" loading="lazy" decoding="async" onerror="this.remove()"'
   + ' onload="if(this.naturalHeight>this.naturalWidth)this.classList.add(\'tall\')">';
 
 export function card(g) {

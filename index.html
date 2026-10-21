@@ -181,7 +181,7 @@ const feature = heroPool[day % heroPool.length];
 const beside = mix(daily(NEWEST, 2), daily(oldBigs, 3)).filter((g) => g !== feature).slice(0, 4);
 $('hero').innerHTML =
   '<a class="hero-main" href="/play/' + feature.slug + '/">'
-  + '<img src="/shots/' + feature.slug + '.png" alt="" onerror="this.remove()">'
+  + '<img src="/shots/h/' + feature.slug + '.webp" alt="" width="1280" height="720" fetchpriority="high" onerror="this.remove()">'
   + '<span class="veil"></span>'
   + '<span class="copy">'
   + '<span class="kicker">Featured &middot; ' + catOf(feature) + '</span>'

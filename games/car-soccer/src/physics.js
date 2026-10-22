@@ -1,13 +1,16 @@
 // Car + ball simulation. Fixed step (240 Hz). Pure data, no drawing, no sound:
 // everything noteworthy is pushed onto world.events for fx/audio/stats to consume.
 import { rand } from './rng.js';
-import { W, H, GH, BALL_R, sdf, grad } from './arena.js';
+import { W, H, GH, GY, GT, BALL_R, sdf, grad, floorY, floorSlope, floorCurv, above } from './arena.js';
 
 export const L = 68, HH = 21, RIDE = 38, WHEEL_R = 17;
 export const G_CAR = 1750, G_BALL = 1300;
 export const MAX_DRIVE = 1150, MAX_SPEED = 2300, SUPERSONIC = 1800, BALL_MAX = 3600;
-const BOOST_ACC = 2100, DRIVE_ACC = 1800, BRAKE = 3800, COAST = 600, REVERSE_MAX = 700;
+const BOOST_ACC = 2100, AIR_BOOST_ACC = 2500, DRIVE_ACC = 1800, BRAKE = 3800, COAST = 600, REVERSE_MAX = 700;
 const JUMP_V = 650, JUMP_HOLD_ACC = 1500, JUMP_HOLD_T = 0.18, DJUMP_V = 580, FLIP_V = 760, FLIP_T = 0.45;
+export const ROLL_T = 0.24, BARREL_T = 0.42, WAVEDASH_V = 430;
+// sticky wheels: how much extra grip (beyond gravity) holds a car on a convex lip before it launches
+const LIP_GRIP = 6000;
 const M_CAR = 1, M_BALL = 0.42, I_CAR = (L * L + HH * HH) / 3;
 export const BOOST_USE = 33, STEP = 1 / 240;
 const N = { x: 0, y: 0 }, N2 = { x: 0, y: 0 };
@@ -15,34 +18,43 @@ const N = { x: 0, y: 0 }, N2 = { x: 0, y: 0 };
 export function makeCar(team, id) {
   return {
     id, team, x: 0, y: RIDE, vx: 0, vy: 0, a: 0, av: 0, dir: team === 0 ? 1 : -1,
-    grounded: true, nx: 0, ny: 1, boost: 33, boosting: false, jumpPrev: false,
-    jumpCD: 0, jumpHold: 0, jnx: 0, jny: 1, flipAvail: false, flipWin: 0, flipping: 0,
+    grounded: true, nx: 0, ny: 1, boost: 33, boosting: false, jumpPrev: false, rollPrev: false,
+    jumpCD: 0, jumpHold: 0, jnx: 0, jny: 1, flipAvail: false, flipWin: 0, flipping: 0, flipKind: '',
+    rollT: 0, rollDur: 0, rollAng: 0, resetT: 0,
     demo: 0, roofT: 0, turnT: 0, wheel: 0, hitCD: 0, airT: 0, supersonic: false, landT: 0,
   };
 }
 export function makeBall() { return { x: 0, y: BALL_R, vx: 0, vy: 0, rot: 0, spin: 0, touchT: 0 }; }
 export function makeWorld() {
-  return { t: 0, ball: makeBall(), cars: [makeCar(0, 0), makeCar(1, 1)], events: [], lastTouch: -1, touchHist: [] };
+  return { t: 0, ball: makeBall(), cars: [makeCar(0, 0), makeCar(1, 1)], events: [], lastTouch: -1, touchHist: [], kick: false };
 }
 
+// kickoff: each car sits on its own goal ledge, the ball drops into the middle of the basin
+export const SPAWN_X = W / 2 - 170, BALL_DROP = 210;
 export function kickoff(w) {
   const b = w.ball;
-  b.x = 0; b.y = BALL_R; b.vx = b.vy = 0; b.spin = 0;
+  b.x = 0; b.y = BALL_DROP; b.vx = b.vy = 0; b.spin = 0; b.rot = 0;
   w.cars.forEach((c) => {
     const s = c.team === 0 ? -1 : 1;
     Object.assign(c, makeCar(c.team, c.id));
-    c.x = s * 720; c.y = RIDE; c.boost = 40;
+    c.x = s * SPAWN_X; c.y = floorY(c.x) + RIDE; c.a = Math.atan(floorSlope(c.x)); c.boost = 40;
   });
-  w.lastTouch = -1;
+  w.lastTouch = -1; w.kick = true;
 }
 
 function respawn(c) {
   const s = c.team === 0 ? -1 : 1;
   Object.assign(c, makeCar(c.team, c.id));
-  c.x = s * (W / 2 - 260); c.y = RIDE + 10; c.boost = 40;
+  c.x = s * (W / 2 - 230); c.y = floorY(c.x) + RIDE + 10; c.a = Math.atan(floorSlope(c.x)); c.boost = 40;
 }
 
 const wrap = (a) => { while (a > Math.PI) a -= 2 * Math.PI; while (a < -Math.PI) a += 2 * Math.PI; return a; };
+
+// an air roll: half roll (ang = PI) turns the car round (dir flips, nose stays put), barrel roll (2 PI) is a trick
+function startRoll(c, ang, w, kind) {
+  c.rollAng = ang; c.rollDur = ang > 4 ? BARREL_T : ROLL_T; c.rollT = c.rollDur;
+  w.events.push({ type: ang > 4 ? 'trick' : 'roll', car: c, kind });
+}
 
 function updateCar(c, inp, dt, w) {
   if (c.demo > 0) {
@@ -52,18 +64,19 @@ function updateCar(c, inp, dt, w) {
   }
   const sx = inp.x || 0, sy = inp.y || 0, mag = Math.hypot(sx, sy);
   const jumpPressed = inp.jump && !c.jumpPrev;
-  c.jumpPrev = !!inp.jump;
-  c.jumpCD -= dt; c.hitCD -= dt; c.turnT -= dt; c.landT -= dt;
+  const rollPressed = !!inp.roll && !c.rollPrev;
+  c.jumpPrev = !!inp.jump; c.rollPrev = !!inp.roll;
+  c.jumpCD -= dt; c.hitCD -= dt; c.turnT -= dt; c.landT -= dt; c.resetT -= dt;
   let ca = Math.cos(c.a), sa = Math.sin(c.a);
   const d = sdf(c.x, c.y);
   grad(c.x, c.y, N);
   const align = -sa * N.x + ca * N.y;
   const wasGrounded = c.grounded;
-  c.grounded = c.jumpCD <= 0 && d < RIDE + 9 && align > 0.5;
+  c.grounded = c.jumpCD <= 0 && d < RIDE + 9 && align > 0.5 && c.rollT <= 0;
   if (c.grounded) {
     const vnIn = c.vx * N.x + c.vy * N.y;
     if (!wasGrounded) { w.events.push({ type: 'land', car: c, power: -vnIn }); c.landT = 0.15; }
-    c.nx = N.x; c.ny = N.y; c.flipAvail = false; c.flipping = 0; c.airT = 0; c.roofT = 0;
+    c.nx = N.x; c.ny = N.y; c.flipAvail = false; c.flipping = 0; c.airT = 0; c.roofT = 0; c.flipKind = '';
     const target = Math.atan2(N.y, N.x) - Math.PI / 2;
     c.a = c.a + wrap(target - c.a) * Math.min(1, 40 * dt);
     c.av = 0;
@@ -87,9 +100,20 @@ function updateCar(c, inp, dt, w) {
     else if (thr < -0.05) acc = vt > 10 ? -BRAKE : vt > -REVERSE_MAX ? -DRIVE_ACC * 0.7 * -thr : 0;
     else if (floor) acc = vt > 0 ? -Math.min(COAST, vt / dt) : Math.min(COAST, -vt / dt);
     c.vx += fx * acc * dt; c.vy += fy * acc * dt;
-    c.vy -= G_CAR * dt * (floor ? 1 : 0.35);   // sticky wheels: walls and ceiling are drivable
+    // gravity: full on floors and ramps, eased off on walls and the ceiling (sticky wheels), with no step
+    // between the two so cars glide smoothly round the curved ramps
+    const gk = N.y >= 0.7 ? 1 : N.y <= 0 ? 0.35 : 0.35 + 0.65 * (N.y / 0.7);
+    c.vy -= G_CAR * dt * gk;
     const tang = Math.abs(c.vx * N.y - c.vy * N.x);
-    const fallOff = (N.y < -0.3 && tang < 320) || (N.y < 0.6 && tang < 140 && Math.abs(thr) < 0.1);
+    let fallOff = (N.y < -0.3 && tang < 320) || (N.y < 0.35 && tang < 140 && Math.abs(thr) < 0.1);
+    // ramp lip: on the convex top of a ramp a fast car cannot stay glued down -> it launches
+    if (!fallOff && N.y > 0.3 && Math.abs(c.x) < W / 2 && above(c.x, c.y) < RIDE + 20) {
+      const k = floorCurv(c.x);
+      if (k < 0 && tang * tang * -k > G_CAR * N.y + LIP_GRIP) {
+        fallOff = true; c.flipAvail = true; c.flipWin = 1.25;
+        w.events.push({ type: 'launch', car: c, speed: tang });
+      }
+    }
     if (!fallOff) {
       const vn = c.vx * N.x + c.vy * N.y;
       c.vx -= vn * N.x; c.vy -= vn * N.y;
@@ -108,23 +132,55 @@ function updateCar(c, inp, dt, w) {
     else c.jumpHold = 0;
     c.flipWin -= dt;
     if (c.flipWin <= 0) c.flipAvail = false;
+    const hgt = above(c.x, c.y);
     if (jumpPressed) {
       if (c.roofT > 0.05) {
         c.vy += 520; c.av = wrap(c.a) > 0 ? -11 : 11; c.roofT = 0; c.flipAvail = false;
         w.events.push({ type: 'jump', car: c });
       } else if (c.flipAvail) {
         c.flipAvail = false; c.jumpHold = 0;
-        if (Math.abs(sx) > 0.35) {
+        const slope = Math.atan(floorSlope(c.x));
+        if (Math.abs(sx) > 0.35 && c.vy < 0 && hgt < RIDE + 48 && Math.abs(wrap(c.a - slope)) < 0.6 && Math.abs(c.x) < W / 2) {
+          // WAVEDASH: a flip just before the wheels touch -> cancel it into a burst of speed along the floor
+          const fd = Math.sign(sx), cs = Math.cos(slope), sn = Math.sin(slope);
+          const vt = c.vx * cs + c.vy * sn;
+          const nv = (Math.sign(vt) === fd ? vt : vt * 0.3) + fd * WAVEDASH_V;
+          c.vx = cs * nv; c.vy = sn * nv - 120; c.av = 0; c.a = slope; c.jumpCD = 0;
+          if (fd !== c.dir) c.dir = fd;
+          w.events.push({ type: 'wavedash', car: c, dir: fd });
+        } else if (Math.abs(sx) > 0.35) {
           const fd = Math.sign(sx);
           c.vx += fd * FLIP_V;
           if (Math.sign(c.vx) !== fd) c.vx = fd * FLIP_V * 0.6;
           c.vy = c.vy * 0.25 + 120;
           c.flipping = FLIP_T; c.av = -fd * (2 * Math.PI / FLIP_T);
-          w.events.push({ type: 'flip', car: c, dir: fd });
+          c.flipKind = fd === c.dir ? 'front' : 'back';
+          w.events.push({ type: 'flip', car: c, dir: fd, kind: c.flipKind });
+        } else if (sy < -0.5) {
+          // SIDE FLIP (seen side-on: a barrel-roll dodge that kills the fall and keeps the speed)
+          c.vy = Math.max(c.vy, 0) * 0.3 + 260; c.vx *= 1.06;
+          c.flipKind = 'side'; c.flipping = 0.12;
+          startRoll(c, 2 * Math.PI, w, 'sideflip');
+          w.events.push({ type: 'flip', car: c, dir: 0, kind: 'side' });
         } else {
           c.vx += -sa * DJUMP_V; c.vy += ca * DJUMP_V;
           w.events.push({ type: 'djump', car: c });
         }
+      }
+    }
+    if (rollPressed && c.rollT <= 0) {
+      if (c.flipping > 0 && c.flipKind === 'back' && c.flipping < FLIP_T * 0.62) {
+        // HALF-FLIP: cancel the backflip once the car is about upside down, then roll upright -> facing home
+        c.flipping = 0; c.av = 0; c.flipKind = 'half';
+        startRoll(c, Math.PI, w, 'half');
+        w.events.push({ type: 'halfflip', car: c });
+      } else if (c.flipping <= 0 || c.flipKind === 'side') startRoll(c, inp.roll === 2 ? 2 * Math.PI : Math.PI, w, inp.roll === 2 ? 'barrel' : 'roll');
+    }
+    if (c.rollT > 0) {
+      c.rollT -= dt;
+      if (c.rollT <= 0) {
+        c.rollT = 0;
+        if (c.rollAng < 4) { c.dir = -c.dir; c.a = wrap(c.a + Math.PI); }   // half roll done: turned round
       }
     }
     if (c.flipping > 0) {
@@ -137,18 +193,19 @@ function updateCar(c, inp, dt, w) {
       c.av += (want - c.av) * Math.min(1, 14 * dt);
     } else {
       c.av *= 1 - Math.min(1, 3 * dt);
-      // gentle landing assist when no stick input and falling near the floor
-      if (c.vy < 0 && c.y < 360 && c.y > 60) c.av += wrap(-c.a) * 6 * dt;
+      // gentle landing assist when no stick input and falling near the floor: match the slope below
+      if (c.vy < 0 && hgt < 360 && hgt > 60 && c.rollT <= 0) c.av += wrap(Math.atan(floorSlope(c.x)) - c.a) * 6 * dt;
     }
     c.a = wrap(c.a + c.av * dt);
     c.wheel += 2 * dt;
   }
-  // boost
+  // boost (stronger in the air so aerials can climb)
   ca = Math.cos(c.a); sa = Math.sin(c.a);
   const was = c.boosting;
   c.boosting = !!inp.boost && c.boost > 0;
   if (c.boosting) {
-    c.vx += c.dir * ca * BOOST_ACC * dt; c.vy += c.dir * sa * BOOST_ACC * dt;
+    const ba = c.grounded ? BOOST_ACC : AIR_BOOST_ACC;
+    c.vx += c.dir * ca * ba * dt; c.vy += c.dir * sa * ba * dt;
     c.boost = Math.max(0, c.boost - BOOST_USE * dt);
   } else c.boost = Math.min(100, c.boost + (c.grounded ? 9 : 4) * dt);
   if (c.boosting && !was) w.events.push({ type: 'boost', car: c });
@@ -259,12 +316,16 @@ function carBall(c, b, w) {
   b.vx += (nx / el) * extra; b.vy += (ey / el) * extra;
   b.spin += (c.av * 0.3) - (nx * c.vy - ny * c.vx) / BALL_R * 0.2;
   const power = -vn;
+  const hAir = above(c.x, c.y);
+  // FLIP RESET: touching the ball with all four wheels in the air gives the flip back
+  if (!c.grounded && nly < -0.6 && hAir > 160 && c.resetT <= 0) { c.flipAvail = true; c.flipWin = 1.6; c.resetT = 0.6; w.events.push({ type: 'reset', car: c }); }
+  w.kick = false;
   if (c.hitCD <= 0 || power > 400) {
-    w.events.push({ type: 'hit', car: c, power, x: b.x - nx * BALL_R, y: b.y - ny * BALL_R, nx, ny, flip: c.flipping > 0, air: !c.grounded && c.y > 260 });
+    w.events.push({ type: 'hit', car: c, power, x: b.x - nx * BALL_R, y: b.y - ny * BALL_R, nx, ny, flip: c.flipping > 0, air: !c.grounded && hAir > 220, hgt: hAir, wheels: nly < -0.6 });
   }
   c.hitCD = 0.12;
   w.lastTouch = c.team;
-  w.touchHist.push({ t: w.t, team: c.team, id: c.id, air: !c.grounded && c.y > 240 });
+  w.touchHist.push({ t: w.t, team: c.team, id: c.id, air: !c.grounded && hAir > 200 });
   if (w.touchHist.length > 8) w.touchHist.shift();
 }
 
@@ -289,8 +350,9 @@ function carCar(a, b, w) {
   if (rel <= 0) return;
   // demolition: a supersonic car driving into the other
   if (a.team !== b.team) {
-    if (a.supersonic && va > 900 && va > vb + 600) { demolish(b, a, w); return; }
-    if (b.supersonic && -vb > 900 && -vb > -va + 600) { demolish(a, b, w); return; }
+    // (a head-on crash between two charging cars is a big bump, not a demolition)
+    if (a.supersonic && va > 900 && va > vb + 600 && vb > -450) { demolish(b, a, w); return; }
+    if (b.supersonic && -vb > 900 && -vb > -va + 600 && va < 450) { demolish(a, b, w); return; }
   }
   const j = rel * 0.5 * 1.35 + 120;
   a.vx -= nx * j; a.vy -= ny * j; b.vx += nx * j; b.vy += ny * j;
@@ -317,8 +379,8 @@ export function step(w, inputs, dt = STEP) {
   for (let i = 0; i < w.cars.length; i++) for (let k = i + 1; k < w.cars.length; k++) carCar(w.cars[i], w.cars[k], w);
   const b = w.ball;
   if (b.hidden) return -1;
-  if (b.x - BALL_R * 0.98 > W / 2) return 0;        // blue (team 0) scores in the right goal
-  if (b.x + BALL_R * 0.98 < -W / 2) return 1;       // orange scores in the left goal
+  if (b.x - BALL_R * 0.98 > W / 2) { w.lastGoal = 0; return 0; }        // blue (team 0) scores in the right goal
+  if (b.x + BALL_R * 0.98 < -W / 2) { w.lastGoal = 1; return 1; }       // orange scores in the left goal
   return -1;
 }
 

@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TINY KNIGHT — Free Knight Action RPG Game Online | PLAYPILE</title>
+<meta name="description" content="Chop, mine and craft your way up from bare fists to the Shadowbane, then pay to build the bridge to the Shadow King's castle. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/tiny-knight-action-rpg-game/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="TINY KNIGHT — PLAYPILE">
+<meta property="og:description" content="Chop, mine and craft your way up from bare fists to the Shadowbane, then pay to build the bridge to the Shadow King's castle. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/tiny-knight-action-rpg-game/">
+<meta property="og:image" content="https://playpile.net/shots/tiny-knight.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"TINY KNIGHT","url":"https://playpile.net/play/tiny-knight-action-rpg-game/","image":"https://playpile.net/shots/tiny-knight.png","description":"Chop, mine and craft your way up from bare fists to the Shadowbane, then pay to build the bridge to the Shadow King's castle.","genre":"Adventure","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"contentRating":"Cartoon sword fighting against cute pixel monsters (slimes, zombies, skeletons, bats, shadow creatures) that pop into particles when beaten, with no blood. Enemies flash white when hit, a short white screen flash on every level-up, a red glow at the screen edges when you are hurt, red danger circles and lines on the ground, and screen shake on big hits.","publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Adventure","item":"https://playpile.net/free-adventure-games/"},{"@type":"ListItem","position":3,"name":"TINY KNIGHT","item":"https://playpile.net/play/tiny-knight-action-rpg-game/"}]}</script>
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<link rel="stylesheet" href="/site/progress.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#050a14">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+<a class="skip" href="#stage">Skip to the game</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/free-adventure-games/">Adventure</a><i>&rsaquo;</i><b>TINY KNIGHT</b></nav>
+    <!-- NO ADVERT ABOVE THE GAME (removed 2026-10-07). It sat 16px over the
+         stage and its Play button - AdSense's "ads interfering" policy bars
+         ads beside action items where they draw accidental clicks, and a
+         click near the top edge of a running game could land on it. -->
+
+    <div class="play">
+      <div>
+        <!-- THE GAME DOES NOT LOAD UNTIL IT IS ASKED FOR.
+             Several of these are heavy, and a page that starts
+             downloading a game the moment it opens costs the player the
+             whole download for a click they might not make. The iframe
+             has no src until START. -->
+        <div class="stage" id="stage">
+          <iframe id="frame" title="game" allow="autoplay; fullscreen; gamepad; pointer-lock"
+                  allowfullscreen hidden></iframe>
+          <div class="curtain" id="curtain">
+            <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
+            <h2 id="ttl">TINY KNIGHT</h2>
+            <p id="lede">Chop, mine and craft your way up from bare fi t  to the Shadowbane, then pay to build the bridge to the Shadow King'  ca tle.</p>
+            <button class="btn" id="start">Play</button>
+            <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
+          </div>
+        </div>
+
+        <div class="stagebar">
+          <span class="title" id="barttl">TINY KNIGHT</span>
+          <span class="where" id="how"></span>
+          <span class="sp"></span>
+          <button id="full" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
+            Fullscreen <kbd>F</kbd></button>
+          <button id="reload" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+            Restart <kbd>R</kbd></button>
+          <a class="lnk" href="/">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>
+            All games</a>
+        </div>
+
+        <!-- YOUR NUMBERS FOR THIS GAME, favourite, today's challenge and the
+             leaderboard. Between the stage bar and the text, well away from
+             every ad slot (those are in the side column and after the guide). -->
+        <div class="pp-play" id="ppplay"></div>
+
+        <section class="about">
+          <h1 id="h1">TINY KNIGHT</h1>
+          <p class="lede" id="blurb">Chop, mine and craft your way up from bare fi t  to the Shadowbane, then pay to build the bridge to the Shadow King'  ca tle.</p>
+          <div id="about"><p>You are a tiny knight on a big island. In the middle, a castle sits on a lake, swallowed by shadow, and the only way across is a bridge that Foreman Bram builds in five stages, if you can pay for them. Chop trees and mine rock and iron, craft better swords, axes, pickaxes, shields, armour and a bow at the workbench, and push out through the Meadow, Whisperwood, the Pebble Hills and the Hollow Graves, where night brings out zombies and bats.</p>
+<p>Every hit lands with a flash, knockback and a bit of hit-stop, and every dangerous enemy attack is shown before it comes, so a well-timed dodge roll gets you through. Level up, loot fourteen chests and sell spare loot in Oakhaven, then cross the bridge, beat the three Shadow Sentinels and face Umbra, the Shadow King, in a three-phase fight. Win and the island stays open for free play.</p>
+<p class="advisory"><b>What is in it:</b> Cartoon sword fighting against cute pixel monsters (slimes, zombies, skeletons, bats, shadow creatures) that pop into particles when beaten, with no blood. Enemies flash white when hit, a short white screen flash on every level-up, a red glow at the screen edges when you are hurt, red danger circles and lines on the ground, and screen shake on big hits. <a href="/site/parents.html">More for parents</a></p>
+<p class="report"><a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20problem%20with%20TINY%20KNIGHT">Report a problem with this game</a></p></div>
+          <h4>Controls</h4>
+          <ul class="keys" id="keys"><li><kbd>W A S D / arrows</kbd><span>move</span></li><li><kbd>J / Z / left click</kbd><span>attack (hold to combo)</span></li><li><kbd>K / Space / X / right click</kbd><span>dodge roll</span></li><li><kbd>E</kbd><span>chop, mine (hold) · open · talk · craft</span></li><li><kbd>L / F</kbd><span>shoot bow</span></li><li><kbd>Q / H</kbd><span>potion</span></li><li><kbd>I / Tab / B</kbd><span>bag</span></li><li><kbd>M</kbd><span>map</span></li><li><kbd>Esc / P</kbd><span>pause</span></li><li><kbd>N</kbd><span>mute</span></li><li><kbd>Touch</kbd><span>left stick, attack / roll / E / bow / potion buttons</span></li></ul>
+          <div class="tip" id="tip">Every dangerous attack is shown first as a flash, a &quot;!&quot;, a red circle or a red line. Roll through it rather than away: you cannot be hurt mid-roll. After Umbra's charge he is stunned and takes 1.6 times damage.</div>
+          <h4>Tags</h4>
+          <div class="tagrow" id="tags"><a class="chip on" href="/free-adventure-games/">Adventure</a><a class="chip" href="/#q=pixel">pixel</a><a class="chip" href="/#q=crafting">crafting</a><a class="chip" href="/#q=action%20rpg">action rpg</a><a class="chip" href="/#q=knight">knight</a><a class="chip" href="/#q=boss">boss</a><a class="chip" href="/#q=island">island</a><a class="chip" href="/#q=mobile">mobile</a></div>
+        </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>TINY KNIGHT is a top-down pixel adventure on a big island. A shadow castle sits on a lake in the middle, reachable only by a bridge you pay for. Move with <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or the arrow keys. Attack with <kbd>J</kbd>, <kbd>Z</kbd> or <b>left click</b>, which swings towards the mouse; hold it to chain a three-hit combo whose third hit is a wide finisher. <kbd>K</kbd>, <kbd>Space</kbd>, <kbd>X</kbd> or <b>right click</b> is a dodge roll, and you cannot be hurt in the middle of it.</p>
+<p><kbd>E</kbd> does everything else: hold it to chop trees and mine rocks, and tap it to open chests, talk to people and use a workbench. Once you have a bow, shoot with <kbd>L</kbd> or <kbd>F</kbd>. <kbd>Q</kbd> or <kbd>H</kbd> drinks a potion, which heals 40% of your health. <kbd>I</kbd>, <kbd>Tab</kbd> or <kbd>B</kbd> opens your bag, <kbd>M</kbd> the island map, <kbd>Esc</kbd> or <kbd>P</kbd> pauses and <kbd>N</kbd> mutes.</p>
+<p>A quest line at the top of the screen always tells you what to do next, and an arrow points at it: the next tree, the workbench, a rock, Foreman Bram or the throne room.</p>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li><b>Make a Wooden Sword first.</b> It costs 5 wood and doubles your damage over bare fists. A Wooden Pickaxe (8 wood) comes next, because stone opens up the rest of the workbench.</li>
+<li><b>Craft potions from slime gel.</b> Three gel makes a potion. Slimes drop gel often, so a few minutes in the meadow keeps you stocked.</li>
+<li><b>Watch for the tell.</b> Every dangerous attack is shown before it lands: a flash, a "!", a red circle on the ground or a red line. Roll through it rather than away from it.</li>
+<li><b>Face your shield at the danger.</b> Shields only block hits from the direction you are facing. The Iron Shield takes 65% off those.</li>
+
+<li><b>Not every rock is a rock.</b> Some in the Pebble Hills are Rocklings that wake up and slam the ground.</li>
+<li><b>Go home to heal.</b> You heal slowly out of combat, but much faster in Oakhaven.</li>
+<li><b>Punish Umbra's charge.</b> After the Shadow King charges along his red line he is stunned, and takes 1.6 times damage until he recovers.</li>
+</ul>
+
+<h2>What's in it</h2>
+<p><b>Five zones</b> that get harder the further you go: the Meadow to the south, Whisperwood to the west, the Pebble Hills to the east (where the iron ore is) and the Hollow Graves to the north. Last comes the castle island. Night falls for part of every eight-minute day, bringing extra zombies and bats and tougher monsters.</p>
+<p><b>A crafting chain</b> at the workbench: four swords from Wooden to Shadowbane, forged from shadow shards; Stone and Iron axes and Wooden and Stone pickaxes; Wooden and Iron shields; Patchwork, Bone and Iron armour; a Hunting Bow with arrows; and potions. Each tool tier unlocks the next material.</p>
+<p><b>Twelve kinds of monster</b>, from slimes (the King Slime splits into three), zombies, skeletons and bats to Shadow Hounds that pounce, Shadow Wisps that teleport and fire homing orbs, and dashing Shadow Knights. Three Shadow Sentinels guard the castle courtyard.</p>
+<p><b>The bridge</b> is built by Foreman Bram in five stages you can watch go up, paid for with coins plus wood, stone and iron. Coins come from monsters, fourteen treasure chests and selling spare loot at Pip's stall in Oakhaven, which also sells potions and arrows.</p>
+<p><b>Umbra, the Shadow King</b>, waits in the throne room and fights in three phases. He starts with leaping slams and charges, then adds teleport strikes and calls in helpers, and finally speeds up with eruptions, double charges and spirals of orbs.</p>
+
+<h2>Questions</h2>
+<h3>What happens when I die?</h3>
+<p>You come straight back with all your gear and lose 10% of your coins. You restart in Oakhaven, or at the lake camp once the bridge has been started.</p>
+<h3>How do I get into the castle?</h3>
+<p>Fund all five bridge stages with Bram, walk across, and beat the three Sentinels in the courtyard. That opens the throne room door, which seals behind you.</p>
+<h3>Is there anything to do after the Shadow King?</h3>
+<p>Yes. Choose Keep Playing on the victory screen to stay on the island in free play.</p>
+<h3>Can I play on a phone?</h3>
+<p>Yes. A stick on the left moves you, and buttons on the right attack, roll, use, shoot and drink potions.</p>
+<h3>Does it save?</h3>
+<p>Yes, in your own browser. It saves every 15 seconds and after every craft, chest, bridge stage, death and boss kill. Clearing your browser's site data clears the save.</p></article>
+
+        <div id="ad-play-footer"></div>
+
+        <!-- the rail that keeps a session going: a player who finishes
+             one game and sees eight more is worth several page views -->
+        <div id="alsorows"></div>
+      </div>
+
+      <aside class="side">
+        <div id="ad-play-rail"></div>
+        <div class="panel">
+          <h4>More games</h4>
+          <div id="more"><a class="mini" href="/play/block-world-voxel-parkour-game/"><span class="th" style="background-image:url('/shots/t/block-world.webp')"></span><span><b>BLOCK WORLD</b><small>Adventure</small></span></a><a class="mini" href="/play/sky-climb-tower-climbing-game/"><span class="th" style="background-image:url('/shots/t/sky-climb.webp')"></span><span><b>SKY CLIMB</b><small>Adventure</small></span></a><a class="mini" href="/play/deep-dive-submarine-rescue-game/"><span class="th" style="background-image:url('/shots/t/deep-dive.webp')"></span><span><b>DEEP DIVE</b><small>Adventure</small></span></a><a class="mini" href="/play/chibi-clash-monster-battle-game/"><span class="th" style="background-image:url('/shots/t/chibi-clash.webp')"></span><span><b>CHIBI CLASH</b><small>Adventure</small></span></a><a class="mini" href="/play/spelldelve-wizard-roguelite-game/"><span class="th" style="background-image:url('/shots/t/spelldelve.webp')"></span><span><b>SPELLDELVE</b><small>Adventure</small></span></a></div>
+        </div>
+        <div id="ad-play-tall"></div>
+      </aside>
+    </div>
+
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">100 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/devlog/">Dev log</a><a href="/articles/">Articles</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<!-- the loading interstitial: over a game that is LOADING, never one
+     that is being played, and it always has a skip -->
+<div class="gate" id="gate">
+  <div class="box">
+    <h3>Advertisement</h3>
+    <div data-ad></div>
+    <div class="count">your game starts in 5</div>
+    <button class="btn ghost" type="button">Skip</button>
+  </div>
+</div>
+
+<script type="module">
+import { GAMES, bySlug } from '/site/catalogue.js';
+import { seoSlug } from '/site/seo.js';
+import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
+import { loadAds, slot, interstitial } from '/ads/ads.js';
+import { mountPlay, trackPlay } from '/site/progress.js';
+
+// THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
+// server.js rewrites /play/<slug> to this file, and tools/deploy.mjs
+// writes this same file out to /play/<slug>/index.html for the static
+// host. Both leave the slug exactly where this line looks for it.
+const slug = location.pathname.split('/').filter(Boolean).pop();
+const g = bySlug(slug) || GAMES.find((x) => seoSlug(x) === slug);
+if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
+
+mountShell({ active: catOf(g) });
+mountPlay(document.getElementById('ppplay'), g.slug);
+
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
+
+ttl.textContent = g.title;
+h1.textContent = g.title;
+barttl.textContent = g.title;
+lede.textContent = g.blurb;
+blurb.textContent = g.blurb;
+about.innerHTML = aboutHtml(g);
+tip.textContent = g.tips;
+shotbg.src = '/shots/h/' + g.slug + '.webp'; shotbg.alt = g.title + ' gameplay screenshot';
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
+tags.innerHTML = [catOf(g), ...(g.tags || [])]
+  .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
+  .join('');
+
+// ---- where does this game actually come from? -----------------------
+//
+// ON THE WEB, NOWHERE BUT HERE. Every game is a folder under /games/,
+// the big ones included, which is why they now ask for their own files
+// by relative path rather than off the web root.
+//
+// ON THIS MACHINE they are still separate servers on separate ports,
+// because that is where they are developed and nothing about that should
+// have to change to suit a website. A port that is not answering shows
+// the browser's own error page inside the frame, which reads as the site
+// being broken - so that case asks first and says so plainly.
+//
+// WHICH OF THE TWO is decided at BUILD time rather than by sniffing the
+// hostname: tools/deploy.mjs stamps this flag into the copy it writes.
+const WEB = !!window.__PLAYPILE_WEB;
+let src = null, note = '';
+if (g.how === 'mounted' && WEB && g.web) {
+  src = '/games/' + g.web;
+  note = 'runs here';
+} else if (g.how === 'local') {
+  src = '/games/' + g.slug + '/';
+  note = 'runs here';
+} else if (g.how === 'unity') {
+  src = '/games/' + g.slug + '/build/index.html';
+  note = 'unity webgl · 83 mb first load';
+  warn.textContent = 'First load is a big download. It is cached after that.';
+} else {
+  src = 'http://localhost:' + g.port + (g.url || '/');
+  note = 'localhost:' + g.port;
+  try {
+    const list = await (await fetch('/api/mounted')).json();
+    const m = list.find((x) => x.slug === g.slug);
+    if (!m || m.state !== 'up') {
+      warn.innerHTML = 'This one runs from its own folder and is not up. '
+        + 'Start PLAYPILE with <code>node server.js</code> and it boots with the site.';
+    }
+  } catch (e) {}
+}
+how.textContent = note;
+
+start.addEventListener('click', async () => {
+  start.disabled = true;
+  await interstitial();          // the ad slot that pays, while it loads
+  frame.src = src;
+  frame.hidden = false;
+  // a play counts when the game is actually started, not when the page is opened
+  remember(g.slug);
+  trackPlay(g.slug);
+  curtain.style.display = 'none';
+  setTimeout(() => { try { frame.focus(); } catch (e) {} }, 400);
+  if (TOUCH) mobileFull(true);
+});
+// ---- phones: fill the whole screen, real fullscreen + landscape lock where the browser allows ----
+const TOUCH = (navigator.maxTouchPoints > 0 || 'ontouchstart' in window) && matchMedia('(pointer: coarse)').matches;
+const UPRIGHT = /^(crossing|drifter|hoops|merge|pipeworks|quickdraw|spike|stack|sweep|block-royale|helix-drop|stack-attack|subway-run|tunnel-dive|slope-rush|drift-tower|word-blitz|prism|one-tile|sushi-conveyor|bubble-trouble|firework-frenzy|stick-swing|golf-orbit|parry)$/;
+const stageEl = document.getElementById('stage');
+const mexit = document.createElement('button');
+mexit.className = 'mexit'; mexit.type = 'button'; mexit.textContent = '✕'; mexit.setAttribute('aria-label', 'Exit full screen');
+stageEl.appendChild(mexit);
+function mobileFull(on) {
+  stageEl.classList.toggle('mfull', on); document.body.classList.toggle('mfull-on', on);
+  if (on) {
+    const rq = stageEl.requestFullscreen || stageEl.webkitRequestFullscreen;
+    try { const r = rq && rq.call(stageEl, { navigationUI: 'hide' });
+      if (r && r.then) r.then(() => { if (!UPRIGHT.test(g.slug) && screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {}); }).catch(() => {});
+    } catch (e) {}
+  } else {
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  }
+  // games size themselves on resize; nudge them once the new box has settled
+  setTimeout(() => { try { frame.contentWindow.dispatchEvent(new Event('resize')); } catch (e) {} }, 350);
+}
+mexit.addEventListener('click', () => mobileFull(false));
+full.addEventListener('click', () => {
+  if (TOUCH) { mobileFull(!stageEl.classList.contains('mfull')); return; }
+  const el = document.getElementById('stage');
+  if (document.fullscreenElement) document.exitFullscreen();
+  else el.requestFullscreen && el.requestFullscreen();
+});
+reload.addEventListener('click', () => { if (frame.src) frame.src = frame.src; });
+// the two shortcuts the stage bar advertises, so they are not a lie
+addEventListener('keydown', (e) => {
+  if (e.target.matches('input,textarea')) return;
+  if (e.key === 'f' || e.key === 'F') full.click();
+  if (e.key === 'r' || e.key === 'R') reload.click();
+});
+
+// ---- more games, which is the other half of running a portal --------
+// Somebody who finishes a game and closes the tab is worth one page
+// view. The rail beside the game is five, chosen from the same category
+// first, and the row below it is everything else.
+const others = GAMES.filter((x) => x.slug !== g.slug);
+const same = others.filter((x) => catOf(x) === catOf(g));
+const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
+
+document.getElementById('alsorows').innerHTML =
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
+  + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
+
+// ---- adverts: every slot that existed before, in the same place -----
+await loadAds();
+slot(document.getElementById('ad-play-rail'), 'play_rail');
+slot(document.getElementById('ad-play-tall'), 'play_tall');
+slot(document.getElementById('ad-play-footer'), 'play_footer');
+</script>
+</body>
+</html>

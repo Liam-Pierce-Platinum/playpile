@@ -81,11 +81,11 @@
 // page reads its own. tools/deploy.mjs writes this page out once per
 // category with the text already in it; locally it is filled in here.
 import { GAMES, mountShell } from '/site/shell.js';
-import { catOf, catSlug, categoryBody } from '/site/pages.js';
+import { catOf, catSlug, categoryBody, catUrl } from '/site/pages.js';
 import { introFor } from '/site/categories.js';
 import { loadAds } from '/ads/ads.js';
 const slug = location.pathname.split('/').filter(Boolean).pop();
-const cat = [...new Set(GAMES.map(catOf))].find((c) => catSlug(c) === slug);
+const cat = [...new Set(GAMES.map(catOf))].find((c) => catSlug(c) === slug || catUrl(c) === '/' + slug + '/');
 if (!cat) { location.replace('/'); throw new Error('no such category: ' + slug); }
 mountShell({ active: cat });
 const list = GAMES.filter((g) => catOf(g) === cat);

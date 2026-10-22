@@ -14,6 +14,8 @@
 // served locally. Pure functions, no imports, no DOM - which is the only
 // thing that lets node and a browser both run it.
 
+import { playUrl, catUrl, kwOf, CAT_TITLE } from './seo.js';
+export { playUrl, catUrl, kwOf, CAT_TITLE };
 export const SITE = 'https://playpile.net';
 
 export const catOf = (g) => g.cat || g.tag || 'Games';
@@ -35,19 +37,20 @@ export const keysHtml = (g) => (g.controls || [])
 
 export const tagsHtml = (g) => [catOf(g), ...(g.tags || [])].map((t, i) => i
   ? '<a class="chip" href="/#q=' + encodeURIComponent(t) + '">' + esc(t) + '</a>'
-  : '<a class="chip on" href="/category/' + catSlug(t) + '/">' + esc(t) + '</a>').join('');
+  : '<a class="chip on" href="' + catUrl(t) + '">' + esc(t) + '</a>').join('');
 
 export const crumbsHtml = (g) => '<a href="/">Games</a><i>&rsaquo;</i>'
-  + '<a href="/category/' + catSlug(catOf(g)) + '/">' + esc(catOf(g)) + '</a>'
+  + '<a href="' + catUrl(catOf(g)) + '">' + esc(catOf(g)) + '</a>'
   + '<i>&rsaquo;</i><b>' + esc(g.title) + '</b>';
 
-export const pageTitle = (g) => g.title + ' — free ' + catOf(g).toLowerCase()
-  + ' game in your browser — PLAYPILE';
+const UP = { fps: 'FPS', rpg: 'RPG', '3d': '3D', f1: 'F1', io: 'io' };
+const cap = (s) => s.split(' ').map((w) => UP[w] || (w.charAt(0).toUpperCase() + w.slice(1))).join(' ');
+export const pageTitle = (g) => g.title + ' — Free ' + cap(kwOf(g)) + ' Online | PLAYPILE';
 
 // the card, identical to shell.js's so a pre-rendered row is the same row
-const shot = (g) => '<img src="/shots/t/' + g.slug + '.webp" alt="' + esc(g.title) + '" width="640" height="360" loading="lazy" decoding="async" onerror="this.remove()"'
+const shot = (g) => '<img src="/shots/t/' + g.slug + '.webp" alt="' + esc(g.title + ' - ' + kwOf(g)) + '" width="640" height="360" loading="lazy" decoding="async" onerror="this.remove()"'
   + ' onload="if(this.naturalHeight>this.naturalWidth)this.classList.add(\'tall\')">';
-export const cardHtml = (g) => '<a class="card" href="/play/' + g.slug + '/" title="' + esc(g.title) + '">'
+export const cardHtml = (g) => '<a class="card" href="' + playUrl(g) + '" title="' + esc(g.title) + '">'
   + '<span class="thumb"><span class="ph">' + esc(g.title.slice(0, 2)) + '</span>' + shot(g)
   + '<span class="badge">' + esc(catOf(g)) + '</span>'
   + (g.big ? '<span class="big-flag">Big</span>' : '')
@@ -59,7 +62,7 @@ export const cardHtml = (g) => '<a class="card" href="/play/' + g.slug + '/" tit
 // a game page: <head> extras and the body text
 // ---------------------------------------------------------------------
 export function gameHead(g) {
-  const url = SITE + '/play/' + g.slug + '/';
+  const url = SITE + playUrl(g);
   const img = SITE + '/shots/' + g.slug + '.png';
   const desc = clean(g.blurb) + ' Free to play in your browser - no download, no sign-up.';
   const ld = {
@@ -74,7 +77,7 @@ export function gameHead(g) {
     '@context': 'https://schema.org', '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Games', item: SITE + '/' },
-      { '@type': 'ListItem', position: 2, name: catOf(g), item: SITE + '/category/' + catSlug(catOf(g)) + '/' },
+      { '@type': 'ListItem', position: 2, name: catOf(g), item: SITE + catUrl(catOf(g)) },
       { '@type': 'ListItem', position: 3, name: g.title, item: url },
     ],
   };
@@ -98,7 +101,7 @@ export function related(g, GAMES, n = 5) {
   const same = others.filter((x) => catOf(x) === catOf(g));
   return [...same, ...others.filter((x) => catOf(x) !== catOf(g))].slice(0, n);
 }
-export const miniHtml = (x) => '<a class="mini" href="/play/' + x.slug + '/">'
+export const miniHtml = (x) => '<a class="mini" href="' + playUrl(x) + '">'
   + '<span class="th" style="background-image:url(\'/shots/t/' + x.slug + '.webp\')"></span>'
   + '<span><b>' + esc(x.title) + '</b><small>' + esc(catOf(x)) + '</small></span></a>';
 
@@ -106,9 +109,9 @@ export const miniHtml = (x) => '<a class="mini" href="/play/' + x.slug + '/">'
 // a category page
 // ---------------------------------------------------------------------
 export function categoryHead(cat, intro) {
-  const url = SITE + '/category/' + catSlug(cat) + '/';
+  const url = SITE + catUrl(cat);
   const desc = clean(intro).slice(0, 155);
-  return '<title>' + esc(cat + ' games — play free in your browser — PLAYPILE') + '</title>\n'
+  return '<title>' + esc((CAT_TITLE[cat] || cat + ' games') + ' — Play Online, No Download | PLAYPILE') + '</title>\n'
     + '<meta name="description" content="' + esc(desc) + '">\n'
     + '<link rel="canonical" href="' + url + '">\n'
     + '<meta property="og:title" content="' + esc(cat + ' games — PLAYPILE') + '">\n'
@@ -116,15 +119,15 @@ export function categoryHead(cat, intro) {
     + '<meta property="og:url" content="' + url + '">';
 }
 export function categoryBody(cat, list, intro) {
-  return '<section class="cathero"><h1>' + esc(cat) + ' games</h1>'
+  return '<section class="cathero"><h1>' + esc(CAT_TITLE[cat] || cat + ' games') + '</h1>'
     + '<p>' + esc(clean(intro)) + '</p></section>'
     + '<div class="strip">' + list.map(cardHtml).join('') + '</div>'
     + '<div class="catlist">' + list.map((g) =>
-      '<article><h2><a href="/play/' + g.slug + '/">' + esc(g.title) + '</a></h2>'
+      '<article><h2><a href="' + playUrl(g) + '">' + esc(g.title) + '</a></h2>'
       + '<p class="lede">' + esc(clean(g.blurb)) + '</p>'
       + '<p>' + esc(clean(String(g.about).split(/\n\s*\n/)[0])) + '</p>'
-      + '<p class="more"><a href="/play/' + g.slug + '/">Play ' + esc(g.title)
-      + ' and read the guide &rarr;</a></p></article>').join('') + '</div>';
+      + '<p class="more"><a href="' + playUrl(g) + '">Play ' + esc(g.title) + ', the free ' + esc(kwOf(g))
+      + ', and read the guide &rarr;</a></p></article>').join('') + '</div>';
 }
 
 // ---------------------------------------------------------------------
@@ -133,8 +136,8 @@ export function categoryBody(cat, list, intro) {
 export function directoryHtml(GAMES) {
   const cats = [...new Set(GAMES.map(catOf))].sort();
   return '<h2>Every game on PLAYPILE</h2>'
-    + cats.map((c) => '<h3><a href="/category/' + catSlug(c) + '/">' + esc(c) + '</a></h3><ul>'
+    + cats.map((c) => '<h3><a href="' + catUrl(c) + '">' + esc(c) + '</a></h3><ul>'
       + GAMES.filter((g) => catOf(g) === c).map((g) =>
-        '<li><a href="/play/' + g.slug + '/"><b>' + esc(g.title) + '</b></a> &mdash; '
+        '<li><a href="' + playUrl(g) + '"><b>' + esc(g.title) + '</b></a> &mdash; '
         + esc(clean(g.blurb)) + '</li>').join('') + '</ul>').join('');
 }

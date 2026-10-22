@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KART CLASH — Free Kart Racing Game Online | PLAYPILE</title>
+<meta name="description" content="Glossy toy-plastic kart battles. Grab ? boxes for rockets, gumball guns, mines and shockwaves, and knock out the most karts in two minutes. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/kart-clash-racing-game/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="KART CLASH — PLAYPILE">
+<meta property="og:description" content="Glossy toy-plastic kart battles. Grab ? boxes for rockets, gumball guns, mines and shockwaves, and knock out the most karts in two minutes. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/kart-clash-racing-game/">
+<meta property="og:image" content="https://playpile.net/shots/kart-clash.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"KART CLASH","url":"https://playpile.net/play/kart-clash-racing-game/","image":"https://playpile.net/shots/kart-clash.png","description":"Glossy toy-plastic kart battles. Grab ? boxes for rockets, gumball guns, mines and shockwaves, and knock out the most karts in two minutes.","genre":"Driving","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"contentRating":"Toy karts bump and blast each other with cartoon rockets, gumballs and mines in a plastic toy arena. Knocked-out karts just respawn; nobody is hurt.","publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Driving","item":"https://playpile.net/free-racing-games/"},{"@type":"ListItem","position":3,"name":"KART CLASH","item":"https://playpile.net/play/kart-clash-racing-game/"}]}</script>
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<link rel="stylesheet" href="/site/progress.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#050a14">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+<a class="skip" href="#stage">Skip to the game</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/free-racing-games/">Driving</a><i>&rsaquo;</i><b>KART CLASH</b></nav>
+    <!-- NO ADVERT ABOVE THE GAME (removed 2026-10-07). It sat 16px over the
+         stage and its Play button - AdSense's "ads interfering" policy bars
+         ads beside action items where they draw accidental clicks, and a
+         click near the top edge of a running game could land on it. -->
+
+    <div class="play">
+      <div>
+        <!-- THE GAME DOES NOT LOAD UNTIL IT IS ASKED FOR.
+             Several of these are heavy, and a page that starts
+             downloading a game the moment it opens costs the player the
+             whole download for a click they might not make. The iframe
+             has no src until START. -->
+        <div class="stage" id="stage">
+          <iframe id="frame" title="game" allow="autoplay; fullscreen; gamepad; pointer-lock"
+                  allowfullscreen hidden></iframe>
+          <div class="curtain" id="curtain">
+            <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
+            <h2 id="ttl">KART CLASH</h2>
+            <p id="lede">Glo y toy-pla tic kart battle . Grab ? boxe  for rocket , gumball gun , mine  and  hockwave , and knock out the mo t kart  in two minute .</p>
+            <button class="btn" id="start">Play</button>
+            <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
+          </div>
+        </div>
+
+        <div class="stagebar">
+          <span class="title" id="barttl">KART CLASH</span>
+          <span class="where" id="how"></span>
+          <span class="sp"></span>
+          <button id="full" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
+            Fullscreen <kbd>F</kbd></button>
+          <button id="reload" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+            Restart <kbd>R</kbd></button>
+          <a class="lnk" href="/">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>
+            All games</a>
+        </div>
+
+        <!-- YOUR NUMBERS FOR THIS GAME, favourite, today's challenge and the
+             leaderboard. Between the stage bar and the text, well away from
+             every ad slot (those are in the side column and after the guide). -->
+        <div class="pp-play" id="ppplay"></div>
+
+        <section class="about">
+          <h1 id="h1">KART CLASH</h1>
+          <p class="lede" id="blurb">Glo y toy-pla tic kart battle . Grab ? boxe  for rocket , gumball gun , mine  and  hockwave , and knock out the mo t kart  in two minute .</p>
+          <div id="about"><p>A battle-arena kart game in shiny toy plastic, against five bots, on a baseplate arena surrounded by giant toys. Drive over the ? boxes to pick up an item and fire it with Space: a homing ROCKET, a GUMBALL GUN with 12 shots, two POP MINES that drop behind you, or a BOING WAVE that blasts karts away from you at close range.</p>
+<p>Each match lasts two minutes and the most KOs wins. KOs and your finishing place earn XP, levels unlock new paint jobs, and the bots get sharper as your level rises.</p>
+<p class="advisory"><b>What is in it:</b> Toy karts bump and blast each other with cartoon rockets, gumballs and mines in a plastic toy arena. Knocked-out karts just respawn; nobody is hurt. <a href="/site/parents.html">More for parents</a></p>
+<p class="report"><a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20problem%20with%20KART%20CLASH">Report a problem with this game</a></p></div>
+          <h4>Controls</h4>
+          <ul class="keys" id="keys"><li><kbd>WASD / arrows</kbd><span>drive</span></li><li><kbd>Space / J</kbd><span>fire your item</span></li><li><kbd>Esc</kbd><span>garage menu</span></li><li><kbd>Touch</kbd><span>left stick drives, FIRE button</span></li></ul>
+          <div class="tip" id="tip">Keep moving between ? boxes so you are never empty-handed. Save the BOING WAVE for when a kart is right on you, and drop POP MINES when someone is chasing you.</div>
+          <h4>Tags</h4>
+          <div class="tagrow" id="tags"><a class="chip on" href="/free-racing-games/">Driving</a><a class="chip" href="/#q=new">new</a><a class="chip" href="/#q=driving">driving</a><a class="chip" href="/#q=karts">karts</a><a class="chip" href="/#q=battle">battle</a><a class="chip" href="/#q=arena">arena</a><a class="chip" href="/#q=toys">toys</a><a class="chip" href="/#q=3d">3d</a><a class="chip" href="/#q=mobile">mobile</a></div>
+        </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>KART CLASH is a kart battle in glossy toy plastic. You and five bots race around a studded baseplate arena surrounded by giant toys, and the goal is not to finish a lap but to knock out as many karts as you can. The game drops you straight into a match after a short countdown.</p>
+<p>Drive with <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or the arrow keys. Drive through a <b>? box</b> to pick up an item, then press <kbd>Space</kbd> (or <kbd>J</kbd> or <kbd>Enter</kbd>) to use it. <kbd>Esc</kbd> opens the garage menu. On a phone, the left thumb stick drives and the FIRE button uses your item.</p>
+<p>A match lasts <b>two minutes</b>. Every kart has 100 health, shown as a bar over its name. Bring a kart's health to zero and that is a KO, and the kart with the most KOs when time runs out wins; on a tie, the kart knocked out fewer times ranks higher. Knocked-out karts come back about two and a half seconds later, including yours, so it is about scoring, not surviving.</p>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li><b>Always be carrying something.</b> You can only score with items, and you can only hold one at a time. There are twelve ? boxes spread over the arena, and each one comes back five seconds after it is taken, so plan a route that takes you through the next box as soon as you have used up your item.</li>
+<li><b>Bumping does no damage.</b> Running into karts and walls only slows you down. Save your speed for chasing and escaping.</li>
+<li><b>Use the respawn shield.</b> When you come back you flicker for two seconds and cannot be hurt. Use it to grab a box in peace.</li>
+<li><b>Get close with the Boing Wave.</b> It knocks out any kart right next to you in one go. Further out it only takes 60 health.</li>
+<li><b>Mines stay put.</b> A Pop Mine sits where you drop it for up to 25 seconds and goes off when any kart drives near, so drop them near ? boxes where rivals are sure to pass.</li>
+<li><b>Do not drive in straight lines when chased.</b> Weaving makes the gumballs miss, and the arena's corners and toys break line of sight and stop rockets.</li>
+</ul>
+
+<h2>What's in it</h2>
+<p><b>Four items</b> from the ? boxes. Rockets and the gumball gun turn up most often, mines and the Boing Wave a little less.</p>
+<ul>
+<li><b>ROCKET</b>: one shot that steers gently towards the nearest kart in front of you and explodes on contact. A hit close to the blast takes all 100 health; the edge of the blast takes 60.</li>
+<li><b>GUMBALL GUN</b>: 12 quick shots of 14 damage each. Line up behind a kart and keep firing.</li>
+<li><b>POP MINE</b>: you get two, dropped behind you. They take a moment to arm, then blink to warn others. A close blast takes all 100 health; further out, 70.</li>
+<li><b>BOING WAVE</b>: a shockwave around your kart that knocks every nearby kart away, for 100 damage close in and 60 further out.</li>
+</ul>
+<p>Rockets and mines never hurt the kart that fired them in their blast. KO streaks are called out on screen: KO!, DOUBLE KO!, TRIPLE KO! and RAMPAGE! for four or more in a row. A kill feed lists every knockout.</p>
+<p>KOs and where you finish earn XP, and levelling up unlocks <b>eight paint jobs</b> for your kart: Cherry, Sky (level 2), Lime (3), Tangerine (4), Grape (6), Bubblegum (8), Gold Rush (10) and Midnight (13). Pick them in the garage, which also shows your level, wins, matches played and best number of KOs in one match. The bots get sharper as your level rises.</p>
+<p>Everything is made to look like shiny plastic toys, with clear-coat reflections, a studded baseplate floor and oversized toys around the arena.</p>
+
+<h2>Behind the game</h2>
+<p>The karts are built for arcade fun rather than racing. Each one has a top speed, quick acceleration and a short grip delay, so it slides a little when you turn hard at speed. Steering only works when you are moving, which keeps parked karts from spinning on the spot.</p>
+<p>The bots head for the nearest ? box when they are empty-handed, then go hunting. They only fire when their target is close to straight ahead, and how tight that aim needs to be, and how quickly they pull the trigger, depends on their skill. Each match sets the bots' skill from your level, with a little random spread between them, so some rivals are sharper than others. By level 13 they are close to their best.</p>
+<p>XP for a match is 25 for every KO, plus a bonus for your finishing place (the higher you finish, the bigger it is), plus 20 just for playing. Each new level needs 60 XP more than the last, starting at 160 for level 2.</p>
+
+<h2>Questions</h2>
+<h3>Do I need an account?</h3>
+<p>No. Your level, XP, stats and paint jobs are saved in your browser.</p>
+<h3>How do I change my paint job?</h3>
+<p>Press <kbd>Esc</kbd> for the garage menu and click any paint you have unlocked. Locked ones show the level they need.</p>
+<h3>Can I play on a phone?</h3>
+<p>Yes: a thumb stick on the left to drive and a FIRE button on the right. Push the stick forward to speed up and pull it back to brake or reverse.</p>
+<h3>Is it multiplayer?</h3>
+<p>No. The five rival karts are played by the computer.</p>
+<h3>Is it violent?</h3>
+<p>No. They are toy karts, and a knocked-out kart simply comes back.</p></article>
+
+        <div id="ad-play-footer"></div>
+
+        <!-- the rail that keeps a session going: a player who finishes
+             one game and sees eight more is worth several page views -->
+        <div id="alsorows"></div>
+      </div>
+
+      <aside class="side">
+        <div id="ad-play-rail"></div>
+        <div class="panel">
+          <h4>More games</h4>
+          <div id="more"><a class="mini" href="/play/moto-stunt-motorbike-game/"><span class="th" style="background-image:url('/shots/t/moto-stunt.webp')"></span><span><b>MOTO STUNT</b><small>Driving</small></span></a><a class="mini" href="/play/drift-tower-one-button-game/"><span class="th" style="background-image:url('/shots/t/drift-tower.webp')"></span><span><b>DRIFT TOWER</b><small>Driving</small></span></a><a class="mini" href="/play/eggy-road-egg-truck-driving-game/"><span class="th" style="background-image:url('/shots/t/eggy-road.webp')"></span><span><b>EGGY ROAD</b><small>Driving</small></span></a><a class="mini" href="/play/stunt-city-car-game/"><span class="th" style="background-image:url('/shots/t/stunt-city.webp')"></span><span><b>STUNT CITY</b><small>Driving</small></span></a><a class="mini" href="/play/rush-hour-traffic-racer-game/"><span class="th" style="background-image:url('/shots/t/rush-hour.webp')"></span><span><b>RUSH HOUR</b><small>Driving</small></span></a></div>
+        </div>
+        <div id="ad-play-tall"></div>
+      </aside>
+    </div>
+
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">100 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/devlog/">Dev log</a><a href="/articles/">Articles</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<!-- the loading interstitial: over a game that is LOADING, never one
+     that is being played, and it always has a skip -->
+<div class="gate" id="gate">
+  <div class="box">
+    <h3>Advertisement</h3>
+    <div data-ad></div>
+    <div class="count">your game starts in 5</div>
+    <button class="btn ghost" type="button">Skip</button>
+  </div>
+</div>
+
+<script type="module">
+import { GAMES, bySlug } from '/site/catalogue.js';
+import { seoSlug } from '/site/seo.js';
+import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
+import { loadAds, slot, interstitial } from '/ads/ads.js';
+import { mountPlay, trackPlay } from '/site/progress.js';
+
+// THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
+// server.js rewrites /play/<slug> to this file, and tools/deploy.mjs
+// writes this same file out to /play/<slug>/index.html for the static
+// host. Both leave the slug exactly where this line looks for it.
+const slug = location.pathname.split('/').filter(Boolean).pop();
+const g = bySlug(slug) || GAMES.find((x) => seoSlug(x) === slug);
+if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
+
+mountShell({ active: catOf(g) });
+mountPlay(document.getElementById('ppplay'), g.slug);
+
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
+
+ttl.textContent = g.title;
+h1.textContent = g.title;
+barttl.textContent = g.title;
+lede.textContent = g.blurb;
+blurb.textContent = g.blurb;
+about.innerHTML = aboutHtml(g);
+tip.textContent = g.tips;
+shotbg.src = '/shots/h/' + g.slug + '.webp'; shotbg.alt = g.title + ' gameplay screenshot';
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
+tags.innerHTML = [catOf(g), ...(g.tags || [])]
+  .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
+  .join('');
+
+// ---- where does this game actually come from? -----------------------
+//
+// ON THE WEB, NOWHERE BUT HERE. Every game is a folder under /games/,
+// the big ones included, which is why they now ask for their own files
+// by relative path rather than off the web root.
+//
+// ON THIS MACHINE they are still separate servers on separate ports,
+// because that is where they are developed and nothing about that should
+// have to change to suit a website. A port that is not answering shows
+// the browser's own error page inside the frame, which reads as the site
+// being broken - so that case asks first and says so plainly.
+//
+// WHICH OF THE TWO is decided at BUILD time rather than by sniffing the
+// hostname: tools/deploy.mjs stamps this flag into the copy it writes.
+const WEB = !!window.__PLAYPILE_WEB;
+let src = null, note = '';
+if (g.how === 'mounted' && WEB && g.web) {
+  src = '/games/' + g.web;
+  note = 'runs here';
+} else if (g.how === 'local') {
+  src = '/games/' + g.slug + '/';
+  note = 'runs here';
+} else if (g.how === 'unity') {
+  src = '/games/' + g.slug + '/build/index.html';
+  note = 'unity webgl · 83 mb first load';
+  warn.textContent = 'First load is a big download. It is cached after that.';
+} else {
+  src = 'http://localhost:' + g.port + (g.url || '/');
+  note = 'localhost:' + g.port;
+  try {
+    const list = await (await fetch('/api/mounted')).json();
+    const m = list.find((x) => x.slug === g.slug);
+    if (!m || m.state !== 'up') {
+      warn.innerHTML = 'This one runs from its own folder and is not up. '
+        + 'Start PLAYPILE with <code>node server.js</code> and it boots with the site.';
+    }
+  } catch (e) {}
+}
+how.textContent = note;
+
+start.addEventListener('click', async () => {
+  start.disabled = true;
+  await interstitial();          // the ad slot that pays, while it loads
+  frame.src = src;
+  frame.hidden = false;
+  // a play counts when the game is actually started, not when the page is opened
+  remember(g.slug);
+  trackPlay(g.slug);
+  curtain.style.display = 'none';
+  setTimeout(() => { try { frame.focus(); } catch (e) {} }, 400);
+  if (TOUCH) mobileFull(true);
+});
+// ---- phones: fill the whole screen, real fullscreen + landscape lock where the browser allows ----
+const TOUCH = (navigator.maxTouchPoints > 0 || 'ontouchstart' in window) && matchMedia('(pointer: coarse)').matches;
+const UPRIGHT = /^(crossing|drifter|hoops|merge|pipeworks|quickdraw|spike|stack|sweep|block-royale|helix-drop|stack-attack|subway-run|tunnel-dive|slope-rush|drift-tower|word-blitz|prism|one-tile|sushi-conveyor|bubble-trouble|firework-frenzy|stick-swing|golf-orbit|parry)$/;
+const stageEl = document.getElementById('stage');
+const mexit = document.createElement('button');
+mexit.className = 'mexit'; mexit.type = 'button'; mexit.textContent = '✕'; mexit.setAttribute('aria-label', 'Exit full screen');
+stageEl.appendChild(mexit);
+function mobileFull(on) {
+  stageEl.classList.toggle('mfull', on); document.body.classList.toggle('mfull-on', on);
+  if (on) {
+    const rq = stageEl.requestFullscreen || stageEl.webkitRequestFullscreen;
+    try { const r = rq && rq.call(stageEl, { navigationUI: 'hide' });
+      if (r && r.then) r.then(() => { if (!UPRIGHT.test(g.slug) && screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {}); }).catch(() => {});
+    } catch (e) {}
+  } else {
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  }
+  // games size themselves on resize; nudge them once the new box has settled
+  setTimeout(() => { try { frame.contentWindow.dispatchEvent(new Event('resize')); } catch (e) {} }, 350);
+}
+mexit.addEventListener('click', () => mobileFull(false));
+full.addEventListener('click', () => {
+  if (TOUCH) { mobileFull(!stageEl.classList.contains('mfull')); return; }
+  const el = document.getElementById('stage');
+  if (document.fullscreenElement) document.exitFullscreen();
+  else el.requestFullscreen && el.requestFullscreen();
+});
+reload.addEventListener('click', () => { if (frame.src) frame.src = frame.src; });
+// the two shortcuts the stage bar advertises, so they are not a lie
+addEventListener('keydown', (e) => {
+  if (e.target.matches('input,textarea')) return;
+  if (e.key === 'f' || e.key === 'F') full.click();
+  if (e.key === 'r' || e.key === 'R') reload.click();
+});
+
+// ---- more games, which is the other half of running a portal --------
+// Somebody who finishes a game and closes the tab is worth one page
+// view. The rail beside the game is five, chosen from the same category
+// first, and the row below it is everything else.
+const others = GAMES.filter((x) => x.slug !== g.slug);
+const same = others.filter((x) => catOf(x) === catOf(g));
+const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
+
+document.getElementById('alsorows').innerHTML =
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
+  + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
+
+// ---- adverts: every slot that existed before, in the same place -----
+await loadAds();
+slot(document.getElementById('ad-play-rail'), 'play_rail');
+slot(document.getElementById('ad-play-tall'), 'play_tall');
+slot(document.getElementById('ad-play-footer'), 'play_footer');
+</script>
+</body>
+</html>

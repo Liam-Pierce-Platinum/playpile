@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DUNGEON QUEST — Free Retro Dungeon Crawler Game Online | PLAYPILE</title>
+<meta name="description" content="An N64 dungeon crawler: four levels, three classes, and a black dragon at the end. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/dungeon-quest-retro-crawler-game/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="DUNGEON QUEST — PLAYPILE">
+<meta property="og:description" content="An N64 dungeon crawler: four levels, three classes, and a black dragon at the end. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/dungeon-quest-retro-crawler-game/">
+<meta property="og:image" content="https://playpile.net/shots/dungeon-quest.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"DUNGEON QUEST","url":"https://playpile.net/play/dungeon-quest-retro-crawler-game/","image":"https://playpile.net/shots/dungeon-quest.png","description":"An N64 dungeon crawler: four levels, three classes, and a black dragon at the end.","genre":"Adventure","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"contentRating":"Fantasy combat with swords, bows and magic against monsters and a dragon, in a blocky retro style.","publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Adventure","item":"https://playpile.net/free-adventure-games/"},{"@type":"ListItem","position":3,"name":"DUNGEON QUEST","item":"https://playpile.net/play/dungeon-quest-retro-crawler-game/"}]}</script>
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<link rel="stylesheet" href="/site/progress.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#050a14">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+<a class="skip" href="#stage">Skip to the game</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/free-adventure-games/">Adventure</a><i>&rsaquo;</i><b>DUNGEON QUEST</b></nav>
+    <!-- NO ADVERT ABOVE THE GAME (removed 2026-10-07). It sat 16px over the
+         stage and its Play button - AdSense's "ads interfering" policy bars
+         ads beside action items where they draw accidental clicks, and a
+         click near the top edge of a running game could land on it. -->
+
+    <div class="play">
+      <div>
+        <!-- THE GAME DOES NOT LOAD UNTIL IT IS ASKED FOR.
+             Several of these are heavy, and a page that starts
+             downloading a game the moment it opens costs the player the
+             whole download for a click they might not make. The iframe
+             has no src until START. -->
+        <div class="stage" id="stage">
+          <iframe id="frame" title="game" allow="autoplay; fullscreen; gamepad; pointer-lock"
+                  allowfullscreen hidden></iframe>
+          <div class="curtain" id="curtain">
+            <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
+            <h2 id="ttl">DUNGEON QUEST</h2>
+            <p id="lede">An N64 dungeon crawler: four level , three cla e , and a black dragon at the end.</p>
+            <button class="btn" id="start">Play</button>
+            <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
+          </div>
+        </div>
+
+        <div class="stagebar">
+          <span class="title" id="barttl">DUNGEON QUEST</span>
+          <span class="where" id="how"></span>
+          <span class="sp"></span>
+          <button id="full" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
+            Fullscreen <kbd>F</kbd></button>
+          <button id="reload" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+            Restart <kbd>R</kbd></button>
+          <a class="lnk" href="/">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>
+            All games</a>
+        </div>
+
+        <!-- YOUR NUMBERS FOR THIS GAME, favourite, today's challenge and the
+             leaderboard. Between the stage bar and the text, well away from
+             every ad slot (those are in the side column and after the guide). -->
+        <div class="pp-play" id="ppplay"></div>
+
+        <section class="about">
+          <h1 id="h1">DUNGEON QUEST</h1>
+          <p class="lede" id="blurb">An N64 dungeon crawler: four level , three cla e , and a black dragon at the end.</p>
+          <div id="about"><p>A forest between the cliffs, a mine shaft, a frozen mountain that actually climbs, and a ledge on a black cliff - then the dragon that took the kingdom. Knight, archer or wizard, told in cutscenes, with every enemy wind-up telegraphed on the ground before it lands. Plug in an N64 controller and that works too.</p>
+<p class="advisory"><b>What is in it:</b> Fantasy combat with swords, bows and magic against monsters and a dragon, in a blocky retro style. <a href="/site/parents.html">More for parents</a></p>
+<p class="report"><a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20problem%20with%20DUNGEON%20QUEST">Report a problem with this game</a></p></div>
+          <h4>Controls</h4>
+          <ul class="keys" id="keys"><li><kbd>W A S D</kbd><span>move</span></li><li><kbd>Arrows</kbd><span>jump · block · attack · special</span></li><li><kbd>Shift / C</kbd><span>run · crouch</span></li><li><kbd>Space</kbd><span>pick up · open · talk</span></li><li><kbd>1 2 3</kbd><span>potion · throw · eat</span></li><li><kbd>E / M / Tab</kbd><span>satchel · map · target</span></li></ul>
+          <div class="tip" id="tip">The dragon tells you which way to move: an orange tail sweep is jumped, green breath is dodged sideways.</div>
+          <h4>Tags</h4>
+          <div class="tagrow" id="tags"><a class="chip on" href="/free-adventure-games/">Adventure</a><a class="chip" href="/#q=rpg">rpg</a><a class="chip" href="/#q=dungeon">dungeon</a><a class="chip" href="/#q=retro">retro</a><a class="chip" href="/#q=3d">3d</a><a class="chip" href="/#q=dragon">dragon</a><a class="chip" href="/#q=n64">n64</a></div>
+        </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>Dungeon Quest is a campaign of four levels, each ending in a dragon. You pick a knight, a wizard or an archer, walk the level, clear it, and fight the dragon at the far end. A gate holds you short of each dragon's arena until every enemy in the level is dead, so you cannot simply run past the fighting.</p>
+<p>The levels are the forest between the cliffs (the green dragon), the mine shaft (the red dragon), the frozen mountain (the ice dragon) and the black cliff (the black dragon). Clearing a level unlocks the next. Boss fights come in waves: at each quarter of a dragon's health more enemies join it, and the dragon keeps attacking while you deal with them.</p>
+<p>Shrines along the road light up as you pass them. When you die you choose to restart the level from the top or resume at the last shrine. Resuming is not a shortcut: everything you killed since that shrine stands up again, and everything still alive walks back to where it started. Coin, upgrades, artifacts and maps are kept through every death.</p>
+<p>Plug in a second controller and the screen splits for two players. Player two gets a different class from player one.</p>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li>Learn the dodge first. Double-tapping <kbd>A</kbd> or <kbd>D</kbd> darts you sideways with any class. It is the main answer to dragon breath.</li>
+<li>The knight's shield cuts a blow to one eighth of its damage, against roughly half for the wizard and archer. It does nothing against being frozen: ice sets around you, costs a point of health a second, and you have to struggle out.</li>
+<li>Physical wind-ups last 45% longer when you play the knight, because he has to fight inside reach. Arrows and dragonfire are not slowed for anyone.</li>
+<li>The archer starts with a 12-arrow quiver and arrows only come back from bodies and the ground. Stand over a body and hold <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> together for three seconds to pull them out. Throwing a potion with <kbd>2</kbd> dips the next five arrows instead: a firebomb makes flame arrows, poison makes poison arrows.</li>
+<li>The wizard's orb costs 15 mana from a pool of 100 that refills slowly. Holding both arrow keys adds 3 mana a second; do it between fights.</li>
+<li>Crouch with <kbd>C</kbd> in tall grass to stay hidden. The forest splits twice into a guarded camp and a quiet grassy route, and camps raise the alarm together if one guard sees you.</li>
+<li>Buy the map in the mine. It costs 300 coin from that level's merchant and marks shrines, taverns, unopened chests and the dragon's chamber, which nothing else points to.</li>
+</ul>
+
+<h2>What's in it</h2>
+<p>Four levels and four dragons, a story told in cutscenes, and three classes with their own upgrade trees. Five upgrades are shared by every class (Vitality, Might, Swiftness, Fortune and Shadow), and each class has three of its own plus a 420-coin mastery: the knight's Execution, which finishes any ordinary enemy outright, the wizard's Firestorm, and the archer's Volley of three homing arrows.</p>
+<ul>
+<li>Six hidden artifacts with permanent bonuses, which taverns will also sell if you missed them.</li>
+<li>Taverns where 20 coin buys a full rest: health, mana and arrows all refilled.</li>
+<li>A mirror in each tavern, where armour, hats, robes and boots cost 10 coin a piece.</li>
+<li>A spell book for the wizard at 185 coin, then five spells bought separately: Creeping Rot, Seeker, Rime, Ember Brand and Mending Light.</li>
+</ul>
+
+<h2>Questions</h2>
+<h3>Does my progress save?</h3>
+<p>Yes. Coin, upgrades, artifacts, maps, outfits, spells and unlocked levels are saved in your browser and survive a reload. The sidebar has a button to reset everything.</p>
+<h3>What happens after the black dragon?</h3>
+<p>The kingdom reopens with its people back in it and nothing hostile left, so you can walk the levels in peace. A dragon outfit piece unlocks for every class, and the black dragon drops a golden key.</p>
+<h3>What is the golden key for?</h3>
+<p>There is a secret at the start of the first valley. Look for rock you can walk through. What the key opens lets you play the whole campaign again from the air.</p>
+<h3>Can I use a controller?</h3>
+<p>Yes. An N64 controller works alongside the keyboard: the C buttons are jump, block, attack and special, Z runs and R crouches. A second pad turns on split-screen two-player.</p>
+<h3>Does it work on a phone?</h3>
+<p>There are no touch controls, so you need a keyboard or a gamepad.</p></article>
+
+        <div id="ad-play-footer"></div>
+
+        <!-- the rail that keeps a session going: a player who finishes
+             one game and sees eight more is worth several page views -->
+        <div id="alsorows"></div>
+      </div>
+
+      <aside class="side">
+        <div id="ad-play-rail"></div>
+        <div class="panel">
+          <h4>More games</h4>
+          <div id="more"><a class="mini" href="/play/block-world-voxel-parkour-game/"><span class="th" style="background-image:url('/shots/t/block-world.webp')"></span><span><b>BLOCK WORLD</b><small>Adventure</small></span></a><a class="mini" href="/play/sky-climb-tower-climbing-game/"><span class="th" style="background-image:url('/shots/t/sky-climb.webp')"></span><span><b>SKY CLIMB</b><small>Adventure</small></span></a><a class="mini" href="/play/deep-dive-submarine-rescue-game/"><span class="th" style="background-image:url('/shots/t/deep-dive.webp')"></span><span><b>DEEP DIVE</b><small>Adventure</small></span></a><a class="mini" href="/play/tiny-knight-action-rpg-game/"><span class="th" style="background-image:url('/shots/t/tiny-knight.webp')"></span><span><b>TINY KNIGHT</b><small>Adventure</small></span></a><a class="mini" href="/play/chibi-clash-monster-battle-game/"><span class="th" style="background-image:url('/shots/t/chibi-clash.webp')"></span><span><b>CHIBI CLASH</b><small>Adventure</small></span></a></div>
+        </div>
+        <div id="ad-play-tall"></div>
+      </aside>
+    </div>
+
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">100 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/devlog/">Dev log</a><a href="/articles/">Articles</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<!-- the loading interstitial: over a game that is LOADING, never one
+     that is being played, and it always has a skip -->
+<div class="gate" id="gate">
+  <div class="box">
+    <h3>Advertisement</h3>
+    <div data-ad></div>
+    <div class="count">your game starts in 5</div>
+    <button class="btn ghost" type="button">Skip</button>
+  </div>
+</div>
+
+<script type="module">
+import { GAMES, bySlug } from '/site/catalogue.js';
+import { seoSlug } from '/site/seo.js';
+import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
+import { loadAds, slot, interstitial } from '/ads/ads.js';
+import { mountPlay, trackPlay } from '/site/progress.js';
+
+// THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
+// server.js rewrites /play/<slug> to this file, and tools/deploy.mjs
+// writes this same file out to /play/<slug>/index.html for the static
+// host. Both leave the slug exactly where this line looks for it.
+const slug = location.pathname.split('/').filter(Boolean).pop();
+const g = bySlug(slug) || GAMES.find((x) => seoSlug(x) === slug);
+if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
+
+mountShell({ active: catOf(g) });
+mountPlay(document.getElementById('ppplay'), g.slug);
+
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
+
+ttl.textContent = g.title;
+h1.textContent = g.title;
+barttl.textContent = g.title;
+lede.textContent = g.blurb;
+blurb.textContent = g.blurb;
+about.innerHTML = aboutHtml(g);
+tip.textContent = g.tips;
+shotbg.src = '/shots/h/' + g.slug + '.webp'; shotbg.alt = g.title + ' gameplay screenshot';
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
+tags.innerHTML = [catOf(g), ...(g.tags || [])]
+  .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
+  .join('');
+
+// ---- where does this game actually come from? -----------------------
+//
+// ON THE WEB, NOWHERE BUT HERE. Every game is a folder under /games/,
+// the big ones included, which is why they now ask for their own files
+// by relative path rather than off the web root.
+//
+// ON THIS MACHINE they are still separate servers on separate ports,
+// because that is where they are developed and nothing about that should
+// have to change to suit a website. A port that is not answering shows
+// the browser's own error page inside the frame, which reads as the site
+// being broken - so that case asks first and says so plainly.
+//
+// WHICH OF THE TWO is decided at BUILD time rather than by sniffing the
+// hostname: tools/deploy.mjs stamps this flag into the copy it writes.
+const WEB = !!window.__PLAYPILE_WEB;
+let src = null, note = '';
+if (g.how === 'mounted' && WEB && g.web) {
+  src = '/games/' + g.web;
+  note = 'runs here';
+} else if (g.how === 'local') {
+  src = '/games/' + g.slug + '/';
+  note = 'runs here';
+} else if (g.how === 'unity') {
+  src = '/games/' + g.slug + '/build/index.html';
+  note = 'unity webgl · 83 mb first load';
+  warn.textContent = 'First load is a big download. It is cached after that.';
+} else {
+  src = 'http://localhost:' + g.port + (g.url || '/');
+  note = 'localhost:' + g.port;
+  try {
+    const list = await (await fetch('/api/mounted')).json();
+    const m = list.find((x) => x.slug === g.slug);
+    if (!m || m.state !== 'up') {
+      warn.innerHTML = 'This one runs from its own folder and is not up. '
+        + 'Start PLAYPILE with <code>node server.js</code> and it boots with the site.';
+    }
+  } catch (e) {}
+}
+how.textContent = note;
+
+start.addEventListener('click', async () => {
+  start.disabled = true;
+  await interstitial();          // the ad slot that pays, while it loads
+  frame.src = src;
+  frame.hidden = false;
+  // a play counts when the game is actually started, not when the page is opened
+  remember(g.slug);
+  trackPlay(g.slug);
+  curtain.style.display = 'none';
+  setTimeout(() => { try { frame.focus(); } catch (e) {} }, 400);
+  if (TOUCH) mobileFull(true);
+});
+// ---- phones: fill the whole screen, real fullscreen + landscape lock where the browser allows ----
+const TOUCH = (navigator.maxTouchPoints > 0 || 'ontouchstart' in window) && matchMedia('(pointer: coarse)').matches;
+const UPRIGHT = /^(crossing|drifter|hoops|merge|pipeworks|quickdraw|spike|stack|sweep|block-royale|helix-drop|stack-attack|subway-run|tunnel-dive|slope-rush|drift-tower|word-blitz|prism|one-tile|sushi-conveyor|bubble-trouble|firework-frenzy|stick-swing|golf-orbit|parry)$/;
+const stageEl = document.getElementById('stage');
+const mexit = document.createElement('button');
+mexit.className = 'mexit'; mexit.type = 'button'; mexit.textContent = '✕'; mexit.setAttribute('aria-label', 'Exit full screen');
+stageEl.appendChild(mexit);
+function mobileFull(on) {
+  stageEl.classList.toggle('mfull', on); document.body.classList.toggle('mfull-on', on);
+  if (on) {
+    const rq = stageEl.requestFullscreen || stageEl.webkitRequestFullscreen;
+    try { const r = rq && rq.call(stageEl, { navigationUI: 'hide' });
+      if (r && r.then) r.then(() => { if (!UPRIGHT.test(g.slug) && screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {}); }).catch(() => {});
+    } catch (e) {}
+  } else {
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  }
+  // games size themselves on resize; nudge them once the new box has settled
+  setTimeout(() => { try { frame.contentWindow.dispatchEvent(new Event('resize')); } catch (e) {} }, 350);
+}
+mexit.addEventListener('click', () => mobileFull(false));
+full.addEventListener('click', () => {
+  if (TOUCH) { mobileFull(!stageEl.classList.contains('mfull')); return; }
+  const el = document.getElementById('stage');
+  if (document.fullscreenElement) document.exitFullscreen();
+  else el.requestFullscreen && el.requestFullscreen();
+});
+reload.addEventListener('click', () => { if (frame.src) frame.src = frame.src; });
+// the two shortcuts the stage bar advertises, so they are not a lie
+addEventListener('keydown', (e) => {
+  if (e.target.matches('input,textarea')) return;
+  if (e.key === 'f' || e.key === 'F') full.click();
+  if (e.key === 'r' || e.key === 'R') reload.click();
+});
+
+// ---- more games, which is the other half of running a portal --------
+// Somebody who finishes a game and closes the tab is worth one page
+// view. The rail beside the game is five, chosen from the same category
+// first, and the row below it is everything else.
+const others = GAMES.filter((x) => x.slug !== g.slug);
+const same = others.filter((x) => catOf(x) === catOf(g));
+const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
+
+document.getElementById('alsorows').innerHTML =
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
+  + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
+
+// ---- adverts: every slot that existed before, in the same place -----
+await loadAds();
+slot(document.getElementById('ad-play-rail'), 'play_rail');
+slot(document.getElementById('ad-play-tall'), 'play_tall');
+slot(document.getElementById('ad-play-footer'), 'play_footer');
+</script>
+</body>
+</html>

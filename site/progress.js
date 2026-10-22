@@ -25,6 +25,7 @@
 // TOASTS LIVE ON THE SITE PAGE, never inside the game's frame, at the top
 // centre (away from every ad slot), and a click on one only closes it.
 import { GAMES } from '/site/catalogue.js';
+import { playUrl } from '/site/seo.js';
 import { avatarSvg, getAvatar, avatarFor } from '/site/avatar.js';
 
 const K = { stats: 'pd.site.stats', badges: 'pd.site.badges', daily: 'pd.site.daily', favs: 'pd.site.favs' };
@@ -295,7 +296,7 @@ export function toast(title, sub, icon) {
 // ---------------------------------------------------------------------
 const shot = (g) => '<img src="/shots/t/' + g.slug + '.webp" alt="" width="640" height="360" loading="lazy" decoding="async" onerror="this.remove()">';
 function miniCard(g, meta) {
-  return '<a class="card" href="/play/' + g.slug + '/" title="' + esc(g.title) + '">'
+  return '<a class="card" href="' + playUrl(g) + '" title="' + esc(g.title) + '">'
     + '<span class="thumb"><span class="ph">' + esc(g.title.slice(0, 2)) + '</span>' + shot(g)
     + '<span class="badge">' + esc(catOf(g)) + '</span><span class="hover"><span>PLAY</span></span></span>'
     + '<span class="cname">' + esc(g.title) + '</span><span class="cmeta">' + meta + '</span></a>';
@@ -305,7 +306,7 @@ const recentSlugs = () => rd('pd.recent', []).filter((s) => bySlug(s));
 export function dailyCardHtml(t = daily()) {
   if (!t.game) return '';
   const g = t.game;
-  return '<a class="pp-daily' + (t.done ? ' done' : '') + '" href="/play/' + g.slug + '/">'
+  return '<a class="pp-daily' + (t.done ? ' done' : '') + '" href="' + playUrl(g) + '">'
     + '<span class="pp-dshot">' + shot(g) + '</span>'
     + '<span class="pp-dbody">'
     + '<span class="pp-kick">Daily challenge &middot; ' + esc(new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })) + '</span>'
@@ -466,7 +467,7 @@ export function mountMe(el) {
       + (rec.length ? '<section class="row"><div class="rowhead"><h2>Recently played</h2><span class="n">' + rec.length + '</span></div>'
         + '<div class="strip">' + rec.map((x) => { const g = s.games[x]; return miniCard(bySlug(x), g ? ago(g.last || Date.now()) : 'played recently'); }).join('') + '</div></section>' : '')
       + (top.length ? '<section class="row"><div class="rowhead"><h2>Most played</h2></div><ol class="pp-top">'
-        + top.map(([k, v]) => '<li><a href="/play/' + k + '/">' + esc(bySlug(k).title) + '</a><span>' + fmtTime(v.secs || 0)
+        + top.map(([k, v]) => '<li><a href="' + playUrl(bySlug(k)) + '">' + esc(bySlug(k).title) + '</a><span>' + fmtTime(v.secs || 0)
           + ' &middot; ' + v.plays + ' ' + (v.plays === 1 ? 'session' : 'sessions') + (hasScore(k) && best(k) ? ' &middot; best ' + best(k).toLocaleString() : '') + '</span></li>').join('')
         + '</ol></section>' : '')
       + '<p class="pp-fine">XP comes from time spent playing (two a minute, while the page is open and in front of you, up to 30 minutes per game per day), '

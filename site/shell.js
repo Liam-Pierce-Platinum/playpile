@@ -23,6 +23,7 @@
 // which works identically on localhost:8170 and on playpile.net, is
 // bookmarkable, and never 404s.
 import { GAMES } from '/site/catalogue.js';
+import { playUrl, catUrl, kwOf } from '/site/seo.js';
 
 // ---------------------------------------------------------------------
 // ICONS
@@ -130,11 +131,11 @@ export function remember(slug) {
 // file is missing - so a game with no screenshot yet still shows a
 // deliberate looking tile instead of a broken image icon.
 const shot = (g) =>
-  '<img src="/shots/t/' + g.slug + '.webp" alt="" width="640" height="360" loading="lazy" decoding="async" onerror="this.remove()"'
+  '<img src="/shots/t/' + g.slug + '.webp" alt="' + (g.title + ' - ' + kwOf(g)).replace(/"/g, '') + '" width="640" height="360" loading="lazy" decoding="async" onerror="this.remove()"'
   + ' onload="if(this.naturalHeight>this.naturalWidth)this.classList.add(\'tall\')">';
 
 export function card(g) {
-  return '<a class="card" href="/play/' + g.slug + '/" title="' + g.title + '">'
+  return '<a class="card" href="' + playUrl(g) + '" title="' + g.title + '">'
     + '<span class="thumb">'
     + '<span class="ph">' + g.title.slice(0, 2) + '</span>'
     + shot(g)
@@ -148,7 +149,7 @@ export function card(g) {
 }
 
 export function tile(g) {
-  return '<a class="tile" href="/play/' + g.slug + '/" title="' + g.title + '">'
+  return '<a class="tile" href="' + playUrl(g) + '" title="' + g.title + '">'
     + '<span class="ph">' + g.title.slice(0, 2) + '</span>'
     + shot(g)
     + '<span class="cap">' + g.title + '</span>'
@@ -198,7 +199,7 @@ export function mountShell({ active = '', onSearch = null } = {}) {
       + '</nav>'
       + '<div class="navhead">Categories</div><nav>';
     for (const c of categories()) {
-      html += link('/category/' + c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/', CAT_ICON[c.name] || 'grid',
+      html += link(catUrl(c.name), CAT_ICON[c.name] || 'grid',
                    c.name, c.count, active === c.name);
     }
     html += '</nav>'

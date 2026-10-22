@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ROOF RUN — Free Rooftop Runner Game Online | PLAYPILE</title>
+<meta name="description" content="Jump the gaps, slide under the neon signs and smash through glass towers as a sunset city speeds up beneath you. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/roof-run-rooftop-runner-game/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="ROOF RUN — PLAYPILE">
+<meta property="og:description" content="Jump the gaps, slide under the neon signs and smash through glass towers as a sunset city speeds up beneath you. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/roof-run-rooftop-runner-game/">
+<meta property="og:image" content="https://playpile.net/shots/roof-run.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"ROOF RUN","url":"https://playpile.net/play/roof-run-rooftop-runner-game/","image":"https://playpile.net/shots/roof-run.png","description":"Jump the gaps, slide under the neon signs and smash through glass towers as a sunset city speeds up beneath you.","genre":"Arcade","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"contentRating":"A cartoon rooftop runner with no violence: if you crash, your runner tumbles off the roof and you start again. Screen shake on crashes and glass smashes, but no flashing lights.","publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Arcade","item":"https://playpile.net/free-arcade-games/"},{"@type":"ListItem","position":3,"name":"ROOF RUN","item":"https://playpile.net/play/roof-run-rooftop-runner-game/"}]}</script>
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<link rel="stylesheet" href="/site/progress.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#050a14">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+<a class="skip" href="#stage">Skip to the game</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/free-arcade-games/">Arcade</a><i>&rsaquo;</i><b>ROOF RUN</b></nav>
+    <!-- NO ADVERT ABOVE THE GAME (removed 2026-10-07). It sat 16px over the
+         stage and its Play button - AdSense's "ads interfering" policy bars
+         ads beside action items where they draw accidental clicks, and a
+         click near the top edge of a running game could land on it. -->
+
+    <div class="play">
+      <div>
+        <!-- THE GAME DOES NOT LOAD UNTIL IT IS ASKED FOR.
+             Several of these are heavy, and a page that starts
+             downloading a game the moment it opens costs the player the
+             whole download for a click they might not make. The iframe
+             has no src until START. -->
+        <div class="stage" id="stage">
+          <iframe id="frame" title="game" allow="autoplay; fullscreen; gamepad; pointer-lock"
+                  allowfullscreen hidden></iframe>
+          <div class="curtain" id="curtain">
+            <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
+            <h2 id="ttl">ROOF RUN</h2>
+            <p id="lede">Jump the gap ,  lide under the neon  ign  and  ma h through gla  tower  a  a  un et city  peed  up beneath you.</p>
+            <button class="btn" id="start">Play</button>
+            <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
+          </div>
+        </div>
+
+        <div class="stagebar">
+          <span class="title" id="barttl">ROOF RUN</span>
+          <span class="where" id="how"></span>
+          <span class="sp"></span>
+          <button id="full" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
+            Fullscreen <kbd>F</kbd></button>
+          <button id="reload" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+            Restart <kbd>R</kbd></button>
+          <a class="lnk" href="/">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>
+            All games</a>
+        </div>
+
+        <!-- YOUR NUMBERS FOR THIS GAME, favourite, today's challenge and the
+             leaderboard. Between the stage bar and the text, well away from
+             every ad slot (those are in the side column and after the guide). -->
+        <div class="pp-play" id="ppplay"></div>
+
+        <section class="about">
+          <h1 id="h1">ROOF RUN</h1>
+          <p class="lede" id="blurb">Jump the gap ,  lide under the neon  ign  and  ma h through gla  tower  a  a  un et city  peed  up beneath you.</p>
+          <div id="about"><p>One button, one runner, one endless skyline. Tap to jump the gaps and hop the rooftop boxes, hold to slide under hanging neon signs, and run straight through the lit office floors of glass towers for a burst of speed and a shower of shards. The run keeps getting faster, and the sky turns from golden hour to dusk to neon night as you go.</p>
+<p>Every clean move feeds a combo that doubles and then triples your coins, and the coins you bank unlock four more runners: KITE jumps higher, SPARK pulls coins in like a magnet, GHOST can double jump, and NOVA makes every coin count double.</p>
+<p class="advisory"><b>What is in it:</b> A cartoon rooftop runner with no violence: if you crash, your runner tumbles off the roof and you start again. Screen shake on crashes and glass smashes, but no flashing lights. <a href="/site/parents.html">More for parents</a></p>
+<p class="report"><a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20problem%20with%20ROOF%20RUN">Report a problem with this game</a></p></div>
+          <h4>Controls</h4>
+          <ul class="keys" id="keys"><li><kbd>Tap / Space / click</kbd><span>jump</span></li><li><kbd>Hold</kbd><span>slide (in the air: drop fast)</span></li><li><kbd>Up / W</kbd><span>instant jump</span></li><li><kbd>Down / S / Shift</kbd><span>instant slide</span></li><li><kbd>P / Esc</kbd><span>pause</span></li><li><kbd>M</kbd><span>mute</span></li><li><kbd>Touch</kbd><span>tap to jump, hold to slide</span></li></ul>
+          <div class="tip" id="tip">Hold in the air to drop fast and land already sliding under a sign. Keep the combo alive: a new move every 3.2 seconds, and at 10 your coins count double.</div>
+          <h4>Tags</h4>
+          <div class="tagrow" id="tags"><a class="chip on" href="/free-arcade-games/">Arcade</a><a class="chip" href="/#q=runner">runner</a><a class="chip" href="/#q=one-button">one-button</a><a class="chip" href="/#q=endless">endless</a><a class="chip" href="/#q=parkour">parkour</a><a class="chip" href="/#q=mobile">mobile</a></div>
+        </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>ROOF RUN is a one-button runner across the rooftops of a sunset city. Your runner sprints to the right on their own and keeps getting faster. You only decide when to <b>jump</b> and when to <b>slide</b>. Your score is the distance you cover, in metres.</p>
+<p>A quick <b>tap</b> of <kbd>Space</kbd>, a click or a tap on the screen is a jump. Jumps fire when you let go, and a tap made just before you land is remembered and used the moment your feet touch the roof. <b>Hold</b> the same button to slide along a roof. Holding in the air makes you drop fast, and if you keep holding as you land you go straight into a slide. On a keyboard, <kbd>Up</kbd> or <kbd>W</kbd> jumps instantly and <kbd>Down</kbd>, <kbd>S</kbd> or <kbd>Shift</kbd> slides instantly. <kbd>P</kbd> or <kbd>Esc</kbd> pauses and <kbd>M</kbd> mutes.</p>
+<p>There are four things in your way. <b>Gaps</b> between buildings have to be jumped. <b>Low boxes</b> (air-conditioning units, crates and striped vents) have to be hopped. <b>Hanging neon signs</b>, with red and white stripes along the bottom edge, have to be slid under. And <b>glass towers</b> have a lit office floor you run straight through, smashing the pane at each end. Run into a box, a sign or the wall above a glass window and it is a <b>WIPEOUT</b>; miss a roof and <b>YOU FELL</b>.</p>
+
+<h2>Tips and strategy</h2>
+<p><b>Chain your moves.</b> Every clean action adds to your combo: GAP, HOP, SLIDE and SMASH!, plus CLOSE! for clearing a box with almost no room to spare and EDGE! for taking off right at the lip of a roof. The combo runs out if you go 3.2 seconds without a new action. At a combo of 10 your coins count double, and at 20 they count triple.</p>
+<p><b>Use fast-drop.</b> If a jump is carrying you over a sign you want to slide under, hold the button in the air to come down quickly and land already sliding.</p>
+<p><b>Do not let go too early under a sign.</b> If you release while a sign is still above you, you keep sliding until you are clear, and a tap made while sliding fires as soon as the sign has passed.</p>
+<p><b>Love the glass.</b> Running through a glass tower gives a burst of extra speed, a little freeze-frame and a shower of shards. Stay low as you go in: jumping into the wall above the window ends the run.</p>
+<p><b>Trust the gaps.</b> Every gap is built so it can be cleared with a normal jump at your current speed, so a late, panicked jump is worse than a calm one.</p>
+
+<h2>What's in it</h2>
+<p>An endless run that speeds up from a jog to a sprint more than twice as fast. The sky changes every 1200 metres through <b>GOLDEN HOUR</b>, <b>DUSK</b> and <b>NEON NIGHT</b>, then starts again, and there is a pop every 500 metres. A BEST flag stands on the roof where your record is, so you can see it coming.</p>
+<p>Coins you collect are banked at the end of each run and spent in the <b>RUNNERS</b> screen on four extra runners, each with a perk: <b>KITE</b> (250 coins) jumps 12% higher, <b>SPARK</b> (600) pulls nearby coins in like a magnet, <b>GHOST</b> (1200) can double jump with a tap in the air, and <b>NOVA</b> (2000) makes every coin count double. <b>DASH</b> is free.</p>
+<p>Your first two runs show prompts above each new hazard, and the first buildings always bring a box, then a sign, then a glass tower, so you meet every move in about ten seconds. Everything is drawn in code, with a layered skyline, a big synthwave sun and a synthwave soundtrack that speeds up with you.</p>
+
+<h2>Questions</h2>
+<p><b>Does it work on a phone?</b> Yes. Tap anywhere to jump and hold to slide. It also plays in portrait, with the view zoomed in a little.</p>
+<p><b>Do I need an account?</b> No. Your best distance, your coins and the runners you own are saved in your browser.</p>
+<p><b>Does it flash?</b> No. There is screen shake on crashes and when you smash glass, and a brief slow-motion moment when you wipe out, but no flashing lights.</p>
+<p><b>Is it violent?</b> No. When you crash, your runner tumbles off the roof and you start again.</p></article>
+
+        <div id="ad-play-footer"></div>
+
+        <!-- the rail that keeps a session going: a player who finishes
+             one game and sees eight more is worth several page views -->
+        <div id="alsorows"></div>
+      </div>
+
+      <aside class="side">
+        <div id="ad-play-rail"></div>
+        <div class="panel">
+          <h4>More games</h4>
+          <div id="more"><a class="mini" href="/play/slope-rush-runner-game/"><span class="th" style="background-image:url('/shots/t/slope-rush.webp')"></span><span><b>SLOPE RUSH</b><small>Arcade</small></span></a><a class="mini" href="/play/tunnel-dive-runner-game/"><span class="th" style="background-image:url('/shots/t/tunnel-dive.webp')"></span><span><b>TUNNEL DIVE</b><small>Arcade</small></span></a><a class="mini" href="/play/bridge-race-game/"><span class="th" style="background-image:url('/shots/t/bridge-race.webp')"></span><span><b>BRIDGE RACE</b><small>Arcade</small></span></a><a class="mini" href="/play/hole-feast-eating-game/"><span class="th" style="background-image:url('/shots/t/hole-feast.webp')"></span><span><b>HOLE FEAST</b><small>Arcade</small></span></a><a class="mini" href="/play/stick-swing-stickman-game/"><span class="th" style="background-image:url('/shots/t/stick-swing.webp')"></span><span><b>STICK SWING</b><small>Arcade</small></span></a></div>
+        </div>
+        <div id="ad-play-tall"></div>
+      </aside>
+    </div>
+
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">100 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/devlog/">Dev log</a><a href="/articles/">Articles</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<!-- the loading interstitial: over a game that is LOADING, never one
+     that is being played, and it always has a skip -->
+<div class="gate" id="gate">
+  <div class="box">
+    <h3>Advertisement</h3>
+    <div data-ad></div>
+    <div class="count">your game starts in 5</div>
+    <button class="btn ghost" type="button">Skip</button>
+  </div>
+</div>
+
+<script type="module">
+import { GAMES, bySlug } from '/site/catalogue.js';
+import { seoSlug } from '/site/seo.js';
+import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
+import { loadAds, slot, interstitial } from '/ads/ads.js';
+import { mountPlay, trackPlay } from '/site/progress.js';
+
+// THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
+// server.js rewrites /play/<slug> to this file, and tools/deploy.mjs
+// writes this same file out to /play/<slug>/index.html for the static
+// host. Both leave the slug exactly where this line looks for it.
+const slug = location.pathname.split('/').filter(Boolean).pop();
+const g = bySlug(slug) || GAMES.find((x) => seoSlug(x) === slug);
+if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
+
+mountShell({ active: catOf(g) });
+mountPlay(document.getElementById('ppplay'), g.slug);
+
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
+
+ttl.textContent = g.title;
+h1.textContent = g.title;
+barttl.textContent = g.title;
+lede.textContent = g.blurb;
+blurb.textContent = g.blurb;
+about.innerHTML = aboutHtml(g);
+tip.textContent = g.tips;
+shotbg.src = '/shots/h/' + g.slug + '.webp'; shotbg.alt = g.title + ' gameplay screenshot';
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
+tags.innerHTML = [catOf(g), ...(g.tags || [])]
+  .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
+  .join('');
+
+// ---- where does this game actually come from? -----------------------
+//
+// ON THE WEB, NOWHERE BUT HERE. Every game is a folder under /games/,
+// the big ones included, which is why they now ask for their own files
+// by relative path rather than off the web root.
+//
+// ON THIS MACHINE they are still separate servers on separate ports,
+// because that is where they are developed and nothing about that should
+// have to change to suit a website. A port that is not answering shows
+// the browser's own error page inside the frame, which reads as the site
+// being broken - so that case asks first and says so plainly.
+//
+// WHICH OF THE TWO is decided at BUILD time rather than by sniffing the
+// hostname: tools/deploy.mjs stamps this flag into the copy it writes.
+const WEB = !!window.__PLAYPILE_WEB;
+let src = null, note = '';
+if (g.how === 'mounted' && WEB && g.web) {
+  src = '/games/' + g.web;
+  note = 'runs here';
+} else if (g.how === 'local') {
+  src = '/games/' + g.slug + '/';
+  note = 'runs here';
+} else if (g.how === 'unity') {
+  src = '/games/' + g.slug + '/build/index.html';
+  note = 'unity webgl · 83 mb first load';
+  warn.textContent = 'First load is a big download. It is cached after that.';
+} else {
+  src = 'http://localhost:' + g.port + (g.url || '/');
+  note = 'localhost:' + g.port;
+  try {
+    const list = await (await fetch('/api/mounted')).json();
+    const m = list.find((x) => x.slug === g.slug);
+    if (!m || m.state !== 'up') {
+      warn.innerHTML = 'This one runs from its own folder and is not up. '
+        + 'Start PLAYPILE with <code>node server.js</code> and it boots with the site.';
+    }
+  } catch (e) {}
+}
+how.textContent = note;
+
+start.addEventListener('click', async () => {
+  start.disabled = true;
+  await interstitial();          // the ad slot that pays, while it loads
+  frame.src = src;
+  frame.hidden = false;
+  // a play counts when the game is actually started, not when the page is opened
+  remember(g.slug);
+  trackPlay(g.slug);
+  curtain.style.display = 'none';
+  setTimeout(() => { try { frame.focus(); } catch (e) {} }, 400);
+  if (TOUCH) mobileFull(true);
+});
+// ---- phones: fill the whole screen, real fullscreen + landscape lock where the browser allows ----
+const TOUCH = (navigator.maxTouchPoints > 0 || 'ontouchstart' in window) && matchMedia('(pointer: coarse)').matches;
+const UPRIGHT = /^(crossing|drifter|hoops|merge|pipeworks|quickdraw|spike|stack|sweep|block-royale|helix-drop|stack-attack|subway-run|tunnel-dive|slope-rush|drift-tower|word-blitz|prism|one-tile|sushi-conveyor|bubble-trouble|firework-frenzy|stick-swing|golf-orbit|parry)$/;
+const stageEl = document.getElementById('stage');
+const mexit = document.createElement('button');
+mexit.className = 'mexit'; mexit.type = 'button'; mexit.textContent = '✕'; mexit.setAttribute('aria-label', 'Exit full screen');
+stageEl.appendChild(mexit);
+function mobileFull(on) {
+  stageEl.classList.toggle('mfull', on); document.body.classList.toggle('mfull-on', on);
+  if (on) {
+    const rq = stageEl.requestFullscreen || stageEl.webkitRequestFullscreen;
+    try { const r = rq && rq.call(stageEl, { navigationUI: 'hide' });
+      if (r && r.then) r.then(() => { if (!UPRIGHT.test(g.slug) && screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {}); }).catch(() => {});
+    } catch (e) {}
+  } else {
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  }
+  // games size themselves on resize; nudge them once the new box has settled
+  setTimeout(() => { try { frame.contentWindow.dispatchEvent(new Event('resize')); } catch (e) {} }, 350);
+}
+mexit.addEventListener('click', () => mobileFull(false));
+full.addEventListener('click', () => {
+  if (TOUCH) { mobileFull(!stageEl.classList.contains('mfull')); return; }
+  const el = document.getElementById('stage');
+  if (document.fullscreenElement) document.exitFullscreen();
+  else el.requestFullscreen && el.requestFullscreen();
+});
+reload.addEventListener('click', () => { if (frame.src) frame.src = frame.src; });
+// the two shortcuts the stage bar advertises, so they are not a lie
+addEventListener('keydown', (e) => {
+  if (e.target.matches('input,textarea')) return;
+  if (e.key === 'f' || e.key === 'F') full.click();
+  if (e.key === 'r' || e.key === 'R') reload.click();
+});
+
+// ---- more games, which is the other half of running a portal --------
+// Somebody who finishes a game and closes the tab is worth one page
+// view. The rail beside the game is five, chosen from the same category
+// first, and the row below it is everything else.
+const others = GAMES.filter((x) => x.slug !== g.slug);
+const same = others.filter((x) => catOf(x) === catOf(g));
+const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
+
+document.getElementById('alsorows').innerHTML =
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
+  + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
+
+// ---- adverts: every slot that existed before, in the same place -----
+await loadAds();
+slot(document.getElementById('ad-play-rail'), 'play_rail');
+slot(document.getElementById('ad-play-tall'), 'play_tall');
+slot(document.getElementById('ad-play-footer'), 'play_footer');
+</script>
+</body>
+</html>

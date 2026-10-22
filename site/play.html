@@ -167,6 +167,7 @@
 
 <script type="module">
 import { GAMES, bySlug } from '/site/catalogue.js';
+import { seoSlug } from '/site/seo.js';
 import { mountShell, catOf, card, row, remember } from '/site/shell.js';
 import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
 import { loadAds, slot, interstitial } from '/ads/ads.js';
@@ -177,7 +178,7 @@ import { mountPlay, trackPlay } from '/site/progress.js';
 // writes this same file out to /play/<slug>/index.html for the static
 // host. Both leave the slug exactly where this line looks for it.
 const slug = location.pathname.split('/').filter(Boolean).pop();
-const g = bySlug(slug);
+const g = bySlug(slug) || GAMES.find((x) => seoSlug(x) === slug);
 if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
 
 mountShell({ active: catOf(g) });
@@ -196,7 +197,7 @@ lede.textContent = g.blurb;
 blurb.textContent = g.blurb;
 about.innerHTML = aboutHtml(g);
 tip.textContent = g.tips;
-shotbg.src = '/shots/' + g.slug + '.png';
+shotbg.src = '/shots/h/' + g.slug + '.webp'; shotbg.alt = g.title + ' gameplay screenshot';
 keys.innerHTML = keysHtml(g);
 tags.innerHTML = tagsHtml(g);
 if (!guide.textContent.trim()) {

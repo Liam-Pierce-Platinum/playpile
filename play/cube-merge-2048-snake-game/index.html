@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__PLAYPILE_WEB=1;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CUBE MERGE — Free 2048 Snake Merge Game Online | PLAYPILE</title>
+<meta name="description" content="A 2048 snake made of crystal number cubes. Eat cubes, fuse equal numbers and bite smaller snakes to reach 128, 256, 512 and beyond. Free to play in your browser - no download, no sign-up.">
+<link rel="canonical" href="https://playpile.net/play/cube-merge-2048-snake-game/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PLAYPILE">
+<meta property="og:title" content="CUBE MERGE — PLAYPILE">
+<meta property="og:description" content="A 2048 snake made of crystal number cubes. Eat cubes, fuse equal numbers and bite smaller snakes to reach 128, 256, 512 and beyond. Free to play in your browser - no download, no sign-up.">
+<meta property="og:url" content="https://playpile.net/play/cube-merge-2048-snake-game/">
+<meta property="og:image" content="https://playpile.net/shots/cube-merge.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"CUBE MERGE","url":"https://playpile.net/play/cube-merge-2048-snake-game/","image":"https://playpile.net/shots/cube-merge.png","description":"A 2048 snake made of crystal number cubes. Eat cubes, fuse equal numbers and bite smaller snakes to reach 128, 256, 512 and beyond.","genre":"Puzzle","gamePlatform":"Web browser","operatingSystem":"Any","applicationCategory":"Game","isAccessibleForFree":true,"contentRating":"Number cubes made of glowing crystal merge and shatter into star shards. No characters and no violence. Bright sparkles but no screen flashing.","publisher":{"@type":"Organization","name":"PLAYPILE","url":"https://playpile.net"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Games","item":"https://playpile.net/"},{"@type":"ListItem","position":2,"name":"Puzzle","item":"https://playpile.net/free-puzzle-games/"},{"@type":"ListItem","position":3,"name":"CUBE MERGE","item":"https://playpile.net/play/cube-merge-2048-snake-game/"}]}</script>
+<link rel="stylesheet" href="/site/style.css">
+<!-- the account button is somebody else's file; this page only holds the hole for it -->
+<link rel="stylesheet" href="/site/account.css">
+<link rel="stylesheet" href="/site/progress.css">
+<script type="module" src="/site/account.js"></script>
+<link rel="icon" href="/site/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/site/icon-180.png">
+<link rel="manifest" href="/site/manifest.webmanifest">
+<meta name="theme-color" content="#050a14">
+<!-- Google AdSense. Verbatim from the AdSense dashboard, on purpose:
+     this is the tag Google looks for when it verifies the site, so it
+     is pasted rather than generated. ads/ads.js notices it is already
+     here and does not add a second copy. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+<a class="skip" href="#stage">Skip to the game</a>
+
+<header class="top"><div class="bar">
+  <button class="burger" id="burger" type="button" aria-label="Categories">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
+  <a class="logo" href="/">PLAY<b>PILE</b></a>
+  <form class="search" id="searchForm" role="search" autocomplete="off">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
+    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
+  </form>
+  <div class="topright">
+    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
+    <div id="accountSlot"></div>
+  </div>
+</div></header>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <nav class="crumbs" id="crumbs"><a href="/">Games</a><i>&rsaquo;</i><a href="/free-puzzle-games/">Puzzle</a><i>&rsaquo;</i><b>CUBE MERGE</b></nav>
+    <!-- NO ADVERT ABOVE THE GAME (removed 2026-10-07). It sat 16px over the
+         stage and its Play button - AdSense's "ads interfering" policy bars
+         ads beside action items where they draw accidental clicks, and a
+         click near the top edge of a running game could land on it. -->
+
+    <div class="play">
+      <div>
+        <!-- THE GAME DOES NOT LOAD UNTIL IT IS ASKED FOR.
+             Several of these are heavy, and a page that starts
+             downloading a game the moment it opens costs the player the
+             whole download for a click they might not make. The iframe
+             has no src until START. -->
+        <div class="stage" id="stage">
+          <iframe id="frame" title="game" allow="autoplay; fullscreen; gamepad; pointer-lock"
+                  allowfullscreen hidden></iframe>
+          <div class="curtain" id="curtain">
+            <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
+            <h2 id="ttl">CUBE MERGE</h2>
+            <p id="lede">A 2048  nake made of cry tal number cube . Eat cube , fu e equal number  and bite  maller  nake  to reach 128, 256, 512 and beyond.</p>
+            <button class="btn" id="start">Play</button>
+            <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
+          </div>
+        </div>
+
+        <div class="stagebar">
+          <span class="title" id="barttl">CUBE MERGE</span>
+          <span class="where" id="how"></span>
+          <span class="sp"></span>
+          <button id="full" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
+            Fullscreen <kbd>F</kbd></button>
+          <button id="reload" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+            Restart <kbd>R</kbd></button>
+          <a class="lnk" href="/">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>
+            All games</a>
+        </div>
+
+        <!-- YOUR NUMBERS FOR THIS GAME, favourite, today's challenge and the
+             leaderboard. Between the stage bar and the text, well away from
+             every ad slot (those are in the side column and after the guide). -->
+        <div class="pp-play" id="ppplay"></div>
+
+        <section class="about">
+          <h1 id="h1">CUBE MERGE</h1>
+          <p class="lede" id="blurb">A 2048  nake made of cry tal number cube . Eat cube , fu e equal number  and bite  maller  nake  to reach 128, 256, 512 and beyond.</p>
+          <div id="about"><p>A number-cube snake brawl in a faceted crystal arena, mixing 2048 with a snake game. Your snake is a chain of numbered gem cubes. Eat loose cubes worth no more than your head, and equal values fuse into the next power of two, 2048-style.</p>
+<p>Other cube snakes roam the arena too. Bite the tails off smaller snakes, ram smaller heads to shatter them, and keep away from bigger heads. Reach the level target (128, then 256, then 512 and so on) to level up; the rival snakes get bigger and meaner each time.</p>
+<p class="advisory"><b>What is in it:</b> Number cubes made of glowing crystal merge and shatter into star shards. No characters and no violence. Bright sparkles but no screen flashing. <a href="/site/parents.html">More for parents</a></p>
+<p class="report"><a href="mailto:liamlikescows@gmail.com?subject=PLAYPILE%3A%20problem%20with%20CUBE%20MERGE">Report a problem with this game</a></p></div>
+          <h4>Controls</h4>
+          <ul class="keys" id="keys"><li><kbd>Mouse / touch drag</kbd><span>steer toward the pointer</span></li><li><kbd>A D / arrows</kbd><span>turn</span></li><li><kbd>Hold click / Space</kbd><span>dash</span></li><li><kbd>Touch</kbd><span>drag to steer, BOOST button to dash</span></li></ul>
+          <div class="tip" id="tip">Only eat cubes that help a merge: a tail in descending order (64, 32, 16...) fuses fastest. Check a rival's head value before you go near it.</div>
+          <h4>Tags</h4>
+          <div class="tagrow" id="tags"><a class="chip on" href="/free-puzzle-games/">Puzzle</a><a class="chip" href="/#q=new">new</a><a class="chip" href="/#q=puzzle">puzzle</a><a class="chip" href="/#q=2048">2048</a><a class="chip" href="/#q=merge">merge</a><a class="chip" href="/#q=snake">snake</a><a class="chip" href="/#q=numbers">numbers</a><a class="chip" href="/#q=3d">3d</a><a class="chip" href="/#q=mobile">mobile</a></div>
+        </section>
+
+        <!-- THE GUIDE: how to play, tips, what is in it, questions. One
+             file per game in site/guides/, written from the game's own
+             code. The build pastes it in here; locally it is fetched. -->
+        <article class="guide" id="guide"><h2>How to play</h2>
+<p>CUBE MERGE mixes the number puzzle 2048 with a snake game. You are a snake made of numbered cubes that look like cut gems, sliding around a round crystal arena under a starry sky. The number on your <b>head</b> cube is what counts.</p>
+<p>Your snake steers towards the mouse pointer, or towards your finger if you drag on a phone. You can also turn with <kbd>A</kbd> and <kbd>D</kbd> or the arrow keys. Hold the mouse button or <kbd>Space</kbd> (or the BOOST button on a phone) to <b>dash</b>.</p>
+<p>Eat loose cubes that are worth <b>the same as or less than your head</b>. A cube worth more than your head just bounces you away. Your snake keeps its cubes in order, biggest at the head, and whenever two cubes of the same value end up side by side they <b>fuse</b> into one of double the value, just like in 2048: two 8s make a 16, two 16s make a 32, and so on. One new cube can set off a whole chain of fusions. Reach the level target, starting at <b>128</b>, to move up a level.</p>
+
+<h2>Tips and strategy</h2>
+<ul>
+<li><b>Feed the tail.</b> Because the snake sorts itself, the cube that grows your head fastest is the one that matches your smallest cube. It fuses, then fuses again with the next one up, all the way to the head.</li>
+<li><b>Size up every head.</b> Run your head into a smaller head and that snake shatters, leaving all its cubes as food. Run into a bigger head and it is you that shatters. Two heads of the same value just bounce off each other.</li>
+<li><b>Bite tails.</b> If your head is at least as big as a cube in another snake's body, touching that cube cuts the snake there. You swallow the cube you hit, and the rest of the cut-off tail spills out as loose cubes for anyone to grab. Touch a body cube bigger than your head and you are knocked aside.</li>
+<li><b>The dash runs on a meter.</b> Dashing raises your speed by about two thirds, but the meter drains in two seconds and takes over five to fill again. Save it for escaping a big head or snatching a cube from a rival.</li>
+<li><b>Use your head start.</b> You are safe from head-on hits for the first three seconds of a run, so use them to get away from the crowd.</li>
+<li><b>Mind the wall.</b> The edge of the arena turns you around. Getting trapped against it by a bigger snake is a common way to go.</li>
+</ul>
+
+<h2>What's in it</h2>
+<p>A level-by-level climb. The target doubles each level (128, then 256, 512 and so on), and your snake starts each run with a single head cube that also grows with the level you start from. Nine rival snakes share the arena with you, with names like Quartzy, Opaline, Bismuth, Garnet and Topaz Tom. A rival you shatter comes back as a fresh snake a few seconds later. On higher levels the rivals start bigger and hunt more. When you level up, any rival far smaller than you is given a boost so the arena stays dangerous.</p>
+<p>When you are shattered, a result card shows who got you and how big their head was, your score, your biggest cube, your knockouts, your best score ever and the highest level you have unlocked. From there you can go straight back in.</p>
+<p>The cubes are shaded like gems, with chamfered edges, rainbow refraction and sparkling facets, on a crystal floor under a star dome. Broken snakes burst into star shards.</p>
+
+<h2>Behind the game</h2>
+<p>Each time a cube joins your snake, the whole chain is sorted from biggest to smallest and then checked for pairs. Every pair found doubles and the check runs again, which is how one small cube can ripple all the way up the snake. Loose food on the floor is kept topped up at all times, and its value is set by your level, mostly small cubes with the odd larger one.</p>
+<p>The rival snakes rethink about five times a second. Each one looks for the best cube it is allowed to eat, nearest first but pulled towards bigger ones. If a bigger head comes close it turns away and dashes. If a smaller snake is near, it may hunt it, aiming just in front of its head, and the chance that it does grows with every level. They also steer back towards the middle when they get near the wall.</p>
+<p>Your score is the total value of every cube you eat and every tail cube you bite off, so big bites count for much more than nibbling small cubes.</p>
+
+<h2>Questions</h2>
+<h3>Do I need an account?</h3>
+<p>No. Your best score, your biggest cube and your highest unlocked level are saved in your browser.</p>
+<h3>Do I have to start from level 1 every time?</h3>
+<p>No. After you are shattered, the AGAIN button starts you one level below the highest level you have unlocked.</p>
+<h3>Can I play on a phone?</h3>
+<p>Yes. Drag a finger to steer and hold the BOOST button to dash.</p>
+<h3>Is it multiplayer?</h3>
+<p>No. The rival snakes are played by the computer.</p>
+<h3>Do I need to know 2048?</h3>
+<p>No. Just remember that two cubes with the same number join into one with double the number.</p>
+<h3>Is it violent?</h3>
+<p>No. It is numbers and crystals.</p>
+<h3>Does it flash?</h3>
+<p>No. There are sparkles and a little screen shake on big fusions, but no screen flashes.</p></article>
+
+        <div id="ad-play-footer"></div>
+
+        <!-- the rail that keeps a session going: a player who finishes
+             one game and sees eight more is worth several page views -->
+        <div id="alsorows"></div>
+      </div>
+
+      <aside class="side">
+        <div id="ad-play-rail"></div>
+        <div class="panel">
+          <h4>More games</h4>
+          <div id="more"><a class="mini" href="/play/word-blitz-search-game/"><span class="th" style="background-image:url('/shots/t/word-blitz.webp')"></span><span><b>WORD BLITZ</b><small>Puzzle</small></span></a><a class="mini" href="/play/block-royale-puzzle-game/"><span class="th" style="background-image:url('/shots/t/block-royale.webp')"></span><span><b>BLOCK ROYALE</b><small>Puzzle</small></span></a><a class="mini" href="/play/bomb-squad-defusal-puzzle-game/"><span class="th" style="background-image:url('/shots/t/bomb-squad.webp')"></span><span><b>BOMB SQUAD</b><small>Puzzle</small></span></a><a class="mini" href="/play/one-tile-heist-puzzle-game/"><span class="th" style="background-image:url('/shots/t/one-tile.webp')"></span><span><b>ONE TILE</b><small>Puzzle</small></span></a><a class="mini" href="/play/merge-number-puzzle-game/"><span class="th" style="background-image:url('/shots/t/merge.webp')"></span><span><b>MERGE</b><small>Puzzle</small></span></a></div>
+        </div>
+        <div id="ad-play-tall"></div>
+      </aside>
+    </div>
+
+    <!-- THE FOOTER IS REAL HTML, not something a script draws.
+         An AdSense reviewer and a search engine both read the page
+         before any module runs, and "privacy and cookies are linked
+         from the home page" is a thing tools/ready.mjs checks in the
+         SOURCE. Injecting it was invisible to all three. -->
+    <footer class="foot">
+      <div class="cols2">
+        <div>
+          <div class="brand">PLAY<b>PILE</b></div>
+          <p class="blurb">100 browser games, all of them written for this site. No sign-up,
+             no download, and your best scores stay in your own browser.</p>
+        </div>
+        <div class="fl"><b>Site</b>
+          <a href="/">All games</a><a href="/site/about.html">About</a>
+          <a href="/site/updates.html">Updates</a><a href="/devlog/">Dev log</a><a href="/articles/">Articles</a><a href="/site/contact.html">Contact</a>
+          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
+        <div class="fl"><b>Legal</b>
+          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
+          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
+          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
+          <a href="/site/settings.html">Do not sell or share my info</a></div>
+        <div class="fl"><b>Play</b>
+          <a href="/category/arcade/">Arcade</a>
+          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
+          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
+      </div>
+      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
+        <span>Made by one person, in a browser.</span></div>
+    </footer>
+  </main>
+</div>
+
+<!-- the loading interstitial: over a game that is LOADING, never one
+     that is being played, and it always has a skip -->
+<div class="gate" id="gate">
+  <div class="box">
+    <h3>Advertisement</h3>
+    <div data-ad></div>
+    <div class="count">your game starts in 5</div>
+    <button class="btn ghost" type="button">Skip</button>
+  </div>
+</div>
+
+<script type="module">
+import { GAMES, bySlug } from '/site/catalogue.js';
+import { seoSlug } from '/site/seo.js';
+import { mountShell, catOf, card, row, remember } from '/site/shell.js';
+import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
+import { loadAds, slot, interstitial } from '/ads/ads.js';
+import { mountPlay, trackPlay } from '/site/progress.js';
+
+// THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
+// server.js rewrites /play/<slug> to this file, and tools/deploy.mjs
+// writes this same file out to /play/<slug>/index.html for the static
+// host. Both leave the slug exactly where this line looks for it.
+const slug = location.pathname.split('/').filter(Boolean).pop();
+const g = bySlug(slug) || GAMES.find((x) => seoSlug(x) === slug);
+if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
+
+mountShell({ active: catOf(g) });
+mountPlay(document.getElementById('ppplay'), g.slug);
+
+// On the web build all of this is already in the HTML (tools/deploy.mjs
+// writes it in from site/pages.js); writing it again here is the same
+// text, and it is what fills the page when it is served locally.
+document.title = pageTitle(g);
+document.getElementById('crumbs').innerHTML = crumbsHtml(g);
+
+ttl.textContent = g.title;
+h1.textContent = g.title;
+barttl.textContent = g.title;
+lede.textContent = g.blurb;
+blurb.textContent = g.blurb;
+about.innerHTML = aboutHtml(g);
+tip.textContent = g.tips;
+shotbg.src = '/shots/h/' + g.slug + '.webp'; shotbg.alt = g.title + ' gameplay screenshot';
+keys.innerHTML = keysHtml(g);
+tags.innerHTML = tagsHtml(g);
+if (!guide.textContent.trim()) {
+  fetch('/site/guides/' + g.slug + '.html').then((r) => r.ok ? r.text() : '')
+    .then((t) => { guide.innerHTML = t; }).catch(() => {});
+}
+tags.innerHTML = [catOf(g), ...(g.tags || [])]
+  .map((t, i) => `<a class="chip${i ? '' : ' on'}" href="/#${i ? 'q' : 'c'}=${encodeURIComponent(t)}">${t}</a>`)
+  .join('');
+
+// ---- where does this game actually come from? -----------------------
+//
+// ON THE WEB, NOWHERE BUT HERE. Every game is a folder under /games/,
+// the big ones included, which is why they now ask for their own files
+// by relative path rather than off the web root.
+//
+// ON THIS MACHINE they are still separate servers on separate ports,
+// because that is where they are developed and nothing about that should
+// have to change to suit a website. A port that is not answering shows
+// the browser's own error page inside the frame, which reads as the site
+// being broken - so that case asks first and says so plainly.
+//
+// WHICH OF THE TWO is decided at BUILD time rather than by sniffing the
+// hostname: tools/deploy.mjs stamps this flag into the copy it writes.
+const WEB = !!window.__PLAYPILE_WEB;
+let src = null, note = '';
+if (g.how === 'mounted' && WEB && g.web) {
+  src = '/games/' + g.web;
+  note = 'runs here';
+} else if (g.how === 'local') {
+  src = '/games/' + g.slug + '/';
+  note = 'runs here';
+} else if (g.how === 'unity') {
+  src = '/games/' + g.slug + '/build/index.html';
+  note = 'unity webgl · 83 mb first load';
+  warn.textContent = 'First load is a big download. It is cached after that.';
+} else {
+  src = 'http://localhost:' + g.port + (g.url || '/');
+  note = 'localhost:' + g.port;
+  try {
+    const list = await (await fetch('/api/mounted')).json();
+    const m = list.find((x) => x.slug === g.slug);
+    if (!m || m.state !== 'up') {
+      warn.innerHTML = 'This one runs from its own folder and is not up. '
+        + 'Start PLAYPILE with <code>node server.js</code> and it boots with the site.';
+    }
+  } catch (e) {}
+}
+how.textContent = note;
+
+start.addEventListener('click', async () => {
+  start.disabled = true;
+  await interstitial();          // the ad slot that pays, while it loads
+  frame.src = src;
+  frame.hidden = false;
+  // a play counts when the game is actually started, not when the page is opened
+  remember(g.slug);
+  trackPlay(g.slug);
+  curtain.style.display = 'none';
+  setTimeout(() => { try { frame.focus(); } catch (e) {} }, 400);
+  if (TOUCH) mobileFull(true);
+});
+// ---- phones: fill the whole screen, real fullscreen + landscape lock where the browser allows ----
+const TOUCH = (navigator.maxTouchPoints > 0 || 'ontouchstart' in window) && matchMedia('(pointer: coarse)').matches;
+const UPRIGHT = /^(crossing|drifter|hoops|merge|pipeworks|quickdraw|spike|stack|sweep|block-royale|helix-drop|stack-attack|subway-run|tunnel-dive|slope-rush|drift-tower|word-blitz|prism|one-tile|sushi-conveyor|bubble-trouble|firework-frenzy|stick-swing|golf-orbit|parry)$/;
+const stageEl = document.getElementById('stage');
+const mexit = document.createElement('button');
+mexit.className = 'mexit'; mexit.type = 'button'; mexit.textContent = '✕'; mexit.setAttribute('aria-label', 'Exit full screen');
+stageEl.appendChild(mexit);
+function mobileFull(on) {
+  stageEl.classList.toggle('mfull', on); document.body.classList.toggle('mfull-on', on);
+  if (on) {
+    const rq = stageEl.requestFullscreen || stageEl.webkitRequestFullscreen;
+    try { const r = rq && rq.call(stageEl, { navigationUI: 'hide' });
+      if (r && r.then) r.then(() => { if (!UPRIGHT.test(g.slug) && screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {}); }).catch(() => {});
+    } catch (e) {}
+  } else {
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  }
+  // games size themselves on resize; nudge them once the new box has settled
+  setTimeout(() => { try { frame.contentWindow.dispatchEvent(new Event('resize')); } catch (e) {} }, 350);
+}
+mexit.addEventListener('click', () => mobileFull(false));
+full.addEventListener('click', () => {
+  if (TOUCH) { mobileFull(!stageEl.classList.contains('mfull')); return; }
+  const el = document.getElementById('stage');
+  if (document.fullscreenElement) document.exitFullscreen();
+  else el.requestFullscreen && el.requestFullscreen();
+});
+reload.addEventListener('click', () => { if (frame.src) frame.src = frame.src; });
+// the two shortcuts the stage bar advertises, so they are not a lie
+addEventListener('keydown', (e) => {
+  if (e.target.matches('input,textarea')) return;
+  if (e.key === 'f' || e.key === 'F') full.click();
+  if (e.key === 'r' || e.key === 'R') reload.click();
+});
+
+// ---- more games, which is the other half of running a portal --------
+// Somebody who finishes a game and closes the tab is worth one page
+// view. The rail beside the game is five, chosen from the same category
+// first, and the row below it is everything else.
+const others = GAMES.filter((x) => x.slug !== g.slug);
+const same = others.filter((x) => catOf(x) === catOf(g));
+const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random() - 0.5);
+more.innerHTML = related(g, GAMES).map(miniHtml).join('');
+
+document.getElementById('alsorows').innerHTML =
+  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
+  + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
+
+// ---- adverts: every slot that existed before, in the same place -----
+await loadAds();
+slot(document.getElementById('ad-play-rail'), 'play_rail');
+slot(document.getElementById('ad-play-tall'), 'play_tall');
+slot(document.getElementById('ad-play-footer'), 'play_footer');
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 // Canvas drawing: arena (pre-rendered layer), cars, ball, particles, HUD.
 // World space is y-up; the world transform flips it so everything is drawn in world units.
-import { W, H, GH, GD, CR, BALL_R, POLY, FLOOR, DIP_D } from './arena.js';
+import { W, H, GH, GD, CR, BALL_R, POLY, FLOOR, GY, GT, LEDGE_Y, BASIN, RAMP_END, floorY } from './arena.js';
 import { L, HH, WHEEL_R } from './physics.js';
 import { fx } from './fx.js';
 
@@ -85,7 +85,7 @@ function buildLayer(s) {
   }
   for (const side of [-1, 1]) {
     for (let x = W / 2 + 80; x < LX1 - LX0; x += 30) {
-      for (let y = GH + 70; y < H + 40; y += 34) {
+      for (let y = GT + 70; y < H + 40; y += 34) {
         const r = rnd();
         g.fillStyle = r < 0.25 ? (side > 0 ? 'rgba(255,138,31,0.5)' : 'rgba(43,140,255,0.5)') : `rgba(${90 + r * 60},${90 + r * 50},${130 + r * 60},0.3)`;
         g.beginPath(); g.arc(side * (x + rnd() * 6), y + rnd() * 8, 9 + rnd() * 3, 0, Math.PI * 2); g.fill();
@@ -102,6 +102,16 @@ function buildLayer(s) {
   const gg = g.createLinearGradient(0, 0, 0, LY0);
   gg.addColorStop(0, '#1a1b3a'); gg.addColorStop(1, '#07070f');
   g.fillStyle = gg; g.fillRect(LX0, LY0, LX1 - LX0, -LY0);
+  // the bowl's concrete body under the ramps and goal ledges
+  const sg = g.createLinearGradient(0, GT, 0, LY0);
+  sg.addColorStop(0, '#20224a'); sg.addColorStop(0.5, '#141634'); sg.addColorStop(1, '#07070f');
+  g.fillStyle = sg; g.beginPath(); g.moveTo(FLOOR[0][0] - 400, LY0); g.lineTo(FLOOR[0][0] - 400, GY);
+  FLOOR.forEach(([x, y]) => g.lineTo(x, y)); g.lineTo(FLOOR[FLOOR.length - 1][0] + 400, GY); g.lineTo(FLOOR[FLOOR.length - 1][0] + 400, LY0); g.closePath(); g.fill();
+  // structural ribs under the ramps
+  g.strokeStyle = 'rgba(120,140,220,0.07)'; g.lineWidth = 6;
+  for (const side of [-1, 1]) for (let x = BASIN + 80; x < W / 2 + GD; x += 120) {
+    g.beginPath(); g.moveTo(side * x, floorY(side * x) - 40); g.lineTo(side * x, -200); g.stroke();
+  }
   const path = () => { g.beginPath(); POLY.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); };
   // wall frame (thick, metallic)
   path(); g.lineJoin = 'round';
@@ -117,7 +127,7 @@ function buildLayer(s) {
   const tg = g.createLinearGradient(-W / 2 - GD, 0, W / 2 + GD, 0);
   tg.addColorStop(0, 'rgba(43,140,255,0.16)'); tg.addColorStop(0.46, 'rgba(43,140,255,0.03)');
   tg.addColorStop(0.54, 'rgba(255,138,31,0.03)'); tg.addColorStop(1, 'rgba(255,138,31,0.16)');
-  g.fillStyle = tg; g.fillRect(-W / 2 - GD, -DIP_D, W + 2 * GD, H + DIP_D);
+  g.fillStyle = tg; g.fillRect(-W / 2 - GD, -60, W + 2 * GD, H + 60);
   // hex grid
   g.strokeStyle = 'rgba(140,170,255,0.06)'; g.lineWidth = 3;
   const hr = 70, hw = hr * Math.sqrt(3);
@@ -145,22 +155,36 @@ function buildLayer(s) {
     const x0 = side * W / 2, x1 = side * (W / 2 + GD);
     const ng = g.createLinearGradient(x0, 0, x1, 0);
     ng.addColorStop(0, team.main + '22'); ng.addColorStop(1, team.main + '66');
-    g.fillStyle = ng; g.fillRect(Math.min(x0, x1), 0, GD, GH);
+    g.fillStyle = ng; g.fillRect(Math.min(x0, x1), GY, GD, GH);
     // net
-    g.save(); g.beginPath(); g.rect(Math.min(x0, x1), 0, GD, GH); g.clip();
+    g.save(); g.beginPath(); g.rect(Math.min(x0, x1), GY, GD, GH); g.clip();
     g.strokeStyle = team.light + '55'; g.lineWidth = 3;
     for (let k = -GH; k < GD + GH; k += 34) {
-      g.beginPath(); g.moveTo(x0 + side * k, 0); g.lineTo(x0 + side * (k + GH), GH); g.stroke();
-      g.beginPath(); g.moveTo(x0 + side * (k + GH), 0); g.lineTo(x0 + side * k, GH); g.stroke();
+      g.beginPath(); g.moveTo(x0 + side * k, GY); g.lineTo(x0 + side * (k + GH), GT); g.stroke();
+      g.beginPath(); g.moveTo(x0 + side * (k + GH), GY); g.lineTo(x0 + side * k, GT); g.stroke();
     }
     g.restore();
-    // goal line on the floor
-    g.fillStyle = team.light; g.fillRect(x0 - 6, -4, 12, 18);
+    // goal line on the ledge
+    g.fillStyle = team.light; g.fillRect(x0 - 6, GY - 4, 12, 18);
+    // kickoff spot on the ledge
+    g.fillStyle = 'rgba(220,235,255,0.35)'; g.beginPath(); g.arc(side * (W / 2 - 170), floorY(side * (W / 2 - 170)), 16, 0, Math.PI); g.fill();
   }
   g.restore();
   // floor strip
   g.strokeStyle = 'rgba(150,200,255,0.14)'; g.lineWidth = 50; g.lineJoin = 'round';
   g.beginPath(); FLOOR.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke();
+  // ramp tick marks (read the curve) and a steel coping rail on each lip
+  g.strokeStyle = 'rgba(170,210,255,0.16)'; g.lineWidth = 4;
+  for (const side of [-1, 1]) for (let x = BASIN + 50; x < RAMP_END; x += 70) {
+    const y = floorY(x), e = 3, sl = (floorY(x + e) - floorY(x - e)) / (2 * e), l = Math.hypot(1, sl);
+    const nx = -side * sl / l, ny = 1 / l;
+    g.beginPath(); g.moveTo(side * x - nx * 6, y - ny * 6); g.lineTo(side * x + nx * 22, y + ny * 22); g.stroke();
+  }
+  for (const side of [-1, 1]) {
+    const lx = side * (RAMP_END - 40), ly = floorY(lx), la = Math.atan((floorY(lx + 3) - floorY(lx - 3)) / 6);
+    g.fillStyle = '#c9d6ff'; g.beginPath(); g.ellipse(lx, ly - 2, 46, 7, la, 0, Math.PI * 2); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.8)'; g.beginPath(); g.ellipse(lx, ly + 1, 40, 2.5, la, 0, Math.PI * 2); g.fill();
+  }
   // neon boundary: blue left half, orange right half, white glow
   const bgr = g.createLinearGradient(-W / 2, 0, W / 2, 0);
   bgr.addColorStop(0, TEAM[0].glow); bgr.addColorStop(0.45, '#9fb8ff'); bgr.addColorStop(0.55, '#ffd0b0'); bgr.addColorStop(1, TEAM[1].glow);
@@ -175,10 +199,12 @@ function buildLayer(s) {
     g.lineCap = 'round';
     for (const [w, a] of [[44, 0.2], [24, 0.5], [11, 1]]) {
       g.strokeStyle = team.glow; g.globalAlpha = a; g.lineWidth = w;
-      g.beginPath(); g.moveTo(x0 + side * GD, GH); g.lineTo(x0, GH); g.lineTo(x0, GH + 40); g.stroke();
+      g.beginPath(); g.moveTo(x0 + side * GD, GT); g.lineTo(x0, GT); g.lineTo(x0, GT + 40); g.stroke();
     }
     g.globalAlpha = 1; g.strokeStyle = '#fff'; g.lineWidth = 4;
-    g.beginPath(); g.moveTo(x0 + side * GD, GH); g.lineTo(x0, GH); g.stroke();
+    g.beginPath(); g.moveTo(x0 + side * GD, GT); g.lineTo(x0, GT); g.stroke();
+    // goal-mouth floor lip
+    g.globalAlpha = 0.9; g.strokeStyle = team.glow; g.lineWidth = 6; g.beginPath(); g.moveTo(x0 + side * GD, GY); g.lineTo(x0, GY); g.stroke(); g.globalAlpha = 1;
   }
   layer = c;
 }
@@ -286,6 +312,8 @@ export function drawCar(c, style, t) {
   const col = style.paint || team.main;
   ctx.save();
   ctx.translate(c.x, c.y); ctx.rotate(c.a); ctx.scale(c.dir, 1);
+  // air roll / barrel roll: seen side-on the car squashes through its own long axis
+  if (c.rollT > 0 && c.rollDur > 0) { const k = Math.cos((1 - c.rollT / c.rollDur) * c.rollAng); ctx.scale(1, Math.abs(k) < 0.12 ? (k < 0 ? -0.12 : 0.12) : k); }
   // turn-around squash
   if (c.turnT > 0) ctx.scale(Math.max(0.2, Math.abs(Math.cos((c.turnT / 0.22) * Math.PI))), 1);
   const squash = c.landT > 0 ? 1 - c.landT * 0.6 : 1;
@@ -355,11 +383,15 @@ export function drawCar(c, style, t) {
 }
 
 function drawShadow(x, y, w, a) {
-  if (y > 700 || y < -60) return;
-  y = Math.max(0, y);
-  const k = Math.max(0, 1 - y / 700);
+  if (Math.abs(x) > W / 2 + GD) return;
+  const fy = floorY(x);
+  let h = y - fy;
+  if (h > 700 || h < -60) return;
+  h = Math.max(0, h);
+  const k = Math.max(0, 1 - h / 700);
+  const ang = Math.atan((floorY(x + 4) - floorY(x - 4)) / 8);
   ctx.fillStyle = `rgba(0,0,10,${0.45 * k * a})`;
-  ctx.beginPath(); ctx.ellipse(x, 2, w * (0.6 + 0.4 * k), 10 * k + 3, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x, fy + 2, w * (0.6 + 0.4 * k), 10 * k + 3, ang, 0, Math.PI * 2); ctx.fill();
 }
 
 // ---------- particles ----------
@@ -409,7 +441,7 @@ export function draw(view, dt) {
     const d = Math.abs(b.x - side * W / 2);
     if (d < 700) {
       ctx.globalCompositeOperation = 'lighter';
-      glow(side * (W / 2 + GD / 2), GH / 2, 330, TEAM[side < 0 ? 0 : 1].glow, (1 - d / 700) * 0.35);
+      glow(side * (W / 2 + GD / 2), GY + GH / 2, 330, TEAM[side < 0 ? 0 : 1].glow, (1 - d / 700) * 0.35);
       ctx.globalCompositeOperation = 'source-over';
     }
   }

@@ -148,6 +148,7 @@ import { GAMES, mountShell, categories, catOf, search, recent, card, tile, row }
 import { loadAds, slot } from '/ads/ads.js';
 import { catSlug, directoryHtml, playUrl, catUrl } from '/site/pages.js';
 import { mountHome } from '/site/progress.js';
+import { friendsList } from '/site/multiplayer.js';
 
 const $ = (id) => document.getElementById(id);
 if (!$('directory').textContent.trim()) $('directory').innerHTML = directoryHtml(GAMES);
@@ -207,6 +208,7 @@ function front() {
     + row('Popular now', mix(oldBigs, daily(NEWEST, 5)), { seeAll: '/#r=popular', wide: true });
   B.innerHTML =
     row('Picked for you today', daily(GAMES, 6).slice(0, 12), { seeAll: '/#r=all' })
+    + row('Play with friends &middot; online and 2 player', [...new Set([...friendsList(GAMES), ...GAMES.filter((g) => has(g, '2 player', 'co-op', 'online', 'multiplayer'))])], { seeAll: '/free-multiplayer-games/' })
     + row('New on PLAYPILE', newestFirst(fresh), { seeAll: '/#r=new' })
     + row('Quick games &middot; under five minutes', newestFirst(GAMES.filter((g) => !g.big)),
           { seeAll: '/#r=quick' });
@@ -215,8 +217,7 @@ function front() {
     .map((c) => row(c.name + ' games', newestFirst(byCat(c.name)),
                     { seeAll: catUrl(c.name) })).join('')
     + row('Great on your phone', daily(GAMES.filter(touch), 7), { seeAll: '/#q=mobile' })
-    + row('Physics and smashing things', daily(GAMES.filter((g) => has(g, 'physics', 'destruction', 'crashes', 'demolition', 'cars')), 8), { seeAll: '/#q=physics' })
-    + row('Play with a friend', GAMES.filter((g) => has(g, '2 player', 'co-op', 'online', 'multiplayer')), { seeAll: '/#q=2 player' });
+    + row('Physics and smashing things', daily(GAMES.filter((g) => has(g, 'physics', 'destruction', 'crashes', 'demolition', 'cars')), 8), { seeAll: '/#q=physics' });
   D.innerHTML = row('All ' + GAMES.length + ' games', newestFirst(GAMES), {});
   document.title = 'PLAYPILE — ' + GAMES.length + ' free games in your browser';
   adsync();

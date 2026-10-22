@@ -15,6 +15,7 @@
 // thing that lets node and a browser both run it.
 
 import { playUrl, catUrl, kwOf, CAT_TITLE } from './seo.js';
+import { isOnline } from './multiplayer.js';
 export { playUrl, catUrl, kwOf, CAT_TITLE };
 export const SITE = 'https://playpile.net';
 
@@ -50,10 +51,11 @@ export const pageTitle = (g) => g.title + ' — Free ' + cap(kwOf(g)) + ' Online
 // the card, identical to shell.js's so a pre-rendered row is the same row
 const shot = (g) => '<img src="/shots/t/' + g.slug + '.webp" alt="' + esc(g.title + ' - ' + kwOf(g)) + '" width="640" height="360" loading="lazy" decoding="async" onerror="this.remove()"'
   + ' onload="if(this.naturalHeight>this.naturalWidth)this.classList.add(\'tall\')">';
-export const cardHtml = (g) => '<a class="card" href="' + playUrl(g) + '" title="' + esc(g.title) + '">'
+export const cardHtml = (g) => '<a class="card" href="' + playUrl(g) + '" title="' + esc(g.title) + '" data-slug="' + g.slug + '">'
   + '<span class="thumb"><span class="ph">' + esc(g.title.slice(0, 2)) + '</span>' + shot(g)
   + '<span class="badge">' + esc(catOf(g)) + '</span>'
   + (g.big ? '<span class="big-flag">Big</span>' : '')
+  + (isOnline(g.slug) ? '<span class="online-flag">Online</span>' : '')
   + '<span class="hover"><span>PLAY</span></span></span>'
   + '<span class="cname">' + esc(g.title) + '</span>'
   + '<span class="cmeta">' + (g.tags || []).filter((t) => t !== 'new').slice(0, 2).map(esc).join(' &middot; ') + '</span></a>';
@@ -61,7 +63,10 @@ export const cardHtml = (g) => '<a class="card" href="' + playUrl(g) + '" title=
 // ---------------------------------------------------------------------
 // a game page: <head> extras and the body text
 // ---------------------------------------------------------------------
-export function gameHead(g) {
+// `rating` is { a, n } from the shared database, or nothing. AggregateRating
+// goes in ONLY with at least 3 real votes: an invented or seeded rating is
+// against Google's structured-data policy and gets a site penalised.
+export function gameHead(g, rating) {
   const url = SITE + playUrl(g);
   const img = SITE + '/shots/' + g.slug + '.png';
   const desc = clean(g.blurb) + ' Free to play in your browser - no download, no sign-up.';
@@ -71,6 +76,9 @@ export function gameHead(g) {
     genre: catOf(g), gamePlatform: 'Web browser', operatingSystem: 'Any',
     applicationCategory: 'Game', isAccessibleForFree: true,
     ...(g.content ? { contentRating: g.content } : {}),
+    ...(rating && rating.n >= 3 && rating.a >= 1 && rating.a <= 5 ? { aggregateRating: {
+      '@type': 'AggregateRating', ratingValue: Math.round(rating.a * 10) / 10, ratingCount: rating.n,
+      bestRating: 5, worstRating: 1 } } : {}),
     publisher: { '@type': 'Organization', name: 'PLAYPILE', url: SITE },
   };
   const crumbs = {

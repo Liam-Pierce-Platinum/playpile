@@ -663,3 +663,90 @@ body > main.wrap > .hero p{margin:0;color:var(--dim);max-width:62ch}
 .advisory{font-size:14px;border-left:3px solid var(--accent);padding:6px 12px;background:rgba(255,255,255,.03)}
 .advisory a,.report a{color:var(--accent)}
 .report{font-size:13px}
+
+/* =====================================================================
+   2026-10-21: STAR RATINGS (site/rating.js) and PLAY ONLINE (site/online.js)
+   ===================================================================== */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* cards: ONLINE bottom left, compact stars bottom right */
+.card .online-flag{
+  position:absolute;left:7px;bottom:7px;padding:3px 7px 3px 18px;border-radius:4px;
+  background:rgba(4,10,22,.86);border:1px solid rgba(34,211,122,.55);color:var(--accent);
+  font:700 9px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;
+}
+.card .online-flag::before{content:"";position:absolute;left:7px;top:50%;width:6px;height:6px;margin-top:-3px;
+  border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent)}
+.card .cstar{
+  position:absolute;right:7px;bottom:7px;display:inline-flex;align-items:center;gap:3px;padding:3px 6px;border-radius:4px;
+  background:rgba(4,10,22,.86);border:1px solid rgba(255,255,255,.08);color:#f5f8fc;font:700 10px/1 var(--mono);
+}
+.card .cstar svg{width:11px;height:11px;fill:#ffc94a}
+.card .cstar small{font:9px/1 var(--mono);color:var(--faint)}
+
+/* the rating bar under the stage */
+.pp-rate{margin-top:10px}
+.rt{display:flex;align-items:center;justify-content:space-between;gap:10px 18px;flex-wrap:wrap;
+  padding:10px 14px;background:var(--panel);border:1px solid var(--edge);border-radius:8px}
+.rt-you{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.rt-k{font:11px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.rt-stars{display:inline-flex;gap:2px;touch-action:none}
+.rt-stars button{width:34px;height:34px;padding:4px;border:0;border-radius:6px;background:none;cursor:pointer;color:#2b4a73}
+.rt-stars button svg{width:100%;height:100%;fill:currentColor;transition:transform .08s ease}
+.rt-stars button.on{color:#ffc94a}
+.rt-stars button.pv{color:#ffdb7d}
+.rt-stars button:hover svg{transform:scale(1.12)}
+.rt-stars button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.rt-me{font-size:13px;color:var(--dim);min-width:12ch}
+.rt-agg{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--dim)}
+.rt-avg{font:700 20px/1 var(--mono);color:var(--text)}
+.rt-n{color:var(--faint)}
+.rt-dim{color:var(--faint)}
+.rt-show{position:relative;display:inline-block;line-height:0;white-space:nowrap}
+.rt-show svg{width:15px;height:15px}
+.rt-bg svg{fill:#2b4a73}
+.rt-fg{position:absolute;left:0;top:0;overflow:hidden;white-space:nowrap}
+.rt-fg svg{fill:#ffc94a}
+
+/* play online: the curtain buttons, the pill, the lobby over the stage */
+.startrow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.curtain [hidden],.startrow [hidden]{display:none!important}   /* .btn sets display, which beats the hidden attribute */
+.olhint{font-size:13px;color:var(--dim)!important}
+.olpill{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:99px;border:1px solid var(--edge);
+  font:10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.olpill[hidden]{display:none}
+.olpill i{width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.olpill.live{color:var(--accent);border-color:rgba(34,211,122,.45)}
+.olpill.live i{background:var(--accent);box-shadow:0 0 6px var(--accent)}
+.olpill.wait i{background:#ffc94a;animation:olblink 1s steps(2) infinite}
+.olpill.bad{color:#ff6b6b;border-color:rgba(255,107,107,.45)}
+.olpill.bad i{background:#ff6b6b}
+@keyframes olblink{50%{opacity:.25}}
+.ol{position:absolute;inset:0;z-index:4;display:grid;place-items:center;padding:16px;overflow:auto;
+  background:radial-gradient(120% 90% at 50% 38%,#10213b,#030812 72%)}
+.ol[hidden]{display:none}
+.olcard{position:relative;width:min(440px,100%);display:grid;gap:12px;justify-items:center;text-align:center}
+.olcard h3{margin:0;font:700 18px/1.1 var(--mono);letter-spacing:.2em;text-transform:uppercase}
+.olsub{margin:0;color:var(--dim);font-size:14px;max-width:44ch}
+.olnote{margin:0;color:var(--faint);font-size:12.5px}
+.olerr{margin:0;padding:8px 12px;border-radius:6px;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.4);color:#ffb4b4;font-size:13px}
+.olx{position:absolute;right:-6px;top:-10px;width:34px;height:34px;border:0;border-radius:50%;background:none;color:var(--dim);font:24px/1 var(--sans);cursor:pointer}
+.olx:hover{color:var(--text);background:var(--panel-2)}
+.olbtns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.oljoin{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center}
+.oljoin label{font-size:13px;color:var(--dim)}
+.oljoin input{width:7.2em;padding:11px 8px 11px calc(8px + .3em);border-radius:7px;border:1px solid var(--edge);background:#081326;color:var(--text);
+  font:700 16px/1 var(--mono);letter-spacing:.3em;text-transform:uppercase;text-align:center}
+.oljoin input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.oljoin .btn,.ollink .btn{padding:12px 18px}
+.olcode{font:700 clamp(40px,8vw,64px)/1 var(--mono);letter-spacing:.3em;padding-left:.3em;color:var(--accent);
+  text-shadow:0 0 24px rgba(34,211,122,.35)}
+.ollink{display:flex;gap:8px;width:100%;flex-wrap:wrap;justify-content:center}
+.ollink input{flex:1 1 220px;min-width:0;padding:11px 10px;border-radius:7px;border:1px solid var(--edge);background:#081326;
+  color:var(--dim);font:12px/1 var(--mono)}
+.olwait{margin:0;display:flex;align-items:center;gap:8px;color:var(--dim);font-size:13.5px}
+.olspin{width:34px;height:34px;border-radius:50%;border:3px solid var(--edge);border-top-color:var(--accent);animation:olspin .8s linear infinite}
+.olspin.sm{width:14px;height:14px;border-width:2px}
+@keyframes olspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.olspin,.olpill.wait i{animation:none}}
+@media (max-width:520px){.rt-stars button{width:40px;height:40px}.olcode{letter-spacing:.2em}}

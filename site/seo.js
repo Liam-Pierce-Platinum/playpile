@@ -67,11 +67,11 @@ export const kwOf = (g) => KW[g.slug] || (String(g.cat || 'arcade').toLowerCase(
 export const CAT_SEO = {
   Action: 'free-action-games', Shooter: 'free-shooting-games', Driving: 'free-racing-games', Arcade: 'free-arcade-games',
   Strategy: 'free-strategy-games', Puzzle: 'free-puzzle-games', Adventure: 'free-adventure-games', Sport: 'free-sports-games',
-  Horror: 'free-horror-games',
+  Horror: 'free-horror-games', Multiplayer: 'free-multiplayer-games',
 };
 export const catUrl = (cat) => '/' + (CAT_SEO[cat] || 'free-' + slugify(cat) + '-games') + '/';
 export const CAT_TITLE = {
   Action: 'Free Action Games', Shooter: 'Free Shooting Games', Driving: 'Free Racing & Driving Games', Arcade: 'Free Arcade Games',
   Strategy: 'Free Strategy Games', Puzzle: 'Free Puzzle Games', Adventure: 'Free Adventure Games', Sport: 'Free Sports Games',
-  Horror: 'Free Horror Games',
+  Horror: 'Free Horror Games', Multiplayer: 'Free Multiplayer Games to Play With Friends',
 };

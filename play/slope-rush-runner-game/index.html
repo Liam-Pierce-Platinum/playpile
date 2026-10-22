@@ -74,8 +74,9 @@
           <div class="curtain" id="curtain">
             <img class="shotbg" id="shotbg" alt="" onerror="this.remove()">
             <h2 id="ttl">SLOPE RUSH</h2>
-            <p id="lede">Roll a glowing ball down an endle   ynthwave  lope. Steer round hole  and red block  while the  peed keep  climbing.</p>
-            <button class="btn" id="start">Play</button>
+            <p id="lede">Roll a glowing ball down an endless synthwave slope. Steer round holes and red blocks while the speed keeps climbing.</p>
+            <div class="startrow"><button class="btn" id="start">Play</button><button class="btn ghost" id="goonline" type="button" hidden>Play online</button></div>
+            <p id="olhint" class="olhint" hidden></p>
             <p id="warn" style="color:#8b96a8;font-size:12px;max-width:52ch"></p>
           </div>
         </div>
@@ -83,6 +84,7 @@
         <div class="stagebar">
           <span class="title" id="barttl">SLOPE RUSH</span>
           <span class="where" id="how"></span>
+          <span class="olpill" id="olpill" hidden></span>
           <span class="sp"></span>
           <button id="full" type="button">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
@@ -98,11 +100,15 @@
         <!-- YOUR NUMBERS FOR THIS GAME, favourite, today's challenge and the
              leaderboard. Between the stage bar and the text, well away from
              every ad slot (those are in the side column and after the guide). -->
+        <!-- STAR RATINGS (site/rating.js): your vote, and the real average once
+             the ratings database is on. Nothing is shown that is not a real vote. -->
+        <div class="pp-rate" id="pprate"></div>
+
         <div class="pp-play" id="ppplay"></div>
 
         <section class="about">
           <h1 id="h1">SLOPE RUSH</h1>
-          <p class="lede" id="blurb">Roll a glowing ball down an endle   ynthwave  lope. Steer round hole  and red block  while the  peed keep  climbing.</p>
+          <p class="lede" id="blurb">Roll a glowing ball down an endless synthwave slope. Steer round holes and red blocks while the speed keeps climbing.</p>
           <div id="about"><p>Roll a glowing ball down an endless, twisting neon slope under a striped synthwave sun. Steer left and right to stay on the track, avoid the red blocks and the holes, and keep going as the speed climbs. Fall off or hit a red block and the run is over.</p>
 <p>Every 400 m is a new sector with a new colour palette and a narrower track, more holes, drop-offs, red blocks and narrow bridges. Score is your distance plus bonuses for gold shards and close passes, and shards unlock new ball skins.</p>
 <p class="advisory"><b>What is in it:</b> A glowing ball on a neon track; no characters and no violence. The screen flashes when you crash and when the colours change every 400 m, with glow, scanlines and screen shake. <a href="/site/parents.html">More for parents</a></p>
@@ -228,6 +234,10 @@ import { mountShell, catOf, card, row, remember } from '/site/shell.js';
 import { aboutHtml, keysHtml, tagsHtml, crumbsHtml, pageTitle, related, miniHtml } from '/site/pages.js';
 import { loadAds, slot, interstitial } from '/ads/ads.js';
 import { mountPlay, trackPlay } from '/site/progress.js';
+import { mountRating } from '/site/rating.js';
+import { mountOnline } from '/site/online.js';
+import { ONLINE } from '/site/multiplayer.js';
+import { catUrl } from '/site/seo.js';
 
 // THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
 // server.js rewrites /play/<slug> to this file, and tools/deploy.mjs
@@ -239,6 +249,7 @@ if (!g) { location.replace('/'); throw new Error('no such game: ' + slug); }
 
 mountShell({ active: catOf(g) });
 mountPlay(document.getElementById('ppplay'), g.slug);
+mountRating(document.getElementById('pprate'), g);
 
 // On the web build all of this is already in the HTML (tools/deploy.mjs
 // writes it in from site/pages.js); writing it again here is the same
@@ -304,10 +315,10 @@ if (g.how === 'mounted' && WEB && g.web) {
 }
 how.textContent = note;
 
-start.addEventListener('click', async () => {
-  start.disabled = true;
-  await interstitial();          // the ad slot that pays, while it loads
-  frame.src = src;
+// put the game in the frame. `role` is set for an online match: the game
+// is told it is the host or the guest (games/_shared/pplink.js reads it)
+function launch(role) {
+  frame.src = role ? src + (src.includes('?') ? '&' : '?') + 'pponline=' + role : src;
   frame.hidden = false;
   // a play counts when the game is actually started, not when the page is opened
   remember(g.slug);
@@ -315,7 +326,37 @@ start.addEventListener('click', async () => {
   curtain.style.display = 'none';
   setTimeout(() => { try { frame.focus(); } catch (e) {} }, 400);
   if (TOUCH) mobileFull(true);
+}
+start.addEventListener('click', async () => {
+  start.disabled = true;
+  await interstitial();          // the ad slot that pays, while it loads
+  launch(null);
 });
+
+// ---- PLAY ONLINE (site/online.js) ------------------------------------
+// Games marked via:'site' in site/multiplayer.js get the lobby: quick
+// match, a room with a code and a link, or a code to join. Games with an
+// online mode of their own just say where to find it.
+// On the local dev server (node server.js) these games run from their own
+// ports, where /games/_shared/pplink.js does not exist, so the lobby is only
+// offered where the game can hear it: the built site (dist/, playpile.net).
+const ol = (WEB || g.how === 'local') && mountOnline({
+  g, stage: document.getElementById('stage'), frame, pill: document.getElementById('olpill'),
+  before: () => interstitial(),
+  launch: (role) => launch(role),
+  stop: () => { frame.removeAttribute('src'); frame.hidden = true; curtain.style.display = ''; start.disabled = false; if (TOUCH) mobileFull(false); },
+  solo: () => start.click(),
+});
+if (ol) {
+  goonline.hidden = false;
+  goonline.addEventListener('click', () => ol.open());
+} else if (ONLINE[g.slug] && ONLINE[g.slug].via === 'site') {
+  olhint.hidden = false;
+  olhint.textContent = 'Play online works on the built site (node tools/deploy.mjs), not on the local dev server.';
+} else if (ONLINE[g.slug]) {
+  olhint.hidden = false;
+  olhint.textContent = 'Online: ' + ONLINE[g.slug].note;
+}
 // ---- phones: fill the whole screen, real fullscreen + landscape lock where the browser allows ----
 const TOUCH = (navigator.maxTouchPoints > 0 || 'ontouchstart' in window) && matchMedia('(pointer: coarse)').matches;
 const UPRIGHT = /^(crossing|drifter|hoops|merge|pipeworks|quickdraw|spike|stack|sweep|block-royale|helix-drop|stack-attack|subway-run|tunnel-dive|slope-rush|drift-tower|word-blitz|prism|one-tile|sushi-conveyor|bubble-trouble|firework-frenzy|stick-swing|golf-orbit|parry)$/;
@@ -362,7 +403,7 @@ const rest = others.filter((x) => catOf(x) !== catOf(g)).sort(() => Math.random(
 more.innerHTML = related(g, GAMES).map(miniHtml).join('');
 
 document.getElementById('alsorows').innerHTML =
-  row('More ' + catOf(g) + ' games', same, { seeAll: '/category/' + catOf(g).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/' })
+  row('More ' + catOf(g) + ' games', same, { seeAll: catUrl(catOf(g)) })
   + row('You might also like', rest.slice(0, 12), { seeAll: '/' });
 
 // ---- adverts: every slot that existed before, in the same place -----

@@ -24,6 +24,8 @@
 // bookmarkable, and never 404s.
 import { GAMES } from '/site/catalogue.js';
 import { playUrl, catUrl, kwOf } from '/site/seo.js';
+import { isOnline } from '/site/multiplayer.js';
+import { decorateCards } from '/site/rating.js';
 
 // ---------------------------------------------------------------------
 // ICONS
@@ -52,6 +54,7 @@ const I = {
   skill:  'M12 2 9.2 8.9 2 9.6l5.4 4.7L5.8 21 12 17.3 18.2 21l-1.6-6.7L22 9.6l-7.2-.7z',
   info:   'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm-1 4h2v2h-2zm0 4h2v6h-2z',
   user:   'M12 3a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 10.5c4.4 0 8 2.2 8 5V21H4v-2.5c0-2.8 3.6-5 8-5z',
+  users:  'M9 4a3.8 3.8 0 1 1 0 7.6A3.8 3.8 0 0 1 9 4zm0 9c3.9 0 7 1.9 7 4.3V20H2v-2.7C2 14.9 5.1 13 9 13zm7.4-8.6a3.4 3.4 0 0 1 0 6.6 5.6 5.6 0 0 0 0-6.6zM17.6 13c2.6.4 4.4 2 4.4 4v3h-4.2v-2.7c0-1.7-.8-3.2-2.2-4.3z',
   tag:    'M11 3H4a1 1 0 0 0-1 1v7l9.5 9.5a1.5 1.5 0 0 0 2.1 0l6.9-6.9a1.5 1.5 0 0 0 0-2.1zM7 8.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z',
 };
 const CAT_ICON = {
@@ -135,12 +138,13 @@ const shot = (g) =>
   + ' onload="if(this.naturalHeight>this.naturalWidth)this.classList.add(\'tall\')">';
 
 export function card(g) {
-  return '<a class="card" href="' + playUrl(g) + '" title="' + g.title + '">'
+  return '<a class="card" href="' + playUrl(g) + '" title="' + g.title + '" data-slug="' + g.slug + '">'
     + '<span class="thumb">'
     + '<span class="ph">' + g.title.slice(0, 2) + '</span>'
     + shot(g)
     + '<span class="badge">' + catOf(g) + '</span>'
     + (g.big ? '<span class="big-flag">Big</span>' : '')
+    + (isOnline(g.slug) ? '<span class="online-flag">Online</span>' : '')
     + '<span class="hover"><span>PLAY</span></span>'
     + '</span>'
     + '<span class="cname">' + g.title + '</span>'
@@ -196,6 +200,7 @@ export function mountShell({ active = '', onSearch = null } = {}) {
       + link('/#r=new', 'new', 'New', '', active === 'new')
       + link('/#r=popular', 'fire', 'Popular', '', active === 'popular')
       + (rec ? link('/#r=recent', 'clock', 'Recently played', rec, active === 'recent') : '')
+      + link('/free-multiplayer-games/', 'users', 'Play with friends', '', active === 'Multiplayer')
       + '</nav>'
       + '<div class="navhead">Categories</div><nav>';
     for (const c of categories()) {
@@ -219,6 +224,16 @@ export function mountShell({ active = '', onSearch = null } = {}) {
       + '<p class="navfoot">&copy; 2026 PLAYPILE</p>';
     nav.innerHTML = html;
   }
+
+  // ---- compact star ratings on every card, now and as rows are drawn ----
+  // (from /site/ratings.json, the build's snapshot of real votes; with no
+  // ratings database that file is empty and the cards stay as they were)
+  decorateCards();
+  try {
+    let t = 0;
+    new MutationObserver(() => { clearTimeout(t); t = setTimeout(() => decorateCards(), 60); })
+      .observe(document.body, { childList: true, subtree: true });
+  } catch (e) { /* very old browser: the first pass is enough */ }
 
   // ---- the drawer, on a phone -------------------------------------
   const burger = document.getElementById('burger');

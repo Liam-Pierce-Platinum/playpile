@@ -5,6 +5,20 @@ import { Sfx } from './audio.js';
 
 const Q = new URLSearchParams(location.search);
 const AUTO = Q.has('auto');
+
+// ---------------------------------------------------------------- online (PLAYPILE lobby)
+// The PLAYPILE play page opens this with ?pponline=host|guest and carries
+// messages through ../../_shared/pplink.js. It is the 2-player mode with
+// the guest as PLAYER 2. Both sides pass each other their button presses,
+// and both run the fighters so the shots, dust and sounds happen on both
+// screens - but the HOST IS THE REFEREE: 30 times a second it sends where
+// both fighters really are (and the gun sway clock), which the guest
+// takes as the truth, and only the host decides rounds and the score.
+// Opened on its own, NET is null and none of this runs.
+const NET = Q.has('pponline') ? await import('../../_shared/pplink.js').then((m) => m.pplink()).catch(() => null) : null;
+const GUEST = !!NET && !NET.host;
+const MY = GUEST ? 1 : 0, OTHER = 1 - MY;
+const ON = { peerReady: false, sendT: 0, hiT: 0, got: false };
 const SKEY = 'rooftop_duel_v1';
 const save = { rung: 0, hats: ['none'], hat: 'none', wins: 0, mute: false };
 try { Object.assign(save, JSON.parse(localStorage.getItem(SKEY) || '{}')); } catch (e) { }
@@ -394,10 +408,12 @@ function startMatch(m, rung) {
   if (m === '2p') { rival = { ...P2LOOK }; target = 5; st = pick(STAGES); }
   else if (m === 'bot') { rival = RIVALS[(Math.random() * (save.rung + 1)) | 0]; target = 5; st = pick(STAGES); }
   else { rival = RIVALS[rung ?? Math.min(save.rung, RIVALS.length - 1)]; target = 3; st = STAGES[rival.stage]; }
+  if (NET) NET.send({ t: 'match', st: STAGES.indexOf(st), target });
   buildStage(st);
   fighters = [new Fighter({ ...P1LOOK, hat: save.hat, hc: HAT_C[save.hat] }, 1), new Fighter(rival, -1)];
   $('n1').textContent = m === '2p' ? 'PLAYER 1' : 'YOU'; $('n2').textContent = rival.name;
-  document.body.classList.toggle('duo', m === '2p'); document.body.classList.toggle('solo', m !== '2p');
+  if (NET) { $('n1').textContent = MY === 0 ? 'YOU' : 'FRIEND'; $('n2').textContent = MY === 1 ? 'YOU' : 'FRIEND'; }
+  document.body.classList.toggle('duo', m === '2p' && !NET); document.body.classList.toggle('solo', m !== '2p' || !!NET);
   hidePanel(); Sfx.music = true; nextRound();
 }
 function nextRound() {
@@ -406,6 +422,7 @@ function nextRound() {
   weapon = round === 1 ? 'revolver' : pick(order.filter((w) => w !== weapon));
   const sp = stage.spawn; fighters[0].reset(STAGE_MID() - sp); fighters[1].reset(STAGE_MID() + sp);
   fighters.forEach((F) => F.setGun(weapon));
+  if (NET && !GUEST) NET.send({ t: 'round', round, weapon, score });
   state = 'intro'; stateT = 1.3; pips();
   banner(score[0] === target - 1 && score[1] === target - 1 ? 'MATCH POINT' : 'ROUND ' + round, WEAPONS[weapon].name + ' &middot; ' + stage.name); Sfx.bell();
 }
@@ -420,7 +437,8 @@ function endMatch(p1won) {
   state = 'result'; Sfx.music = false; stats.matches++;
   if (AUTO) { stats.results.push(score.join('-')); stats.t.push(+T.toFixed(0)); startMatch('arcade', (Math.random() * 8) | 0); return; }
   let title, sub = '', btns = [];
-  if (mode === '2p') { title = (p1won ? 'PLAYER 1' : 'PLAYER 2') + ' WINS'; btns = [['rematch', 'REMATCH'], ['menu', 'MENU']]; }
+  if (NET) { if (!GUEST) NET.send({ t: 'end', score }); const won = score[MY] >= target; title = won ? 'YOU WIN' : 'FRIEND WINS'; sub = 'Online duel'; btns = [['rematch', GUEST ? 'ASK FOR A REMATCH' : 'REMATCH'], ['leave', 'LEAVE']]; won ? Sfx.ko() : Sfx.lose(); }
+  else if (mode === '2p') { title = (p1won ? 'PLAYER 1' : 'PLAYER 2') + ' WINS'; btns = [['rematch', 'REMATCH'], ['menu', 'MENU']]; }
   else if (p1won) {
     save.wins++; title = 'YOU WIN';
     if (mode === 'arcade') {
@@ -437,6 +455,13 @@ function endMatch(p1won) {
 }
 function act(a) {
   Sfx.init(); Sfx.click();
+  if (NET && (a === 'rematch' || a === 'again')) {
+    if (!GUEST) startMatch('2p');
+    else { NET.send({ t: 'rematch' }); const b = $('panel').querySelector('[data-a="rematch"]'); if (b) b.textContent = 'WAITING FOR HOST…'; }
+    return;
+  }
+  if (NET && a === 'leave') { NET.leave(); return; }
+  if (NET && a === 'close') { hidePanel(); return; }
   if (a === 'arcade') startMatch('arcade');
   else if (a === 'bot' || a === 'again') startMatch('bot');
   else if (a === '2p') startMatch('2p');
@@ -461,7 +486,7 @@ function showMenu() {
 function showPanel(html) { document.body.classList.toggle('nohud', !fighters.length); const p = $('panel'); p.innerHTML = html; p.classList.remove('hide'); }
 function hidePanel() { $('panel').classList.add('hide'); }
 $('panel').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) act(b.dataset.a); });
-$('menuBtn').addEventListener('click', () => { Sfx.init(); state === 'menu' ? act('resume') : showMenu(); });
+$('menuBtn').addEventListener('click', () => { Sfx.init(); if (NET) { onlineMenu(); return; } state === 'menu' ? act('resume') : showMenu(); });
 function pips() {
   for (let i = 0; i < 2; i++) $('p' + (i + 1)).innerHTML = Array.from({ length: target }, (_, k) => `<i class="${k < score[i] ? 'on' : ''}"></i>`).join('');
   $('wep').textContent = WEAPONS[weapon].name;
@@ -472,23 +497,26 @@ function banner(t, sub) { const b = $('banner'); b.innerHTML = `<b>${t}</b>${sub
 const K1J = ['KeyW'], K1S = ['KeyD'], K2J = ['ArrowUp'], K2S = ['ArrowLeft'];
 const SOLO_J = ['KeyW', 'Space', 'ArrowUp'], SOLO_S = ['KeyD', 'KeyF', 'KeyJ', 'Enter', 'ArrowRight', 'ArrowLeft'];
 function keyMap(code) {
+  if (NET) { if (SOLO_J.includes(code)) return [MY, 'j']; if (SOLO_S.includes(code)) return [MY, 's']; return null; }
   if (mode === '2p') { if (K1J.includes(code)) return [0, 'j']; if (K1S.includes(code)) return [0, 's']; if (K2J.includes(code)) return [1, 'j']; if (K2S.includes(code)) return [1, 's']; return null; }
   if (SOLO_J.includes(code)) return [0, 'j']; if (SOLO_S.includes(code)) return [0, 's']; return null;
 }
 addEventListener('keydown', (e) => {
   Sfx.init();
+  if (NET && (e.code === 'Escape' || e.code === 'KeyP')) { $('panel').classList.contains('hide') ? onlineMenu() : (state !== 'result' && hidePanel()); return; }
   if (e.code === 'Escape' || e.code === 'KeyP') { state === 'menu' ? (fighters.length && act('resume')) : showMenu(); return; }
   if (state === 'menu' || state === 'result') { if (e.code === 'Enter' || e.code === 'Space') { const b = $('panel').querySelector('button'); if (b) b.click(); e.preventDefault(); } return; }
   const m = keyMap(e.code); if (!m) return; e.preventDefault(); if (e.repeat) return;
   const k = keys[m[0]]; if (m[1] === 'j') k.jp = 1; else { k.sp = 1; k.sh = 1; }
+  if (NET) NET.send({ t: 'in', k: m[1], d: 1 });
 });
-addEventListener('keyup', (e) => { const m = keyMap(e.code); if (m && m[1] === 's') keys[m[0]].sh = 0; });
+addEventListener('keyup', (e) => { const m = keyMap(e.code); if (m && m[1] === 's') { keys[m[0]].sh = 0; if (NET) NET.send({ t: 'in', k: 's', d: 0 }); } });
 const touch = 'ontouchstart' in window || Q.has('touch');
 if (touch) document.body.classList.add('touch');
 document.querySelectorAll('#touch [data-k]').forEach((el) => {
   const [p, t] = el.dataset.k.split('');
-  const down = (e) => { e.preventDefault(); Sfx.init(); if (state !== 'fight' && state !== 'intro' && state !== 'ko') return; const i = mode === '2p' ? +p : 0; if (mode !== '2p' && p === '1') return; if (t === 'j') keys[i].jp = 1; else { keys[i].sp = 1; keys[i].sh = 1; } el.classList.add('on'); };
-  const up = (e) => { e.preventDefault(); const i = mode === '2p' ? +p : 0; if (t === 's') keys[i].sh = 0; el.classList.remove('on'); };
+  const down = (e) => { e.preventDefault(); Sfx.init(); if (state !== 'fight' && state !== 'intro' && state !== 'ko') return; const i = NET ? MY : mode === '2p' ? +p : 0; if ((NET || mode !== '2p') && p === '1') return; if (t === 'j') keys[i].jp = 1; else { keys[i].sp = 1; keys[i].sh = 1; } if (NET) NET.send({ t: 'in', k: t, d: 1 }); el.classList.add('on'); };
+  const up = (e) => { e.preventDefault(); const i = NET ? MY : mode === '2p' ? +p : 0; if (t === 's') { keys[i].sh = 0; if (NET) NET.send({ t: 'in', k: 's', d: 0 }); } el.classList.remove('on'); };
   el.addEventListener('pointerdown', down); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up); el.addEventListener('pointerleave', up);
 });
 addEventListener('pointerdown', () => Sfx.init(), { once: true });
@@ -511,12 +539,12 @@ function sim(dt) {
       F.step(dt);
     });
   }
-  if (state === 'intro' && stateT <= 0) { state = 'fight'; stateT = 0; banner('FIGHT!'); }
-  if (state === 'fight') {
+  if (state === 'intro' && stateT <= 0 && !GUEST) { state = 'fight'; stateT = 0; banner('FIGHT!'); }
+  if (state === 'fight' && !GUEST) {
     if (stateT < -32 && !windOn) { windOn = true; banner('HIGH WINDS'); Sfx.noise(1.5, 500, 'bandpass', 0.4, 0.5); }
-    if (fighters.some((F) => F.out)) { state = 'ko'; stateT = 2.1; slow = 0.9; shake = 0.4; Sfx.ko(); stats.rounds++; const w = fighters.findIndex((F) => !F.out); banner(w < 0 ? 'DOUBLE DROP' : (w === 0 ? fighters[0].look.name === 'YOU' && mode !== '2p' ? 'NICE SHOT' : 'PLAYER 1 SCORES' : rival.name + ' SCORES')); }
+    if (fighters.some((F) => F.out)) { state = 'ko'; stateT = 2.1; slow = 0.9; shake = 0.4; Sfx.ko(); stats.rounds++; const w = fighters.findIndex((F) => !F.out); banner(NET ? koText(w) : w < 0 ? 'DOUBLE DROP' : (w === 0 ? fighters[0].look.name === 'YOU' && mode !== '2p' ? 'NICE SHOT' : 'PLAYER 1 SCORES' : rival.name + ' SCORES')); }
   }
-  if (state === 'ko' && stateT <= 0) endRound();
+  if (state === 'ko' && stateT <= 0 && !GUEST) endRound();
   updBullets(dt); updParts(dt);
 }
 const camPos = new THREE.Vector3(0, 3, 18), camLook = new THREE.Vector3(0, 1, 0);
@@ -554,12 +582,105 @@ let acc = 0, last = performance.now();
 function frame(now) {
   requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000); last = now;
   acc += dt; let n = 0; while (acc >= STEP && n < 4) { tick(STEP); acc -= STEP; n++; } if (n === 4) acc = 0;
+  if (NET) onlineTick(dt);
   render(dt);
 }
 
+// ---------------------------------------------------------------- online: the wire
+const r3 = (v) => Math.round(v * 1000) / 1000;
+function koText(w) { return w < 0 ? 'DOUBLE DROP' : w === MY ? 'NICE SHOT' : 'FRIEND SCORES'; }
+function onlineMenu() {
+  if (state === 'result' || state === 'wait') return;
+  showPanel('<h1>ROOFTOP<span>DUEL</span></h1><p class="keys">ONLINE &middot; the match keeps going while this is open</p>'
+    + '<button data-a="close">BACK TO THE DUEL</button><button data-a="leave">LEAVE MATCH</button>');
+}
+function onlineTick(dt) {
+  if (!GUEST) {
+    if (state === 'wait' && ON.peerReady) startMatch('2p');
+    ON.sendT -= dt;
+    if (fighters.length && state !== 'wait' && state !== 'result' && ON.sendT <= 0) {
+      ON.sendT = 1 / 30;
+      NET.send({ t: 's', st: state, stT: r3(stateT), T: r3(T), wind: windOn ? 1 : 0, ko: state === 'ko' ? fighters.findIndex((F) => !F.out) : -2,
+        f: fighters.map((F) => [r3(F.x), r3(F.y), r3(F.vx), r3(F.vy), r3(F.ang), r3(F.angV), F.ground ? 1 : 0, F.fallen ? 1 : 0, F.out ? 1 : 0, r3(F.cd), r3(F.ph)]) });
+    }
+  } else {
+    ON.hiT -= dt;
+    if (!ON.got && ON.hiT <= 0) { ON.hiT = 0.5; NET.send({ t: 'hi' }); }
+  }
+}
+function guestMatch(d) {
+  ON.got = true;
+  mode = '2p'; score = [0, 0]; round = 0; target = d.target;
+  fighters.forEach((F) => F.dispose());
+  rival = { ...P2LOOK };
+  buildStage(STAGES[d.st] || STAGES[0]);
+  fighters = [new Fighter({ ...P1LOOK }, 1), new Fighter(rival, -1)];
+  // on their marks now: the 'round' message may arrive a frame later, and
+  // a fighter with no position yet would be drawn at NaN for that frame
+  fighters[0].reset(STAGE_MID() - stage.spawn); fighters[1].reset(STAGE_MID() + stage.spawn);
+  fighters.forEach((F) => F.setGun(weapon));
+  $('n1').textContent = 'FRIEND'; $('n2').textContent = 'YOU';
+  document.body.classList.remove('duo'); document.body.classList.add('solo');
+  hidePanel(); Sfx.music = true;
+}
+function guestRound(d) {
+  round = d.round; score = d.score.slice(); weapon = d.weapon;
+  bullets.splice(0).forEach(freeTracer); parts.length = 0; windOn = false;
+  const sp = stage.spawn; fighters[0].reset(STAGE_MID() - sp); fighters[1].reset(STAGE_MID() + sp);
+  fighters.forEach((F) => F.setGun(weapon));
+  state = 'intro'; stateT = 1.3; pips();
+  banner(score[0] === target - 1 && score[1] === target - 1 ? 'MATCH POINT' : 'ROUND ' + round, WEAPONS[weapon].name + ' &middot; ' + stage.name); Sfx.bell();
+}
+function guestSnap(d) {
+  if (!fighters.length) return;
+  // the round's story, as the host tells it
+  if (d.st !== state && state !== 'result') {
+    if (d.st === 'fight' && state === 'intro') banner('FIGHT!');
+    if (d.st === 'ko') { slow = 0.9; shake = 0.4; Sfx.ko(); banner(koText(d.ko)); }
+    state = d.st;
+  }
+  stateT = d.stT;
+  if (d.wind && !windOn) { banner('HIGH WINDS'); Sfx.noise(1.5, 500, 'bandpass', 0.4, 0.5); }
+  windOn = !!d.wind;
+  T += (d.T - T) * 0.5;
+  // the fighters: the host is right. Small differences are eased away,
+  // anything bigger (a fall the guest did not see) is taken as it is
+  d.f.forEach((q, i) => {
+    const F = fighters[i]; if (!F) return;
+    const far = Math.hypot(q[0] - F.x, q[1] - F.y) > 0.6 || !!q[8] !== F.out || !!q[7] !== F.fallen;
+    const k = far ? 1 : 0.5;
+    F.x += (q[0] - F.x) * k; F.y += (q[1] - F.y) * k; F.vx = q[2]; F.vy = q[3];
+    F.ang += (q[4] - F.ang) * k; F.angV = q[5];
+    F.ground = !!q[6]; F.fallen = !!q[7];
+    if (q[8] && !F.out) { F.out = true; F.fallT = 0; Sfx.fall(); }
+    F.out = !!q[8]; F.cd = q[9]; F.ph = q[10];
+  });
+}
+if (NET) {
+  NET.onmsg = (d) => {
+    if (!d) return;
+    if (d.t === 'in') {
+      // the other player's button, pressed on their side
+      const k = keys[OTHER];
+      if (d.k === 'j') k.jp = 1; else if (d.d) { k.sp = 1; k.sh = 1; } else k.sh = 0;
+      return;
+    }
+    if (!GUEST) {
+      if (d.t === 'hi') ON.peerReady = true;
+      else if (d.t === 'rematch' && state === 'result') startMatch('2p');
+    } else {
+      if (d.t === 'match') guestMatch(d);
+      else if (d.t === 'round') guestRound(d);
+      else if (d.t === 's') guestSnap(d);
+      else if (d.t === 'end') { score = d.score.slice(); pips(); endMatch(score[MY] >= target); }
+    }
+  };
+}
+
 // ---------------------------------------------------------------- boot
-if (Q.has('title')) { buildStage(STAGES[0]); showMenu(); } else startMatch(Q.get('mode') === '2p' ? '2p' : 'arcade');
-if (!AUTO && !Q.has('title') && !touch) { $('hint').classList.add('show'); setTimeout(() => $('hint').classList.remove('show'), 5000); }
+if (NET) { buildStage(STAGES[0]); state = 'wait'; showPanel('<h1>ROOFTOP<span>DUEL</span></h1><p class="keys">ONLINE &middot; ' + (GUEST ? 'joining the host&rsquo;s rooftop&hellip;' : 'waiting for your friend&rsquo;s game to load&hellip;') + '</p>'); }
+else if (Q.has('title')) { buildStage(STAGES[0]); showMenu(); } else startMatch(Q.get('mode') === '2p' ? '2p' : 'arcade');
+if (!AUTO && !Q.has('title') && !touch && !NET) { $('hint').classList.add('show'); setTimeout(() => $('hint').classList.remove('show'), 5000); }
 requestAnimationFrame(frame);
 window.__G = {
   get state() { return state; }, get score() { return score; }, get fighters() { return fighters; }, stats, startMatch, act,

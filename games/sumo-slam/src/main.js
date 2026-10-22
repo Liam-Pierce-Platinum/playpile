@@ -8,6 +8,19 @@ import { load, save, COLORS } from './save.js';
 
 const Q = new URLSearchParams(location.search);
 const $ = (id) => document.getElementById(id);
+
+// ---------- online (PLAYPILE lobby) ----------
+// The PLAYPILE play page starts this game with ?pponline=host|guest and
+// carries messages through ../../_shared/pplink.js. The HOST runs the real
+// match - its 2-player mode, with the guest as P2 - and sends the ring 30
+// times a second plus every event (hits, falls, rounds). The GUEST runs no
+// simulation: it sends its stick and SLAM button, and draws what it is told.
+// Opened on its own, NET is null and nothing below changes the game.
+const NET = Q.has('pponline') ? await import('../../_shared/pplink.js').then((m) => m.pplink()).catch(() => null) : null;
+const MYPID = NET && !NET.host ? 1 : 0;
+const ON = { peerReady: false, snap: null, snapAt: 0, sendT: 0, inT: 0, hiT: 0, ev: [], pending: [], setup: null, lastIn: '' };
+const WKEYS = ['x', 'y', 'z', 'vx', 'vy', 'vz', 'face', 'charge', 'charging', 'dashT', 'dashPow', 'stun', 'air', 'alive', 'falling', 'out', 'power', 'powerT', 'teeter', 'r', 'm', 'score', 'cd'];
+const r3 = (v) => (typeof v === 'number' ? Math.round(v * 1000) / 1000 : v);
 const canvas = $('c');
 const view = new View(canvas);
 const snd = new Sound();
@@ -107,13 +120,22 @@ function makePlayers(mode, rnd) {
 }
 
 function startMatch(o = {}) {
+  if (NET && !NET.host) { NET.send({ t: 'rematch' }); return; }   // the host starts every online match
+  if (NET) o = { ...o, mode: '2p' };
   Object.assign(opts, o);
-  input.mode = opts.mode;
+  // online, each player has one keyboard (or one phone) to themselves, so
+  // both read the single-player controls: WASD or arrows, Space or click
+  input.mode = NET ? 'solo' : opts.mode;
   const seed = o.seed ?? (Q.has('seed') && !startMatch.used ? +Q.get('seed') : (Math.random() * 1e9) | 0);
   startMatch.used = true;
   sim = new Sim({ seed, tier: opts.tier });
   sim.autoHumans = autopilot;
   sim.setupMatch(makePlayers(opts.mode, mulberry32(seed + 1)));
+  if (NET) {
+    ON.ev.length = 0; override[1] = { x: 0, z: 0, dash: false };
+    NET.send({ t: 'setup', tier: opts.tier, ps: sim.ws.map((w) => ({ name: w.name, color: w.color, human: w.human, hat: w.hat })) });
+    onlineNames();
+  }
   view.setMatch(sim);
   buildTags();
   state = 'play';
@@ -318,11 +340,12 @@ function handleEvents(live) {
         if (card) { card.classList.add('bump'); setTimeout(() => card.classList.remove('bump'), 300); }
         if (!w) { banner('DRAW!', 'nobody scores'); break; }
         const me = w.human !== null;
-        const who = me ? (opts.mode === '2p' ? `${w.name} WINS` : 'YOU WIN') : `${w.name.toUpperCase()} WINS`;
-        if (e.match !== null) banner(me && opts.mode !== '2p' ? 'CHAMPION!' : who, 'the match', 1.8);
+        const mine = NET ? w.human === MYPID : me;
+        const who = NET ? (mine ? 'YOU WIN' : `${w.name.toUpperCase()} WINS`) : me ? (opts.mode === '2p' ? `${w.name} WINS` : 'YOU WIN') : `${w.name.toUpperCase()} WINS`;
+        if (e.match !== null) banner(mine && (NET || opts.mode !== '2p') ? 'CHAMPION!' : who, 'the match', 1.8);
         else banner(who, `the round  ${w.score}/${WIN_ROUNDS}`, 1.7);
         if (w.alive && !w.falling) view.burst('confetti', w.x, 0, w.z);
-        if (me) snd.roundWin(); else snd.lose();
+        if (mine) snd.roundWin(); else snd.lose();
         break;
       }
     }
@@ -335,7 +358,7 @@ function finishMatch() {
   state = 'results';
   snd.setMusic(false);
   const winner = sim.ws[sim.matchWinner];
-  const humanWon = winner && winner.human !== null;
+  const humanWon = NET ? !!winner && winner.human === MYPID : winner && winner.human !== null;
   const soloWin = opts.mode === 'solo' && humanWon;
   data.matches++;
   lastNewUnlock = null;
@@ -355,7 +378,8 @@ function finishMatch() {
   } else if (opts.mode === 'solo') data.streak = 0;
   save(data);
   if (humanWon) snd.win(); else snd.lose();
-  $('resTitle').textContent = opts.mode === '2p' ? (humanWon ? `${winner.name} WINS!` : 'BOTS WIN!') : humanWon ? 'YOU WIN!' : `${winner.name.toUpperCase()} WINS`;
+  if (NET && NET.host) NET.send({ t: 'over', mw: sim.matchWinner });
+  $('resTitle').textContent = NET ? (humanWon ? 'YOU WIN!' : winner ? `${winner.name.toUpperCase()} WINS` : 'DRAW') : opts.mode === '2p' ? (humanWon ? `${winner.name} WINS!` : 'BOTS WIN!') : humanWon ? 'YOU WIN!' : `${winner.name.toUpperCase()} WINS`;
   $('resSub').textContent = `${TIERS[opts.tier].name} league  ·  ${sim.round} rounds` + (soloWin && data.streak > 1 ? `  ·  ${data.streak} win streak` : '');
   const list = $('resList');
   list.innerHTML = '';
@@ -370,6 +394,7 @@ function finishMatch() {
   }
   $('resUnlock').textContent = unlockLines.join('  ');
   $('nextBtn').classList.toggle('hidden', !(soloWin && opts.tier < data.unlocked));
+  if (NET) { $('retryBtn').textContent = NET.host ? 'REMATCH' : 'ASK FOR A REMATCH'; $('menuBtn').textContent = 'LEAVE'; $('resSub').textContent = 'Online  ·  ' + $('resSub').textContent; }
   show('results');
   $('banner').innerHTML = '';
   $('hud').classList.remove('hidden');
@@ -379,9 +404,9 @@ function finishMatch() {
 // ---------- buttons ----------
 function tapAudio() { snd.init(); }
 $('playBtn').onclick = () => { tapAudio(); snd.click(); startMatch({}); };
-$('retryBtn').onclick = () => { tapAudio(); snd.click(); startMatch({}); };
+$('retryBtn').onclick = () => { tapAudio(); snd.click(); if (NET && !NET.host) $('retryBtn').textContent = 'WAITING FOR HOST…'; startMatch({}); };
 $('nextBtn').onclick = () => { tapAudio(); snd.click(); opts.tier = Math.min(data.unlocked, opts.tier + 1); data.tier = opts.tier; save(data); startMatch({}); };
-$('menuBtn').onclick = () => { snd.click(); toTitle(); };
+$('menuBtn').onclick = () => { snd.click(); if (NET) { NET.leave(); return; } toTitle(); };
 $('pauseBtn').onclick = () => { snd.click(); pause(); };
 $('resumeBtn').onclick = () => { snd.click(); resume(); };
 $('restartBtn').onclick = () => { snd.click(); startMatch({}); };
@@ -391,7 +416,7 @@ $('muteBtn').onclick = () => { snd.init(); data.muted = !data.muted; snd.setMute
 $('muteBtn2').onclick = $('muteBtn').onclick;
 syncMute();
 function pause() {
-  if (state !== 'play') return;
+  if (state !== 'play' || NET) return;   // online: nobody pauses the other player's match
   state = 'paused';
   for (const w of sim.ws) snd.chargeStop(w.id);
   snd.setMusic(false);
@@ -406,20 +431,20 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) pause
 input.onKey = (code) => {
   snd.init();
   if (state === 'title' && (code === 'Enter' || code === 'Space')) { startMatch({}); return; }
-  if (state === 'results' && (code === 'KeyR' || code === 'Enter' || code === 'Space')) { startMatch({}); return; }
+  if (state === 'results' && (code === 'KeyR' || code === 'Enter' || code === 'Space')) { $('retryBtn').onclick(); return; }
   if (state === 'play' && (code === 'Escape' || code === 'KeyP')) { pause(); return; }
   if (state === 'paused' && (code === 'Escape' || code === 'KeyP' || code === 'Enter' || code === 'Space')) { resume(); return; }
   if (code === 'KeyM') $('muteBtn').onclick();
-  if (state === 'play' && spectating()) skipping = true;
+  if (state === 'play' && spectating() && !NET) skipping = true;
 };
 input.bindTouch($('tzone'), $('stick'), $('stick').firstElementChild, $('dashBtn'));
 canvas.addEventListener('pointerdown', (e) => {
   snd.init();
-  if (state === 'play' && spectating()) { skipping = true; return; }
+  if (state === 'play' && spectating() && !NET) { skipping = true; return; }
   if (e.pointerType === 'mouse' && state === 'play') input.mouseDash = true;
 });
 addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') input.mouseDash = false; });
-$('hud').addEventListener('pointerdown', () => { if (state === 'play' && spectating()) skipping = true; });
+$('hud').addEventListener('pointerdown', () => { if (state === 'play' && spectating() && !NET) skipping = true; });
 
 function spectating() {
   return sim && sim.phase === 'fight' && sim.ws.every((w) => w.human === null || w.falling || !w.alive);
@@ -437,9 +462,11 @@ function feedInputs() {
 
 function tick(dtSim) {
   // returns after one fixed step
+  if (NET && !NET.host && state === 'play') { guestStep(); return; }
   if (state === 'play' || state === 'title') {
     if (state === 'play') feedInputs();
     sim.step(dtSim);
+    if (NET && state === 'play' && sim.events.length) for (const e of sim.events) ON.ev.push({ ...e });
     handleEvents(state === 'play');
     if (sim.phase === 'end') {
       endWait += dtSim;
@@ -484,9 +511,107 @@ function frame(now) {
     while (acc >= STEP && n++ < 8) { acc -= STEP; tick(STEP); }
     if (n >= 8) acc = 0;
   }
+  if (NET) onlineTick(rdt);
   view.update(sim, STEP, rdt);
   view.render();
   updateTags();
+}
+
+// ---------- online: the wire ----------
+function onlineNames() {
+  // each player sees themselves as YOU and the other human as FRIEND
+  for (const w of sim.ws) if (w.human !== null) w.name = w.human === MYPID ? 'YOU' : 'FRIEND';
+}
+function onlineTick(dt) {
+  if (NET.host) {
+    if (state === 'title' && ON.peerReady) startMatch({});
+    ON.sendT -= dt;
+    if (state === 'play' && ON.sendT <= 0) {
+      ON.sendT = 1 / 30;
+      NET.send({ t: 's', ph: sim.phase, R: r3(sim.R), tx: r3(sim.tiltX), tz: r3(sim.tiltZ), st: r3(sim.t), endT: r3(sim.endT || 0),
+        round: sim.round, rw: sim.roundWinner, mw: sim.matchWinner,
+        it: sim.items.map((i) => [i.id, i.kind, r3(i.x), r3(i.z), r3(i.t), r3(i.drop)]),
+        ws: sim.ws.map((w) => ({ k: WKEYS.map((k) => r3(w[k])), i: [r3(w.input.x), r3(w.input.z), w.input.dash ? 1 : 0], s: [w.stats.slams, w.stats.outs, w.stats.dashes] })),
+        ev: ON.ev.splice(0) });
+    }
+  } else {
+    ON.hiT -= dt;
+    if (!ON.setup && ON.hiT <= 0) { ON.hiT = 0.5; NET.send({ t: 'hi' }); }
+    ON.inT -= dt;
+    if (state === 'play') {
+      const i = input.read(0);
+      const msg = { t: 'i', x: r3(i.x), z: r3(i.z), d: i.dash ? 1 : 0 };
+      const key = msg.x + ',' + msg.z + ',' + msg.d;
+      // 30 a second, and at once when the SLAM button changes
+      if (ON.inT <= 0 || (key !== ON.lastIn && msg.d !== +(ON.lastIn.split(',')[2] || 0))) { ON.inT = 1 / 30; ON.lastIn = key; NET.send(msg); }
+    }
+  }
+}
+function guestSetup(d) {
+  ON.setup = d; ON.snap = null; ON.pending.length = 0;
+  opts.mode = '2p'; opts.tier = d.tier; input.mode = 'solo';
+  sim = new Sim({ seed: 1, tier: d.tier });
+  sim.setupMatch(d.ps);
+  onlineNames();
+  view.setMatch(sim);
+  buildTags();
+  state = 'play';
+  show(null);
+  $('hud').classList.remove('hidden');
+  $('keysHint').textContent = 'Move: WASD / arrows  ·  HOLD Space or mouse, LET GO to SLAM';
+  $('keysHint').style.opacity = 1;
+  clearTimeout(startMatch.hintT); startMatch.hintT = setTimeout(() => { $('keysHint').style.opacity = 0; }, 8000);
+  view.snapCamera(sim);
+  snd.init(); snd.setMusic(true);
+}
+function guestStep() {
+  const s = ON.snap;
+  if (!s) return;
+  const age = Math.min(0.1, (performance.now() - ON.snapAt) / 1000);
+  sim.phase = s.ph; sim.R = s.R; sim.tiltX = s.tx; sim.tiltZ = s.tz; sim.t = s.st; sim.endT = s.endT;
+  sim.roundWinner = s.rw; sim.matchWinner = s.mw; sim.round = s.round;
+  sim.items = s.it.map(([id, kind, x, z, t, drop]) => ({ id, kind, x, z, t, drop }));
+  s.ws.forEach((q, n) => {
+    const w = sim.ws[n]; if (!w) return;
+    const px = w.x, pz = w.z;
+    WKEYS.forEach((k, j) => { w[k] = q.k[j]; });
+    // positions: the host's, carried on by their speed since the packet,
+    // eased in from where we drew them last so nothing jumps
+    const tx = q.k[0] + q.k[3] * age, tz = q.k[2] + q.k[5] * age;
+    w.x = px + (tx - px) * 0.55; w.z = pz + (tz - pz) * 0.55;
+    if (Math.hypot(tx - px, tz - pz) > 3) { w.x = tx; w.z = tz; }   // a new round: snap
+    w.input.x = q.i[0]; w.input.z = q.i[1]; w.input.dash = !!q.i[2];
+    w.stats.slams = q.s[0]; w.stats.outs = q.s[1]; w.stats.dashes = q.s[2];
+  });
+  if (ON.pending.length) {
+    sim.events.push(...ON.pending.splice(0));
+    for (const e of sim.events) if (e.type === 'roundStart') guestRound(e.round);
+    handleEvents(true);
+  }
+}
+function guestRound(n) {
+  // what nextRound() does on screen, without touching the simulation
+  endWait = 0; slowT = 0; freeze = 0;
+  view.lastR = sim.R;
+  $('roundLbl').textContent = 'ROUND ' + n;
+  $('roundLbl').style.display = 'block';
+  banner('READY', n > 1 ? `ROUND ${n}` : 'knock them all off the ring!', 0);
+  snd.count(1);
+  renderBoard();
+}
+if (NET) {
+  NET.onmsg = (d) => {
+    if (!d) return;
+    if (NET.host) {
+      if (d.t === 'hi') ON.peerReady = true;
+      else if (d.t === 'i') override[1] = { x: +d.x || 0, z: +d.z || 0, dash: !!d.d };
+      else if (d.t === 'rematch' && state === 'results') startMatch({});
+    } else {
+      if (d.t === 'setup') guestSetup(d);
+      else if (d.t === 's' && ON.setup) { ON.snap = d; ON.snapAt = performance.now(); if (d.ev && d.ev.length) ON.pending.push(...d.ev); }
+      else if (d.t === 'over' && state === 'play') { guestStep(); sim.matchWinner = d.mw; finishMatch(); }
+    }
+  };
 }
 
 function resize() {
@@ -517,7 +642,15 @@ window.__G = {
   toTitle, pause, resume, finishMatch,
 };
 
-if (Q.has('play')) {
+if (NET) {
+  $('pauseBtn').classList.add('hidden');
+  // the ring idles behind a short message until both games have loaded
+  toTitle();
+  $('title').classList.add('hidden');
+  $('spect').firstChild.textContent = 'SPECTATING';
+  if ($('spect').lastElementChild) $('spect').lastElementChild.textContent = 'the bots are finishing the round';
+  banner('ONLINE', NET.host ? 'waiting for your friend’s game to load…' : 'joining the host’s ring…', 0);
+} else if (Q.has('play')) {
   opts.mode = Q.get('mode') === '2p' ? '2p' : 'solo';
   if (Q.has('tier')) opts.tier = Math.max(0, Math.min(3, +Q.get('tier')));
   buildTitle();

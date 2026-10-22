@@ -3,6 +3,19 @@ import * as THREE from '../vendor/three.module.js';
 
 const Q = new URLSearchParams(location.search);
 const $ = (id) => document.getElementById(id);
+
+// ---------- online (PLAYPILE lobby) ----------
+// The PLAYPILE play page opens this with ?pponline=host|guest and carries
+// messages through ../../_shared/pplink.js. It is DUEL 2P with the host as
+// RED and the guest as INDIGO, taking turns. A shot is sent as the angle
+// and power it was loosed at, so both screens fly the same arrow - but the
+// HOST IS THE REFEREE: it alone decides hits, damage, who goes down, the
+// wind, whose turn it is and the score, and the guest is told. Opened on
+// its own, NET is null and none of this runs.
+const NET = Q.has('pponline') ? await import('../../_shared/pplink.js').then((m) => m.pplink()).catch(() => null) : null;
+const GUEST = !!NET && !NET.host;
+const MY = GUEST ? 1 : 0, OTHER = 1 - MY;
+const ON = { peerReady: false, hiT: 0, got: false, setup: null, aimT: 0 };
 const COL = { paper: 0xefe4cc, ink: 0x1b1714, red: 0xb8321f, blue: 0x2d3a5a, ochre: 0xc89b3c, moss: 0x5b6b3a, bone: 0xe6d6b3 };
 const rnd = (a, b) => a + Math.random() * (b - a);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -258,10 +271,13 @@ const pk = (id) => G.perks[id] || 0;
 
 function setupRound() {
   arrows.forEach((a) => scene.remove(a.m)); arrows = []; drops.forEach((d) => { d.life = 0; d.m.visible = false; });
-  const n = G.stage, dist = G.mode === '1p' ? 12 + Math.min(n, 10) * 0.9 : rnd(13, 18);
-  const h0 = rnd(0, 3), h1 = rnd(0, 3) + (G.mode === '1p' ? Math.min(n, 6) * 0.3 : 0);
+  const n = G.stage; let dist = G.mode === '1p' ? 12 + Math.min(n, 10) * 0.9 : rnd(13, 18);
+  let h0 = rnd(0, 3), h1 = rnd(0, 3) + (G.mode === '1p' ? Math.min(n, 6) * 0.3 : 0);
+  if (GUEST && ON.setup) ({ dist, h0, h1 } = ON.setup);
   placePillar(pillars[0], -dist / 2, h0); placePillar(pillars[1], dist / 2, h1);
   wind = G.mode === '1p' ? (n >= 3 ? rnd(-1, 1) * Math.min(5, (n - 2) * 0.8) : 0) : rnd(-2.5, 2.5);
+  if (GUEST && ON.setup) { wind = ON.setup.wind; G.score = ON.setup.score.slice(); }
+  if (NET && !GUEST && !ON.quiet) NET.send({ t: 'setup', dist, h0, h1, wind, score: G.score });
   const maxP = 100 + pk('hide') * 30;
   A[0].reset(-dist / 2, h0, 1, G.mode === '1p' ? maxP : 100); if (G.mode === '1p') A[0].hp = Math.min(maxP, playerHp);
   A[1].reset(dist / 2, h1, -1, G.mode === '1p' ? 70 + 12 * n : 100);
@@ -269,7 +285,8 @@ function setupRound() {
   $('n0').textContent = G.mode === '1p' ? 'YOU' : 'RED'; $('n1').textContent = G.mode === '1p' ? BOTNAMES[(n - 1) % BOTNAMES.length].toUpperCase() : 'INDIGO';
   $('stage').textContent = G.mode === '1p' ? 'STAGE ' + n : 'RED ' + G.score[0] + ' - ' + G.score[1] + ' INDIGO';
   G.turn = 0; turnWait = 0; endT = 0; camFocus = null; slow = 1; G.state = 'play'; hidePanel(); hud();
-  if (G.mode === '2p') banner('RED TO SHOOT');
+  if (NET) { $('n0').textContent = MY === 0 ? 'YOU' : 'FRIEND'; $('n1').textContent = MY === 1 ? 'YOU' : 'FRIEND'; $('stage').textContent = 'ONLINE ' + G.score[MY] + ' - ' + G.score[OTHER]; banner(G.turn === MY ? 'YOUR SHOT' : 'FRIEND SHOOTS FIRST'); }
+  else if (G.mode === '2p') banner('RED TO SHOOT');
 }
 function hud() {
   $('hp0').style.width = Math.max(0, A[0].hp / A[0].maxHp * 100) + '%'; $('hp1').style.width = Math.max(0, A[1].hp / A[1].maxHp * 100) + '%';
@@ -288,7 +305,8 @@ function hitArcher(a, ar, h) {
   const base = { head: 45, torso: 24, arm: 12, leg: 14 }[h.part];
   let dmg = base * a.dmgMul;
   if (G.mode === '1p') { if (a.owner === 0) dmg *= 1 + pk('dmg') * 0.25; else { dmg *= bot.dmg; if (h.part === 'head') dmg *= Math.pow(0.6, pk('helm')); } }
-  dmg = Math.round(dmg); ar.hp -= dmg;
+  dmg = Math.round(dmg);
+  if (!GUEST) ar.hp -= dmg;   // online, the guest's damage comes from the host
   if (shooterIsPlayer && pk('leech')) A[0].hp = Math.min(A[0].maxHp, A[0].hp + 6 * pk('leech'));
   // stick the arrow into the limb, in that limb's frame
   const [i, j] = STICKS[h.s]; const P = ar.p; const sa = Math.atan2(P[j * 2 + 1] - P[i * 2 + 1], P[j * 2] - P[i * 2]); const len = Math.hypot(P[j * 2] - P[i * 2], P[j * 2 + 1] - P[i * 2 + 1]) || 1;
@@ -296,7 +314,8 @@ function hitArcher(a, ar, h) {
   a.stuck = { ar, s: h.s, u: (rx * Math.cos(sa) + ry * Math.sin(sa)) / len, v: -rx * Math.sin(sa) + ry * Math.cos(sa), rel: a.ang - sa }; a.fly = false;
   for (const q of h.pts) ar.limp[q] = 0.45; ar.flinch = 0.18; ar.push(h.pts, a.vx, a.vy, 0.0012);
   const head = h.part === 'head'; splat(a.x, a.y, a.vx, a.vy, head ? 22 : 12, a.z); hitstop = head ? 0.12 : 0.06; shake = head ? 0.55 : 0.3;
-  head ? SFX.head() : SFX.hit(); floatText((head ? 'HEADSHOT ' : '') + '-' + dmg, a.x, a.y + 0.4, true);
+  head ? SFX.head() : SFX.hit(); if (!GUEST) floatText((head ? 'HEADSHOT ' : '') + '-' + dmg, a.x, a.y + 0.4, true);
+  if (NET && !GUEST) NET.send({ t: 'hit', who: ar.idx, hp: [A[0].hp, A[1].hp], dmg, head: head ? 1 : 0, x: a.x, y: a.y, down: ar.hp <= 0 && ar.alive ? 1 : 0, vx: a.vx, vy: a.vy, pts: h.pts });
   if (ar.hp <= 0 && ar.alive) {
     ar.hp = 0; ar.die(a.vx, a.vy, h.pts); slow = 0.22; slowT = 1.3; camFocus = ar; endT = 2.2; G.state = 'dying';
     banner(head ? 'PINNED!' : 'DOWN!');
@@ -354,11 +373,12 @@ function brain(ar, foe, skill, dt) {
 let drag = null;
 const dots = new THREE.InstancedMesh(new THREE.SphereGeometry(0.05, 6, 4), inkMat, 24); dots.count = 0; dots.frustumCulled = false; scene.add(dots);
 function ctrl() { return G.mode === '2p' ? A[G.turn] : A[0]; }
-canvas.addEventListener('pointerdown', (e) => { audio(); if (AC && AC.state === 'suspended') AC.resume(); if (G.state !== 'play' || G.auto) return; const ar = ctrl(); if (!ar.alive || (G.mode === '2p' && turnWait > 0) || arrows.some((a) => a.fly && G.mode === '2p')) return; drag = { x: e.clientX, y: e.clientY, ar, pw: 0 }; SFX.draw(); });
+canvas.addEventListener('pointerdown', (e) => { audio(); if (AC && AC.state === 'suspended') AC.resume(); if (G.state !== 'play' || G.auto) return; const ar = ctrl(); if (NET && G.turn !== MY) return; if (!ar.alive || (G.mode === '2p' && turnWait > 0) || arrows.some((a) => a.fly && G.mode === '2p')) return; drag = { x: e.clientX, y: e.clientY, ar, pw: 0 }; SFX.draw(); });
 addEventListener('pointermove', (e) => {
   if (!drag) return; const dx = drag.x - e.clientX, dy = e.clientY - drag.y; const len = Math.hypot(dx, dy); if (len < 6) return;
   const f = drag.ar.f; let ang = Math.atan2(dy, dx); let rel = f > 0 ? ang : Math.PI - ang; rel = Math.atan2(Math.sin(rel), Math.cos(rel)); rel = clamp(rel, -1.2, 1.45);
   drag.ar.ang = f > 0 ? rel : Math.PI - rel; drag.pw = Math.min(1, len / (Math.min(innerWidth, innerHeight) * 0.32)); drag.ar.draw = drag.pw;
+  if (NET && performance.now() - ON.aimT > 66) { ON.aimT = performance.now(); NET.send({ t: 'aim', ang: drag.ar.ang, draw: drag.pw }); }
 });
 function release() {
   if (!drag) return; const ar = drag.ar; const pw = drag.pw; drag = null; ar.draw = 0; dots.count = 0;
@@ -367,6 +387,7 @@ function release() {
 }
 function playerLoose(ar, ang, pw) {
   const twin = G.mode === '1p' && pk('twin');
+  if (NET) NET.send({ t: 'shot', ang, pw });
   fire(ar, ang, pw); if (twin) setTimeout(() => ar.alive && fire(ar, ang + 0.035, pw * 0.97, 0.7), 90);
   ar.reload = G.mode === '1p' ? 0.85 * Math.pow(0.7, pk('quick')) : 0;
   if (firstShot) { firstShot = false; $('tip').style.opacity = '0'; }
@@ -394,6 +415,7 @@ function roundOver() {
   const won = A[1].hp <= 0;
   if (G.mode === '2p') {
     G.score[won ? 0 : 1]++; SFX.win(); G.state = 'result';
+    if (NET) { ON.lastW = won ? 0 : 1; NET.send({ t: 'over', score: G.score, w: ON.lastW }); onlineResult(); return; }
     show(`<h2>${won ? 'RED' : 'INDIGO'} TAKES IT</h2><p>RED ${G.score[0]} &mdash; ${G.score[1]} INDIGO</p><button class="btn red" id="r">NEXT DUEL</button><button class="btn" id="m">MENU</button>`, { '#r': () => setupRound(), '#m': menu });
     return;
   }
@@ -409,7 +431,8 @@ function roundOver() {
 }
 function choosePerk(i) { const p = G.offer[i]; G.perks[p.id] = pk(p.id) + 1; if (p.id === 'mend') playerHp = 999; if (p.id === 'hide') playerHp += 30; G.stage++; setupRound(); }
 G.choosePerk = choosePerk; G.startLadder = startLadder; G.start2P = start2P; G.menu = menu;
-$('menuBtn').onclick = () => { SFX.click(); menu(); };
+G.aimAt = (i) => solve(A[i], A[1 - i].p[2], A[1 - i].p[3]);   // test hook: a shot from archer i at the other's chest
+$('menuBtn').onclick = () => { SFX.click(); if (NET) { onlineMenu(); return; } menu(); };
 $('muteBtn').onclick = () => { muted = !muted; $('muteBtn').style.opacity = muted ? 0.4 : 1; if (!muted) audio(); };
 if (muted) $('muteBtn').style.opacity = 0.4;
 
@@ -423,14 +446,14 @@ function simStep(dt) {
     else if (G.auto && G.state === 'play' && turnWait <= 0 && !arrows.some((a) => a.fly)) { const ar = A[G.turn], foe = A[1 - G.turn]; const s = solve(ar, foe.p[2], foe.p[3]); fire(ar, s.ang + rnd(-0.03, 0.03), s.pw); }
   }
   stepArrows(dt);
-  if (turnWait > 0) { turnWait -= dt; if (turnWait <= 0 && G.state === 'play') { G.turn = 1 - G.turn; wind = clamp(wind + rnd(-1, 1), -3, 3); hud(); banner(G.turn ? 'INDIGO TO SHOOT' : 'RED TO SHOOT'); } }
+  if (turnWait > 0) { turnWait -= dt; if (turnWait <= 0 && G.state === 'play' && !GUEST) { G.turn = 1 - G.turn; wind = clamp(wind + rnd(-1, 1), -3, 3); hud(); if (NET) { NET.send({ t: 'turn', turn: G.turn, wind }); banner(G.turn === MY ? 'YOUR SHOT' : 'FRIEND TO SHOOT'); } else banner(G.turn ? 'INDIGO TO SHOOT' : 'RED TO SHOOT'); } }
   for (const d of drops) if (d.life > 0) { d.life -= dt; d.vy -= GRAV * dt; d.x += d.vx * dt; d.y += d.vy * dt; if (d.y < FLOOR) d.vy = d.vx = 0; }
 }
 function update(dtReal) {
   if (hitstop > 0) { hitstop -= dtReal; return; }
   if (slowT > 0) { slowT -= dtReal; if (slowT <= 0) slow = 1; }
   acc += dtReal * slow; let n = 0; while (acc >= STEP && n++ < 30) { simStep(STEP); acc -= STEP; }
-  if (G.state === 'dying') { endT -= dtReal; if (endT <= 0) roundOver(); }
+  if (G.state === 'dying' && !GUEST) { endT -= dtReal; if (endT <= 0) roundOver(); }
   shake = Math.max(0, shake - dtReal * 1.6);
 }
 const camPos = new THREE.Vector3(0, 3, 30), camLook = new THREE.Vector3();
@@ -454,5 +477,45 @@ function loop(now) { const dt = Math.min(0.05, (now - last) / 1000); last = now;
 G.fast = (sec) => { G.fasting = true; for (let i = 0; i < sec * 120; i++) update(STEP); G.fasting = false; draw(0.5); };
 G.loose = (ang, pw) => playerLoose(ctrl(), ang, pw);
 
-if (Q.has('title')) { G.mode = '1p'; setupRound(); menu(); } else startLadder();
+// ---------- online: the wire ----------
+function onlineResult() {
+  const iWon = ON.lastW === MY;
+  if (GUEST) (iWon ? SFX.win : SFX.lose)();   // the host already heard roundOver's
+  show(`<h2>${iWon ? 'YOU TAKE IT' : 'FRIEND TAKES IT'}</h2><p>YOU ${G.score[MY]} &mdash; ${G.score[OTHER]} FRIEND</p>`
+    + `<button class="btn red" id="r">${GUEST ? 'ASK FOR THE NEXT DUEL' : 'NEXT DUEL'}</button><button class="btn" id="m">LEAVE</button>`,
+  { '#r': () => { if (!GUEST) setupRound(); else { NET.send({ t: 'next' }); const b = $('r'); if (b) b.textContent = 'WAITING FOR HOST…'; } }, '#m': () => NET.leave() });
+}
+function onlineMenu() {
+  if (G.state === 'result' || G.state === 'wait') return;
+  show('<h2>ONLINE DUEL</h2><p>The duel carries on while this is open.</p><button class="btn red" id="b">BACK TO THE DUEL</button><button class="btn" id="l">LEAVE MATCH</button>',
+    { '#b': hidePanel, '#l': () => NET.leave() });
+}
+if (NET) {
+  NET.onmsg = (d) => {
+    if (!d) return;
+    // both ways: the other archer drawing, and loosing
+    if (d.t === 'aim') { const ar = A[OTHER]; ar.ang = d.ang; ar.draw = d.draw; return; }
+    if (d.t === 'shot') { const ar = A[OTHER]; ar.ang = d.ang; ar.draw = 0; fire(ar, d.ang, d.pw); return; }
+    if (!GUEST) {
+      if (d.t === 'hi' && G.state === 'wait') start2P();
+      else if (d.t === 'next' && G.state === 'result') setupRound();
+      return;
+    }
+    if (d.t === 'setup') { ON.got = true; ON.setup = d; G.mode = '2p'; setupRound(); }
+    else if (d.t === 'turn') { G.turn = d.turn; wind = d.wind; turnWait = 0; hud(); banner(G.turn === MY ? 'YOUR SHOT' : 'FRIEND TO SHOOT'); }
+    else if (d.t === 'hit') {
+      A[0].hp = d.hp[0]; A[1].hp = d.hp[1]; hud();
+      floatText((d.head ? 'HEADSHOT ' : '') + '-' + d.dmg, d.x, d.y + 0.4, true);
+      const ar = A[d.who];
+      if (d.down && ar.alive) {
+        ar.hp = 0; ar.die(d.vx, d.vy, d.pts); slow = 0.22; slowT = 1.3; camFocus = ar; endT = 2.2; G.state = 'dying';
+        banner(d.head ? 'PINNED!' : 'DOWN!'); hud();
+      }
+    } else if (d.t === 'over') { G.score = d.score.slice(); ON.lastW = d.w; G.state = 'result'; onlineResult(); }
+  };
+  // the guest says hello until the host answers with an arena
+  if (GUEST) setInterval(() => { if (!ON.got) NET.send({ t: 'hi' }); }, 500);
+}
+if (NET) { G.mode = '2p'; G.score = [0, 0]; ON.quiet = true; setupRound(); ON.quiet = false; G.state = 'wait'; if (GUEST) NET.send({ t: 'hi' }); show('<h1>ARCHER<br>DUEL</h1><p>ONLINE &middot; ' + (GUEST ? 'joining the host&rsquo;s hill&hellip;' : 'waiting for your friend&rsquo;s game to load&hellip;') + '</p>', {}); }
+else if (Q.has('title')) { G.mode = '1p'; setupRound(); menu(); } else startLadder();
 requestAnimationFrame(loop);

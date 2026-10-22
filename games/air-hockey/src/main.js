@@ -11,6 +11,28 @@ const RGB = { 0: '46,242,255', 1: '255,61,154', puck: '255,243,107' };
 const LEVELS = ['easy', 'medium', 'hard'];
 const LABEL = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
 
+// ---------------------------------------------------------------- online (PLAYPILE lobby)
+// When the PLAYPILE play page starts this game for an online match it adds
+// ?pponline=host|guest, and ../../_shared/pplink.js carries the messages.
+// The HOST runs the real match (its local 2-player mode, the guest on the
+// top mallet) and sends the table 30 times a second. The GUEST runs no
+// physics at all: it sends where its mallet wants to be and draws the
+// host's table turned round, so each player defends the bottom goal.
+// Opened on its own (no ?pponline) none of this exists.
+const NET = qs.has('pponline') ? await import('../../_shared/pplink.js').then((m) => m.pplink()).catch(() => null) : null;
+const ON = { peerReady: false, snap: null, snapAt: 0, sendT: 0, inT: 0, ev: [], hiT: 0 };
+const nx = (x) => Math.round(x / W * 10000) / 10000, ny = (y) => Math.round(y / H * 10000) / 10000;
+const flipEv = (e) => {
+  // a host event, seen from the guest's end of the table
+  const o = { ...e };
+  if (e.x != null) o.x = W - e.x * W; if (e.y != null) o.y = H - e.y * H;
+  if (e.nx != null) { o.nx = -e.nx; o.ny = -e.ny; }
+  if (e.side != null) o.side = 1 - e.side;
+  if (e.scorer != null) o.scorer = 1 - e.scorer;
+  if (e.winner != null) o.winner = 1 - e.winner;
+  return o;
+};
+
 // ---------------------------------------------------------------- save
 const SAVE_KEY = 'pd.air-hockey';
 const save = Object.assign({ diff: 'medium', wins: { easy: 0, medium: 0, hard: 0 }, losses: { easy: 0, medium: 0, hard: 0 }, streak: 0, bestStreak: 0, top: 0, muted: false, matches: 0, duels: 0 }, load());
@@ -57,7 +79,7 @@ const pointers = new Map(); // pointerId -> side
 let lastPointer = matchMedia('(pointer: coarse)').matches ? 'touch' : 'mouse';
 let keyDir = { x: 0, y: 0 };
 function pointerSide(e, x, y) {
-  if (S.game.mode !== '2p' || e.pointerType === 'mouse') return 0;
+  if (NET || S.game.mode !== '2p' || e.pointerType === 'mouse') return 0;   // online: every finger is yours
   return y > H / 2 ? 0 : 1;
 }
 function aim(e) {
@@ -91,7 +113,10 @@ window.addEventListener('keydown', (e) => {
   if (KEYS[e.code]) { held.add(e.code); e.preventDefault(); }
   if (e.repeat) return;
   if (e.code === 'KeyM') toggleMute();
-  if (S.state === 'play') {
+  if (NET) {
+    // online: nobody can pause the other player's match; a rematch is asked for
+    if (S.state === 'results' && (e.code === 'Space' || e.code === 'Enter')) { e.preventDefault(); onlineRematch(); }
+  } else if (S.state === 'play') {
     if (e.code === 'Escape' || e.code === 'KeyP') togglePause();
     else if (e.code === 'KeyR') restart();
   } else if (S.state === 'results') {
@@ -113,7 +138,7 @@ function keyMove(dt) {
   S.moved += 1100 * dt * 3;
   setTarget(S.game, 0, m.x + tx * 1100 * dt * 3, m.y + ty * 1100 * dt * 3);
 }
-document.addEventListener('visibilitychange', () => { if (document.hidden && S.state === 'play' && !S.paused) togglePause(); });
+document.addEventListener('visibilitychange', () => { if (!NET && document.hidden && S.state === 'play' && !S.paused) togglePause(); });
 
 // ---------------------------------------------------------------- flow
 function start(opts) {
@@ -126,7 +151,9 @@ function start(opts) {
   clearFx();
   document.body.classList.add('playing');
   const two = opts.mode === '2p';
-  bigText(two ? 'GO!' : 'FIRST TO 7', COL.p1, two ? 0.8 : 0.9, two ? undefined : textSize(0.8), two ? undefined : [view.land ? W * 0.2 : W / 2, H * 0.25]);
+  if (NET) { ON.snap = null; ON.ev.length = 0; ON.pending.length = 0; S.waitRematch = false; if (NET.host) NET.send({ t: 'start' }); }
+  if (NET) bigText('GO!', COL.p1, 0.8, undefined, [view.land ? W * 0.2 : W / 2, H * 0.75]);
+  else bigText(two ? 'GO!' : 'FIRST TO 7', COL.p1, two ? 0.8 : 0.9, two ? undefined : textSize(0.8), two ? undefined : [view.land ? W * 0.2 : W / 2, H * 0.25]);
   fx.coach = opts.mode === '2p' ? 0 : 1; S.moved = 0;
   renderUI();
 }
@@ -160,7 +187,8 @@ function finish(winner) {
       if (g.score[1] === 0) r.badges.push('Shutout!');
       sfx.win();
     } else { save.losses[g.diff]++; save.streak = 0; sfx.lose(); }
-  } else { save.duels++; sfx.win(); }
+  } else if (NET) { save.duels++; (winner === 0 ? sfx.win : sfx.lose)(); }
+  else { save.duels++; sfx.win(); }
   if (kmh > save.top) { if (save.top > 0) r.badges.push('Hardest shot ever: ' + kmh + ' km/h'); save.top = kmh; }
   store();
   S.lastResult = r;
@@ -183,7 +211,7 @@ function burst(x, y, n, rgb, speed, size = 5, life = 0.45, nx = 0, ny = 0) {
 function textSize(k = 1) { return Math.max(24, Math.min(view.cw * 0.13, view.ch * 0.12, 96) * k); }
 function bigText(text, color, dur = 1, size, at) {
   // 2 players on an upright phone: one copy per half, the top one faces the top player
-  if (!at && S.game && S.game.mode === '2p' && !view.land) {
+  if (!at && S.game && S.game.mode === '2p' && !view.land && !NET) {
     const sz = Math.min(size || textSize(), textSize(0.8));
     bigText(text, color, dur, sz, [W / 2, H * 0.75]);
     bigText(text, color, dur, sz, [W / 2, H * 0.25]);
@@ -231,10 +259,10 @@ function handleEvents(g, quiet) {
       fx.shake = 16; fx.scorePunch[s] = 1;
       fx.trail.length = 0;
       if (!quiet) {
-        const good = g.mode === '2p' || s === 0;
+        const good = (g.mode === '2p' && !NET) || s === 0;
         sfx.goal(good);
         let label = 'GOAL!';
-        if (g.score[s] >= g.target) label = g.mode === 'bot' ? (s === 0 ? 'WINNER!' : 'GAME') : 'WINNER!';
+        if (g.score[s] >= g.target) label = g.mode === 'bot' || NET ? (s === 0 ? 'WINNER!' : 'GAME') : 'WINNER!';
         else if (g.score[s] === g.target - 1) label = 'MATCH POINT';
         bigText(label, s === 0 ? COL.p1 : COL.p2, 1.1, label.length > 6 ? textSize(0.75) : undefined);
       }
@@ -281,12 +309,14 @@ function simulate(realDt) {
   const quiet = S.state !== 'play';
   if (S.state === 'play' && S.paused) return;
   keyMove(realDt);
+  if (NET && !NET.host && S.state !== 'title') { guestFrame(g, realDt); return; }
   let dt = realDt * S.timeScale;
   if (S.hitstop > 0) { S.hitstop -= realDt; return; }
   acc += dt;
   let n = 0;
   while (acc >= DT && n < 40) {
     step(g, DT); acc -= DT; n++;
+    if (NET && S.state === 'play' && g.events.length) for (const e of g.events) ON.ev.push(packEv(e));
     handleEvents(g, quiet);
     if (n % 2 === 0) pushTrail(g);
     if (S.hitstop > 0) { acc = 0; break; }
@@ -297,9 +327,89 @@ function simulate(realDt) {
 function frame(now) {
   const realDt = Math.min(0.05, (now - last) / 1000); last = now;
   simulate(realDt);
+  if (NET) onlineTick(realDt);
   updateFx(S.paused ? 0 : realDt * Math.min(S.timeScale, 4));
-  drawFrame(ctx, S.game, fx, { coach: S.state === 'play' && !S.paused ? fx.coach : 0, touch: lastPointer !== 'mouse', flipTop: S.game.mode === '2p', dim: S.state === 'title' ? 0.25 : S.state === 'results' ? 0.15 : 0 });
+  drawFrame(ctx, S.game, fx, { coach: S.state === 'play' && !S.paused ? fx.coach : 0, touch: lastPointer !== 'mouse', flipTop: S.game.mode === '2p' && !NET, dim: S.state === 'title' ? 0.25 : S.state === 'results' ? 0.15 : 0 });
   requestAnimationFrame(frame);
+}
+
+// ---------------------------------------------------------------- online: the wire
+// Everything on the wire is in TABLE FRACTIONS (x / W, y / H), because the
+// table length H is fitted to each player's own screen shape.
+function packEv(e) {
+  const o = { type: e.type };
+  if (e.x != null) { o.x = nx(e.x); o.y = ny(e.y); }
+  for (const k of ['side', 'scorer', 'winner', 'speed']) if (e[k] != null) o[k] = e[k];
+  if (e.nx != null) { o.nx = Math.round(e.nx * 100) / 100; o.ny = Math.round(e.ny * 100) / 100; }
+  return o;
+}
+function onlineTick(dt) {
+  const g = S.game;
+  if (NET.host) {
+    // the guest's game says hello when it has loaded; then the match starts
+    if (S.state === 'title' && ON.peerReady) start({ mode: '2p' });
+    ON.sendT -= dt;
+    if (S.state !== 'title' && ON.sendT <= 0) {
+      ON.sendT = 1 / 30;
+      const p = g.puck;
+      NET.send({ t: 's', st: S.state, ph: g.phase, sc: g.score, w: g.winner,
+        p: [nx(p.x), ny(p.y), Math.round(p.vx / W * 1000) / 1000, Math.round(p.vy / H * 1000) / 1000],
+        m: [nx(g.m[0].x), ny(g.m[0].y), nx(g.m[1].x), ny(g.m[1].y)],
+        k: [Math.round(g.stats.top), g.stats.longest, Math.round(g.t * 10) / 10],
+        ev: ON.ev.splice(0) });
+    }
+  } else {
+    // keep saying hello until the host answers with a table
+    ON.hiT -= dt;
+    if (!ON.snap && ON.hiT <= 0) { ON.hiT = 0.5; NET.send({ t: 'hi' }); }
+    ON.inT -= dt;
+    if (S.state === 'play' && ON.inT <= 0) {
+      ON.inT = 1 / 30;
+      const m = g.m[0];
+      NET.send({ t: 'i', x: nx(m.tx), y: ny(m.ty) });
+    }
+  }
+}
+function guestFrame(g, dt) {
+  const s = ON.snap;
+  if (!s) return;
+  // the puck: where the host last saw it, carried on by its speed since
+  // (dead reckoning), so it does not stutter between packets
+  const age = Math.min(0.1, (performance.now() - ON.snapAt) / 1000);
+  const px = W - (s.p[0] + s.p[2] * age) * W, py = H - (s.p[1] + s.p[3] * age) * H;
+  const p = g.puck;
+  p.x += (Math.max(0, Math.min(W, px)) - p.x) * 0.6; p.y += (Math.max(0, Math.min(H, py)) - p.y) * 0.6;
+  p.vx = -s.p[2] * W; p.vy = -s.p[3] * H;
+  // your own mallet follows your hand straight away; the host agrees a moment later
+  const me = g.m[0], them = g.m[1];
+  me.x = me.tx; me.y = me.ty;
+  them.x += (W - s.m[0] * W - them.x) * 0.5; them.y += (H - s.m[1] * H - them.y) * 0.5;
+  g.score[0] = s.sc[1]; g.score[1] = s.sc[0];
+  g.phase = s.ph; g.winner = s.w < 0 ? -1 : 1 - s.w;
+  if (s.k) { g.stats.top = s.k[0]; g.stats.longest = s.k[1]; g.t = s.k[2]; }
+  if (ON.pending.length) { g.events.push(...ON.pending.splice(0)); handleEvents(g, false); if (S.hitstop > 0) S.hitstop = 0; }
+  if (S.overT > 0) { S.overT -= dt; if (S.overT <= 0 && S.state === 'play') finish(g.winner); }
+}
+ON.pending = [];
+if (NET) {
+  NET.onmsg = (d) => {
+    if (!d) return;
+    if (NET.host) {
+      if (d.t === 'hi') ON.peerReady = true;
+      else if (d.t === 'i' && S.state === 'play') setTarget(S.game, 1, W - d.x * W, H - d.y * H);
+      else if (d.t === 'rematch' && S.state === 'results') restart();
+    } else {
+      if (d.t === 'start' || (d.t === 's' && S.state === 'title')) { if (S.state !== 'play') start({ mode: '2p' }); }
+      if (d.t === 's') {
+        ON.snap = d; ON.snapAt = performance.now();
+        if (d.ev && d.ev.length) ON.pending.push(...d.ev.map(flipEv));
+      }
+    }
+  };
+}
+function onlineRematch() {
+  if (S.state !== 'results') return;
+  if (NET.host) restart(); else { NET.send({ t: 'rematch' }); S.waitRematch = true; renderUI(); }
 }
 
 // ---------------------------------------------------------------- UI
@@ -310,7 +420,12 @@ function muteBtn() { return `<button class="hudbtn r" data-a="mute" aria-label="
 function renderUI() {
   S.panel = S.paused ? 'pause' : S.state;
   let h = '';
-  if (S.state === 'title') {
+  if (NET && S.state === 'title') {
+    h = `<div class="scrim vig"><div class="panel">
+      <div class="logo"><h1><span class="a">PUCK</span><span class="b">BLITZ</span></h1><p>Online &middot; first to 7</p></div>
+      <div class="stats">${NET.host ? 'Waiting for your friend&rsquo;s game to load&hellip;' : 'Joining the host&rsquo;s table&hellip;'}</div>
+    </div></div>${muteBtn()}`;
+  } else if (S.state === 'title') {
     const diffs = LEVELS.map((d) => `<button class="${save.diff === d ? 'sel' : ''}" data-diff="${d}">${LABEL[d]}<span class="st ${save.wins[d] ? 'on' : ''}">&#9733;</span><small>${save.wins[d]}W &middot; ${save.losses[d]}L</small></button>`).join('');
     h = `<div class="scrim vig"><div class="panel">
       <div class="logo"><h1><span class="a">PUCK</span><span class="b">BLITZ</span></h1><p>Neon air hockey &middot; first to 7</p></div>
@@ -320,14 +435,15 @@ function renderUI() {
       <div class="stats">Best streak <b>${save.bestStreak}</b> &nbsp;&middot;&nbsp; Hardest shot <b>${save.top}</b> km/h</div>
     </div></div>${muteBtn()}`;
   } else if (S.state === 'play') {
-    h = `<button class="hudbtn l" data-a="pause" aria-label="Pause"><i></i><i></i></button>${muteBtn()}`;
+    h = (NET ? '' : `<button class="hudbtn l" data-a="pause" aria-label="Pause"><i></i><i></i></button>`) + muteBtn();
     if (S.paused) h += `<div class="scrim dark"><div class="panel"><div class="ptitle">PAUSED</div>
       <button class="btn play" data-a="resume">RESUME</button>
       <div class="row"><button class="btn" data-a="restart">Restart</button><button class="btn" data-a="menu">Menu</button></div></div></div>`;
   } else if (S.state === 'results') {
     const r = S.lastResult, g = S.game;
     let head, cls;
-    if (r.mode === 'bot') { head = r.winner === 0 ? 'YOU WIN!' : 'BOT WINS'; cls = r.winner === 0 ? 'p1' : 'p2'; }
+    if (NET) { head = r.winner === 0 ? 'YOU WIN!' : 'YOU LOSE'; cls = r.winner === 0 ? 'p1' : 'p2'; }
+    else if (r.mode === 'bot') { head = r.winner === 0 ? 'YOU WIN!' : 'BOT WINS'; cls = r.winner === 0 ? 'p1' : 'p2'; }
     else { head = r.winner === 0 ? 'BLUE WINS!' : 'PINK WINS!'; cls = r.winner === 0 ? 'p1' : 'p2'; }
     const nextIdx = LEVELS.indexOf(r.diff) + 1;
     const next = r.mode === 'bot' && r.winner === 0 && nextIdx < 3 ? LEVELS[nextIdx] : null;
@@ -337,9 +453,9 @@ function renderUI() {
       <div class="score"><span class="a">${r.score[0]}</span><span class="dash">&ndash;</span><span class="b">${r.score[1]}</span></div>
       ${badges}
       <div class="chips"><div class="chip"><b>${Math.round(r.top * 0.045)}</b><span>top km/h</span></div><div class="chip"><b>${r.longest}</b><span>best rally</span></div><div class="chip"><b>${fmtTime(r.time)}</b><span>time</span></div></div>
-      <button class="btn play" data-a="rematch">REMATCH</button>
-      <div class="row">${next ? `<button class="btn" data-a="next">Try ${LABEL[next]} &#9654;</button>` : ''}<button class="btn" data-a="menu">Menu</button></div>
-      <div class="hint">${r.mode === 'bot' ? LABEL[r.diff] + ' bot' : 'first to 7'}${lastPointer === 'mouse' ? ' &middot; space to rematch' : ''}</div>
+      ${NET && S.waitRematch ? '<button class="btn play" disabled>WAITING FOR HOST&hellip;</button>' : '<button class="btn play" data-a="rematch">REMATCH</button>'}
+      <div class="row">${NET ? '<button class="btn" data-a="leave">Leave match</button>' : ''}${!NET && next ? `<button class="btn" data-a="next">Try ${LABEL[next]} &#9654;</button>` : ''}${NET ? '' : '<button class="btn" data-a="menu">Menu</button>'}</div>
+      <div class="hint">${NET ? 'online &middot; ' + (NET.host ? 'you are the host' : 'you are the guest') : r.mode === 'bot' ? LABEL[r.diff] + ' bot' : 'first to 7'}${lastPointer === 'mouse' ? ' &middot; space to rematch' : ''}</div>
     </div></div>${muteBtn()}`;
   }
   ui.innerHTML = h;
@@ -354,7 +470,9 @@ ui.addEventListener('click', (e) => {
   if (a === 'play') start({ mode: 'bot', diff: save.diff });
   else if (a === '2p') start({ mode: '2p' });
   else if (a === 'mute') toggleMute();
-  else if (a === 'pause' || a === 'resume') togglePause();
+  else if ((a === 'pause' || a === 'resume') && !NET) togglePause();
+  else if (NET && a === 'rematch') onlineRematch();
+  else if (NET && a === 'leave') NET.leave();
   else if (a === 'restart' || a === 'rematch') restart();
   else if (a === 'menu') toTitle();
   else if (a === 'next') { const d = LEVELS[LEVELS.indexOf(S.lastResult.diff) + 1]; start({ mode: 'bot', diff: d }); }

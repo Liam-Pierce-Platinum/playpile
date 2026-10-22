@@ -36,20 +36,21 @@
   "monetag": {
     "_readme": "Checked 2026-10-21: none of these install a service worker or ask for notifications. NEVER add Push Notifications / MultiTag / OnClick. In-page push stays OFF game pages; vignette is desktop-only (Google demotes full-screen ads on phones).",
     "enabled": true,
-    "inpage": {
-      "zone": "12092884",
-      "src": "https://nap5k.com/tag.min.js",
-      "where": "home, category and info pages - never /play/ or /games/"
-    },
-    "vignette": {
-      "zone": "12092882",
-      "src": "https://n6wxm.com/vignette.min.js",
-      "where": "desktop only (wide screen + mouse), never /play/ or /games/"
-    },
     "direct": {
       "url": "https://uplcm.com/4/12092883",
       "label": "Sponsored",
       "where": "a small labelled link in the page footer"
+    },
+    "_off": "2026-10-22: in-page push + vignette switched OFF - Liam saw a fake \"finish downloading\" scam ad from Monetag. Only re-enable after blocking that ad category in the Monetag dashboard and re-checking.",
+    "inpage_disabled": {
+      "zone": "12092884",
+      "src": "https://nap5k.com/tag.min.js",
+      "where": "home, category and info pages - never /play/ or /games/"
+    },
+    "vignette_disabled": {
+      "zone": "12092882",
+      "src": "https://n6wxm.com/vignette.min.js",
+      "where": "desktop only (wide screen + mouse), never /play/ or /games/"
     }
   }
 }

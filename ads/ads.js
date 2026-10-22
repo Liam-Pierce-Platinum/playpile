@@ -104,30 +104,7 @@ export async function loadAds() {
     }
   }
   notice();
-  monetag(CFG.monetag);
   return CFG;
-}
-
-// MONETAG (2026-10-21). Loaded after the page is idle so it never slows the first paint. In-page push
-// and the vignette stay off game pages; the vignette is desktop-only. The direct link is a labelled
-// 'Sponsored' link in the footer, rel=sponsored so search engines don't treat it as an endorsement.
-function monetag(M) {
-  if (!M || !M.enabled || window.__mtDone) return; window.__mtDone = 1;
-  const p = location.pathname, game = p.startsWith('/play/') || p.startsWith('/games/');
-  const tag = (z) => { const s = document.createElement('script'); s.dataset.zone = z.zone; s.src = z.src; s.async = true; document.body.appendChild(s); };
-  const go = () => {
-    if (!game && M.inpage) tag(M.inpage);
-    if (!game && M.vignette && matchMedia('(pointer: fine)').matches && innerWidth >= 1024) tag(M.vignette);
-    if (M.direct) for (const f of document.querySelectorAll('footer.foot')) {
-      if (f.querySelector('.pp-sponsor')) continue;
-      const a = document.createElement('a'); a.className = 'pp-sponsor'; a.href = M.direct.url; a.target = '_blank';
-      a.rel = 'sponsored nofollow noopener'; a.textContent = M.direct.label || 'Sponsored';
-      a.style.cssText = 'display:inline-block;margin:8px 0;font-size:12px;opacity:.7';
-      f.appendChild(a);
-    }
-  };
-  const idle = window.requestIdleCallback || ((f) => setTimeout(f, 1500));
-  if (document.readyState === 'complete') idle(go, { timeout: 4000 }); else addEventListener('load', () => idle(go, { timeout: 4000 }), { once: true });
 }
 
 /**

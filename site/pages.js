@@ -141,7 +141,7 @@ export function categoryBody(cat, list, intro) {
     + '<h2 class="cath2">All ' + esc(CAT_TITLE[cat] || cat + ' games') + '</h2>'
     + '<div class="strip wide catbig">' + list.map(cardHtml).join('') + '</div>'
     + '<div class="catlist">' + list.map((g) =>
-      '<article><h2><a href="' + playUrl(g) + '">' + esc(g.title) + '</a></h2>'
+      '<article><a href="' + playUrl(g) + '"><img src="/shots/t/' + g.slug + '.webp" alt="' + esc(g.title) + '" loading="lazy"></a><h2><a href="' + playUrl(g) + '">' + esc(g.title) + '</a></h2>'
       + '<p class="lede">' + esc(clean(g.blurb)) + '</p>'
       + '<p>' + esc(clean(String(g.about).split(/\n\s*\n/)[0])) + '</p>'
       + '<p class="more"><a href="' + playUrl(g) + '">Play ' + esc(g.title) + ', the free ' + esc(kwOf(g))

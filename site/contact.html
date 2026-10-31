@@ -50,6 +50,23 @@
         <h1>Contact</h1>
         <p id="lede">PLAYPILE is made by one person, and every message is read by that person.</p>
       </section>
+      <h2>Send a message</h2>
+      <form id="cform" style="display:grid;gap:10px;max-width:560px;margin:0 0 22px">
+        <label>Your name <input name="n" required style="width:100%;padding:9px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:inherit"></label>
+        <label>Your email <input name="e" type="email" required style="width:100%;padding:9px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:inherit"></label>
+        <label>Topic <select name="t" style="width:100%;padding:9px;border-radius:8px;border:1px solid var(--edge);background:var(--bg,#111);color:inherit">
+          <option>A game is broken</option><option>Idea or feedback</option><option>Privacy or my data</option><option>Parents</option><option>Business</option><option>Something else</option></select></label>
+        <label>Message <textarea name="m" rows="6" required style="width:100%;padding:9px;border-radius:8px;border:1px solid var(--edge);background:transparent;color:inherit"></textarea></label>
+        <button class="btn" type="submit" style="justify-self:start;padding:10px 20px">Send</button>
+        <small style="color:var(--dim)">This opens your email app with the message ready to send to support@playpile.net.</small>
+      </form>
+      <script>
+        document.getElementById('cform').addEventListener('submit', (ev) => {
+          ev.preventDefault(); const f = ev.target;
+          const body = f.m.value + '\n\n- ' + f.n.value + ' (' + f.e.value + ')';
+          location.href = 'mailto:support@playpile.net?subject=' + encodeURIComponent('PLAYPILE: ' + f.t.value) + '&body=' + encodeURIComponent(body);
+        });
+      </script>
       <h2>Email</h2>
       <p style="font-size:18px"><a href="mailto:support@playpile.net?subject=PLAYPILE%3A%20Hello" style="color:var(--accent)">support@playpile.net</a></p>
       <p>There is no form and no ticket system. Write as you would to anyone, and use one of the

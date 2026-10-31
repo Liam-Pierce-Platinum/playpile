@@ -29,14 +29,14 @@ export const KW = {
   'firework-frenzy': 'firework rocket flying game', 'pursued': 'horror chase game', 'deep-dive': 'submarine rescue game',
   'sky-aces': 'plane dogfight game', 'auto-arena': 'auto battler game', 'tiny-knight': 'knight action rpg game',
   'the-mark': 'sniper assassin game', 'chibi-clash': 'monster battle game', 'spelldelve': 'wizard roguelite game',
-  'frontline': 'fps shooter game', 'curveball': '3d pong game', 'helix-drop': 'helix ball drop game',
+  'frontline': 'fps shooter game', 'curveball': 'football kicking game', 'helix-drop': 'helix ball drop game',
   'axe-throw': 'axe throwing game', 'car-soccer': 'car football game', 'tank-duel': 'artillery tank game',
   'sumo-slam': 'sumo party game', 'prism': 'colour switch game', 'home-run': 'baseball batting game',
-  'air-hockey': 'air hockey game', 'strike': 'bowling game', 'word-blitz': 'word search game',
+  'air-hockey': 'air hockey game', 'strike': 'bowling game', 'word-blitz': 'word hunt game',
   'beat-dash': 'rhythm runner game', 'neon-swarm': 'twin stick shooter game', 'pinball': 'pinball game',
-  'mini-golf': 'mini golf game', 'graze': 'bullet hell dodging game', 'lanternfall': 'survivor roguelike game',
-  'bailout': 'car stunt crash game', 'twister-io': 'tornado io game', 'block-royale': 'block puzzle game',
-  'bannerfall': 'castle siege strategy game', 'stack-attack': 'stacking tower game', 'snowball-royale': 'snowball fight game',
+  'mini-golf': 'mini golf game', 'graze': 'one button cave flying game', 'lanternfall': 'survivor roguelike game',
+  'bailout': 'stunt bike game', 'twister-io': 'tornado io game', 'block-royale': 'block puzzle game',
+  'bannerfall': 'castle siege strategy game', 'stack-attack': 'burger stacking game', 'snowball-royale': 'snowball fight game',
   'wrecking-ball': 'wrecking ball demolition game', 'mower-madness': 'lawn mower game', 'sushi-conveyor': 'sushi restaurant game',
   'bomb-squad': 'bomb defusal puzzle game', 'grapple-goblin': 'grappling hook game', 'parry': 'sword parry rhythm game',
   'one-tile': 'heist puzzle game', 'derby': 'demolition derby game', 'touge-drift': 'mountain drift racing game',
@@ -74,4 +74,10 @@ export const CAT_TITLE = {
   Action: 'Free Action Games', Shooter: 'Free Shooting Games', Driving: 'Free Racing & Driving Games', Arcade: 'Free Arcade Games',
   Strategy: 'Free Strategy Games', Puzzle: 'Free Puzzle Games', Adventure: 'Free Adventure Games', Sport: 'Free Sports Games',
   Horror: 'Free Horror Games', Multiplayer: 'Free Multiplayer Games to Play With Friends',
+};
+
+// keyword fixes 2026-10-31: the old addresses redirect to the new ones
+export const OLD_SEO = {
+  'curveball': 'curveball-3d-pong-game', 'bailout': 'bailout-car-stunt-crash-game', 'word-blitz': 'word-blitz-search-game',
+  'stack-attack': 'stack-attack-stacking-tower-game', 'graze': 'graze-bullet-hell-dodging-game',
 };

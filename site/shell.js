@@ -212,7 +212,8 @@ export function mountShell({ active = '', onSearch = null } = {}) {
       + '<nav>' + link('/site/about.html', 'info', 'About', '', active === 'about')
       + link('/site/updates.html', 'clock', 'Updates', '', active === 'updates')
       + link('/devlog/', 'pen', 'Dev log', '', active === 'devlog')
-      + link('/articles/', 'doc', 'Articles', '', active === 'articles') + '</nav>'
+      + link('/articles/', 'doc', 'My picks', '', active === 'articles')
+      + link('/site/contact.html', 'info', 'Contact', '', active === 'contact') + '</nav>'
       + '<div class="navsmall">'
       + '<a href="/site/contact.html">Contact</a>'
       + '<a href="/site/parents.html">Parents</a>'

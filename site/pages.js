@@ -126,10 +126,20 @@ export function categoryHead(cat, intro) {
     + '<meta property="og:description" content="' + esc(desc) + '">\n'
     + '<meta property="og:url" content="' + url + '">';
 }
+// the pick of the category: the newest big game, shown large with its full intro
+function featHtml(list) {
+  const g = list.find((x) => x.big) || list[0];
+  return '<a class="catfeat" href="' + playUrl(g) + '"><img src="/shots/' + g.slug + '.png" alt="' + esc(g.title) + '" loading="lazy">'
+    + '<div><small>Liam&rsquo;s pick in this category</small><h2>' + esc(g.title) + '</h2><p>' + esc(clean(g.blurb)) + '</p>'
+    + '<p>' + esc(clean(String(g.about).split(/\n\s*\n/)[0])) + '</p><b>Play now &rarr;</b></div></a>';
+}
+
 export function categoryBody(cat, list, intro) {
   return '<section class="cathero"><h1>' + esc(CAT_TITLE[cat] || cat + ' games') + '</h1>'
     + '<p>' + esc(clean(intro)) + '</p></section>'
-    + '<div class="strip">' + list.map(cardHtml).join('') + '</div>'
+    + featHtml(list)
+    + '<h2 class="cath2">All ' + esc(CAT_TITLE[cat] || cat + ' games') + '</h2>'
+    + '<div class="strip wide catbig">' + list.map(cardHtml).join('') + '</div>'
     + '<div class="catlist">' + list.map((g) =>
       '<article><h2><a href="' + playUrl(g) + '">' + esc(g.title) + '</a></h2>'
       + '<p class="lede">' + esc(clean(g.blurb)) + '</p>'

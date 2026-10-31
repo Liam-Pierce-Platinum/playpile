@@ -177,13 +177,18 @@
         <div id="alsorows"></div>
       </div>
 
+      <!-- ADS KEEP 150px CLEAR OF THE GAME (Google's gameplay ad rule).
+           The side ads come after More games, and adSpacing() below pushes
+           them down until they start 150px under the bottom of the stage. -->
       <aside class="side">
-        <div id="ad-play-rail"></div>
         <div class="panel">
           <h4>More games</h4>
           <div id="more"><a class="mini" href="/play/kart-clash-racing-game/"><span class="th" style="background-image:url('/shots/t/kart-clash.webp')"></span><span><b>KART CLASH</b><small>Driving</small></span></a><a class="mini" href="/play/moto-stunt-motorbike-game/"><span class="th" style="background-image:url('/shots/t/moto-stunt.webp')"></span><span><b>MOTO STUNT</b><small>Driving</small></span></a><a class="mini" href="/play/drift-tower-one-button-game/"><span class="th" style="background-image:url('/shots/t/drift-tower.webp')"></span><span><b>DRIFT TOWER</b><small>Driving</small></span></a><a class="mini" href="/play/stunt-city-car-game/"><span class="th" style="background-image:url('/shots/t/stunt-city.webp')"></span><span><b>STUNT CITY</b><small>Driving</small></span></a><a class="mini" href="/play/rush-hour-traffic-racer-game/"><span class="th" style="background-image:url('/shots/t/rush-hour.webp')"></span><span><b>RUSH HOUR</b><small>Driving</small></span></a></div>
         </div>
-        <div id="ad-play-tall"></div>
+        <div id="ad-side-ads">
+          <div id="ad-play-rail"></div>
+          <div id="ad-play-tall"></div>
+        </div>
       </aside>
     </div>
 
@@ -414,6 +419,19 @@ await loadAds();
 slot(document.getElementById('ad-play-rail'), 'play_rail');
 slot(document.getElementById('ad-play-tall'), 'play_tall');
 slot(document.getElementById('ad-play-footer'), 'play_footer');
+
+// side ads start at least 150px below the game, measured, not guessed
+function adSpacing() {
+  const box = document.getElementById('ad-side-ads'), st = document.querySelector('.stage');
+  if (!box || !st) return;
+  box.style.marginTop = '0px';
+  const gap = st.getBoundingClientRect().bottom + 150 - box.getBoundingClientRect().top;
+  box.style.marginTop = Math.max(0, Math.ceil(gap)) + 'px';
+}
+adSpacing();
+addEventListener('resize', adSpacing);
+const ro = new ResizeObserver(adSpacing);
+ro.observe(document.querySelector('.stage')); ro.observe(document.querySelector('.side .panel'));
 </script>
 </body>
 </html>

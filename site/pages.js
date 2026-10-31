@@ -30,7 +30,7 @@ export const aboutHtml = (g) => String(g.about || '').split(/\n\s*\n/).map(clean
   .filter(Boolean).map((p) => '<p>' + esc(p) + '</p>').join('\n')
   + (g.content ? '\n<p class="advisory"><b>What is in it:</b> ' + esc(g.content)
     + ' <a href="/site/parents.html">More for parents</a></p>' : '')
-  + '\n<p class="report"><a href="mailto:liamlikescows@gmail.com?subject='
+  + '\n<p class="report"><a href="mailto:support@playpile.net?subject='
   + encodeURIComponent('PLAYPILE: problem with ' + g.title) + '">Report a problem with this game</a></p>';
 
 export const keysHtml = (g) => (g.controls || [])

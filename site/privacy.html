@@ -29,37 +29,33 @@
 <main class="wrap" style="max-width:760px">
   <section class="hero">
     <h1>Privacy</h1>
-    <p>The short version: your scores are saved in your own browser. You can also make
-       a <b>profile</b> (still only on your device), or <b>sign up</b> so that your progress
-       follows you to another browser &mdash; and if you do, the only thing we hold is your
-       email address and that saved progress. No tracking, no analytics, no selling anything
-       to anybody.</p>
+    <p>The short version: your scores and profiles are saved in your own browser.
+       Use a <b>save code</b> to move progress to another device. Email-and-password accounts
+       and automatic cloud saves are not currently available. PLAYPILE does not run an
+       analytics service or sell your saved game progress. <b>Google advertising may use
+       cookies and other identifiers</b>, as explained below.</p>
   </section>
 
   <section class="about" style="margin-top:26px">
     <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:0 0 8px">What is stored, and where</h2>
-    <p>Every game keeps its leaderboard and your three-letter name in your browser's
-       own <b>local storage</b>. That is a per-site scratchpad on your computer. It is
-       not sent anywhere, we cannot read it, and clearing your browsing data deletes
-       it. It is why your scores do not follow you to another browser or another
-       device.</p>
+    <p>Games keep scores, names you enter, unlocks and settings in your browser's
+       own <b>local storage</b>. This saved game data is not uploaded to PLAYPILE.
+       Clearing your browser's site data deletes it. Scores do not follow you to another
+       browser or device automatically; you can transfer them with a save code.</p>
     <p>Playing as a guest, your scores and progress stay on your machine. The only things that leave it are the requests Google's adverts make (described below) and, if you choose to play online, the connection to the other player (see <a href="#online" style="color:var(--accent)">playing online</a>).</p>
 
     <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Profiles, save codes and accounts</h2>
-    <p>The <b>Sign in</b> button at the top of the page offers up to three things, depending
-       on what the site has switched on:</p>
+    <p>The <b>Sign in</b> button at the top of the page opens the profile panel.
+       Despite its label, the current site uses local profiles, not online accounts:</p>
     <p><b>A profile</b> lets several people share one browser. Each profile keeps its own copy
        of those same local-storage keys. It never leaves the device and needs no email address.</p>
     <p><b>A save code</b> is your progress written out as a long line of text you can copy. Paste
        it into the panel on another device and it loads there. We never see it &mdash; copying
        and pasting it is entirely between you and your own clipboard.</p>
-    <p><b>An account</b>, where the site offers one, is an email address and a password, and it
-       exists so your progress can follow you between devices. The email address, a player
-       name if you set one, and the saved progress itself are stored for you by
-       <b>Google Firebase</b> (Authentication and Firestore), because PLAYPILE is a static
-       site with no server of its own. We can see your email address and your saved game
-       progress; we cannot see your password, which Google holds and we never receive. Nothing
-       is shared with anyone else and none of it is used for advertising.</p>
+    <p><b>Online accounts and cloud saves are currently switched off.</b> The site does not
+       currently collect an email address or password to save progress, and it does not
+       upload profiles or scores to Firebase. This policy will be updated before online
+       accounts or public online leaderboards are made available.</p>
     <p>The saved progress is exactly what the games already keep on your device: high scores,
        the three letters you type in beside them, coins, unlocked clothes and settings. No
        location, no contacts, no device fingerprinting, nothing about what else you do online.</p>
@@ -70,21 +66,17 @@
        challenge streak, the games you mark as favourites, the picture you choose, and the list of
        games you played recently. It is counted in your browser while a game page is open in
        front of you, it is not sent anywhere, and it is shown back to you on your profile page.</p>
-    <p>If you sign in to an <b>account</b>, those keys are saved with the rest of your progress
-       as described above. Signed-in players also appear on <b>public leaderboards</b>: for each
-       game that keeps a best score, we store your player name, your chosen picture and your best
-       score (in Google Firestore, under <code>leaderboards</code>), and anyone visiting that
-       game's page can see them. Your email address is never shown on a leaderboard. Pick a
-       nickname rather than your real name. Without an account, the leaderboard only shows the
-       profiles on your own device and nothing is published.</p>
-    <p><b>Deleting it.</b> Sign out and clear your browser data and the device copy is gone. To
-       have an account and its saved progress deleted from the server, email the address at the
-       bottom of this page and it will be removed &mdash; there is no form to fill in and no
-       waiting period beyond how long it takes to read the message.</p>
+    <p><b>Leaderboards currently show profiles on your own device.</b> Your player name,
+       picture and best scores are not published to an online leaderboard. Use a nickname
+       if other people share your browser.</p>
+    <p><b>Deleting it.</b> Use the <a href="/site/settings.html" style="color:var(--accent)">privacy
+       settings page</a> to inspect, download or delete saved browser data. Clearing all of
+       PLAYPILE's site data in your browser also removes local profiles and saves. Keep a
+       save code first if you want to restore your progress later.</p>
 
     <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Advertising</h2>
-    <p>PLAYPILE carries advertising, and that is the one part of the site that
-       involves somebody else. The adverts are served by <b>Google AdSense</b>.</p>
+    <p>PLAYPILE carries advertising served by <b>Google AdSense</b>. Advertising has its
+       own data collection, separate from the game progress kept in your browser.</p>
     <ul>
       <li>Third-party vendors, including Google, use cookies to serve ads based on your
           prior visits to this website or to other websites.</li>
@@ -112,7 +104,7 @@
        other personal information are ever sent to Google in an ad request.</p>
 
     <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px" id="online">Playing online</h2>
-    <p>Nine games can be played online: AIR HOCKEY, SUMO SLAM, ROOFTOP DUEL, ARCHER DUEL, HOOPS, EGG WARS, SKY ACES, TOY SOLDIER BLITZ and INKVALE. You join a game in one of three ways: a four-letter room code, a link a friend sends you, or <b>Quick match</b>, which pairs you with whoever else is waiting in the same game, so that player may be a stranger. To connect, both browsers briefly contact a free public matchmaking server run by the PeerJS project, which sees the room code and each browser's IP address. After that the game goes directly between the browsers, which means <b>each player's browser can see the other's IP address</b>, as with any direct video call or online game. Nothing is stored about the game and there is no chat or messaging. To play only with people you know, use a room code instead of Quick match.</p>
+    <p>Nine games can be played online: PUCK BLITZ (air hockey), SUMO SLAM, ROOFTOP DUEL, ARCHER DUEL, HOOPS, EGG WARS, SKY ACES, TOY SOLDIER BLITZ and INKVALE. You join a game in one of three ways: a four-letter room code, a link a friend sends you, or <b>Quick match</b>, which pairs you with whoever else is waiting in the same game, so that player may be a stranger. To connect, both browsers briefly contact a free public matchmaking server run by the PeerJS project, which sees the room code and each browser's IP address. After that the game goes directly between the browsers, which means <b>each player's browser can see the other's IP address</b>, as with any direct video call or online game. Nothing is stored about the game and there is no chat or messaging. To play only with people you know, use a room code instead of Quick match.</p>
     <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Your choices and rights</h2>
     <ul>
       <li>On the <a href="/site/settings.html" style="color:var(--accent)">privacy settings page</a> you can
@@ -121,20 +113,21 @@
       <li>Choosing non-personalised adverts is how you opt out of the "sale" or "sharing" of personal
           information for targeted advertising under US state laws such as the CCPA.</li>
       <li>If you are in the UK, the EU or another place with similar laws, you have the right to ask what
-          data is held about you, to have it corrected or deleted, and to object to its use. For an
-          account, email the address below; for adverts, Google's own tools are linked above. You can
+          data is held about you, to have it corrected or deleted, and to object to its use. For a
+          privacy request, email the address below; for adverts, Google's own tools are linked above. You can
           also complain to your local data protection authority.</li>
-      <li>An account's saved progress is kept until you ask for it to be deleted. Data in your browser
-          stays until you delete it.</li>
+      <li>Saved progress and local profiles stay in your browser until you delete them.
+          Save codes you copy elsewhere stay there until you remove those copies.</li>
     </ul>
     <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Analytics</h2>
     <p>None. There is no analytics script on this site.</p>
 
     <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Children</h2>
-    <p>PLAYPILE is not directed at children under 13 and does not knowingly collect anything
-       from them. If an account turns out to belong to a child under 13, email the address
-       below and it will be deleted. A child can play every game on the site without an
-       account, and nothing on the site asks for one.</p>
+    <p>PLAYPILE is not directed at children under 13. Games do not require an online
+       account or an email address, and profiles and saved progress stay in the browser.
+       If you believe a child has sent us personal information, contact the address below
+       to ask for its removal. See also <a href="/site/parents.html" style="color:var(--accent)">the
+       page for parents</a> and the advertising information above.</p>
 
     <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Getting in touch</h2>
     <p>If you want anything on this page explained or removed, email <a href="mailto:support@playpile.net">support@playpile.net</a>.</p>

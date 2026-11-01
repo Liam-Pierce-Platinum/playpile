@@ -772,8 +772,14 @@ body > main.wrap > .hero p{margin:0;color:var(--dim);max-width:62ch}
 @media (max-width:760px){.catfeat{grid-template-columns:1fr}.strip.catbig{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}}
 /* fill the width: wider intro, write-ups as a card grid with pictures */
 .cathero p{max-width:none!important}
-.catlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:18px}
+.catlist{max-width:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px}
 .catlist article{border:1px solid var(--edge);border-radius:var(--r);padding:14px;margin:0}
 .catlist article img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;margin-bottom:8px}
 @media (max-width:560px){.catlist{grid-template-columns:1fr}}
 body > main.wrap > .hero p{max-width:none}
+/* no narrow text strips: guides flow in two columns, prose pages go wider */
+.guide{max-width:none;columns:2 380px;column-gap:36px}
+.guide h2,.guide h3{break-after:avoid}
+.guide p,.guide li,.guide ul{break-inside:avoid}
+.prose{max-width:1180px}
+.sitecopy p,.prose .hero p,.cathero p{max-width:none}

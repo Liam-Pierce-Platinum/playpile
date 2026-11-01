@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Why your progress lives in your browser, and how levels and badges work - PLAYPILE</title>
-<meta name="description" content="PLAYPILE has no accounts server. Here is how saves, save codes, XP, fifteen badges and a daily challenge work without one.">
+<meta name="description" content="How PLAYPILE's local profiles, save codes, XP, fifteen badges and daily challenge work. Progress stays in your browser; cloud accounts are currently off.">
 <link rel="canonical" href="https://playpile.net/devlog/progress-lives-in-your-browser/">
 <link rel="stylesheet" href="/site/style.css">
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
@@ -22,7 +22,7 @@
      here and does not add a second copy. -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
      crossorigin="anonymous"></script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Why your progress lives in your browser, and how levels and badges work","description":"PLAYPILE has no accounts server. Here is how saves, save codes, XP, fifteen badges and a daily challenge work without one.","datePublished":"2026-10-14","author":{"@type":"Person","name":"Liam"},"publisher":{"@type":"Organization","name":"PLAYPILE"},"mainEntityOfPage":"https://playpile.net/devlog/progress-lives-in-your-browser/"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Why your progress lives in your browser, and how levels and badges work","description":"How PLAYPILE's local profiles, save codes, XP, fifteen badges and daily challenge work. Progress stays in your browser; cloud accounts are currently off.","datePublished":"2026-10-14","dateModified":"2026-10-31","author":{"@type":"Person","name":"Liam"},"publisher":{"@type":"Organization","name":"PLAYPILE"},"mainEntityOfPage":"https://playpile.net/devlog/progress-lives-in-your-browser/"}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to the content</a>
@@ -52,7 +52,8 @@
       <article>
       <section class="hero"><h1>Why your progress lives in your browser, and how levels and badges work</h1>
         <p id="lede"><time datetime="2026-10-14">14 October 2026</time> &middot; 5 min read</p></section>
-<p>PLAYPILE has no sign-up. You open a game and play it, and your best scores, coins and unlocks are still there next time. On 14 October we added a profile page with a site-wide level, XP, fifteen badges and a daily challenge. All of it works without an account, and nothing you do is sent to us. This post explains why it is built that way and exactly how it works.</p>
+<div class="tip"><b>Updated <time datetime="2026-10-31">31 October 2026</time>:</b> profiles and progress are currently saved only in your browser. Save codes let you transfer them yourself. Online accounts, automatic cloud saves and public online leaderboards are switched off. Advertising and online multiplayer make separate network connections, described in the <a href="/site/privacy.html" style="color:var(--accent)">privacy policy</a>.</div>
+<p>No sign-up is needed to play PLAYPILE. You open a game and play it, and your best scores, coins and unlocks are still there next time in the same browser. On 14 October we added a profile page with a site-wide level, XP, fifteen badges and a daily challenge. All of it works with local profiles, and that saved progress is not uploaded to us. This post explains how it works.</p>
 
 <h2>A website with nobody at home</h2>
 <p>PLAYPILE is a static site: a folder of files served from a content network, with no server of ours behind it. There is nowhere for us to keep your progress, so your browser keeps it, in its local storage. Every game saves under keys that start with <i>pd.</i>, and that prefix has been the rule since the first game shipped. Your progress is simply every <i>pd.</i> key on your device.</p>
@@ -93,7 +94,7 @@
 
 <h2>Profiles, and what leaves your machine</h2>
 <p>A single browser can hold several named profiles, each with its own picture, which suits a family sharing one computer. Switching profile swaps in that player's saved keys. Leaderboards on a game page currently show the profiles on this device.</p>
-<p>On the privacy settings page you can see every score and save the site has kept in your browser, download a copy as a file, or delete it, either all at once or a group at a time. For guests and local profiles, nothing you do leaves your machine. The only outside services the site talks to are the advertising script and, for games with online play, a matchmaking service that introduces two players' browsers to each other. We keep no analytics at all.</p>
+<p>On the <a href="/site/settings.html" style="color:var(--accent)">privacy settings page</a> you can inspect saved browser data, download a copy as a file, or delete it, either all at once or a group at a time. Guest and local-profile progress is not uploaded to us. Advertising may use cookies and identifiers, and online multiplayer connects through a matchmaking service to another player's browser. Those connections are described in the <a href="/site/privacy.html" style="color:var(--accent)">privacy policy</a>; they are separate from local game saves. PLAYPILE does not run an analytics service.</p>
       </article>
       <h2>More from the dev log</h2>
       <ul><li><a href="/devlog/one-script-for-every-phone/" style="color:var(--accent)">One script that makes every game work on a phone</a></li><li><a href="/devlog/designing-tension/" style="color:var(--accent)">Designing tension in three games: a crowd, a chase and a muzzle flash</a></li><li><a href="/devlog/how-we-check-every-game/" style="color:var(--accent)">How we check every game without playing each one by hand</a></li><li><a href="/devlog/a-guide-for-every-game/" style="color:var(--accent)">Writing a guide for every game, checked against the code</a></li></ul>
@@ -132,11 +133,9 @@
 </div>
 
 <script type="module">
-import { GAMES, mountShell, row } from '/site/shell.js';
+import { mountShell } from '/site/shell.js';
 import { loadAds } from '/ads/ads.js';
 mountShell({ active: 'about' });
-document.getElementById('picks').innerHTML =
-  row('Start with one of these', GAMES.filter((g) => g.big).slice(0, 6), { seeAll: '/' });
 // no ad slots on this page, but it does load the ad script, so it owes
 // the visitor the same cookie notice as everywhere else
 loadAds();

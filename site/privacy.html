@@ -31,8 +31,9 @@
     <h1>Privacy</h1>
     <p>The short version: your scores and profiles are saved in your own browser.
        Use a <b>save code</b> to move progress to another device. Email-and-password accounts
-       and automatic cloud saves are not currently available. PLAYPILE does not run an
-       analytics service or sell your saved game progress. <b>Google advertising may use
+       and automatic cloud saves are not currently available. We use <b>Cloudflare Web
+       Analytics</b> to measure visits and page performance without analytics cookies.
+       We do not sell your saved game progress. <b>Google advertising may use
        cookies and other identifiers</b>, as explained below.</p>
   </section>
 
@@ -42,7 +43,7 @@
        own <b>local storage</b>. This saved game data is not uploaded to PLAYPILE.
        Clearing your browser's site data deletes it. Scores do not follow you to another
        browser or device automatically; you can transfer them with a save code.</p>
-    <p>Playing as a guest, your scores and progress stay on your machine. The only things that leave it are the requests Google's adverts make (described below) and, if you choose to play online, the connection to the other player (see <a href="#online" style="color:var(--accent)">playing online</a>).</p>
+    <p>Playing as a guest, your scores and progress stay on your machine. Your browser also contacts Cloudflare for aggregate visit and performance measurements, Google for advertising, and a matchmaking service and the other player if you choose to play online. These connections are explained below; they do not upload your saved game progress.</p>
 
     <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Profiles, save codes and accounts</h2>
     <p>The <b>Sign in</b> button at the top of the page opens the profile panel.
@@ -119,8 +120,18 @@
       <li>Saved progress and local profiles stay in your browser until you delete them.
           Save codes you copy elsewhere stay there until you remove those copies.</li>
     </ul>
-    <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Analytics</h2>
-    <p>None. There is no analytics script on this site.</p>
+    <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px" id="analytics">Analytics</h2>
+    <p>We use <b>Cloudflare Web Analytics</b> to understand how often PLAYPILE is visited,
+       which pages are popular and how quickly pages load. Your browser sends page and
+       performance measurements to Cloudflare. Reports include page views, visits,
+       referring websites, country, browser and device type.</p>
+    <p>Cloudflare's analytics does not use cookies or local storage to identify visitors
+       and does not fingerprint individuals. We do not send profile names, scores,
+       save codes or other saved game data to it. These aggregate statistics are separate
+       from advertising and from the progress kept on your device.</p>
+    <p>Read more about <a href="https://developers.cloudflare.com/web-analytics/" rel="noopener">Cloudflare Web Analytics</a>
+       and <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">Cloudflare's privacy policy</a>.
+       Blocking the analytics script does not stop the games working.</p>
 
     <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Children</h2>
     <p>PLAYPILE is not directed at children under 13. Games do not require an online
@@ -132,7 +143,7 @@
     <h2 style="font:600 17px/1 system-ui;letter-spacing:0;margin:20px 0 8px">Getting in touch</h2>
     <p>If you want anything on this page explained or removed, email <a href="mailto:support@playpile.net">support@playpile.net</a>.</p>
 
-    <div class="tip">Last updated 31 October 2026. If this page ever stops matching what the site actually does, the site is wrong, not the page &mdash; tell us and it gets fixed.</div>
+    <div class="tip">Last updated 4 November 2026. If this page ever stops matching what the site actually does, the site is wrong, not the page &mdash; tell us and it gets fixed.</div>
   </section>
 </main>
 

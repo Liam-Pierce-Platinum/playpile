@@ -1,7 +1,8 @@
 // PLAYPILE shared mobile helper (2026-10-18).
 // tools/deploy.mjs puts <script src="../_shared/mobile.js"> at the top of the
 // <head> of every game in dist/games/<slug>/, so it runs before the game's own
-// scripts. It only acts on touch phones and tablets; on a desktop it does nothing.
+// scripts. The mobile adjustments only act on touch phones and tablets.
+// Standalone game pages also load the independent analytics module on desktop.
 //  1. viewport: no pinch or double-tap zoom, no page bounce or scroll-chaining.
 //  2. speed: caps devicePixelRatio at 1.5, turns off MSAA on WebGL contexts and
 //     reports a 2048 max texture size, which makes three.js clamp shadow maps
@@ -12,6 +13,14 @@
 //     the pad games, which need landscape).
 (function () {
   'use strict';
+  // The portal counts its own page. Do not count its embedded game again.
+  if (window.self === window.top &&
+      (location.hostname === 'playpile.net' || location.hostname === 'www.playpile.net')) {
+    var analytics = document.createElement('script');
+    analytics.type = 'module';
+    analytics.src = '/site/analytics.js';
+    document.head.appendChild(analytics);
+  }
   var touch = false;
   try { touch = (navigator.maxTouchPoints > 0 || 'ontouchstart' in window) && matchMedia('(pointer: coarse)').matches; } catch (e) {}
   if (!touch) return;

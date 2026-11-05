@@ -28,15 +28,18 @@
 //     reading another's save. Until that file exists the sign-in panel says
 //     so honestly rather than pretending.
 //
-// WHAT IS NEVER DONE HERE: no tracking, no analytics, no third-party
-// scripts. The only network calls in this file go to Google's identity and
-// Firestore endpoints, and only when somebody has actually signed in.
+// Profiles and saved progress are not sent to analytics. The independent
+// analytics module below counts visits without reading local game data.
 //
 // 2026-10-14: the panel was redesigned (name + picture, honest "saved on
 // this device" / "saved to your account" states), progress merges
 // sensibly per key, and best scores go to a public Firestore leaderboard
 // (leaderboards/{game}/scores/{uid}) once cloud accounts are on.
 import { AVATARS, avatarSvg, avatarFor, getAvatar, setAvatar } from '/site/avatar.js';
+
+// Every portal page already loads this module. Analytics stays optional:
+// a blocked or unavailable counter must never break profiles or games.
+import('/site/analytics.js').catch(() => {});
 
 const PREFIX = 'pd.';
 const LOCAL_KEY = 'playpile.account';

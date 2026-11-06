@@ -76,7 +76,7 @@
     'dungeon-quest': { left: 'wasd', btns: [['ATK', 'ArrowLeft'], ['JUMP', 'ArrowUp'], ['BLOCK', 'ArrowDown'], ['SPEC', 'ArrowRight'], ['USE', 'Space'], ['BAG', 'KeyE']] },
   };
   // games that already work upright on a phone: no "turn your phone" hint.
-  var UPRIGHT = /^(crossing|drifter|hoops|merge|pipeworks|quickdraw|spike|stack|sweep|block-royale|helix-drop|stack-attack|subway-run|tunnel-dive|slope-rush|drift-tower|word-blitz|prism|one-tile|sushi-conveyor|bubble-trouble|firework-frenzy|stick-swing|golf-orbit|parry)$/;
+  var UPRIGHT = /^(lukes-diner|crossing|drifter|hoops|merge|pipeworks|quickdraw|spike|stack|sweep|block-royale|helix-drop|stack-attack|subway-run|tunnel-dive|slope-rush|drift-tower|word-blitz|prism|one-tile|sushi-conveyor|bubble-trouble|firework-frenzy|stick-swing|golf-orbit|parry)$/;
 
   var KEY = { ArrowUp: ['ArrowUp', 38], ArrowDown: ['ArrowDown', 40], ArrowLeft: ['ArrowLeft', 37], ArrowRight: ['ArrowRight', 39],
     KeyW: ['w', 87], KeyA: ['a', 65], KeyS: ['s', 83], KeyD: ['d', 68], KeyE: ['e', 69], KeyQ: ['q', 81], KeyZ: ['z', 90], KeyX: ['x', 88],

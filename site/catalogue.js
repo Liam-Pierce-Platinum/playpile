@@ -12,6 +12,16 @@
 //                     port. The page frames http://localhost:<port>.
 //         'unity'   - a Unity WebGL build under games/<slug>/build.
 export const GAMES = [
+  {
+    slug: "lukes-diner", title: "Luke's Diner", how: 'local',
+    content: "A cartoon diner game with timed orders, impatient customers and light bickering. No violence.",
+    tag: "Diner time management", big: false, added: '2026-11-05',
+    cat: "Arcade", tags: ["new", "cooking", "time management", "serving", "cosy", "mobile", "gilmore girls"],
+    blurb: "Pour coffee, take orders, and serve diner regulars through a year of Stars Hollow events.",
+    about: "Run the counter in an unofficial Gilmore Girls fan game. Learn the diner one station at a time, then juggle coffee refills and food orders as customers arrive. A town map tracks your progress through seasonal shifts, and a relaxed mode gives you more room to learn the routine.",
+    controls: [["Click / tap", "select customers and use the coffee pot or kitchen window"], ["Q W E", "counter seats"], ["A S D", "tables"], ["Space", "coffee pot"], ["K", "kitchen window"], ["T", "use your equipped skill"]],
+    tips: "Watch the order bubbles and serve the customers who have been waiting longest first.",
+  },
   // ---- 2026-10-18 (later): BLADEBORN + IRONSIGHT ----
   {
     slug: "bladeborn", title: "BLADEBORN", how: 'mounted', port: 8435, url: "/",

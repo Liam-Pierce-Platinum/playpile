@@ -12,8 +12,10 @@ export function characterHTML(kind) {
   return '<pp-character kind="' + normalize(kind) + '" aria-hidden="true"></pp-character>';
 }
 
-const SOURCES = Object.fromEntries([...CHARACTER_KINDS.filter(k => k !== 'friends'), 'friend-left', 'friend-right']
-  .map(kind => [kind, { path: '/site/arcade-assets/' + kind + '.webp', width: kind === 'driving' ? 192 : 128 }]));
+const NEW_CAST = new Set(['arcade','action','adventure','puzzle','strategy','horror','new','popular','friends']);
+export const CHARACTER_ASSETS = Object.freeze(Object.fromEntries(CHARACTER_KINDS
+  .map(kind => [kind, { path: '/site/arcade-assets/' + kind + (NEW_CAST.has(kind) ? '-original.png' : '.webp'), width: kind === 'driving' || kind === 'friends' ? 192 : 128 }])));
+const SOURCES = CHARACTER_ASSETS;
 const images = new Map();
 function loadSprite(kind) {
   if (!images.has(kind)) {
@@ -124,7 +126,7 @@ function makeRuntime() {
     async load(){
       if(this.loading)return this.loading;
       const kind=normalize(this.getAttribute('kind'));this.kind=kind;
-      const keys=kind==='friends'?['friend-left','friend-right']:[kind];
+      const keys=[kind];
       this.loading=Promise.all(keys.map(async key=>{this.assets[key]=await loadSprite(key);})).then(()=>{
         if(this.isConnected)this.paint(still()?0:performance.now()/1000);
       }).catch(()=>{this.failed=true;this.dataset.artState='unavailable';});
@@ -141,8 +143,8 @@ function makeRuntime() {
     paint(time){
       const c=this.ctx;if(!c || !this.kind)return;
       const k=this.kind,t=still()?0:time;
-      if(k==='friends' ? (!this.assets['friend-left'] || !this.assets['friend-right']) : !this.assets[k])return;
-      const idle=Math.floor(t*5)%6;
+      if(!this.assets[k])return;
+      const idle=[0,0,1,2,3,4,5,5][Math.floor(t*4)%8];
       c.clearRect(0,0,240,160);c.imageSmoothingEnabled=false;
       // A small contact shadow anchors the cast without adding another panel.
       rect(c,k==='driving'?27:63,148,k==='driving'?187:114,3,'#101c2840');
@@ -157,7 +159,6 @@ function makeRuntime() {
         this.sprite(k,Math.floor(t*8)%6,120+Math.floor(Math.sin(t*1.6)*10),147,1);
       }else if(k==='arcade'){
         arcadeCabinet(c,t);this.sprite(k,idle,100,147,1);
-        coin(c,50,70+Math.floor(Math.sin(t*2)*4),Math.floor(t*7));
       }else if(k==='action'){
         const frame=[0,0,0,0,1,2,3,3,4,5,0,0][Math.floor(t*7)%12];
         this.sprite(k,frame,110,147,1);
@@ -180,10 +181,9 @@ function makeRuntime() {
         this.sprite(k,idle,119,147,1);
         coin(c,48,87+Math.floor(Math.sin(t*3)*3),Math.floor(t*7));
         star(c,180,51+Math.floor(Math.cos(t*2)*3),'#f2c36d',2);
-        rect(c,172,118,3,9,'#91bbd0');rect(c,175,118,5,2,'#91bbd0');rect(c,168,126,5,3,'#91bbd0');
+        star(c,175,119,'#91bbd0',1);
       }else if(k==='friends'){
-        this.sprite('friend-left',idle,79,147,.95);
-        this.sprite('friend-right',(idle+2)%6,160,147,.95,true);
+        this.sprite(k,idle,120,147,1);
         star(c,115,43+Math.floor(Math.sin(t*3)*3),'#e7ba68',1);
       }
       this.dataset.artState='ready';

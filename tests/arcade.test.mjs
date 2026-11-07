@@ -6,10 +6,19 @@ import { fileURLToPath } from 'node:url';
 import { GAMES } from '../site/catalogue.js';
 import { GAME_COPY } from '../site/arcade-copy.js';
 import { WORLDS } from '../site/arcade-data.js';
+import { CHARACTER_ASSETS } from '../site/arcade-art.js';
 import { playUrl } from '../site/seo.js';
 import { gameCardHTML,escapeHTML } from '../site/arcade-ui.js';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=p=>fs.readFile(path.join(root,p),'utf8');
+
+test('all twelve category animation atlases exist and new sheets contain six complete frames',async()=>{
+ assert.equal(Object.keys(CHARACTER_ASSETS).length,12);
+ for(const [kind,asset] of Object.entries(CHARACTER_ASSETS)){
+  const bytes=await fs.readFile(path.join(root,asset.path.slice(1)));
+  if(asset.path.endsWith('.png')){assert.equal(bytes.readUInt32BE(16),asset.width*6,kind);assert.equal(bytes.readUInt32BE(20),128,kind);assert.equal(bytes[25],6,kind+' must preserve RGBA transparency');}
+ }
+});
 test('every current game remains available with real source, a thumbnail, crawlable text and controls',async()=>{
  assert.equal(GAMES.length,101);assert.deepEqual(Object.keys(GAME_COPY).sort(),GAMES.map(g=>g.slug).sort());
  for(const g of GAMES){const html=await read(playUrl(g).slice(1)+'index.html');assert.ok(html.includes(escapeHTML(g.blurb)),g.slug+' missing static copy');assert.ok(html.includes('id="frame"'),g.slug+' missing game frame');assert.ok(html.includes('window.__PLAYPILE_WEB=1'),g.slug+' not a hosted game');assert.ok(html.includes('id="keys"'));await fs.access(path.join(root,'shots/t/'+g.slug+'.webp'));await fs.access(path.join(root,'games',(g.web||g.slug).split('?')[0],'index.html'));}

@@ -1,21 +1,20 @@
-PLAYPILE category cast
+PLAYPILE original category cast
 
-The Arcade, Action, Adventure, Puzzle, Strategy, Horror, New, Popular and
-Friends figures reuse the owner's Pavement Punchers full-body character art.
-Their authored poses were cropped into small lossless WebP animation atlases.
-The original project and its original files were left untouched.
+All twelve categories now use original designs generated for PlayPile with
+the built-in image_gen tool. Pavement Punchers informed the full-body arcade
+pixel-art style only. None of its roster artwork is used in this cast.
 
-Driving, Sport and Shooter are new six-pose sheets made with the built-in
-image_gen tool, matching the arcade pixel-art direction. Exact prompts are
-saved in generation-prompts.json. The sheets were packed at their actual UI
-display size with nearest-neighbor sampling and retained transparency.
+Nine new six-pose atlases replace the reused roster: Arcade, Action,
+Adventure, Puzzle, Strategy, Horror, New, Popular and Friends. Friends is
+one synchronized two-person fist-bump animation. Exact prompts are in
+original-cast-prompts.json. The new atlases are named *-original.png.
+tools/pack-original-cast.ps1 mechanically packs the six generated cells into
+horizontal strips with nearest-neighbor sampling and preserved alpha.
+
+Driving, Sport and Shooter were already original designs generated for
+PlayPile. Their six-frame .webp atlases remain, with their prompts in
+generation-prompts.json. No character images are read from another project.
 
 arcade-art.js owns playback, pauses offscreen characters, and presents a still
-frame for reduced-motion visitors. No remote image URLs or runtime libraries
-are used. Drawing helpers add small pixel props, including the arcade cabinet,
-map table, lantern, puzzle blocks, coins and sparks.
-
-Production assets: the thirteen .webp files in this folder.
-cast-preview.png is an art contact sheet rather than a production dependency.
-The two Python scripts document packing. They accept source directory paths
-as arguments and require Pillow; they are not used by the deployed website.
+frame for reduced-motion visitors. All artwork is served locally. Small
+canvas props include the arcade cabinet, map table, lantern and puzzle blocks.

@@ -3,7 +3,7 @@ import * as THREE from '../vendor/three.module.js';
 import { PLANES, TRACKS, MISSIONS, planeById, save, persist, upOf, statsFor, upgradeCost, trackMax, resetSave } from './meta.js';
 import { fmtMoney, clamp } from './util.js';
 import { ARENA } from './world.js';
-import * as A from './audio.js?v=ios-audio-1';
+import * as A from './audio.js?v=ios-audio-2';
 import { makePlane, animatePilot } from './models.js';
 
 const $ = (s) => document.querySelector(s);

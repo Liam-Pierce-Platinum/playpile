@@ -2,16 +2,16 @@
 import * as THREE from '../vendor/three.module.js';
 import { makeRenderer, buildWorld, ARENA, groundAt } from './world.js';
 import { FX } from './fx.js';
-import { Game } from './game.js?v=ios-audio-1';
+import { Game } from './game.js?v=ios-audio-2';
 import { Input } from './input.js';
-import { UI } from './ui.js?v=ios-audio-1';
+import { UI } from './ui.js?v=ios-audio-2';
 import { Online } from './online.js';
 import { Brain } from './ai.js';
 import { makePlane, animatePilot } from './models.js';
 import { planeById, statsFor, upOf } from './meta.js';
 import { clamp, damp, QS, rand } from './util.js';
 import { save, persist, addMoney, MISSIONS } from './meta.js';
-import * as A from './audio.js?v=ios-audio-1';
+import * as A from './audio.js?v=ios-audio-2';
 
 const canvas = document.getElementById('c');
 const lowq = QS.has('lq') || (matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) < 500);

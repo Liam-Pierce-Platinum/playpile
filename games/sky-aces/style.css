@@ -178,6 +178,10 @@ body.touch #mute, body.touch #pauseBtn { top: max(8px, env(safe-area-inset-top))
 #mute:is(.pending, .off) small { display: block; font-size: 11px; line-height: 1; white-space: nowrap; }
 #mute.off > span { text-decoration: line-through; }
 body.touch #pauseBtn { left: max(10px, env(safe-area-inset-left)); }
+@media (max-width: 520px) {
+  #mute:is(.pending, .off) ~ #hud #top { top: max(58px, calc(env(safe-area-inset-top) + 50px)); }
+  #mute:is(.pending, .off) ~ #hud #feed { top: max(112px, calc(env(safe-area-inset-top) + 104px)); }
+}
 @media (max-width: 600px) {
   .card { padding: 14px; border-radius: 18px; }
   button.play { font-size: 32px; padding: 12px 44px; }

@@ -534,7 +534,7 @@ There are 24 missions across fishing boats, ferries, cargo ships, cruise liners,
   {
     slug: "sky-aces", title: "SKY ACES", how: 'mounted', port: 8380, url: "/",
     content: "Cartoon plane dogfights: planes are shot down in fireballs with smoke and falling wreckage, no people are shown hurt. Bright explosion and muzzle flashes, a red flash at the screen edges when you are hit, screen shake, and the screen briefly turns white when you fly through a cloud.",
-    web: "sky-aces/",
+    web: "sky-aces/?v=ios-audio-1",
     tag: "Dogfight", big: true, added: '2026-10-13',
     cat: "Shooter", tags: ["planes","dogfight","airships","3d","upgrades","online","mobile"],
     blurb: "Arcade dogfights in a bright cartoon sky. Shoot down raiders, aces, bombers and armoured airships, then spend the money on faster planes.",

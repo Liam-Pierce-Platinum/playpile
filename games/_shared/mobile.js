@@ -23,7 +23,8 @@
   // grants audio activation, even when it was the player's first move.
   var audioContexts = new Map();
   var audioConstructors = new Map();
-  for (var audioName of ['AudioContext', 'webkitAudioContext']) {
+  var ownAudio = document.currentScript?.hasAttribute('data-own-audio');
+  for (var audioName of ownAudio ? [] : ['AudioContext', 'webkitAudioContext']) {
     var AudioConstructor = window[audioName];
     if (typeof AudioConstructor !== 'function' || typeof Proxy !== 'function') continue;
     if (!audioConstructors.has(AudioConstructor)) {

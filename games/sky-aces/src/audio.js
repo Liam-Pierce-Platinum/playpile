@@ -2,8 +2,13 @@
 import { createMusicSequencer } from '../../_shared/music-sequencer.js';
 
 let ctx = null, master = null, noiseBuf = null, muted = false;
-let eng = null;
-let music = null;
+let eng = null, lockOsc = null, music = null;
+let session = null, legacyAudio = null, legacyPlay = null, legacyStarted;
+let legacyNeeded = false, legacyReady = false, legacyFailed = false;
+let health = 'idle', monitor, lastAudioTime, lastProgress;
+let attempted = false, confirmation = false, pageActive = true;
+const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const last = {};
 const melody = [
   [69, 72, 76, null, 74, 72, 71, null],
@@ -25,46 +30,178 @@ function score(step) {
   return notes;
 }
 
-export function initAudio() {
-  if (document.hidden || muted) return;
-  if (!ctx) {
-    try { ctx = new (window.AudioContext || window.webkitAudioContext)(); }
-    catch { return; }
-    master = ctx.createGain();
-    master.gain.value = 0.55;
-    const comp = ctx.createDynamicsCompressor();
-    comp.threshold.value = -14; comp.ratio.value = 4;
-    master.connect(comp); comp.connect(ctx.destination);
-    noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
-    const d = noiseBuf.getChannelData(0);
-    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    music = createMusicSequencer(ctx, master, { bpm: 132, steps: 64, notesAt: score });
-    ctx.addEventListener('statechange', audioStateChanged);
-    audioStateChanged();
-  }
-  if (ctx.state !== 'running' && ctx.state !== 'closed') {
-    // Safari can interrupt a previously unlocked context. Retry on a real
-    // gesture, and leave the enable-sound button available if it is denied.
-    try { ctx.resume().catch(() => {}); } catch { /* Retry on the next gesture. */ }
-  }
-}
-export const audioReady = () => ctx?.state === 'running' && !document.hidden;
-const audible = () => audioReady() && !muted;
+const outputAllowed = () => !muted && pageActive && !document.hidden;
+const audible = () => outputAllowed() && health === 'ready' && ctx?.state === 'running';
+export const audioReady = () => audible() && (!legacyNeeded || (legacyReady && !legacyAudio.paused));
+export const audioStatus = () => legacyFailed ? 'retry' : health === 'ready' && legacyNeeded && !legacyReady ? 'starting' : health;
+const announce = () => window.dispatchEvent(new Event('sky-audio-state'));
 
-function audioStateChanged() {
-  if (!audible()) music?.stop();
-  window.dispatchEvent(new Event('sky-audio-state'));
+function confirmSound() {
+  if (confirmation && audioReady()) { confirmation = false; sJingle('sound'); }
 }
-function setOutput() {
-  if (master) master.gain.setTargetAtTime(muted || document.hidden ? 0 : 0.55, ctx.currentTime, 0.025);
-  audioStateChanged();
+
+function pauseLegacyRoute() {
+  legacyPlay = null;
+  legacyNeeded = legacyReady = legacyFailed = false;
+  if (legacyAudio && !legacyAudio.paused) legacyAudio.pause();
 }
-document.addEventListener('visibilitychange', setOutput);
+
+function selectPlaybackRoute() {
+  if (!isIOS) return;
+  // WebKit's default Web Audio route follows the ringer switch. Media playback
+  // uses the volume the player expects for the game's explicit Sound control.
+  try {
+    const route = navigator.audioSession;
+    if (route) {
+      if (route.type !== 'playback') route.type = 'playback';
+      if (route.type === 'playback') {
+        session = route;
+        if (legacyNeeded) pauseLegacyRoute();
+        return;
+      }
+    }
+  } catch { /* Older WebKit can use the media element route below. */ }
+  legacyNeeded = true;
+  try {
+    legacyAudio ??= new window.Audio(new URL('../ios-media-route.wav', import.meta.url).href);
+    legacyAudio.loop = true;
+    if (legacyAudio.paused && !legacyPlay) {
+      // Older iOS joins Web Audio to the media route while a media element
+      // plays. Keep this quiet carrier alive only while game sound is enabled.
+      const playing = Promise.resolve(legacyAudio.play());
+      legacyPlay = playing;
+      legacyStarted = performance.now();
+      playing.then(() => {
+        if (legacyPlay !== playing) return;
+        legacyPlay = null;
+        legacyReady = true;
+        legacyFailed = false;
+        announce();
+        confirmSound();
+      }, () => {
+        if (legacyPlay !== playing) return;
+        legacyPlay = null;
+        legacyReady = false;
+        legacyFailed = true;
+        announce();
+      });
+    }
+  } catch {
+    // The normal Web Audio route still works with Silent mode off.
+    legacyFailed = true;
+  }
+}
+
+function checkClock() {
+  if (!ctx || !outputAllowed()) { monitor = undefined; return; }
+  const now = performance.now(), time = ctx.currentTime;
+  if ((legacyPlay && now - legacyStarted >= 3000) || (legacyReady && legacyAudio.paused)) {
+    legacyPlay = null;
+    legacyReady = false;
+    legacyFailed = true;
+    legacyAudio.pause();
+    announce();
+  }
+  if (ctx.state === 'running' && time > lastAudioTime) {
+    lastAudioTime = time;
+    lastProgress = now;
+    if (health !== 'ready') {
+      health = 'ready';
+      announce();
+      confirmSound();
+    }
+  } else if (ctx.state === 'closed' || (health === 'ready' && ctx.state !== 'running') || now - lastProgress >= 900) {
+    // Safari may leave resume() pending, or report running with a frozen clock.
+    if (health !== 'retry') { health = 'retry'; music?.stop(); announce(); }
+  }
+  monitor = setTimeout(checkClock, 100);
+}
+
+function discardContext() {
+  clearTimeout(monitor);
+  monitor = undefined;
+  const previous = ctx;
+  music?.stop();
+  ctx = master = music = eng = lockOsc = noiseBuf = null;
+  if (previous?.state !== 'closed') {
+    try { previous?.close().catch(() => {}); } catch { /* Rebuild on this tap anyway. */ }
+  }
+}
+
+export function initAudio({ explicit = false } = {}) {
+  if (!outputAllowed() || (!explicit && audioReady())) return;
+  attempted = true;
+  if (explicit) confirmation = true;
+  selectPlaybackRoute();
+  if (ctx?.state === 'closed' || (explicit && health === 'retry')) discardContext();
+  if (!ctx) {
+    try {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      master = ctx.createGain();
+      const comp = ctx.createDynamicsCompressor();
+      comp.threshold.value = -14; comp.ratio.value = 4;
+      master.connect(comp); comp.connect(ctx.destination);
+      noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+      const d = noiseBuf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      music = createMusicSequencer(ctx, master, { bpm: 132, steps: 64, notesAt: score });
+      // Start a silent frame inside the gesture before waiting for the clock.
+      const primer = ctx.createBufferSource();
+      primer.buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+      primer.connect(master);
+      primer.onended = () => primer.disconnect();
+      primer.start();
+    } catch {
+      discardContext();
+      health = 'retry';
+      announce();
+      return;
+    }
+  }
+  master.gain.setTargetAtTime(0.55, ctx.currentTime, 0.025);
+  if (monitor === undefined) {
+    lastAudioTime = ctx.currentTime;
+    lastProgress = performance.now();
+    health = 'starting';
+    announce();
+    monitor = setTimeout(checkClock, 100);
+  }
+  if (ctx.state !== 'running') {
+    try { ctx.resume().catch(() => {}); } catch { /* A later tap can retry. */ }
+  }
+  confirmSound();
+}
+
+function stopOutput() {
+  clearTimeout(monitor);
+  monitor = undefined;
+  health = 'idle';
+  confirmation = false;
+  if (master) master.gain.setTargetAtTime(0, ctx.currentTime, 0.025);
+  music?.stop();
+  engineStop();
+  sLockTone(0);
+  pauseLegacyRoute();
+  if (session) {
+    try { if (session.type === 'playback') session.type = 'auto'; } catch { /* Already inactive. */ }
+    session = null;
+  }
+  announce();
+}
+
+function syncVisibility() {
+  if (!outputAllowed()) stopOutput();
+  else if (attempted) initAudio();
+}
+document.addEventListener('visibilitychange', syncVisibility);
+window.addEventListener('pagehide', () => { pageActive = false; stopOutput(); });
+window.addEventListener('pageshow', () => { pageActive = true; syncVisibility(); });
 export const updateMusic = (volume) => music?.update(audible() ? volume : 0);
 
 export function setMuted(m) {
   muted = !!m;
-  setOutput();
+  if (muted) stopOutput();
+  else announce();
 }
 export const isMuted = () => muted;
 
@@ -176,7 +313,6 @@ export function sMissile() {
   const g = ctx.createGain(); env(g, t, 0.02, 0.5, 0.8);
   n.connect(f); f.connect(g); g.connect(master); n.start(t); n.stop(t + 1);
 }
-let lockOsc = null;
 export function sLockTone(state) { // 0 none, 1 locking, 2 locked
   if (!audible() && (state !== 0 || !lockOsc)) return;
   if (!lockOsc) {
@@ -215,7 +351,7 @@ export function sJingle(kind) { // 'kill' | 'streak' | 'win' | 'lose' | 'buy' | 
     kill: [[784, 0], [1046, 0.07]], streak: [[659, 0], [880, 0.08], [1175, 0.16], [1568, 0.24]],
     win: [[523, 0], [659, 0.12], [784, 0.24], [1046, 0.36], [1318, 0.52]], lose: [[392, 0], [330, 0.18], [262, 0.36], [196, 0.6]],
     buy: [[880, 0], [1320, 0.06], [1760, 0.12]], click: [[660, 0]], wave: [[440, 0], [587, 0.1], [880, 0.2]],
-    deny: [[200, 0], [160, 0.08]],
+    deny: [[200, 0], [160, 0.08]], sound: [[659, 0], [880, 0.12]],
   };
   const t = ctx.currentTime;
   for (const [f, d] of seqs[kind] || []) {

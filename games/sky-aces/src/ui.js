@@ -3,7 +3,7 @@ import * as THREE from '../vendor/three.module.js';
 import { PLANES, TRACKS, MISSIONS, planeById, save, persist, upOf, statsFor, upgradeCost, trackMax, resetSave } from './meta.js';
 import { fmtMoney, clamp } from './util.js';
 import { ARENA } from './world.js';
-import * as A from './audio.js';
+import * as A from './audio.js?v=ios-audio-1';
 import { makePlane, animatePilot } from './models.js';
 
 const $ = (s) => document.querySelector(s);
@@ -25,7 +25,7 @@ export class UI {
     const sound = $('#mute');
     const shouldMute = () => !A.isMuted() && A.audioReady();
     let soundIntent;
-    // The shared release handler may unlock audio before click arrives. Keep
+    // An interrupted context may recover before click arrives. Keep
     // the action the button advertised when the player pressed it.
     sound.addEventListener('pointerdown', () => { soundIntent = shouldMute(); });
     sound.addEventListener('pointercancel', () => { soundIntent = undefined; });
@@ -36,9 +36,11 @@ export class UI {
     const updateSound = () => {
       const muted = A.isMuted();
       const pending = !muted && !A.audioReady();
+      const status = A.audioStatus();
       sound.classList.toggle('off', muted);
       sound.classList.toggle('pending', pending);
-      const label = pending ? 'Enable sound' : muted ? 'Unmute sound' : 'Mute sound';
+      const label = muted ? 'Unmute sound' : pending ? (status === 'retry' ? 'Retry sound' : 'Enable sound') : 'Mute sound';
+      sound.querySelector('small').textContent = muted ? 'Unmute' : status === 'retry' ? 'Retry sound' : status === 'starting' ? 'Starting sound…' : 'Tap for sound';
       sound.title = label;
       sound.setAttribute('aria-label', label);
     };
@@ -47,13 +49,13 @@ export class UI {
       save.settings.mute = mute;
       persist();
       A.setMuted(save.settings.mute);
-      if (!save.settings.mute) A.initAudio();
+      if (!save.settings.mute) A.initAudio({ explicit: true });
     };
     sound.onclick = (e) => { e.stopPropagation(); this.toggleSound(soundIntent); };
     addEventListener('sky-audio-state', updateSound);
     updateSound();
     const wakeSound = (e) => {
-      if (!e.isTrusted || sound.contains(e.target) || e.code === 'KeyM') return;
+      if (!e.isTrusted || sound.contains(e.target) || e.code === 'KeyM' || e.key === 'Escape' || e.repeat || e.ctrlKey || e.metaKey) return;
       if (e.type === 'pointerdown' && e.pointerType !== 'mouse') return;
       A.initAudio();
     };

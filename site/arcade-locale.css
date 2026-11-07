@@ -54,28 +54,22 @@ html[dir="rtl"] .arcade-site .arcade-search button { border-left: 0; border-inli
 html[dir="rtl"] .arcade-site .monitor-chin .power-light { margin-left: 0; margin-inline-start: auto; }
 html[dir="rtl"] .arcade-site #accountSlot { margin-left: 0; margin-inline-start: auto; }
 html[dir="rtl"] .arcade-footer nav { margin-left: 0; margin-inline-start: auto; }
-.arcade-site .arcade-nav a { overflow-wrap: anywhere; text-align: center; }
 html[data-pp-locale]:not([data-pp-locale="en"]) .arcade-site :is(.world-name, .settings-card strong, .feed-play) {
   min-width: 0;
   white-space: normal;
   overflow-wrap: anywhere;
 }
 
-@media (min-width: 701px) and (max-width: 1080px) {
-  .arcade-site header.top .bar:has(#localeSlot) { gap: 10px; }
-  .arcade-site .arcade-nav a { white-space: normal; }
-}
-@media (max-width: 700px) {
-  .arcade-site .arcade-header-tools #accountSlot { margin-inline: 0; }
+@media (max-width: 1100px) {
   .arcade-language select { width: 105px; }
 }
 @media (max-width: 420px) {
-  .arcade-site header.top .bar:has(#localeSlot) { gap: 8px; padding-inline: 10px; }
-  .arcade-site .logo { font-size: 24px; }
   .arcade-language { gap: 4px; padding-inline-start: 5px; }
   .arcade-language select { width: 88px; font-size: 12px; }
 }
 @media (max-width: 360px) {
+  .arcade-language select { width: 80px; }
+  .arcade-site .arcade-header-tools #accountSlot { inline-size: 44px; }
   .arcade-site #accountSlot button { width: 44px; padding-inline: 6px; justify-content: center; }
   .arcade-site #accountSlot .acc-name, .arcade-site #accountSlot .acc-mode { display: none; }
 }

@@ -19,12 +19,35 @@ button,a{ -webkit-tap-highlight-color:transparent }
 .arcade-site .logo{font:32px/1 var(--heading);letter-spacing:0;display:flex;align-items:center;gap:0;color:#eee5cd}
 .arcade-site .logo b{font-weight:400;color:#a9d99e}
 .logo-pixel{width:8px;height:8px;background:#edc779;margin-left:9px;box-shadow:8px -8px #a9d99e}
-.arcade-nav{display:flex;align-items:center;gap:8px;flex:1;justify-content:center}
-.arcade-nav a{padding:9px 15px;border:2px solid transparent;font-size:15px;font-weight:700;white-space:nowrap;color:#c4cbc7}
+.arcade-nav{display:flex;align-items:center;justify-content:center;flex:1;flex-wrap:wrap;min-width:0;gap:6px 8px}
+.arcade-nav a{display:inline-flex;flex:none;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:8px 15px;border:2px solid transparent;font-size:15px;font-weight:700;white-space:nowrap;color:#c4cbc7}
 .arcade-nav a:hover,.arcade-nav a[aria-current=page]{color:#f4eacb;background:#343b46;border-color:#59616b;box-shadow:3px 3px #11151e}
 .arcade-nav a[aria-current=page]{border-bottom-color:#a9d99e}
 .arcade-site #accountSlot{margin-left:auto}.arcade-site #accountSlot button{font-family:var(--sans);font-size:14px;border-radius:0;background:#303641;border:2px solid #59616b;padding:7px 10px;color:var(--text)}
-.arcade-header-tools{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-inline-start:auto;min-width:0}
+.arcade-header-tools{display:flex;flex:none;align-items:center;gap:8px;margin-inline-start:auto}
+.arcade-site .arcade-header-tools #accountSlot{min-width:0;margin-inline:0}
+/* Keep the full labels together and let whole tabs move when space is tight. */
+@media (max-width: 1100px) {
+  .arcade-site header.top .bar{padding:9px 16px;gap:8px}
+  .arcade-site .logo{font-size:clamp(24px,3.2vw,32px)}
+  .arcade-nav{gap:6px 4px}
+  .arcade-nav a{font-size:14px;padding-inline:6px}
+  .arcade-header-tools .acc-name{max-width:76px}
+}
+@media (max-width: 840px) {
+  .arcade-nav{order:1;flex:1 0 100%;justify-content:space-between}
+}
+@media (max-width: 560px) {
+  .arcade-nav a{font-size:13px;padding-inline:5px}
+}
+@media (max-width: 420px) {
+  .arcade-site header.top .bar{padding-inline:10px}
+}
+@media (max-width: 360px) {
+  .arcade-site header.top .bar{padding-inline:8px;gap:6px}
+  .arcade-site .logo{font-size:20px}
+  .arcade-nav a{font-size:12px;padding-inline:3px}
+}
 .arcade-site .pp-av{image-rendering:pixelated;border-radius:0!important}
 .arcade-site .row{margin:36px 0;display:block}
 .arcade-site .rowhead{margin-bottom:20px;gap:15px;align-items:baseline;flex-wrap:wrap}
@@ -147,12 +170,11 @@ button,a{ -webkit-tap-highlight-color:transparent }
 .arcade-site main h2[style],.arcade-site main h3[style]{font-family:var(--heading)!important;font-size:29px!important;line-height:1.3!important;font-weight:400!important}
 .arcade-site .prose a{color:#c4dca5}.arcade-site .category-note{max-width:70ch;color:#cbd0c5;font-size:22px}
 @media(min-width:1600px){.arcade-site .shell>main,.arcade-site main.arcade-main{width:min(1480px,100%)}.world-stage{height:210px}.world-stage pp-character{height:195px}}
-@media(max-width:1050px){.world-grid,.arcade-site .strip,.arcade-site .strip.wide,.game-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}.browse-heading{align-items:start;flex-direction:column}.arcade-search{width:100%}.arcade-site .play{grid-template-columns:1fr}.arcade-site .side{display:none}.arcade-site header.top .bar{gap:16px;padding:14px 22px}.arcade-nav a{padding:7px 10px}.arcade-site .pp-tiles{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:700px){.arcade-site .shell>main,.arcade-site main.arcade-main{padding:22px 18px 0}.arcade-site header.top .bar{padding:13px 18px;gap:12px}.arcade-site .logo{font-size:27px}.arcade-nav{order:3;flex:1 0 100%;justify-content:space-between;gap:5px}.arcade-nav a{font-size:14px;padding:8px 10px}.arcade-site #accountSlot button{font-size:14px}.world-grid,.arcade-site .strip,.arcade-site .strip.wide,.game-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 14px}.world-stage{height:155px}.world-stage pp-character{height:150px}.world-label{display:block;padding:12px 10px 4px}.world-name{font-size:25px;display:block}.world-count{font-size:17px}.world-hook{padding:0 10px 12px;font-size:19px}.world-number{font-size:16px;top:7px;left:9px}.world-hero{grid-template-columns:minmax(0,1fr) 130px;gap:15px;align-items:end}.hero-character{height:165px;box-shadow:4px 4px #0d111a}.hero-character pp-character{height:155px}.world-hero h1{font-size:38px}.world-hero .world-catch{font-size:26px}.world-hero p{font-size:21px}.world-hero .backlink{margin-bottom:16px}.world-hero .eyebrow{font-size:16px}.hero-character::after{bottom:16px}.browse-heading h1{font-size:40px}.cartridge-top{font-size:16px;padding:7px 9px}.arcade-site .cartridge .thumb{margin:7px 6px 0}.cartridge-copy{padding:10px 9px;gap:7px}.arcade-site .card .cname{font-size:23px}.card-hook{font-size:15px}.arcade-site .card .cmeta{font-size:13px}.arcade-site .pp-badges,.settings-grid{grid-template-columns:1fr 1fr}.arcade-site .pp-badge{flex-direction:column;align-items:start;gap:8px;padding:12px}.arcade-site .pp-who{min-width:170px}.arcade-site .pp-hero{padding:18px;gap:18px}.arcade-site .pp-hero>.pp-av{width:82px;height:82px}.arcade-site .pp-daily{grid-template-columns:92px 1fr}.arcade-site .pp-dshot{aspect-ratio:auto}.quest-medal{width:64px;height:64px}.arcade-site .pp-dbody{padding:15px}.arcade-site .pp-dtitle{font-size:26px}.arcade-site .pp-dgoal{font-size:20px}.arcade-site .prose p,.arcade-site .prose li{font-size:22px}.arcade-site .prose h1{font-size:40px}.arcade-site .prose{padding-top:8px}.arcade-footer{margin-top:40px;gap:10px 20px}.arcade-footer nav{margin-left:0;flex-basis:100%}.arcade-site .stagebar{gap:8px}.arcade-site .stagebar .title{font-size:20px;flex-basis:100%}.arcade-site .stagebar button,.arcade-site .stagebar .lnk{font-size:18px;padding:6px}.arcade-site .keys li{flex-wrap:wrap}.settings-card{padding:18px}.settings-card strong{font-size:27px}.settings-card p{font-size:20px}}
+@media(max-width:1050px){.world-grid,.arcade-site .strip,.arcade-site .strip.wide,.game-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}.browse-heading{align-items:start;flex-direction:column}.arcade-search{width:100%}.arcade-site .play{grid-template-columns:1fr}.arcade-site .side{display:none}.arcade-site .pp-tiles{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.arcade-site .shell>main,.arcade-site main.arcade-main{padding:22px 18px 0}.world-grid,.arcade-site .strip,.arcade-site .strip.wide,.game-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 14px}.world-stage{height:155px}.world-stage pp-character{height:150px}.world-label{display:block;padding:12px 10px 4px}.world-name{font-size:25px;display:block}.world-count{font-size:17px}.world-hook{padding:0 10px 12px;font-size:19px}.world-number{font-size:16px;top:7px;left:9px}.world-hero{grid-template-columns:minmax(0,1fr) 130px;gap:15px;align-items:end}.hero-character{height:165px;box-shadow:4px 4px #0d111a}.hero-character pp-character{height:155px}.world-hero h1{font-size:38px}.world-hero .world-catch{font-size:26px}.world-hero p{font-size:21px}.world-hero .backlink{margin-bottom:16px}.world-hero .eyebrow{font-size:16px}.hero-character::after{bottom:16px}.browse-heading h1{font-size:40px}.cartridge-top{font-size:16px;padding:7px 9px}.arcade-site .cartridge .thumb{margin:7px 6px 0}.cartridge-copy{padding:10px 9px;gap:7px}.arcade-site .card .cname{font-size:23px}.card-hook{font-size:15px}.arcade-site .card .cmeta{font-size:13px}.arcade-site .pp-badges,.settings-grid{grid-template-columns:1fr 1fr}.arcade-site .pp-badge{flex-direction:column;align-items:start;gap:8px;padding:12px}.arcade-site .pp-who{min-width:170px}.arcade-site .pp-hero{padding:18px;gap:18px}.arcade-site .pp-hero>.pp-av{width:82px;height:82px}.arcade-site .pp-daily{grid-template-columns:92px 1fr}.arcade-site .pp-dshot{aspect-ratio:auto}.quest-medal{width:64px;height:64px}.arcade-site .pp-dbody{padding:15px}.arcade-site .pp-dtitle{font-size:26px}.arcade-site .pp-dgoal{font-size:20px}.arcade-site .prose p,.arcade-site .prose li{font-size:22px}.arcade-site .prose h1{font-size:40px}.arcade-site .prose{padding-top:8px}.arcade-footer{margin-top:40px;gap:10px 20px}.arcade-footer nav{margin-left:0;flex-basis:100%}.arcade-site .stagebar{gap:8px}.arcade-site .stagebar .title{font-size:20px;flex-basis:100%}.arcade-site .stagebar button,.arcade-site .stagebar .lnk{font-size:18px;padding:6px}.arcade-site .keys li{flex-wrap:wrap}.settings-card{padding:18px}.settings-card strong{font-size:27px}.settings-card p{font-size:20px}}
 @media(max-width:560px){.monitor{padding:17px 13px 15px;box-shadow:inset 4px 4px #ece7ce,inset -6px -6px #777e78}.screen-well{padding:7px;border-width:2px}.computer-screen{border-width:3px}.boot-label{font-size:9px;top:5px;left:7px}.monitor-chin{padding-top:14px;font-size:16px}.monitor-chin small{font-size:12px}.monitor-neck{height:22px;width:110px}.monitor-foot{height:19px;width:230px}.keyboard{width:90%;height:48px;margin-top:11px;gap:3px;padding:5px}.world-hero{grid-template-columns:1fr}.hero-character{position:absolute;right:23px;top:180px;width:105px;height:110px;opacity:.5;z-index:-1}.world-hero{position:relative;isolation:isolate}.world-hero p{max-width:33ch}.hero-character pp-character{height:106px}.world-hero .eyebrow{margin-top:0}.arcade-site .pp-tiles{gap:12px}.arcade-site .pp-tile b{font-size:27px}.arcade-site .pp-tile small{font-size:17px}.arcade-site .pp-who h1{font-size:34px}.arcade-site .pp-hero{align-items:start}.arcade-site .pp-hero>.pp-av{width:64px;height:64px}.arcade-site .pp-lvrow{gap:4px}.arcade-site .pp-acts .btn{font-size:20px}.arcade-site .about h1{font-size:34px}.arcade-site .notice{padding:12px;gap:9px;font-size:18px}.arcade-site .pp-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:560px){.world-hero{display:grid;grid-template-columns:minmax(0,1fr) 125px;gap:8px 12px}.world-hero>div:first-child{display:contents}.world-hero .backlink,.world-hero .eyebrow{grid-column:1/-1}.world-hero h1{grid-column:1;grid-row:3;font-size:34px;align-self:end}.world-hero .world-catch{grid-column:1;grid-row:4;align-self:start;font-size:25px}.world-hero>div:first-child>p:not(.world-catch){grid-column:1/-1;max-width:none;margin-top:12px}.world-hero .hero-character{position:relative;top:auto;right:auto;grid-column:2;grid-row:3/5;width:125px;height:135px;opacity:1;z-index:0;border:0;background:transparent;box-shadow:none;align-self:center}.world-hero .hero-character pp-character{height:135px}.hero-character::after{bottom:8px}.arcade-search{min-width:0}}
 @media(max-width:700px){.arcade-site .play{grid-template-columns:minmax(0,1fr)}.arcade-site .stage{aspect-ratio:3/4;min-height:380px}.arcade-site .stage .curtain{padding:18px;gap:12px}.arcade-site .stage .curtain p{font-size:20px}.arcade-site .keys kbd{white-space:normal}.arcade-site .keys span{font-size:19px}.arcade-site .rt-k{font-size:18px;letter-spacing:0}.arcade-site .rt-me{font-size:17px}}
-@media(max-width:560px){.arcade-nav{display:grid;grid-template-columns:1.35fr 1.2fr 1fr 1fr;min-width:0;width:100%;gap:4px}.arcade-nav a{font-size:13px;line-height:1.2;white-space:normal;padding:6px 3px;text-align:center;display:flex;align-items:center;justify-content:center;min-height:44px}}
 @media(max-width:360px){.world-grid,.arcade-site .strip,.arcade-site .strip.wide,.game-grid,.settings-grid{grid-template-columns:1fr}.world-stage{height:170px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.arcade-boot{display:none}}
 html.arcade-still *,html.arcade-still *::before,html.arcade-still *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
@@ -192,7 +214,6 @@ html.arcade-still .arcade-boot{display:none}
 
 @media(min-width:1250px){.game-feed{grid-template-columns:repeat(5,minmax(0,1fr))}}
 @media(max-width:700px){
-  .arcade-header-tools #accountSlot button{max-width:108px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .feed-heading{grid-template-columns:minmax(0,1fr);padding:12px 14px}
   .feed-heading h1{font-size:38px}
   .game-feed{gap:14px 10px}

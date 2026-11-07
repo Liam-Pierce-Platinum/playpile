@@ -335,24 +335,39 @@ function dragTo(x, y) {
   if (p.length && !adjacent(p[p.length - 1], i)) return;
   p.push(i); G.tileAnim[i].pop = 0.7; sfx.tile(p.length);
 }
+let wordPointer = null;
 cv.addEventListener('pointerdown', e => {
   initAudio();
-  if (G.screen !== 'play' || G.rotA) return;
+  if (G.screen !== 'play' || G.rotA || G.dragging || e.button !== 0) return;
   const i = tileAt(e.clientX, e.clientY, false);
   if (i < 0) return;
   G.flash = null; if (G.banner) G.banner.t = Math.min(G.banner.t, 0.2); // the last word's flash/banner never covers the next drag
+  wordPointer = e.pointerId;
   G.typed = ''; G.dragging = true; G.path = [i]; G.tileAnim[i].pop = 0.7; sfx.tile(1);
   try { cv.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
   e.preventDefault();
 });
 cv.addEventListener('pointermove', e => {
-  if (!G.dragging) return;
+  if (!G.dragging || e.pointerId !== wordPointer) return;
   const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
   for (const ev of (evs.length ? evs : [e])) dragTo(ev.clientX, ev.clientY);
 });
-const up = () => { if (!G.dragging) return; G.dragging = false; submit(G.path.slice()); };
-cv.addEventListener('pointerup', up);
-cv.addEventListener('pointercancel', up);
+cv.addEventListener('pointerup', e => {
+  if (e.pointerId !== wordPointer) return;
+  wordPointer = null;
+  if (!G.dragging) return;
+  G.dragging = false;
+  submit(G.path.slice());
+});
+function cancelWordDrag() {
+  if (wordPointer === null) return;
+  wordPointer = null;
+  if (G.dragging) G.path = [];
+  G.dragging = false;
+}
+cv.addEventListener('lostpointercapture', e => { if (e.pointerId === wordPointer) cancelWordDrag(); });
+cv.addEventListener('pointercancel', e => { if (e.pointerId === wordPointer) cancelWordDrag(); });
+addEventListener('blur', cancelWordDrag);
 addEventListener('keydown', e => {
   if (e.key === 'm' && G.screen !== 'play') { toggleMute(); return; }
   if (G.screen === 'title' && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); startGame('classic'); return; }

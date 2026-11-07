@@ -69,10 +69,15 @@ function showTouch() { document.body.classList.add('touch'); }
 if (matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window) showTouch();
 const stick = document.getElementById('stick'), knob = document.getElementById('knob');
 let stickId = null, sx0 = 0, sy0 = 0;
-stick.addEventListener('pointerdown', (e) => { initAudio(); showTouch(); stickId = e.pointerId; try { stick.setPointerCapture(e.pointerId); } catch (er) {} const r = stick.getBoundingClientRect(); sx0 = r.left + r.width / 2; sy0 = r.top + r.height / 2; moveStick(e); });
+stick.addEventListener('pointerdown', (e) => { if (stickId !== null) return; initAudio(); showTouch(); stickId = e.pointerId; try { stick.setPointerCapture(e.pointerId); } catch (er) {} const r = stick.getBoundingClientRect(); sx0 = r.left + r.width / 2; sy0 = r.top + r.height / 2; moveStick(e); });
 stick.addEventListener('pointermove', (e) => { if (e.pointerId === stickId) moveStick(e); });
 const endStick = (e) => { if (e.pointerId !== stickId) return; stickId = null; touch.x = touch.y = 0; knob.style.transform = ''; };
 stick.addEventListener('pointerup', endStick); stick.addEventListener('pointercancel', endStick);
+stick.addEventListener('lostpointercapture', endStick);
+addEventListener('blur', () => {
+  endStick({ pointerId: stickId });
+  for (const b of tc.querySelectorAll('.down')) b.classList.remove('down');
+});
 function moveStick(e) {
   let dx = e.clientX - sx0, dy = e.clientY - sy0; const R = stick.clientWidth * 0.4, d = Math.hypot(dx, dy);
   if (d > R) { dx = dx / d * R; dy = dy / d * R; }

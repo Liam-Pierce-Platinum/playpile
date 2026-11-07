@@ -45,3 +45,4 @@ background-image:repeating-linear-gradient(45deg,#e8462f 0 10px,#fffaf0 10px 20p
 #go{font:italic 900 24px Georgia,serif;color:#fff;background:#e8462f;border:0;border-radius:30px;padding:10px 30px;box-shadow:0 4px 0 #a52a17;cursor:pointer}
 #go:active{transform:translateY(3px);box-shadow:0 1px 0 #a52a17}
 @media (max-width:600px){#dist{font-size:32px}#stamp{width:72px;height:86px}#toast{font-size:28px}#card{inset:5px}}
+@media (pointer:coarse){#panel{touch-action:pan-y}#go,.up{min-height:44px}}

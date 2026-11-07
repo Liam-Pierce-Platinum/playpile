@@ -5,6 +5,7 @@
 <meta charset="utf-8">
 <title>HIGHRISE</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="../_shared/touch-combat.css">
 <style>
   :root { --ink:#e6e2d8; --dim:#8a8578; --acc:#c8412f; }
   * { box-sizing: border-box; }
@@ -17,7 +18,7 @@
      pointer you cannot see. Editor.toggle() puts this class on. */
   body.editing { cursor:crosshair; }
   body.editing.looking { cursor:none; }
-  canvas { display:block; position:fixed; inset:0; }
+  canvas { display:block; position:fixed; inset:0; width:100%; height:100%; }
 
   #hud { position:fixed; inset:0; pointer-events:none; z-index:2; }
   #cross { position:absolute; left:50%; top:50%; width:22px; height:22px;
@@ -117,6 +118,21 @@
   #dead { position:fixed; inset:0; display:none; place-items:center; z-index:4;
           background:rgba(20,2,0,.72); text-align:center; }
   #dead h2 { font:900 42px "Segoe UI",system-ui; letter-spacing:.24em; margin:0; }
+  #enter-tower { min-height:44px; margin-top:18px; padding:8px 20px; border:1px solid #a35a47; color:#f1d8c2; background:#301e1b; font:700 15px Arial,sans-serif; cursor:pointer; }
+  .touch-help { display:none; }
+  .phone-controls #boot { padding:16px; overflow:auto; }
+  .phone-controls #boot h1 { font-size:clamp(28px,8vw,48px); }
+  .phone-controls #boot p { margin-top:12px; color:#c0b9aa; }
+  .phone-controls .touch-help { display:block; }
+  .phone-controls .desktop-help { display:none; }
+  .phone-controls #vitals { left:12px; bottom:112px; }
+  .phone-controls #iframe { left:0; bottom:0; }
+  .phone-controls #meds { left:0; bottom:20px; }
+  .phone-controls #hpbar,.phone-controls #stambar,.phone-controls #iframe { width:105px; }
+  .phone-controls #gun { right:12px; bottom:156px; }
+  .phone-controls #ammo { font-size:24px; }
+  .phone-controls #log { left:12px; bottom:154px; }
+  .phone-controls #kills { top:50px; }
 </style>
 </head>
 <body>
@@ -150,7 +166,7 @@
     <div class="sub">thirty-one floors &middot; go up</div>
     <p>You are on the ground floor of a building full of people paid to keep you off the roof.
        Take what they carry.</p>
-    <p style="margin-top:18px">
+    <p class="desktop-help" style="margin-top:18px">
       <kbd>W A S D</kbd> move &middot; <kbd>SHIFT</kbd> sprint &middot; <kbd>CTRL</kbd> crouch &middot;
       <kbd>SPACE</kbd> slide<br>
       <kbd>DOUBLE-TAP</kbd> a move key to dodge &mdash; nothing can hit you mid-dodge<br>
@@ -159,7 +175,8 @@
       <kbd>R</kbd> reload &middot; <kbd>1-9</kbd> / <kbd>WHEEL</kbd> weapons &middot; walk over a body to take what he had<br>
       <kbd>1</kbd> is your fists &mdash; behind a man who has not seen you, they are enough
     </p>
-    <p style="margin-top:26px;color:#c8412f;letter-spacing:.2em">CLICK TO PLAY</p>
+    <p class="touch-help">Drag on the left to move and on the right to aim. Tap Fire, Reload or Weapon with your right thumb.</p>
+    <button id="enter-tower" type="button" disabled>Loading tower…</button>
   </div>
 </div>
 <div id="dead"><div><h2>DOWN</h2><p style="color:#8a8578">click to start over</p></div></div>

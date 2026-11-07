@@ -50,13 +50,16 @@ if (touch) {
   cv.addEventListener('touchstart', (e) => {
     e.preventDefault(); A.wake();
     for (const t of e.changedTouches) {
-      if (t.clientX < w * 0.5 && stick.id === null) { Object.assign(stick, { id: t.identifier, ox: t.clientX, oy: t.clientY, x: t.clientX, y: t.clientY }); }
+      if (t.clientX < w * 0.5) {
+        if (stick.id === null) Object.assign(stick, { id: t.identifier, ox: t.clientX, oy: t.clientY, x: t.clientX, y: t.clientY });
+      }
       else { const p = toWorld(t.clientX, t.clientY); throwAt(G, p.x, p.y); }
     }
   }, { passive: false });
   cv.addEventListener('touchmove', (e) => { e.preventDefault(); for (const t of e.changedTouches) if (t.identifier === stick.id) { stick.x = t.clientX; stick.y = t.clientY; } }, { passive: false });
   const end = (e) => { for (const t of e.changedTouches) if (t.identifier === stick.id) stick.id = null; };
   cv.addEventListener('touchend', end); cv.addEventListener('touchcancel', end);
+  addEventListener('blur', () => { stick.id = null; tBoost = tDrift = false; });
 }
 function readInput() {
   const I = G.input; if (G.bot) return;

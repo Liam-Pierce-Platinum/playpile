@@ -173,7 +173,12 @@ export function bindInput(G, canvas) {
   window.addEventListener('blur', () => cam.S.keys.clear());
 
   // ---------------- touch
-  const T = { pts: new Map(), start: null, mode: null, pinch: null, longT: 0 };
+  const T = { pts: new Map(), start: null, mode: null, pinch: null, lineEnd: null };
+  function clearTouchOrder() {
+    if (T.mode === 'draw') { M.drawing = null; G.previewTool(null); }
+    if (T.mode === 'line') G.previewLine(null);
+    T.start = T.mode = T.pinch = T.lineEnd = null;
+  }
   canvas.addEventListener('pointerdown', (e) => {
     if (e.pointerType !== 'touch') return;
     G.initAudio();
@@ -187,9 +192,9 @@ export function bindInput(G, canvas) {
       if (!T.mode && sq && G.sel.has(sq.id)) T.mode = 'line';
     } else if (T.pts.size === 2) {
       const [a, b] = [...T.pts.values()];
+      clearTouchOrder();
       T.pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), ang: Math.atan2(b.y - a.y, b.x - a.x), dist: cam.S.tdist, yaw: cam.S.tyaw };
       T.mode = 'pinch';
-      if (M.drawing) { M.drawing = null; G.previewTool(null); }
     }
   });
   canvas.addEventListener('pointermove', (e) => {
@@ -228,9 +233,8 @@ export function bindInput(G, canvas) {
     }
   });
   const touchEnd = (e) => {
-    if (e.pointerType !== 'touch') return;
-    T.pts.delete(e.pointerId);
-    if (T.mode === 'pinch') { if (T.pts.size === 0) T.mode = null; return; }
+    if (e.pointerType !== 'touch' || !T.pts.delete(e.pointerId)) return;
+    if (T.mode === 'pinch') { if (T.pts.size === 0) clearTouchOrder(); return; }
     const s = T.start; T.start = null;
     if (!s) return;
     if (T.mode === 'draw' && M.drawing) {
@@ -250,7 +254,13 @@ export function bindInput(G, canvas) {
     T.mode = null;
   };
   canvas.addEventListener('pointerup', touchEnd);
-  canvas.addEventListener('pointercancel', touchEnd);
+  const cancelTouch = (e) => {
+    if (!T.pts.delete(e.pointerId)) return;
+    if (T.mode !== 'pinch' || T.pts.size === 0) clearTouchOrder();
+  };
+  canvas.addEventListener('pointercancel', cancelTouch);
+  canvas.addEventListener('lostpointercapture', cancelTouch);
+  addEventListener('blur', () => { T.pts.clear(); clearTouchOrder(); });
 
   return { M, tipEl };
 }

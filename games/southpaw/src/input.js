@@ -33,9 +33,10 @@ export function createInput(target = window) {
     pressed.push(k);
   }
   function ku(e) { down.delete(e.code); }
+  function clear() { down.clear(); pressed.length = 0; I.aimHeld = false; }
   target.addEventListener('keydown', kd);
   target.addEventListener('keyup', ku);
-  window.addEventListener('blur', () => down.clear());
+  window.addEventListener('blur', clear);
 
   // Called once a frame. Returns the intent for this frame.
   I.poll = function (dt) {
@@ -71,7 +72,7 @@ export function createInput(target = window) {
     return it;
   };
 
-  I.clear = () => { down.clear(); pressed.length = 0; };
-  I.dispose = () => { target.removeEventListener('keydown', kd); target.removeEventListener('keyup', ku); };
+  I.clear = clear;
+  I.dispose = () => { target.removeEventListener('keydown', kd); target.removeEventListener('keyup', ku); window.removeEventListener('blur', clear); };
   return I;
 }

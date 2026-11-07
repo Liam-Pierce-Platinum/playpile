@@ -41,3 +41,13 @@ body.touch #touchui { display: flex; }
 #touchui button.gas { width: 90px; height: 90px; background: #ffd23a; font-size: 26px; }
 #touchui button.on { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #1b1026; background: #52e0ff; }
 @media (max-width: 520px) { .pop { font-size: 32px; } .pop.big { font-size: 48px; } .panel h1.logo { font-size: 46px; } #grid { grid-template-columns: repeat(3, 1fr); } #hud .lvbox { font-size: 14px; min-width: 120px; } #time { font-size: 26px; } }
+
+@media (pointer: coarse) {
+  html,body { touch-action: manipulation; }
+  .panel { box-sizing: border-box; max-height: calc(100dvh - 24px); overflow: auto; touch-action: pan-y; }
+  .panel button,#bPause { min-height: 44px; }
+  #touchui { padding: 0 max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left)); }
+  #touchui div { gap: 8px; }
+  #touchui button { width: clamp(48px,16vmin,74px); height: clamp(48px,16vmin,74px); }
+  #touchui button.gas { width: clamp(56px,21vmin,90px); height: clamp(56px,21vmin,90px); }
+}

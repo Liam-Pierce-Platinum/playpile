@@ -401,6 +401,12 @@ cv.addEventListener('mousedown', (e) => {
   if (G.dead || G.won) { afterEnd(); return; }
   if (e.button === 2) strikeMatch(); else fire();
 });
+cv.addEventListener('pointerdown', e => {
+  if (e.pointerType !== 'touch') return;
+  e.preventDefault();
+  toLogical(e); G.aimMode = 'mouse';
+  if (G.dead || G.won) afterEnd(); else fire();
+});
 cv.addEventListener('contextmenu', (e) => e.preventDefault());
 
 function afterEnd() {

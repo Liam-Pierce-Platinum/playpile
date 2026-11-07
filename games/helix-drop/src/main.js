@@ -64,25 +64,28 @@ function nextLevel() {
 }
 
 // ------------------------------------------------------------------ input
-let dragging = false, lastX = 0, dragPx = 0;
+let dragId = null, lastX = 0, dragPx = 0;
 const sens = () => (TAU * 0.95) / Math.min(window.innerWidth, 760);
 canvas.addEventListener('pointerdown', (e) => {
+  if (dragId !== null || e.button !== 0) return;
   sfx.unlock();
-  dragging = true; lastX = e.clientX; dragPx = 0;
+  dragId = e.pointerId; lastX = e.clientX; dragPx = 0;
   try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
 });
 canvas.addEventListener('pointermove', (e) => {
-  if (!dragging) return;
+  if (dragId !== e.pointerId) return;
   const dx = e.clientX - lastX; lastX = e.clientX; dragPx += Math.abs(dx);
   if (state === 'play' && !G.paused) game.rotate(dx * sens());
   else if (state === 'title' && dragPx > 8) { /* spinning on the title starts the game */ start('levels'); }
 });
 const up = (e) => {
-  if (!dragging) return; dragging = false;
+  if (dragId !== e.pointerId) return;
+  dragId = null;
   if (dragPx < 8) tapAnywhere();
 };
 canvas.addEventListener('pointerup', up);
-canvas.addEventListener('pointercancel', () => { dragging = false; });
+canvas.addEventListener('lostpointercapture', (e) => { if (dragId === e.pointerId) dragId = null; });
+addEventListener('blur', () => { dragId = null; });
 
 function tapAnywhere() {
   if (state === 'dead' && stateT > 0.35) retry();

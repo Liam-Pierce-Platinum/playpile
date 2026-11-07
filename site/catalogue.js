@@ -29,10 +29,10 @@ export const GAMES = [
     content: "Blocky cube men, but very violent: claw slashes, severed limbs, heavy red blood and finishing moves. Enemies use guns, batons and blades. No accounts, no chat, no purchases.",
     web: "bladeborn/",
     tag: "Cube-man claw brawler", big: true, added: '2026-10-18',
-    cat: "Action", tags: ["new","action","fighting","climbing","stealth","3d","desktop"],
+    cat: "Action", tags: ["new","action","fighting","climbing","stealth","3d", "mobile"],
     blurb: "A cube man with three claws on each hand. Slash where you aim, climb any wall with your claws, slam down from above and finish enemies with brutal takedowns. Desktop only: needs a mouse and keyboard.",
     about: `A third-person brawler where everyone is built from cubes. Click both mouse buttons to pop the claws, then every click is a strike that lands where the crosshair is: the head or neck kills, arms drop a guard, legs make them limp. Any concrete wall can be climbed by driving the claws in, one hand at a time, and from up high you can drop on an enemy with a slam or a takedown. PLAY is the yard with endless waves; STAGES has four levels with plain objectives: a lab and walled compound, a night forest, downtown Toronto and a tower with a two-sword boss on the helipad. Desktop only: it needs a mouse and keyboard.`,
-    controls: [["WASD","move"],["Mouse","look"],["LMB + RMB","claws out (hold both to sheathe)"],["LMB / RMB","left / right claw strike"],["Middle mouse","block, time it to parry"],["Double-click LMB","finisher when the bar is full"],["Space","jump, wall-jump"],["Shift","sprint"],["C","crouch"],["E","takedown"],["Esc","pause"]],
+    controls: [["WASD","move"],["Mouse","look"],["LMB + RMB","claws out (hold both to sheathe)"],["LMB / RMB","left / right claw strike"],["Middle mouse","block, time it to parry"],["Double-click LMB","finisher when the bar is full"],["Space","jump, wall-jump"],["Shift","sprint"],["C","crouch"],["E","takedown"],["Esc","pause"], ["Touch", "Drag left to move, drag right to look, and use the action buttons to fight or climb"]],
     tips: "Aim for the head or neck: it kills in one strike. On a wall, middle-click kills the enemy below without a fight. Parry with a well-timed middle click to knock an attacker down.",
   },
   {
@@ -40,10 +40,10 @@ export const GAMES = [
     content: "A realistic military shooter against computer-controlled soldiers. Guns, grenades and headshots; no gore beyond a small hit effect. No accounts, no chat and no purchases. Online play only works when the game is run on your own computer.",
     web: "ironsight/",
     tag: "Realistic tactical FPS", big: true, added: '2026-10-18',
-    cat: "Shooter", tags: ["new","shooter","fps","realistic","gunsmith","3d","desktop"],
+    cat: "Shooter", tags: ["new","shooter","fps","realistic","gunsmith","3d", "mobile"],
     blurb: "A realistic first-person shooter. Build your gun in the gunsmith, then fight nine bots in free-for-all or a 5v5 team match across four maps. Headshots kill instantly. Desktop only: needs a mouse and keyboard. Big download.",
     about: `A tactical first-person shooter with realistic gloved hands, real-looking guns and four maps: a rainy city, an office tower, the docks and a desert compound. Every match has ten fighters: free-for-all against nine bots, or team deathmatch five against five. Bots fight each other too, hunt, and throw frag, flash and smoke grenades. A headshot is an instant kill. In the gunsmith you choose optics from iron sights to an 8x scope, muzzles, grips, laser colour and camo. The firing range is for trying builds. The online lobby needs the game running on your own computer, so it is switched off here. Desktop only, and the first load is large (around 100 MB per map).`,
-    controls: [["WASD","move"],["Mouse","aim"],["Click","shoot"],["Right mouse","aim down sights"],["Shift","sprint"],["C","crouch / slide"],["Z","prone"],["Space","jump / mantle"],["Q / E","lean"],["R","reload"],["1-2","weapons"],["F / X","lethal / tactical grenade"],["Tab","leaderboard"],["L","loadout"],["Esc","pause"]],
+    controls: [["WASD","move"],["Mouse","aim"],["Click","shoot"],["Right mouse","aim down sights"],["Shift","sprint"],["C","crouch / slide"],["Z","prone"],["Space","jump / mantle"],["Q / E","lean"],["R","reload"],["1-2","weapons"],["F / X","lethal / tactical grenade"],["Tab","leaderboard"],["L","loadout"],["Esc","pause"], ["Touch", "Drag left to move, drag right to aim. Use Fire, Aim, Reload and the other buttons"]],
     tips: "Aim for the head: one shot kills. Lean round corners instead of stepping out, and use smoke to cross open ground.",
   },
   // ---- 2026-10-18: BLADE DASH: CASTLE + 25 3D games from the session hub ----
@@ -615,7 +615,7 @@ There are fifteen spells to learn from spellbooks, from Fireball and Chain Light
     content: "A war shooter with guns, grenades and explosions against simple low-poly soldiers. Hits show a small red puff and soldiers tumble when they fall; no gore. Muzzle flashes and explosion flashes.",
     web: "frontline/",
     tag: "FPS", big: true, added: '2026-10-12',
-    cat: "Shooter", tags: ["fps","squad","ai","low poly","3d","armory","war"],
+    cat: "Shooter", tags: ["fps","squad","ai","low poly","3d","armory","war", "mobile"],
     blurb: "A low-poly squad shooter against soldiers who take cover, flank, suppress, throw grenades and call out your position.",
     about: `Eight against eight across three capture points, with every other soldier on the field run by an AI that fights the way you do. Enemies hide behind cover and peek to shoot, pin you down with suppressing fire, send a flanker round the side, put a marksman on the bell tower, throw grenades when you camp, and revive each other. Spot one and he radios your position to his whole squad.
 
@@ -888,7 +888,7 @@ Your debris ring is your armour. Fling pieces at rivals to knock their rings apa
     content: "Medieval battles between toy-like armies with swords, bows, cavalry and siege engines: soldiers fall when beaten and villages can be burned, but there is no blood, and hits show as small sparks and dust.",
     web: "bannerfall/",
     tag: "Strategy", big: true, added: '2026-10-11',
-    cat: "Strategy", tags: ["strategy","medieval","rts","castles","siege","3d","war"],
+    cat: "Strategy", tags: ["strategy","medieval","rts","castles","siege","3d","war", "mobile"],
     blurb: "Dig trenches, raise walls, then lead your army in real time to storm every rival capital.",
     about: `Found a kingdom with a royal grant of 50,000 gold. While time is stopped you dig trenches, raise palisades and stone walls, and recruit your first squads. Then raise the banners and the war runs in real time on a generated map 2, 3 or 4 km across, against 1 to 3 rival kingdoms that also fight each other. Take villages and pillage them or tax them, raid forts, claim land, and break into castles with rams and mangonels. A kingdom falls when its capital is taken, its ruler is slain or it surrenders. Space pauses whenever you need to think.
 
@@ -941,7 +941,7 @@ There are fifteen blocks in three districts: Old Town brick and timber, Downtown
     content: "Cartoon garden chaos: gnomes and toys get knocked flying and shatter, a dog chases the mower and bumps into it, and cats leap away hissing. No animals are hurt and there is no blood.",
     web: "mower-madness/",
     tag: "Arcade", big: false, added: '2026-10-09',
-    cat: "Driving", tags: ["mowing","lawn","stripes","garden","time trial","cartoon","top down"],
+    cat: "Driving", tags: ["mowing","lawn","stripes","garden","time trial","cartoon","top down", "mobile"],
     blurb: "A ride-on mower, a ticking clock, and a lawn full of gnomes that will not get out of the way.",
     about: `Fifteen gardens to cut against the clock, from a tidy front lawn on Number 12 to a royal garden party with the corgis loose. The mower drives the way you press and spins on the spot, the grass turns light or dark by the way you mowed it, and every straight pass you lay right beside the last one grows a STRIPE CHAIN that multiplies everything you cut, up to five times.
 
@@ -954,7 +954,7 @@ Gnomes, a dog that chases, sleeping cats, toys that clog the blades, pop-up spri
     content: "Cartoon customers in a sushi bar get grumpy and storm out if kept waiting, and a cat steals plates. No violence.",
     web: "sushi-conveyor/",
     tag: "Arcade", big: false, added: '2026-10-09',
-    cat: "Arcade", tags: ["sushi","cooking","serving","time management","cute","touch","2d"],
+    cat: "Arcade", tags: ["sushi","cooking","serving","time management","cute","touch","2d", "mobile"],
     blurb: "Grab the right plate off three speeding belts and get it to the right face before they storm out.",
     about: `Customers line the back of the counter, each with a bubble that says what they want: a dish, any plate of a colour, a colour under a price, or just "something hot". Drag, flick or tap the right plate up to them before their patience bar runs red. Serve fast for bigger tips and a growing combo; serve wrong and they shove it back. Three walkouts and the shop closes.
 
@@ -967,7 +967,7 @@ Twelve short days at four restaurants, from a Tiny Tokyo Stall to a Floating Riv
     content: "A cartoon bomb that goes BOOM with a comic-book explosion, a bright white flash and a sooty pair of eyes when you fail. A strike tints the screen red and shakes it. Nobody is hurt and there is no blood.",
     web: "bomb-squad/",
     tag: "Puzzle", big: false, added: '2026-10-09',
-    cat: "Puzzle", tags: ["bomb","defusal","puzzle","manual","timer","daily","endless"],
+    cat: "Puzzle", tags: ["bomb","defusal","puzzle","manual","timer","daily","endless", "mobile"],
     blurb: "A ticking bomb, a paper manual and three strikes to spare: snip, flip, read, don't panic.",
     about: `A bomb sits on your desk under the lamp, with a manual open beside it. Pick a module and the booklet flips to its page: cut the right one of three to six wires, tap or hold the button and let go on the right digit, set five switches by their cap colours, press four symbol keys in column order, answer Simon with the mapped colour, steer through a maze whose walls you cannot see, or spin four letter wheels to the one word that fits. Almost every rule depends on the serial number, the batteries and the lights along the top.
 
@@ -993,7 +993,7 @@ Twenty caves in four places - the Mossy Cave, the Crystal Cavern, the Lava Mine 
     content: "Cartoon fantasy fighters (bandits, knights, ninjas, ogres, pirates) are knocked flying or puff away with a KO when you block them back. Small cartoon explosions from bombs and fireballs. No blood.",
     web: "parry/",
     tag: "Rhythm", big: false, added: '2026-10-09',
-    cat: "Arcade", tags: ["rhythm","music","blocking","boss fights","reflex","endless","2d"],
+    cat: "Arcade", tags: ["rhythm","music","blocking","boss fights","reflex","endless","2d", "mobile"],
     blurb: "You only block, and every arrow, axe and fireball lands on the beat.",
     about: `You stand at a crossroads and attacks come down all four roads, each landing on the beat of a drum and bass loop that speeds up through the round. A ring closes on the target in each lane: block as it lands. A perfect, inside 45 milliseconds, sends the arrow or fireball straight back and knocks out whoever threw it. A good just bounces it off, and a miss costs one of your three hearts. Rogues fake a swing and strike a beat later. Ninjas throw two daggers down the same road, half a beat apart. Boulders have to be held, and bombs must not be blocked at all.
 
@@ -1006,7 +1006,7 @@ There are eight stages, from Forest Road to the Storm Citadel. Each round lasts 
     content: "A cartoon pixel thief sneaks past guards, cameras and lasers. Being spotted sets off an alarm and a soft red pulse over the room, then the level restarts. Nobody is hurt.",
     web: "one-tile/",
     tag: "Puzzle", big: false, added: '2026-10-09',
-    cat: "Puzzle", tags: ["heist","stealth","pixel","guards","real time","puzzle","2d"],
+    cat: "Puzzle", tags: ["heist","stealth","pixel","guards","real time","puzzle","2d", "mobile"],
     blurb: "Crack the safe, grab the gold and get out before the guard turns round.",
     about: `Twenty-four rooms across a bank, a museum, a casino and a penthouse, each one a single screen seen from above. Hold WASD and the thief dashes tile to tile, more than twice as fast as a guard. Stand next to the safe until it clicks open three times, then run for the EXIT, which stays padlocked until you do. Guards, cameras and lasers run their loops whether you move or not, and each one throws a cone showing exactly what it can see.
 
@@ -1019,7 +1019,7 @@ Walk one tile behind a guard and he never knows. Duck into a potted fern or a lo
     content: "Cartoon top-down cars ram each other, lose panels, smoke and catch fire. There are no people shown and nobody is hurt.",
     web: "derby/",
     tag: "Driving", big: false, added: '2026-10-09',
-    cat: "Driving", tags: ["demolition derby","cars","crashing","top down","arena","destruction","physics"],
+    cat: "Driving", tags: ["demolition derby","cars","crashing","top down","arena","destruction","physics", "mobile"],
     blurb: "Eight cars, one dirt bowl, and the last one still running wins.",
     about: `Seven AI drivers and you, boxed into a walled arena with nowhere to go but into each other. Your front bumper is armoured and the sides crumple, so the hit that counts is the T-bone: nose into a door at full boost. Panels dent where they are struck, bumpers, bonnets and doors fall off and stay on the dirt, and engines go from grey smoke to black smoke to fire before they stall for good. At 75 seconds a ring of fire starts closing in, so nobody hides forever.
 
@@ -1032,7 +1032,7 @@ Every round pays coins by place, by damage dealt and by wrecks caused, to spend 
     content: "Cartoon cars racing and drifting on a mountain road. They scrape the guardrail and bump each other, with sparks and tyre smoke. No crashes that hurt anyone and no people shown.",
     web: "touge-drift/",
     tag: "Driving", big: false, added: '2026-10-09',
-    cat: "Driving", tags: ["drifting","racing","touge","eurobeat","top down","cars","time attack"],
+    cat: "Driving", tags: ["drifting","racing","touge","eurobeat","top down","cars","time attack", "mobile"],
     blurb: "Slide an 80s hatchback down an endless Japanese mountain pass at dusk, one long drift at a time.",
     about: `A white-and-black hatchback with pop-up headlights, a mountain road that never ends, and eurobeat playing. Turn hard at speed and the back steps out; hold the slide and the points climb, faster and wider worth more. Hold it long enough and the multiplier ticks up to x10, and drifting right next to the guardrail doubles everything. Slam the rail hard, though, and you lose the drift you have not banked yet. Banked points fill the nitro.
 
@@ -1058,7 +1058,7 @@ Thirty stages in three chapters, the Bamboo Forest, the Red Castle and the Night
     content: "A peaceful island game. Nobody gets hurt and you cannot die. You chop trees and catch, cook and eat fish; storms bring rain, thunder and lightning.",
     web: "tiny-harbor/",
     tag: "Cosy", big: true, added: '2026-10-09',
-    cat: "Adventure", tags: ["cosy","island","fishing","lighthouse","building","3d","sailing"],
+    cat: "Adventure", tags: ["cosy","island","fishing","lighthouse","building","3d","sailing", "mobile"],
     blurb: "Keep a tiny island: tie up the trading boats, light them in at night, and grow a leaky tent into a cottage.",
     about: `You keep a small island with a campfire, a wooden dock and a striped lighthouse out on its own islet. Chop trees for wood, fish off the dock for supper, and pick up clams and shells off the wet sand when the tide goes out - it comes back twice a day and takes whatever you left. Three trading boats sail in by day, and each one pays extra for something: fish, shells or wood. At night they wait out at sea, and you climb the lighthouse and lead them past the rocks with the beam.
 
@@ -1073,7 +1073,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     content: 'Realistic gun and melee violence in first person, with blood. Enemies are shot and killed. Not for young children.',
     web: 'highrise/?play',
     tag: 'Shooter', big: true,
-    cat: 'Shooter', tags: ['fps', 'guns', '3d', 'tower', 'singleplayer', 'first person'],
+    cat: 'Shooter', tags: ['fps', 'guns', '3d', 'tower', 'singleplayer', 'first person', 'mobile'],
     blurb: 'Thirty-one storeys of a 2000s Manhattan tower, and you go up all of them.',
     about: `One building, not thirty-one levels: every floor exists at its real
     height in the same world at the same time, so you climb actual stairs and can
@@ -1083,7 +1083,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     controls: [['W A S D', 'move'], ['Mouse', 'look · click to fire · right-click to strike'],
                ['Shift', 'sprint'], ['Ctrl', 'crouch'], ['Space', 'slide'],
                ['Q E', 'lean'], ['R', 'reload'], ['1 - 8 / wheel', 'weapons'],
-               ['H', 'bandage']],
+               ['H', 'bandage'], ["Touch", "Drag left to move, drag right to aim. Fire, Slide, Reload, Heal and Weapon have their own buttons"]],
     tips: 'Cover is real - a locker bank stops bullets. Crouch behind a barrier and it covers you.',
   },
   {
@@ -1091,13 +1091,13 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     content: 'Cartoon pixel-art gun violence: enemies are shot and fall. No blood close up.',
     web: 'kickback/',
     tag: 'Action', big: true,
-    cat: 'Action', tags: ['shotgun', 'platformer', 'physics', '2d', 'guns'],
+    cat: 'Action', tags: ['shotgun', 'platformer', 'physics', '2d', 'guns', 'mobile'],
     blurb: 'A sawed-off with two shells in it, and the shells are your legs.',
     about: `Six floors of an unfinished tower over the harbour with downtown across
     the water. Fire it at the floor and it throws you; fire it at a man and it is a
     shotgun. Two shells, then a reload you have to find the time for.`,
     controls: [['A D / arrows', 'walk'], ['Mouse', 'swing the gun'], ['Click', 'fire'],
-               ['R', 'reload'], ['1 2 3', 'pick an upgrade at a crate'], ['P', 'pause']],
+               ['R', 'reload'], ['1 2 3', 'pick an upgrade at a crate'], ['P', 'pause'], ["Touch", "Hold a direction to walk, and tap or drag on the screen to aim and fire. Tap an upgrade card to pick it"]],
     tips: 'Down is a jump. Aim under your feet and pull.',
   },
   {
@@ -1105,14 +1105,14 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     content: 'Horror. A dark ship, creatures in the dark and sudden scares, with a gun you fire to see. Bright flashes.',
     web: 'exposure/',
     tag: 'Horror', big: true,
-    cat: 'Horror', tags: ['dark', 'shooting', 'atmospheric', '2d', 'scary'],
+    cat: 'Horror', tags: ['dark', 'shooting', 'atmospheric', '2d', 'scary', 'mobile'],
     blurb: 'The deck is pitch black. Your muzzle flash is the only light, and it freezes.',
     about: `Firing lights the room for an instant, and that instant STAYS on the
     screen - cold, grainy and still - while everything in the actual room keeps
     moving in the dark. You are always looking at a photograph of where things were.`,
     controls: [['W A S D / arrows', 'move'], ['Mouse', 'aim'],
                ['Click / Z / Space', 'fire'], ['X / F / right-click', 'strike a match'],
-               ['Shift', 'hold your aim and creep'], ['R', 'restart after a run']],
+               ['Shift', 'hold your aim and creep'], ['R', 'restart after a run'], ["Touch", "Move with the stick, tap the scene to fire toward that point, or use Fire and Match"]],
     tips: 'The photograph is a second old. Shoot where the thing is going, not where it was.',
   },
   {
@@ -1120,7 +1120,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     content: 'Fantasy combat with swords, bows and magic against monsters and a dragon, in a blocky retro style.',
     web: 'dungeon-quest/',
     tag: 'Adventure', big: true,
-    cat: 'Adventure', tags: ['rpg', 'dungeon', 'retro', '3d', 'dragon', 'n64'],
+    cat: 'Adventure', tags: ['rpg', 'dungeon', 'retro', '3d', 'dragon', 'n64', 'mobile'],
     blurb: 'An N64 dungeon crawler: four levels, three classes, and a black dragon at the end.',
     about: `A forest between the cliffs, a mine shaft, a frozen mountain that actually
     climbs, and a ledge on a black cliff - then the dragon that took the kingdom. Knight,
@@ -1128,7 +1128,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     ground before it lands. Plug in an N64 controller and that works too.`,
     controls: [['W A S D', 'move'], ['Arrows', 'jump · block · attack · special'],
                ['Shift / C', 'run · crouch'], ['Space', 'pick up · open · talk'],
-               ['1 2 3', 'potion · throw · eat'], ['E / M / Tab', 'satchel · map · target']],
+               ['1 2 3', 'potion · throw · eat'], ['E / M / Tab', 'satchel · map · target'], ["Touch", "Move with the stick, then tap Attack, Jump, Block, Special, Use or Bag. Target, Sneak and Run sit above the fight"]],
     tips: 'The dragon tells you which way to move: an orange tail sweep is jumped, green breath is dodged sideways.',
   },
   {
@@ -1137,7 +1137,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     web: 'apex/',
     tag: 'Racing', big: true,
     cat: 'Driving', tags: ['racing', 'f1', 'cars', 'simulation', '3d', 'track',
-                           'rain', 'pit stops', 'damage', 'career'],
+                           'rain', 'pit stops', 'damage', 'career', 'mobile'],
     blurb: 'Thirty-three real circuits, twenty-four cars, and air that decides the overtake.',
     about: `Every circuit on the calendar and a good many that are not, each built
     from survey data of the real track, smoothed and checked against the published
@@ -1155,7 +1155,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
                ['E Q', 'up a gear · down a gear'], ['Space', 'DRS'],
                ['C', 'clutch'], ['P', 'ready the crew, then drive into the pit lane'],
                ['1 - 5', 'choose tyres'],
-               ['V', 'camera'], ['R', 'back on track'], ['Esc', 'pause']],
+               ['V', 'camera'], ['R', 'back on track'], ['Esc', 'pause'], ["Touch", "Steer with your left thumb. Gas, Brake, Clutch, gears, Pit and DRS are on the right. Open Tyres to select a compound"]],
     tips: 'Get a tow down the straight before you commit to the move - in the corner behind him you have less grip than he does, not more. And a downshift too many will step the back out.',
   },
   {
@@ -1164,7 +1164,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     web: 'nascar/',
     tag: 'Racing', big: true,
     cat: 'Driving', tags: ['racing', 'nascar', 'stock cars', 'oval', 'cars',
-                           'simulation', '3d', 'draft', 'pit stops', 'career'],
+                           'simulation', '3d', 'draft', 'pit stops', 'career', 'mobile'],
     blurb: 'Twenty ovals, forty cars, and a draft that decides it on the last lap.',
     about: `Twenty speedways, each solved from its published lap distance, banking and
     corner radius until the shape closes - Daytona's tri-oval, Bristol's concrete bowl,
@@ -1182,7 +1182,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
                ['E Q', 'up a gear · down a gear'], ['C', 'clutch - restart after a stall'],
                ['P', 'call the pits'], ['V', 'camera'],
                ['Arrows', 'wedge · track bar'], ['[ ]', 'race speed'],
-               ['R', 'back on track'], ['Esc', 'pause']],
+               ['R', 'back on track'], ['Esc', 'pause'], ["Touch", "Steer with your left thumb while using Gas and Brake on the right. Gear, Clutch, Pit and Race Setup have touch controls"]],
     tips: 'Nobody wins a superspeedway race on their own. Stay on the bumper in front, and remember the man behind you is pushing because it suits him, not you.',
   },
   {
@@ -1190,7 +1190,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     content: 'A crime story seen from above: robberies, police chases and gunfights with the police. Small figures, no blood close up.',
     web: 'night-shift/',
     tag: 'Crime', big: true,
-    cat: 'Action', tags: ['crime', 'driving', 'stealth', 'top down', 'cars', 'open world'],
+    cat: 'Action', tags: ['crime', 'driving', 'stealth', 'top down', 'cars', 'open world', 'mobile'],
     blurb: 'Do the job, and do not get caught. They have to kill you to stop you.',
     about: `A top-down city at night, and a police force that does not look for YOU -
     it looks for a description, built one line at a time out of what you left at the
@@ -1201,7 +1201,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     controls: [['W A S D', 'drive · walk'], ['F', 'get out · go in · take a car'],
                ['Shift', 'sprint'], ['Mouse', 'aim'], ['Click', 'fire'],
                ['R', 'reload'], ['M', 'mask'], ['Q', 'down a floor in a stairwell'],
-               ['E', 'eat'], ['Esc', 'pause']],
+               ['E', 'eat'], ['Esc', 'pause'], ["Touch", "Use the wheel and pedals to drive. On foot, use the movement and action controls"]],
     tips: 'Change the car and the clothes between jobs. What they cannot describe, they cannot look for.',
   },
   {
@@ -1209,7 +1209,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     content: 'Skateboarding in the street. Falls, but nothing violent.',
     web: 'grind-city/',
     tag: 'Sport', big: true,
-    cat: 'Sport', tags: ['skateboard', 'pixel', 'tricks', '2d', 'street'],
+    cat: 'Sport', tags: ['skateboard', 'pixel', 'tricks', '2d', 'street', 'mobile'],
     blurb: 'A 2D pixel skater where the mouse IS the board, not a pointer.',
     about: `Your hand is your weight on the deck. Slide to a tip and flick sideways and
     it flips; push down in the middle and it spins flat; push down over a tip and it
@@ -1221,7 +1221,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     controls: [['Mouse / arrows', 'your weight on the deck'],
                ['A D', 'push · brake · spin in the air'],
                ['Hold down', 'pump in a transition · manual over a tip'],
-               ['1 - 0', 'grabs'], ['R', 'bail and reset'], ['Esc', 'pause']],
+               ['1 - 0', 'grabs'], ['R', 'bail and reset'], ['Esc', 'pause'], ["Touch", "Hold the push pads to roll, then drag or flick the board to do tricks"]],
     tips: 'TRICK SHEETS on the main screen plays every gesture back at you with the real board attached.',
   },
   {
@@ -1229,7 +1229,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     content: 'Cartoon pixel-art boxing, plus wrestling and sumo. Fighters are knocked down; no blood.',
     web: 'southpaw/',
     tag: 'Sport', big: true,
-    cat: 'Sport', tags: ['boxing', 'fighting', 'pixel', 'wrestling', 'sumo', 'career', '2d'],
+    cat: 'Sport', tags: ['boxing', 'fighting', 'pixel', 'wrestling', 'sumo', 'career', '2d', 'mobile'],
     blurb: 'Arcade pixel boxing: ten opponents, a gym, and a wrestling bowl and a sumo ring besides.',
     about: `Ten fighters stand between you and the belt, and every one of them has a
     strength and a hole you can find - one drops his guard after a flurry, one taunts,
@@ -1244,7 +1244,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
                ['← ↑ → ↓', 'jab · cross · hook · uppercut'],
                ['Hold Space', 'punches go to the body'], ['Shift', 'guard high'],
                ['Shift + Space', 'guard low'], ['Q / E', 'slip · duck'],
-               ['F', 'star punch'], ['Esc', 'pause']],
+               ['F', 'star punch'], ['Esc', 'pause'], ["Touch", "Move with the stick and use the labeled punch, guard and dodge buttons"]],
     tips: 'If he keeps blocking high, hold SPACE and go to the body - and if you are guarding high yourself, expect him to wait half a second and go low.',
   },
   {
@@ -1252,7 +1252,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     content: 'Storybook fantasy battles: archers, knights and wizards against ink monsters, which splash into ink when beaten. No blood.',
     web: 'inkvale/',
     tag: 'Strategy', big: true,
-    cat: 'Strategy', tags: ['tower defence', 'watercolour', 'co-op', 'online', 'heroes', 'story', '2 player'],
+    cat: 'Strategy', tags: ['tower defence', 'watercolour', 'co-op', 'online', 'heroes', 'story', '2 player', 'mobile'],
     blurb: 'A tower defence painted in watercolour, where your towers paint the enemy and the colours mix.',
     about: `Twelve battles, three acts, and a Hollow King at the end of the road. Archers stain
     what they hit ochre, mages ultramarine, artillery vermilion - and a second colour on a
@@ -1268,7 +1268,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     and you each bring your own gold, towers and hero.`,
     controls: [['Click', 'build on a plot · upgrade a tower'], ['Drag + 1', 'The Wash, along the road'],
                ['Drag + 2', 'Ink Wall, across the road'], ['H', 'select your hero, then click to send'],
-               ['Space', 'call the next wave early'], ['F', 'game speed'], ['Esc', 'pause · cancel']],
+               ['Space', 'call the next wave early'], ['F', 'game speed'], ['Esc', 'pause · cancel'], ["Touch", "Tap to select and place towers, and use the battle controls to manage waves"]],
     tips: 'Two colours on the same bend of road beat one big tower. Put an archer post and a mage tower side by side and watch the vines.',
   },
   {
@@ -1276,7 +1276,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     content: 'A cartoon penguin fishing while seals, sharks and orcas try to catch it. Nothing graphic.',
     web: 'penguin-dash/',
     tag: 'Arcade', big: true,
-    cat: 'Arcade', tags: ['penguin', 'fishing', 'pixel', 'underwater', 'side scroller', 'animals'],
+    cat: 'Arcade', tags: ['penguin', 'fishing', 'pixel', 'underwater', 'side scroller', 'animals', 'mobile'],
     blurb: 'A penguin, a grey sea, and everything in it that eats penguins.',
     about: `Swim out from the shore, catch a fish in your beak and bring it back to the
     pile - while seals, sharks and orcas hunt you. The penguin swims towards the
@@ -1288,7 +1288,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     penguins to dress as, and points to spend on speed and strength.`,
     controls: [['Mouse', 'swim towards the pointer · hop on land and ice'],
                ['Click / Space', 'dash'], ['Arrows + Enter', 'menus'],
-               ['Esc', 'pause · back'], ['M', 'sound']],
+               ['Esc', 'pause · back'], ['M', 'sound'], ["Touch", "Use the movement stick and Jump button. Tap menu items to choose a mode"]],
     tips: 'A shark that sees you calls every predator nearby to where you were - so change direction after it spots you, not before.',
   },
 
@@ -1308,14 +1308,14 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
   {
     slug: 'drifter', title: 'DRIFTER', how: 'local', tag: 'Arcade',
     content: 'A spaceship shooting at asteroids. Nothing of concern.',
-    cat: 'Arcade', tags: ['asteroids', 'space', 'shooting', 'retro', 'ship'],
+    cat: 'Arcade', tags: ['asteroids', 'space', 'shooting', 'retro', 'ship', 'mobile'],
     blurb: 'Rocks, a small ship, and bullets that cost the fuel you steer with.',
     about: `Asteroids with one rule changed: the gun and the engine come out of the same
     tank. Shooting a rock is easy; shooting everything is how you end up drifting into
     one with nothing left to stop with. Fuel comes back slowly while you fly and quickly
     while you sit still - and sitting still is not safe.`,
     controls: [['A D / ← →', 'turn'], ['W / ↑', 'thrust'], ['Space / Click', 'fire'],
-               ['Shift', 'hyperspace - tap it, do not hold it']],
+               ['Shift', 'hyperspace - tap it, do not hold it'], ["Touch", "Left thumb turns the ship. Right thumb thrusts or fires"]],
     tips: 'A small rock is worth five times a big one, and the wave does not end until every one of them is gone - so shoot the big ones where they will break up away from you.',
   },
   {
@@ -1333,7 +1333,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
   {
     slug: 'pipeworks', title: 'PIPEWORKS', how: 'local', tag: 'Puzzle',
     content: 'A pipe puzzle. Nothing of concern.',
-    cat: 'Puzzle', tags: ['pipes', 'water', 'logic', 'levels', 'tiles'],
+    cat: 'Puzzle', tags: ['pipes', 'water', 'logic', 'levels', 'tiles', 'mobile'],
     blurb: 'Six rooms of pipe by hand, then it generates them for ever.',
     about: `The cellar, the waterworks, the boiler, the roof, the foundry and the deep -
     each with its own room and one new idea: pipes bolted down that cannot be turned, and
@@ -1345,7 +1345,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
   {
     slug: 'sweep', title: 'SWEEP', how: 'local', tag: 'Puzzle',
     content: 'Minesweeper. Nothing of concern.',
-    cat: 'Puzzle', tags: ['minesweeper', 'logic', 'mines', 'timed', 'board'],
+    cat: 'Puzzle', tags: ['minesweeper', 'logic', 'mines', 'timed', 'board', 'mobile'],
     blurb: 'Minesweeper on a clock, at whatever size and difficulty you can stand.',
     about: `Four board sizes and four difficulties, from an 11% board with room to think
     to a 26% one past the density where logic alone gets you home. Boards come one after
@@ -1357,7 +1357,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
   {
     slug: 'quickdraw', title: 'QUICKDRAW', how: 'local', tag: 'Reaction',
     content: 'Cartoon western gunfights between two cowboys, with hits counted by limb. Bright muzzle flashes; no blood.',
-    cat: 'Shooter', tags: ['reaction', 'western', 'duel', '2 player', 'aim'],
+    cat: 'Shooter', tags: ['reaction', 'western', 'duel', '2 player', 'aim', 'mobile'],
     blurb: 'Hand on the holster. One shot each, then hands down, until one of you drops.',
     about: `Keep the pointer on your holster through the wait. Leaving early is a re-do
     rather than a death - but three of them in one fight and you stand through the next
@@ -1372,13 +1372,13 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     draw, jumps the word, and pulls shots wide, and the worse he is the more of all three.`,
     controls: [['Mouse', 'hold the holster, then pull clear and aim'],
                ['Click', 'fire - your hand must be on your own half'],
-               ['Arrows', 'player two aims'], ['Enter', 'player two fires']],
+               ['Arrows', 'player two aims'], ['Enter', 'player two fires'], ["Touch", "Hold the holster, slide to aim when DRAW appears, then lift your finger to fire"]],
     tips: 'Hit and still holding your shot? Fire NOW - you have a quarter of a second.',
   },
   {
     slug: 'hoops', title: 'HOOPS', how: 'local', tag: 'Sport',
     content: 'Basketball. Can be played online with a friend using a room code; there is no chat.',
-    cat: 'Sport', tags: ['basketball', 'multiplayer', 'online', '2 player', 'ball'],
+    cat: 'Sport', tags: ['basketball', 'multiplayer', 'online', '2 player', 'ball', 'mobile'],
     blurb: 'Streetball on the blacktop or a full game in the arena - alone, or online with a friend.',
     about: `Three games on one side-on court. HALF COURT is streetball: one ring, both teams
     attacking it, first to eleven and win by two, and a team that wins the ball has to take it
@@ -1408,7 +1408,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
   {
     slug: 'spike', title: 'SPIKE', how: 'local', tag: 'Sport',
     content: 'Volleyball between two jelly blobs. Nothing of concern.',
-    cat: 'Sport', tags: ['volleyball', 'physics', '2 player', 'ball', 'jelly'],
+    cat: 'Sport', tags: ['volleyball', 'physics', '2 player', 'ball', 'jelly', 'mobile'],
     blurb: 'Two jelly slimes, one ball, one net, first to eleven. Bring a friend.',
     about: `Volleyball with the rules taken out: no touch limit, no positions, just a ball that
     must not land on your side. The slimes are jelly - a spring for the squash and four
@@ -1416,7 +1416,7 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
     the ball comes off wherever you meet it. Play the computer, which gets better every
     point it loses, or take the right-hand slime yourself.`,
     controls: [['A D / mouse', 'move'], ['W', 'jump'], ['Click / Space', 'serve'],
-               ['Arrows', 'player two moves'], ['Up arrow', 'player two jumps']],
+               ['Arrows', 'player two moves'], ['Up arrow', 'player two jumps'], ["Touch", "Hold and drag to steer. A quick tap or second finger makes your slime jump"]],
     tips: 'Jump INTO the ball, not under it. TWO PLAYER on the home screen puts a friend on the right-hand slime.',
   },
   // DUNK WAS HERE. Liam: "delete dunk". It was a three-a-side game with

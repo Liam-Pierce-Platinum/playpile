@@ -78,20 +78,46 @@ let mx = W * 0.7, my = H * 0.4, held = false, held2 = false;
 const KEY = { KeyA: 'left', KeyD: 'right', ArrowLeft: 'left', ArrowRight: 'right' };
 addEventListener('keydown', (e) => {
   if (KEY[e.code]) IN[KEY[e.code]] = true;
-  if (e.code === 'KeyR') IN.reload = true;
+  if (e.code === 'KeyR') { if (!player.alive) location.reload(); else IN.reload = true; }
   if (e.code === 'KeyP') paused = !paused;
   if (choosing && /Digit[123]/.test(e.code)) pick(+e.code.slice(5) - 1);
   if (['KeyA', 'KeyD', 'KeyW', 'KeyS', 'Space'].includes(e.code)) e.preventDefault();
 });
 addEventListener('keyup', (e) => { if (KEY[e.code]) IN[KEY[e.code]] = false; });
 addEventListener('blur', () => { IN.left = IN.right = false; held = held2 = false; });
-addEventListener('mousemove', (e) => {
+function aimAt(e) {
   const r = canvas.getBoundingClientRect();
   /* deliberately NOT clamped. The aim wants the true angle even when the
      pointer is off the picture; only the drawn crosshair gets pinned. */
   mx = (e.clientX - r.left) / r.width * W;
   my = (e.clientY - r.top) / r.height * H;
-});
+}
+addEventListener('mousemove', aimAt);
+if (matchMedia('(pointer: coarse)').matches) {
+  let finger = null;
+  canvas.addEventListener('pointerdown', e => {
+    if (e.pointerType !== 'touch' || finger !== null) return;
+    e.preventDefault();
+    aimAt(e);
+    if (choosing) {
+      const width = 128, gap = 12, n = choosing.picks.length;
+      const origin = (W - (n * width + (n - 1) * gap)) / 2;
+      const ix = Math.floor((mx - origin) / (width + gap));
+      if (my >= 62 && my <= 190 && ix >= 0 && ix < n && mx - origin - ix * (width + gap) < width) pick(ix);
+      return;
+    }
+    if (paused || !player.alive) return;
+    finger = e.pointerId;
+    try { canvas.setPointerCapture(finger); } catch {}
+    IN.fire = held = true;
+  });
+  canvas.addEventListener('pointermove', e => { if (e.pointerId === finger) aimAt(e); });
+  const release = () => { finger = null; held = false; };
+  for (const type of ['pointerup','pointercancel','lostpointercapture']) {
+    canvas.addEventListener(type, e => { if (e.pointerId === finger) release(); });
+  }
+  addEventListener('blur', release);
+}
 addEventListener('mousedown', (e) => {
   if (choosing) return;
   if (e.button === 0) { held = true; IN.fire = true; }
@@ -342,7 +368,7 @@ function drawHUD(g) {
     g.fillStyle = P.red; g.font = '20px ui-monospace, monospace';
     g.fillText('DOWN', W / 2, H / 2 - 2);
     g.fillStyle = P.bone; g.font = '8px ui-monospace, monospace';
-    g.fillText('reload the page', W / 2, H / 2 + 14);
+    g.fillText(matchMedia('(pointer: coarse)').matches ? 'tap RELOAD to retry' : 'press R to retry', W / 2, H / 2 + 14);
   } else if (won) {
     g.textAlign = 'center';
     g.fillStyle = P.gold; g.font = '20px ui-monospace, monospace';

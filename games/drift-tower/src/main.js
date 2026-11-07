@@ -244,7 +244,19 @@ function down(e) {
   hold = true;
 }
 function up() { hold = false; }
-addEventListener('pointerdown', down); addEventListener('pointerup', up); addEventListener('pointercancel', up);
+let driftPointer = null;
+addEventListener('pointerdown', e => {
+  if (driftPointer !== null || e.target.closest?.('button,.panel')) return;
+  driftPointer = e.pointerId;
+  e.target.setPointerCapture(e.pointerId);
+  down(e);
+});
+function releaseDrift(e) {
+  if (e && e.pointerId !== driftPointer) return;
+  driftPointer = null; up();
+}
+for (const event of ['pointerup','pointercancel','lostpointercapture']) addEventListener(event, releaseDrift);
+addEventListener('blur', () => releaseDrift());
 const KEYS = ['Space', 'ArrowLeft', 'ArrowUp', 'KeyA', 'Enter'];
 addEventListener('keydown', (e) => { if (e.repeat || !KEYS.includes(e.code)) return; e.preventDefault(); if (state === 'menu') { sfx.unlock(); startPlay(); return; } down(); });
 addEventListener('keyup', (e) => { if (KEYS.includes(e.code)) up(); });

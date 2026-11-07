@@ -219,17 +219,20 @@ addEventListener('keydown', (e) => {
   if (k === 'ArrowRight' || k === 'd' || k === 'D') hop(1, 0);
 });
 let touch = null;
-addEventListener('touchstart', (e) => { const t = e.touches[0]; touch = { x: t.clientX, y: t.clientY }; });
+D.cv.addEventListener('touchstart', (e) => { if (!touch) touch = e.changedTouches[0]; });
 addEventListener('touchend', (e) => {
   if (!touch) return;
+  const t = Array.from(e.changedTouches).find(point => point.identifier === touch.identifier);
+  if (!t) return;
   // the tap on PLAY is not also the first hop
   if (D.t - startedAt < 0.35) { touch = null; return; }
-  const t = e.changedTouches[0];
   const dx = t.clientX - touch.x, dy = t.clientY - touch.y;
   if (Math.hypot(dx, dy) < 20) { hop(0, 1); touch = null; return; }
   if (Math.abs(dx) > Math.abs(dy)) hop(Math.sign(dx), 0); else hop(0, -Math.sign(dy));
   touch = null;
 });
+addEventListener('touchcancel', e => { if (touch && Array.from(e.changedTouches).some(t => t.identifier === touch.identifier)) touch = null; });
+addEventListener('blur', () => { touch = null; });
 
 // ---------------------------------------------------------------------
 // starting, and stopping

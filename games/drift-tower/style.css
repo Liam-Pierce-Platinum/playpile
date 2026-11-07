@@ -34,3 +34,10 @@ button.ghost{background:#c9c1ec;box-shadow:0 6px 0 #9a90c8}
 #wallet{font-weight:700;opacity:.7;font-size:14px}
 #muteBtn{position:fixed;left:14px;top:14px;width:42px;height:42px;padding:0;margin:0;border-radius:50%;font-size:20px;background:rgba(255,255,255,.6);color:#5a4a63;box-shadow:none}
 @media (max-width:480px){#score{font-size:48px}#best{top:76px}#coins{font-size:18px;top:66px;right:12px}#hint{font-size:13px}}
+
+@media (pointer: coarse) {
+  html,body { touch-action: manipulation; }
+  .panel { box-sizing: border-box; max-height: calc(100dvh - 24px); overflow: auto; touch-action: pan-y; overscroll-behavior: contain; }
+  .panel button,#muteBtn { min-height: 44px; }
+  #muteBtn { left: max(12px, env(safe-area-inset-left)); top: max(12px, env(safe-area-inset-top)); }
+}

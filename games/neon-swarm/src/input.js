@@ -56,6 +56,7 @@ export class Input {
     const up = (e) => { for (const st of [this.left, this.right]) if (st.id === e.pointerId) this.release(st); };
     canvas.addEventListener('pointerup', up);
     canvas.addEventListener('pointercancel', up);
+    canvas.addEventListener('lostpointercapture', up);
   }
   release(st) { st.active = false; st.id = -1; st.dx = st.dy = 0; }
 

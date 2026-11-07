@@ -36,6 +36,7 @@ import desert from './maps/desert.js';
 import docks from './maps/docks.js';
 import office from './maps/office.js';
 import range from './maps/range.js';
+import { mountTouchCombat, touchCombat } from '../../_shared/touch-combat.js';
 
 // four maps reworked for 10-player fights (three lanes, opposite team spawns); fewer, better maps
 export const MAPS = [city, office, docks, desert];
@@ -43,10 +44,11 @@ const ALL_MAPS = { city, desert, docks, office, range };
 const params = new URLSearchParams(location.search);
 const clsName = c => ({ ar: 'Rifle', smg: 'SMG', sniper: 'Sniper', dmr: 'DMR', shotgun: 'Shotgun', pistol: 'Pistol' }[c] || 'Rifle');
 const $ = id => document.getElementById(id);
+document.documentElement.classList.toggle('touch-combat', touchCombat);
 
 // ---------------------------------------------------------------- settings
 const SETTINGS_KEY = 'ironsight.settings.v1';
-const DEFAULTS = { sens: 1.0, adsSens: 0.8, fov: 90, vmFov: 54, quality: 2, volume: 0.8, invert: false, showFps: false };
+const DEFAULTS = { sens: 1.0, adsSens: 0.8, fov: 90, vmFov: 54, quality: touchCombat ? 0 : 2, volume: 0.8, invert: false, showFps: false };
 function loadSettings() { try { return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') }; } catch (e) { return { ...DEFAULTS }; } }
 function saveSettings(s) { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); } catch (e) { /* private mode */ } }
 
@@ -70,6 +72,7 @@ class Input {
   constructor(canvas) {
     this.keys = new Set(); this.down = new Set(); this.mouse = { dx: 0, dy: 0, l: false, r: false, lp: false, rp: false, wheel: 0 };
     this.locked = false; this.canvas = canvas;
+    this.touchX = this.touchY = 0;
     addEventListener('keydown', e => { if (e.repeat) return; this.keys.add(e.code); this.down.add(e.code); if (['Space', 'Tab'].includes(e.code)) e.preventDefault(); });
     addEventListener('keyup', e => this.keys.delete(e.code));
     addEventListener('mousedown', e => { if (!this.locked) return; if (e.button === 0) { this.mouse.l = true; this.mouse.lp = true; } if (e.button === 2) { this.mouse.r = true; this.mouse.rp = true; } });
@@ -79,7 +82,14 @@ class Input {
     addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('pointerlockchange', () => { this.locked = document.pointerLockElement === canvas; if (!this.locked) { this.mouse.l = this.mouse.r = false; this.keys.clear(); if (this.onUnlock) this.onUnlock(); } });
   }
-  lock() { try { const p = this.canvas.requestPointerLock({ unadjustedMovement: true }); if (p && p.catch) p.catch(() => this.canvas.requestPointerLock()); } catch (e) { this.canvas.requestPointerLock(); } }
+  async lock() {
+    if (touchCombat || document.documentElement.classList.contains('pp-touch') || !this.canvas.requestPointerLock) return;
+    try { await this.canvas.requestPointerLock({ unadjustedMovement: true }); }
+    catch {
+      if (navigator.userActivation?.isActive === false) return;
+      try { await this.canvas.requestPointerLock(); } catch { /* The engage prompt remains available. */ }
+    }
+  }
   unlock() { if (document.pointerLockElement) document.exitPointerLock(); }
   pressed(c) { return this.down.has(c); }
   endFrame() { this.down.clear(); this.mouse.dx = this.mouse.dy = 0; this.mouse.lp = this.mouse.rp = false; this.mouse.wheel = 0; }
@@ -103,6 +113,7 @@ class Game {
     this.camera.layers.enable(LAYER_REFLECTOR);
     this.scene.add(this.camera);
     this.input = new Input(r.domElement);
+    if (touchCombat) this.touchUI = this.mountTouchControls();
     this.audio = new Audio(); this.audio.setVolume(this.settings.volume);
     this.vm = new ViewModel(r); this.vm.fov = this.settings.vmFov;
     this.hud = new HUD();
@@ -555,7 +566,7 @@ class Game {
     P.look(I.mouse.dx, I.mouse.dy, sens, S.invert);
     const k = I.keys;
     const inp = {
-      f: (k.has('KeyW') ? 1 : 0) - (k.has('KeyS') ? 1 : 0), s: (k.has('KeyD') ? 1 : 0) - (k.has('KeyA') ? 1 : 0),
+      f: I.touchY || (k.has('KeyW') ? 1 : 0) - (k.has('KeyS') ? 1 : 0), s: I.touchX || (k.has('KeyD') ? 1 : 0) - (k.has('KeyA') ? 1 : 0),
       jump: k.has('Space'), jumpPressed: I.pressed('Space'), sprint: k.has('ShiftLeft') || k.has('ShiftRight'), sprintPressed: I.pressed('ShiftLeft') || I.pressed('ShiftRight'),
       crouchPressed: I.pressed('KeyC') || I.pressed('ControlLeft'), pronePressed: I.pressed('KeyZ'), leanL: k.has('KeyQ'), leanR: k.has('KeyE'),
       ads: I.mouse.r, adsW: ads, firing: I.mouse.l && (ws.slot?.mag > 0),
@@ -718,7 +729,8 @@ class Game {
       this.menuCamera(this.time);
       if (this.world) { this.npcs.update(dt, { player: this.player, fireBullet: () => { }, viewRange: 1, lightK: 0 }); this.fx.update(dt); }
     }
-    if (this.state === 'play') { const need = !this.input.locked && !this.testMode; if (need !== this.engageShown) { this.engageShown = need; $('engage').classList.toggle('hidden', !need); } }
+    this.touchUI?.(this.state === 'play');
+    if (this.state === 'play') { const need = !touchCombat && !this.input.locked && !this.testMode; if (need !== this.engageShown) { this.engageShown = need; $('engage').classList.toggle('hidden', !need); } }
     else if (this.engageShown) { this.engageShown = false; $('engage').classList.add('hidden'); }
     this.render(dt);
     this.input.endFrame();
@@ -905,6 +917,19 @@ class Game {
     }
   }
   applySettings() { this.vm.fov = this.settings.vmFov; this.audio.setVolume(this.settings.volume); }
+  mountTouchControls() {
+    const input = this.input;
+    const key = (label, code) => ({ label, down: () => { input.keys.add(code); input.down.add(code); }, up: () => input.keys.delete(code) });
+    return mountTouchCombat({
+      move(x, y) { input.touchX = x; input.touchY = -y; },
+      look(dx, dy) { input.mouse.dx += dx * 2.5; input.mouse.dy += dy * 2.5; },
+      actions: [key('Sprint', 'ShiftLeft'), key('Crouch', 'KeyC'), key('Jump', 'Space'),
+        key('Grenade', 'KeyF'), key('Tactical', 'KeyX'), { label: 'Swap', down: () => { input.mouse.wheel = 1; } },
+        key('Reload', 'KeyR'), { label: 'Aim', down: () => { input.mouse.r = !input.mouse.r; } },
+        { label: 'Fire', primary: true, down: () => { input.mouse.l = input.mouse.lp = true; }, up: () => { input.mouse.l = false; } }],
+      onMenu: () => this.pause(true),
+    });
+  }
   async startGame(mapId, mode, diff) {
     this.show(null); this.hud.show(false);
     await this.loadMap(mapId, mode, diff);

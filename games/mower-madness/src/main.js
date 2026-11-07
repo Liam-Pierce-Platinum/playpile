@@ -74,6 +74,7 @@ class Game {
     cv.addEventListener('pointermove', (e) => { if (this.stick && e.pointerId === this.stick.id) { this.stick.x = e.clientX; this.stick.y = e.clientY; } });
     const up = (e) => { if (this.stick && e.pointerId === this.stick.id) this.stick = null; };
     cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+    cv.addEventListener('lostpointercapture', up);
     addEventListener('keydown', (e) => {
       this.audio.unlock();
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) e.preventDefault();

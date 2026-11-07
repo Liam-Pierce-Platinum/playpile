@@ -3,6 +3,7 @@
   font-family: "Segoe UI", system-ui, sans-serif;
 }
 html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; color: var(--fg); user-select: none; }
+.touch-copy { display: none; }
 canvas { display: block; }
 .hidden { display: none !important; }
 button { font: 600 14px/1 inherit; letter-spacing: .14em; text-transform: uppercase; color: var(--fg); background: rgba(255,255,255,.04);
@@ -215,3 +216,57 @@ h2 { font-weight: 300; letter-spacing: .4em; text-transform: uppercase; margin: 
 .ol-code { font-size: 13px; letter-spacing: .2em; color: var(--mute); text-transform: uppercase; } .ol-code b { font-size: 34px; color: #ffd27a; letter-spacing: .3em; margin-left: 10px; }
 #olPlayers { list-style: none; padding: 0; margin: 0; columns: 2; font-size: 14px; color: #e3e7ea; } #olPlayers li { padding: 3px 0; } #olPlayers i { font-style: normal; font-size: 10px; color: var(--mute); letter-spacing: .15em; margin-left: 6px; }
 #olMsg { color: #ff8a73; min-height: 1em; } .ol-link { font-size: 12px; color: var(--mute); } #olWait.hidden, #olHostOpts.hidden, #olGo.hidden { display: none; }
+
+/* Touch menus scroll independently of the full-screen renderer. */
+.touch-combat .touch-copy { display: inline; }
+.touch-combat .keyboard-copy { display: none; }
+.touch-combat .screen {
+  box-sizing: border-box;
+  overflow: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  justify-content: flex-start;
+  padding: max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right))
+    max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+}
+.touch-combat #menu { padding: max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 14px max(14px, env(safe-area-inset-left)); }
+.touch-combat #menu .brand, .touch-combat #menu .menu-col { padding-left: 0; }
+.touch-combat #menu .brand h1 { font-size: clamp(27px, 8vw, 50px); letter-spacing: .13em; }
+.touch-combat #menu .brand p { margin: 4px 0 14px; }
+.touch-combat #menu .menu-col { width: min(340px,100%); }
+.touch-combat #menu .menu-col button { padding: 6px 12px; min-height: 46px; }
+.touch-combat .menu-foot { position: static; margin: 12px 0 0; }
+.touch-combat #mnLoadout { display: none; }
+.touch-combat .screen :is(button,select,input:not([type=checkbox])) { min-height: 44px; }
+.touch-combat .screen label { flex-wrap: wrap; gap: 5px; }
+.touch-combat .screen :is(select,input) { max-width: 100%; }
+.touch-combat #maplist { width: 100%; grid-template-columns: repeat(auto-fit, minmax(min(145px,100%),1fr)); }
+.touch-combat #maplist .card { min-height: 118px; }
+.touch-combat #maplist .card .txt { padding: 8px; }
+.touch-combat .row-opts { gap: 8px 14px; }
+.touch-combat .ol-cols { flex-wrap: wrap; }
+.touch-combat .ol-box { box-sizing: border-box; min-width: 0; max-width: 100%; }
+.touch-combat #gunsmith { display: flex; overflow: hidden; }
+.touch-combat #gunsmith .gs-left { box-sizing: border-box; width: min(100%,355px); max-height: 100%; padding: 12px 14px; touch-action: pan-y; }
+.touch-combat #gunsmith .gs-right { display: none; }
+.touch-combat .ld-hdr { padding: 8px 12px; letter-spacing: .1em; }
+.touch-combat .ld-mid h1 { font-size: clamp(31px,9vw,64px); letter-spacing: .12em; }
+.touch-combat .ld-foot { grid-template-columns: minmax(0,1fr); gap: 6px; padding: 0 12px 15px; }
+.touch-combat .ld-tip { display: none; }
+.touch-combat #compass { top: 8px; width: min(38vw,270px); }
+.touch-combat #objective { left: max(12px, env(safe-area-inset-left)); top: 12px; max-width: 28vw; font-size: 10px; }
+.touch-combat #ammo { right: max(12px, env(safe-area-inset-right)); bottom: 158px; }
+.touch-combat #ammo b { font-size: 28px; }
+.touch-combat #health { bottom: 107px; left: max(12px, env(safe-area-inset-left)); }
+.touch-combat #hpBar { width: min(28vw,145px); }
+.touch-combat #killfeed { top: 58px; right: max(10px, env(safe-area-inset-right)); font-size: 11px; }
+.touch-combat #rangeInfo { top: 56px; right: 10px; font-size: 11px; }
+.touch-combat #center-msg { font-size: 16px; }
+.touch-combat #callouts { left: 10px; font-size: 11px; }
+.touch-combat #board { max-width: 95vw; min-width: min(330px,95vw); overflow: auto; }
+.touch-combat .combat-touch { z-index: 15; }
+@media (pointer: coarse) and (max-height: 520px) {
+  #menu .menu-col { display: grid; grid-template-columns: 1fr 1fr; }
+  .touch-combat #menu .menu-col { width: min(500px,100%); }
+  .touch-combat #menu .brand p { margin-bottom: 8px; }
+}

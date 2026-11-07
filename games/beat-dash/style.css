@@ -27,7 +27,7 @@ button { font-family: inherit; cursor: pointer; border: 0; color: inherit; }
 #title .logo { font-size: min(22vw, 19vh, 150px); }
 @media (max-aspect-ratio: 10/11) { #title { padding-bottom: 38vh; justify-content: flex-end; } }
 #title .hints { position: absolute; left: 16px; right: 16px; bottom: max(16px, 5vh, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; }
-.titleMute { position: absolute; top: max(10px, env(safe-area-inset-top)); right: 10px; }
+.titleMute { position: absolute; top: max(10px, env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right)); }
 .pInfo b { color: #fff; }
 .touchHint { display: none; }
 @media (pointer: coarse) { .touchHint { display: block; } .deskHint { display: none; } }
@@ -57,8 +57,8 @@ button { font-family: inherit; cursor: pointer; border: 0; color: inherit; }
 .ibtn .x { display: none; }
 .muted .ibtn .wave { display: none; }
 .muted .ibtn .x { display: inline; }
-#hudBtns { position: fixed; top: max(8px, env(safe-area-inset-top)); right: 10px; display: flex; gap: 8px; z-index: 4; }
-#pracBtns { position: fixed; left: 12px; bottom: max(14px, env(safe-area-inset-bottom)); display: flex; gap: 12px; z-index: 4; }
+#hudBtns { position: fixed; top: max(8px, env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right)); display: flex; gap: 8px; z-index: 4; }
+#pracBtns { position: fixed; left: max(12px, env(safe-area-inset-left)); bottom: max(14px, env(safe-area-inset-bottom)); display: flex; gap: 12px; z-index: 4; }
 .pbtn { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; position: relative;
   background: rgba(0, 0, 0, 0.45); box-shadow: inset 0 0 0 3px currentColor; }
 .pbtn svg { width: 30px; height: 30px; }
@@ -130,7 +130,12 @@ button { font-family: inherit; cursor: pointer; border: 0; color: inherit; }
   .cubes { display: none; }
 }
 @media (max-width: 480px) {
-  .arrow { width: 40px; height: 70px; }
+  .arrow { width: 44px; height: 70px; }
   .big { padding: 12px 44px; font-size: 28px; }
   .stats { gap: 14px; }
+}
+@media (max-height: 510px) {
+  #title { padding-bottom: 10vh; justify-content: center; }
+  #title .hints { bottom: max(8px, env(safe-area-inset-bottom)); }
+  #title .logo { font-size: min(22vw, 14vh, 115px); }
 }

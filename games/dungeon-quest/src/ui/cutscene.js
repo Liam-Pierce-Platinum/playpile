@@ -29,6 +29,10 @@ export class Cutscene {
     };
     addEventListener('keydown', advance);
     this.el.addEventListener('click', () => { if (this.active) this.next(); });
+    document.getElementById('touch-cutscene-skip').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (this.active) this.finish();
+    });
   }
 
   /** @param beats array of { lines, hold, title, boss } */

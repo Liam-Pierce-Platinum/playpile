@@ -18,9 +18,17 @@
 <div id="say"></div>
 <div id="card" class="hide"></div>
 <div id="touch">
-  <button id="tl" aria-label="hop left">&#9664;</button>
-  <button id="tf" aria-label="fire">BANG</button>
-  <button id="tr" aria-label="hop right">&#9654;</button>
+  <button id="touchMenu" type="button">Menu</button>
+  <div class="touch-player" aria-label="Player 1 controls">
+    <button data-player="0" data-touch-action="left" aria-label="Player 1 hop left">&#9664;</button>
+    <button data-player="0" data-touch-action="fire" aria-label="Player 1 fire">Bang</button>
+    <button data-player="0" data-touch-action="right" aria-label="Player 1 hop right">&#9654;</button>
+  </div>
+  <div class="touch-player" aria-label="Player 2 controls" id="touchP2" hidden>
+    <button data-player="1" data-touch-action="left" aria-label="Player 2 hop left">&#9664;</button>
+    <button data-player="1" data-touch-action="fire" aria-label="Player 2 fire">Bang</button>
+    <button data-player="1" data-touch-action="right" aria-label="Player 2 hop right">&#9654;</button>
+  </div>
 </div>
 <script type="module" src="./src/main.js"></script>
 </body>

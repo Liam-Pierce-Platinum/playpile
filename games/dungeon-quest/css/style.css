@@ -581,3 +581,76 @@ kbd.pad-b { background: #2f7a3a; border-color: #6ad07a; color: #eaffee; }
 @media (max-height: 420px) {
   .title-panel { zoom: .66; max-height: 140vh; }
 }
+
+/* Touch keeps the playfield clear and gives long menus real scroll areas. */
+.touch-only { display: none; }
+.slot { border: 0; padding: 0; background: none; box-shadow: none; }
+html.pp-touch .touch-only { display: inline-block; }
+html.pp-touch .desktop-keys, html.pp-touch #cutscene-skip { display: none; }
+html.pp-touch body { touch-action: manipulation; }
+html.pp-touch #game { touch-action: none; }
+html.pp-touch .screen, html.pp-touch .title-panel, html.pp-touch .shop-panel { touch-action: pan-y; }
+html.pp-touch .title-panel {
+  display: flex;
+  flex-direction: column;
+  zoom: 1;
+  width: min(400px, 100%);
+  max-height: calc(100dvh - 22px);
+}
+html.pp-touch .title-panel > :nth-child(-n+4) { order: -2; }
+html.pp-touch .title-panel > .start-row { order: -1; margin-top: 9px; }
+html.pp-touch .title-panel > *, html.pp-touch .shop-panel > * { flex-shrink: 0; }
+html.pp-touch .shop-panel { max-height: calc(100dvh - 24px); }
+html.pp-touch :is(.shop-panel, .title-panel, #sidebar, .touch-only) button,
+html.pp-touch button.touch-only { min-height: 44px; }
+html.pp-touch .swatches i { width: 30px; height: 30px; }
+html.pp-touch .brief-rows .bkeys { flex-basis: 104px; flex-wrap: wrap; }
+html.pp-touch .brief-rows .btext { font-size: 12px; }
+html.pp-touch .brief-rows .btext b { font-size: 12px; }
+html.pp-touch .hud-tr { top: calc(max(8px, env(safe-area-inset-top)) + 52px); }
+html.pp-touch #touch-menu { pointer-events: auto; margin-top: 8px; }
+html.pp-touch .hud-br { display: none; }
+html.pp-touch .hud-bl { bottom: calc(clamp(44px, 13vmin, 62px) * 1.65 + 23px); }
+html.pp-touch .potions { flex-direction: column; padding: 3px; gap: 3px; }
+html.pp-touch .potions:not(:has(.slot.has)) { display: none; }
+html.pp-touch .slot { min-height: 44px; padding: 5px 7px; pointer-events: auto; }
+html.pp-touch .slot:not(.has) { display: none; }
+html.pp-touch .slot kbd { display: none; }
+html.pp-touch .slot .pname { min-width: 0; }
+html.pp-touch #sidebar {
+  inset: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) auto auto;
+  width: min(330px, calc(100vw - 24px));
+  max-height: calc(100dvh - 26px);
+  overflow-y: auto;
+  touch-action: pan-y;
+  z-index: 25;
+}
+html.pp-touch #sidebar:not(.touch-open), html.pp-touch #sidebar .krow, html.pp-touch #sidebar .sb-foot { display: none; }
+html.pp-touch #touch-menu-tools p { color: var(--dim); font-size: 13px; line-height: 1.45; margin-top: 10px; }
+html.pp-touch body:has(.screen:not([hidden]), #cutscene:not([hidden]), #travel:not([hidden]), #sidebar.touch-open) #pp-pad { display: none; }
+html.pp-touch #cutscene-text { max-width: 94vw; }
+html.pp-touch #cutscene-text canvas { max-width: 100%; height: auto; }
+html.pp-touch .cutscene-actions {
+  display: flex;
+  gap: 8px;
+  position: absolute;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 2;
+}
+@media (orientation: portrait) {
+  html.pp-touch #title {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+    overflow-y: auto;
+    padding: max(14px, env(safe-area-inset-top)) 13px max(14px, env(safe-area-inset-bottom));
+  }
+  html.pp-touch .title-art { flex-shrink: 0; }
+  html.pp-touch .title-panel { flex-shrink: 0; max-height: none; overflow: visible; }
+  html.pp-touch #title-logo canvas, html.pp-touch #title-sub canvas { max-width: 82vw; height: auto; }
+  html.pp-touch #title-sub { margin-top: 6px; }
+  html.pp-touch .hud-bl { bottom: calc(clamp(44px, 13vmin, 62px) * 2 + 30px); }
+}

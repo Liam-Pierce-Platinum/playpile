@@ -312,19 +312,19 @@ export function createRenderer() {
         v.rect(152, 150, 80, 12, P.ink); v.rect(153, 151, 78, 10, '#2a2131');
         v.rect(153 + 62, 151, 16, 10, '#3a6a2a');
         v.rect(153 + Math.round(k * 74), 149, 3, 14, me.lockQ >= 0 ? P.cream : P.hot);
-        text(v, me.lockQ >= 0 ? 'LOCKED IN' : 'PRESS AN ARROW IN THE GREEN!', 192, 138, P.hot, { align: 'center', outline: P.ink });
+        text(v, me.lockQ >= 0 ? 'LOCKED IN' : ui.touch ? 'TAP A STRIKE IN THE GREEN!' : 'PRESS AN ARROW IN THE GREEN!', 192, 138, P.hot, { align: 'center', outline: P.ink });
       }
       if (me.state === 'hold') {
         const opts = [['left', 'SUPLEX'], ['up', 'SLAM'], ['right', 'WHIP'], ['down', 'DDT']];
         v.rect(92, 140, 200, 26, P.ink); v.rect(93, 141, 198, 24, '#2a2131');
-        opts.forEach(([d, n], i) => { arrow(v, 104 + i * 49, 149, d, P.hot); text(v, n, 110 + i * 49, 146, P.cream); });
-        if (me.stars >= 1) text(v, 'F  POWERBOMB!', 192, 156, Math.sin(now * 12) > 0 ? P.bad : P.hot, { align: 'center' });
+        opts.forEach(([d, n], i) => { if (!ui.touch) arrow(v, 104 + i * 49, 149, d, P.hot); text(v, n, 110 + i * 49, 146, P.cream); });
+        if (me.stars >= 1) text(v, ui.touch ? 'TAP BOMB FOR POWERBOMB!' : 'F  POWERBOMB!', 192, 156, Math.sin(now * 12) > 0 ? P.bad : P.hot, { align: 'center' });
         else text(v, 'PICK A MOVE', 192, 156, '#b9a48c', { align: 'center' });
       }
       const opp = fight.f[1 - ui.human];
       if (fight.phase === 'fight' && opp.state === 'down' && me.state === 'idle' && Math.sin(now * 8) > -0.2) {
         const [ox, oy] = proj(opp.x, opp.z);
-        text(v, 'SPACE: PIN', ox, oy - 26, P.good, { align: 'center', outline: P.ink });
+        text(v, ui.touch ? 'TAP GRAB / PIN' : 'SPACE: PIN', ox, oy - 26, P.good, { align: 'center', outline: P.ink });
       }
     }
     if (fight.phase === 'pin' && fight.pin) {
@@ -332,14 +332,14 @@ export function createRenderer() {
       if (n > 0) text(v, n >= 3 ? '3!' : String(n), 192, 60, n >= 2 ? P.bad : '#ffffff', { align: 'center', scale: 4, outline: P.ink });
       if (me && fight.pin.on === ui.human) {
         const k2 = Math.min(1, me.mash / Math.max(1, me.mashNeed));
-        text(v, 'MASH THE ARROWS TO KICK OUT!', 192, 150, Math.sin(now * 16) > 0 ? P.hot : '#ffffff', { align: 'center', outline: P.ink });
+        text(v, ui.touch ? 'TAP STRIKES TO KICK OUT!' : 'MASH THE ARROWS TO KICK OUT!', 192, 150, Math.sin(now * 16) > 0 ? P.hot : '#ffffff', { align: 'center', outline: P.ink });
         v.rect(132, 160, 120, 8, P.ink); v.rect(133, 161, 118, 6, '#2a2131'); v.rect(133, 161, Math.round(118 * k2), 6, P.good);
       }
     }
     // ---- SUMO: the charge
     if (fight.kind === 'sumo' && me && fight.phase === 'intro' && fight.pt > 0.5) {
       if (!fight.called) text(v, 'WAIT FOR IT...', 192, 150, P.cream, { align: 'center', outline: P.ink });
-      else if (me.state === 'shikiri') text(v, 'CHARGE! ANY ARROW', 192, 150, Math.sin(now * 20) > 0 ? P.hot : '#ffffff', { align: 'center', outline: P.ink, scale: 2 });
+      else if (me.state === 'shikiri') text(v, ui.touch ? 'TAP CHARGE!' : 'CHARGE! ANY ARROW', 192, 150, Math.sin(now * 20) > 0 ? P.hot : '#ffffff', { align: 'center', outline: P.ink, scale: 2 });
     }
 
     // the ref's count, big, over the downed man
@@ -355,7 +355,7 @@ export function createRenderer() {
       const d = fight.f[ui.human];
       const k = Math.min(1, d.mash / Math.max(1, d.mashNeed));
       const on = Math.sin(now * 16) > 0;
-      text(v, 'MASH THE ARROW KEYS!', 192, 150, on ? P.hot : '#ffffff', { align: 'center', outline: P.ink, scale: 1 });
+      text(v, ui.touch ? 'TAP PUNCHES TO GET UP!' : 'MASH THE ARROW KEYS!', 192, 150, on ? P.hot : '#ffffff', { align: 'center', outline: P.ink, scale: 1 });
       v.rect(132, 160, 120, 8, P.ink); v.rect(133, 161, 118, 6, '#2a2131'); v.rect(133, 161, Math.round(118 * k), 6, P.good);
     }
 

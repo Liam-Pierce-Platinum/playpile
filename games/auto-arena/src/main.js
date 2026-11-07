@@ -323,10 +323,11 @@ function doLock() { const on = Run.toggleLock(S.run); sfx('click'); toast(on ? '
 // ---------------------------------------------------------------- input
 function ptr(e) { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
 cv.addEventListener('pointerdown', e => {
+  if (S.down || e.button !== 0) return;
   initAudio();
   const p = ptr(e); S.mx = p.x; S.my = p.y;
   try { cv.setPointerCapture(e.pointerId); } catch { }
-  S.down = { x: p.x, y: p.y, t: performance.now() };
+  S.down = { id: e.pointerId, x: p.x, y: p.y, t: performance.now() };
   if (S.screen === 'game' && !S.modal && S.run) {
     const run = S.run;
     // draggable things
@@ -342,6 +343,7 @@ cv.addEventListener('pointerdown', e => {
   }
 });
 cv.addEventListener('pointermove', e => {
+  if (S.down && S.down.id !== e.pointerId) return;
   const p = ptr(e); S.mx = p.x; S.my = p.y;
   if (S.drag) {
     S.drag.x = p.x; S.drag.y = p.y;
@@ -349,6 +351,8 @@ cv.addEventListener('pointermove', e => {
   }
 });
 cv.addEventListener('pointerup', e => {
+  if (S.down?.id !== e.pointerId) return;
+  S.down = null;
   const p = ptr(e); S.mx = p.x; S.my = p.y;
   const d = S.drag; S.drag = null;
   if (e.pointerType !== 'mouse') { S.mx = -1; S.my = -1; }
@@ -358,7 +362,9 @@ cv.addEventListener('pointerup', e => {
   for (let i = S.hot.length - 1; i >= 0; i--) { const h = S.hot[i]; if (inR(p.x, p.y, h)) { h.fn(p); return; } }
   if (S.screen === 'game') { S.sel = null; }
 });
-cv.addEventListener('pointercancel', () => { S.drag = null; });
+function clearPointer() { S.down = S.drag = null; }
+cv.addEventListener('lostpointercapture', e => { if (S.down?.id === e.pointerId) clearPointer(); });
+addEventListener('blur', clearPointer);
 cv.addEventListener('contextmenu', e => {
   e.preventDefault();
   if (S.screen === 'game' && S.phase === 'shop' && S.run) { const p = ptr(e); const loc = locAt(p.x, p.y); if (loc && Run.getAt(S.run, loc)) doSell(loc); }

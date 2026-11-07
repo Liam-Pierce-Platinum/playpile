@@ -7,7 +7,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: radial-gra
 canvas { position: fixed; inset: 0; display: block; }
 #ui { position: fixed; inset: 0; pointer-events: none; }
 #ui button { pointer-events: auto; font-family: inherit; cursor: pointer; border: 0; color: #fff; }
-.hud { position: absolute; top: max(8px, env(safe-area-inset-top)); left: 8px; right: 8px; display: flex; gap: 8px; justify-content: flex-end; }
+.hud { position: absolute; top: max(8px, env(safe-area-inset-top)); left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); display: flex; gap: 8px; justify-content: flex-end; }
 .hb { background: rgba(20,10,50,0.7); border: 1px solid rgba(63,240,255,0.45) !important; border-radius: 10px; padding: 8px 12px;
   font-size: 12px; font-weight: 800; letter-spacing: 1px; }
 .hb.nudge { margin-right: auto; order: -1; background: rgba(255,63,164,0.35); }
@@ -78,3 +78,4 @@ button.big { font-size: clamp(20px, 7.5vw, 30px); letter-spacing: clamp(2px, 1vw
   button.mid { padding: 8px 0; font-size: 13px; }
 }
 @media (orientation: landscape) and (max-height: 480px) and (pointer: coarse) { .rot { display: block; } }
+@media (pointer: coarse) { .hb, button.mid { min-width: 44px; min-height: 44px; } }

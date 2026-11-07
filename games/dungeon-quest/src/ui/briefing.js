@@ -97,24 +97,37 @@ export class Briefing {
 
   /**
    * @param classId  which hero's controls to explain
-   * @param onPad    true if a controller is plugged in
+   * @param device   touch, pad, or keyboard
    * @param done     called once the player dismisses it
    */
-  show(classId, onPad, done) {
+  show(classId, device, done) {
     const info = PER_CLASS[classId];
     this.done = done;
     this.nameEl.textContent = 'THE ' + classId.toUpperCase();
-    this.deviceEl.textContent = onPad ? 'CONTROLLER' : 'KEYBOARD';
+    this.deviceEl.textContent = device === 'touch' ? 'TOUCH' : device === 'pad' ? 'CONTROLLER' : 'KEYBOARD';
     this.blurbEl.innerHTML = info.blurb;
 
     this.rowsEl.innerHTML = '';
     for (const r of [...info.rows, ...COMMON]) {
-      const keys = onPad ? r.pad : r.keys;
+      const labels = {
+        'MOVE': ['STICK'], 'USE': ['USE'], 'SATCHEL': ['BAG'], 'SWITCH TARGET': ['TARGET'],
+        'JUMP': ['JUMP'], 'SWING': ['ATK'], 'JAB': ['SPECIAL'], 'BLOCK': ['BLOCK'],
+        'BOLT': ['ATK'], 'FLAME': ['SPECIAL'], 'DRAW MANA': ['ATK', 'SPECIAL'],
+        'BLOCK / SPELL': ['BLOCK'], 'SHOOT': ['ATK'], 'TWIN SHOT': ['SPECIAL'],
+        'PULL ARROWS': ['ATK', 'SPECIAL'], 'DART ASIDE': ['STICK'], 'DASH': ['STICK'],
+      };
+      const keys = device === 'touch' ? labels[r.name] || [] : device === 'pad' ? r.pad : r.keys;
+      const touchNote = {
+        'MOVE': 'Hold Run to move faster. Drag the world to look around.',
+        'DART ASIDE': 'Flick the stick left or right twice, returning to the centre between flicks.',
+        'DASH': 'Flick the stick forward twice.',
+      };
+      const description = device === 'touch' ? touchNote[r.name] || r.text : r.text;
       const row = document.createElement('div');
       row.className = 'brow';
       row.innerHTML = `
         <span class="bkeys">${keys.map(k => `<kbd>${k}</kbd>`).join('')}</span>
-        <span class="btext"><b>${r.name}</b>${r.text ? '<br>' + r.text : ''}</span>`;
+        <span class="btext"><b>${r.name}</b>${description ? '<br>' + description : ''}</span>`;
       this.rowsEl.appendChild(row);
     }
     this.el.hidden = false;

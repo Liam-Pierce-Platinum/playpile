@@ -159,6 +159,7 @@ function placePlayers() {
 // ---------- match flow ----------
 function startMatch(m) {
   mode = m; attract = false; hideCard(); makePlayers(); round = 0; result = null; newRound();
+  $('touchP2').hidden = mode !== 2;
   if (Q.get('stage') == null) persist();
 }
 function startAttract() { attract = true; mode = 1; makePlayers(); round = 0; newRound(); state = 'play'; }
@@ -472,13 +473,12 @@ function menu() {
   const h = save.hat;
   showCard(`<h1>GETAWAY FLOP</h1><h2>a rubber-hose heist picture</h2>
     <button data-a="p1">1 PLAYER &middot; HEIST No. ${save.stage}</button>
-    <button data-a="p2">2 PLAYERS &middot; SAME KEYS</button>
+    <button data-a="p2">2 PLAYERS &middot; ${isTouch ? 'SAME PHONE' : 'SAME KEYBOARD'}</button>
     <div class="row"><button data-a="hl">&#9664;</button><span>${hatOpen(h) ? HAT_NAMES[h].toUpperCase() : 'LOCKED'}</span><button data-a="hr">&#9654;</button></div>
     <p><small>Hats unlock at heists ${HAT_AT.slice(1).join(', ')} &middot; best: No. ${save.best}</small></p>
     <p>Hop to the getaway car. Grab <b>?</b> crates for popguns, blunderbusses and cream pies.
     First to <b>3 getaways</b> takes the loot.</p>
-    <p><small>P1: A / D hop &middot; W or S fire &nbsp;|&nbsp; P2: &larr; / &rarr; hop &middot; &uarr; or &darr; fire<br>
-    Tap twice for a mid-air hop. Esc = menu.</small></p>`);
+    <p><small>${isTouch ? 'Tap an arrow to hop, or tap Bang to fire. Tap the arrow again in mid-air for a second hop.' : 'P1: A / D hop · W or S fire | P2: ← / → hop · ↑ or ↓ fire. Esc opens the menu.'}</small></p>`);
 }
 $('card').addEventListener('click', (e) => {
   const a = e.target.closest('button')?.dataset.a; if (!a) return;
@@ -512,9 +512,17 @@ addEventListener('keydown', (e) => {
   if (c.startsWith('Arrow') || c === 'Space') e.preventDefault();
   if (c === 'Space' && p1) p1.wantFire = true;
 });
-for (const [id, fn] of [['tl', (p) => (p.wantHop = -1)], ['tr', (p) => (p.wantHop = 1)], ['tf', (p) => (p.wantFire = true)]]) {
-  $(id).addEventListener('pointerdown', (e) => { e.preventDefault(); wake(); const p = humans()[0]; if (p) fn(p); });
+for (const button of document.querySelectorAll('[data-touch-action]')) {
+  button.addEventListener('pointerdown', e => {
+    e.preventDefault(); wake();
+    const player = humans()[Number(button.dataset.player)];
+    if (!player || attract) return;
+    const action = button.dataset.touchAction;
+    if (action === 'fire') player.wantFire = true;
+    else player.wantHop = action === 'left' ? -1 : 1;
+  });
 }
+$('touchMenu').addEventListener('click', menu);
 addEventListener('pointerdown', wake, { once: true });
 
 // ---------- loop ----------

@@ -81,7 +81,10 @@ class Game {
     cv.addEventListener('pointerdown', (e) => {
       this.audio.unlock();
       if (e.pointerType === 'mouse') { this.target = this.toWorld(e.clientX); this.mouseOn = true; }
-      else this.drag = { id: e.pointerId, x: this.toWorld(e.clientX), t: this.target };
+      else if (!this.drag) {
+        this.drag = { id: e.pointerId, x: this.toWorld(e.clientX), t: this.target };
+        try { cv.setPointerCapture(e.pointerId); } catch (err) { /* old browsers */ }
+      }
     });
     cv.addEventListener('pointermove', (e) => {
       if (e.pointerType === 'mouse') { this.target = this.toWorld(e.clientX); this.mouseOn = true; }
@@ -89,6 +92,7 @@ class Game {
     });
     const up = (e) => { if (this.drag && this.drag.id === e.pointerId) this.drag = null; };
     cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+    cv.addEventListener('lostpointercapture', up);
     addEventListener('keydown', (e) => {
       this.audio.unlock();
       this.keys.add(e.code);
@@ -102,7 +106,7 @@ class Game {
       if ((e.code === 'Space' || e.code === 'Enter') && this.ui.open) { e.preventDefault(); this.ui.primary(); }
     });
     addEventListener('keyup', (e) => this.keys.delete(e.code));
-    addEventListener('blur', () => { this.keys.clear(); if (this.mode === 'play' && !this.ui.open) this.ui.show('pause'); });
+    addEventListener('blur', () => { this.keys.clear(); this.drag = null; if (this.mode === 'play' && !this.ui.open) this.ui.show('pause'); });
   }
   keyDir() {
     const k = this.keys;

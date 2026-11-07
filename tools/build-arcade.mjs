@@ -20,7 +20,8 @@ const release=releaseHash.digest('hex').slice(0,8);
 const importMap='<script type="importmap">'+JSON.stringify({imports:Object.fromEntries(modulePaths.map(url=>[url,url+'?v='+release]))})+'</script>';
 const read=p=>fs.readFile(path.join(root,p),'utf8');
 const write=async(p,s)=>{if(p.endsWith('.html'))s=s.replace(/<script type="importmap">[\s\S]*?<\/script>\s*/g,'').replace('<head>','<head>'+importMap).replace(/(href|src)="(\/site\/(?:arcade[^"?]*\.(?:js|css)|account\.js))(?:\?[^\"]*)?"/g,(_,attr,url)=>`${attr}="${url}?v=${release}"`).replace(/\r\n?/g,'\n').replace(/[\t ]+$/gm,'');await fs.mkdir(path.dirname(path.join(root,p)),{recursive:true});await fs.writeFile(path.join(root,p),s);};
-const styles='<link rel="stylesheet" href="/site/arcade-characters.css">\n<link rel="stylesheet" href="/site/arcade.css">';
+const extraStyles='<link rel="stylesheet" href="/site/arcade-return.css">\n<link rel="stylesheet" href="/site/arcade-locale.css">';
+const styles='<link rel="stylesheet" href="/site/arcade-characters.css">\n<link rel="stylesheet" href="/site/arcade.css">\n'+extraStyles;
 const client='<script type="module" src="/site/arcade-client.js"></script>';
 const head=(title,description,url)=>`<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} — PLAYPILE</title><meta name="description" content="${esc(description)}"><link rel="canonical" href="https://playpile.net${url}"><meta property="og:title" content="${esc(title)} — PLAYPILE"><meta property="og:description" content="${esc(description)}"><meta property="og:image" content="https://playpile.net/site/icon-512.png"><meta name="theme-color" content="#152b2c"><link rel="icon" href="/site/icon.svg" type="image/svg+xml"><link rel="manifest" href="/site/manifest.webmanifest"><link rel="stylesheet" href="/site/style.css"><link rel="stylesheet" href="/site/account.css"><link rel="stylesheet" href="/site/progress.css">${styles}<script>window.__PLAYPILE_WEB=1;</script><script type="module" src="/site/account.js"></script>`;
 const page=(title,desc,url,content,mode='browse',extra='',intro='')=>`<!doctype html><html lang="en"><head>${head(title,desc,url)}${extra}</head><body class="arcade-site" data-arcade-page="${mode}"><a class="skip" href="#main">Skip to content</a>${intro}${headerHTML(mode==='profile'?'me':mode)}<main id="main" class="arcade-main">${content}${footerHTML()}</main>${client}</body></html>`;
@@ -38,7 +39,7 @@ const boot=`<div class="arcade-boot" id="arcadeBoot" aria-hidden="true" hidden><
     } catch {}
   }
 </script>`;
-const catalogue=`<div class="browse-heading feed-heading"><div><h1>Browse games</h1><p>Find something fun and jump in.</p></div>${searchHTML()}</div>
+const catalogue=`<div id="returnShelf"></div><div class="browse-heading feed-heading"><div><h1>Browse Games</h1><p>Find something fun and jump in.</p></div>${searchHTML()}</div>
 <section aria-label="Game library"><div class="feed-status"><p id="gameCount" role="status">${GAMES.length} games</p><button class="feed-clear" id="clearSearch" type="button" hidden>Clear search</button></div>
 <div class="game-grid game-feed" id="gameFeed">${GAMES.map(game=>gameCardHTML(game,{compact:true})).join('')}</div>
 <p class="empty-state" id="searchEmpty" hidden>Try a different title, genre or art style.</p></section>`;
@@ -59,10 +60,11 @@ for(const world of WORLDS){
 
 const infoPages=[['01','About','The person and the idea behind the pile','/site/about.html'],['02','Updates','What’s new, what’s fixed and what changed','/site/updates.html'],['03','Dev log','A peek under the hood','/devlog/'],['04','My picks','A few good places to start','/articles/'],['05','Contact','Found a bug? Got an idea? Say hello','/site/contact.html'],['06','Privacy & saves','Your saved games and your choices','/site/settings.html']];
 await write('settings/index.html',page('Settings & info','Display options, site information and a way to get in touch.','/settings/',`<a class="backlink" href="/">← Back to the computer</a><div class="eyebrow">The useful stuff</div><h1>Settings & info</h1><p>Need something outside the games? You’re in the right place</p><section class="display-options"><h2>Make yourself comfortable</h2><label><input type="checkbox" id="reduceMotion">Keep the characters still and skip the zoom</label><p class="pp-fine">Your device’s reduced-motion setting is respected too</p></section><section class="settings-grid" aria-label="Site pages">${infoPages.map(([n,title,desc,href])=>`<a class="settings-card" href="${href}"><span>${n} / OPEN FILE</span><strong>${title} →</strong><p>${desc}</p></a>`).join('')}</section><h2>A few more things</h2><nav class="settings-secondary" aria-label="Policies and support"><a href="/site/parents.html">For parents</a><a href="/site/privacy.html">Privacy policy</a><a href="/site/cookies.html">Cookies</a><a href="/site/terms.html">Terms</a><a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a><a href="/site/advertise.html">Advertising</a></nav>`,'settings'));
-await write('me/index.html',page('Your save screen','Your profile, recently played games, favourites, daily quest and badges.','/me/','<div id="me" class="pp-me"><noscript>Your profile needs JavaScript to read your saved progress from this browser.</noscript></div><script type="module">import { mountMe } from "/site/arcade-profile.js";mountMe(document.getElementById("me"));</script>','profile','<meta name="robots" content="noindex">'));
+await write('me/index.html',page('Your save screen','Your profile, daily quest, progress and badges.','/me/','<div id="me" class="pp-me"><noscript>Your profile needs JavaScript to read your saved progress from this browser.</noscript></div><script type="module">import { mountMe } from "/site/arcade-profile.js";mountMe(document.getElementById("me"));</script>','profile','<meta name="robots" content="noindex">'));
 
 function theme(html,active='browse'){
  if(!html.includes('/site/arcade.css'))html=html.replace('</head>',styles+'\n</head>');
+ else if(!html.includes('/site/arcade-locale.css'))html=html.replace('</head>',extraStyles+'\n</head>');
  if(!html.includes('/site/arcade-client.js'))html=html.replace('</body>',client+'\n</body>');
  html=html.replace(/<body([^>]*)>/,(_,attributes)=>attributes.includes('arcade-site')?'<body'+attributes+'>':attributes.includes('class=')?'<body'+attributes.replace(/class="([^"]*)"/,'class="$1 arcade-site"')+'>':'<body class="arcade-site"'+attributes+'>');
  html=html.replace(/<header class="top[^>]*>[\s\S]*?<\/header>/,headerHTML(active));
@@ -71,7 +73,7 @@ function theme(html,active='browse'){
  html=html.replace(/document\.getElementById\('picks'\)\.innerHTML\s*=\s*row\([\s\S]*?\);/g,'// Optional recommendations removed: the page already has its own content.');
  html=html.replaceAll('More from the my picks','More picks').replaceAll('More from the articles','More picks');
  html=html.replace(/100 browser games/g,GAMES.length+' browser games');
- html=html.replaceAll('>All games</a>','>Browse games</a>').replaceAll('href="/">Browse games','href="/browse/">Browse games');
+ html=html.replaceAll('>All games</a>','>Browse Games</a>').replaceAll('>Browse games</a>','>Browse Games</a>').replaceAll('href="/">Browse Games','href="/browse/">Browse Games');
  return html;
 }
 

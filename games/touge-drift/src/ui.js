@@ -7,12 +7,41 @@ export class UI {
     this.root = document.getElementById('ui');
     this.el = null; this.panel = null;
     this.pauseBtn = h('button', 'pausebtn', 'II');
+    this.pauseBtn.type = 'button'; this.pauseBtn.setAttribute('aria-label', 'Pause');
     this.pauseBtn.addEventListener('pointerdown', (e) => { e.stopPropagation(); if (this.g.mode === 'play' && !this.open) this.show('pause'); });
     this.root.appendChild(this.pauseBtn);
+    this.touchActions = h('div', 'touch-actions');
+    for (const action of ['brake', 'nitro']) {
+      const button = h('button', 'touch-action', action);
+      button.type = 'button';
+      let owner = null;
+      const release = (event) => {
+        if (event && event.pointerId !== owner) return;
+        owner = null;
+        this.g.touch[action] = false;
+        button.classList.remove('held');
+      };
+      button.addEventListener('pointerdown', (event) => {
+        if (owner !== null || this.open || event.button !== 0) return;
+        event.preventDefault();
+        this.g.audio.unlock();
+        owner = event.pointerId;
+        try { button.setPointerCapture(owner); } catch (_) { /* older browsers */ }
+        this.g.touch[action] = true;
+        button.classList.add('held');
+      });
+      for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) button.addEventListener(event, release);
+      addEventListener('blur', () => release());
+      this.touchActions.appendChild(button);
+    }
+    this.root.appendChild(this.touchActions);
     this.hud(false);
   }
   get open() { return !!this.el; }
-  hud(on) { this.pauseBtn.style.display = on ? '' : 'none'; }
+  hud(on) {
+    this.pauseBtn.hidden = !on;
+    this.touchActions.hidden = !on || !this.g.isTouch;
+  }
   close() { if (this.el) { this.el.remove(); this.el = null; this.panel = null; } }
   show(kind, data = {}) {
     this.close();
@@ -46,7 +75,7 @@ export class UI {
       <button class="btn" data-act="attack">Time Attack <small>best ${s.best.toLocaleString()}</small></button>
       <button class="btn" data-act="free">Free Run <small>best ${s.bestFree.toLocaleString()}</small></button>
       <div class="row"><button class="btn sm" data-act="howto">How to play</button><button class="btn sm" data-act="settings">Settings</button></div></div>
-      <div class="keys">${this.g.isTouch ? 'Hold left / right side of the screen to steer' : '<b>W</b> gas · <b>S</b> brake · <b>A D</b> steer · <b>Space</b> handbrake · <b>Shift</b> nitro'}</div>
+      <div class="keys">${this.g.isTouch ? 'Hold either side to steer · hold both to drift' : '<b>W</b> gas · <b>S</b> brake · <b>A D</b> steer · <b>Space</b> handbrake · <b>Shift</b> nitro'}</div>
       <div class="credit">a PLAYPILE game</div></div>`;
   }
   p_pause() {
@@ -76,12 +105,12 @@ export class UI {
   p_howto() {
     const r = (k, t) => `<div class="how"><span class="k">${k}</span><span>${t}</span></div>`;
     return `<div class="card"><h2>How to play</h2>
-      ${r('W', 'Gas. <b>S</b> brakes.')}
-      ${r('A D', 'Steer. Turn hard at speed and the back steps out: you\'re drifting.')}
-      ${r('SPACE', 'Handbrake: kick the car sideways instantly.')}
+      ${this.g.isTouch
+        ? r('Steer', 'Hold either side to steer. The car accelerates on its own.') + r('Brake', 'Hold the Brake button to slow down.') + r('Drift', 'Hold both sides to use the handbrake.')
+        : r('W', 'Gas. <b>S</b> brakes.') + r('A D', 'Steer. Turn hard at speed and the back steps out.') + r('SPACE', 'Handbrake: kick the car sideways instantly.')}
       ${r('x10', 'Hold a drift to raise the multiplier. Start the next one within 2 seconds to keep it.')}
       ${r('!', 'Drift close to the guardrail for double points. Slam it hard and you lose the drift you were building.')}
-      ${r('SHIFT', 'Nitro. It fills up as you bank drifts.')}
+      ${r(this.g.isTouch ? 'Nitro' : 'SHIFT', 'Hold to boost. Nitro fills as you bank drifts.')}
       ${r('⏱', 'Time Attack: the chequered checkpoints add time. Free Run has no clock.')}
       <div class="menu"><button class="btn pink" data-act="back">Got it</button></div></div>`;
   }

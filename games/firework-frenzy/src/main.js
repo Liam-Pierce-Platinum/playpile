@@ -77,18 +77,34 @@ function toLocal(e) { const r = cv.getBoundingClientRect(); return [(e.clientX -
 cv.addEventListener('pointerdown', (e) => {
   wake(); e.preventDefault();
   if (e.pointerType === 'touch') touchMode = true;
-  const [x, y] = toLocal(e); ptrs.set(e.pointerId, { x, y, touch: e.pointerType === 'touch' });
-  if (mode === 'play') { if (e.pointerType === 'touch' && zone(x, y) === 'fire') { kickQ = true; pressQ = true; } if (hit(pauseBtn(), x, y)) setMode('pause'); return; }
+  const [x, y] = toLocal(e);
+  if (mode === 'play' && hitPause(e, x, y)) { ptrs.clear(); kickQ = pressQ = false; setMode('pause'); return; }
+  cv.setPointerCapture(e.pointerId);
+  ptrs.set(e.pointerId, { x, y, touch: e.pointerType === 'touch' });
+  if (mode === 'play') { if (e.pointerType === 'touch' && zone(x, y) === 'fire') { kickQ = true; pressQ = true; } return; }
   if (mode === 'garage') { garageDown(e.pointerId, x, y); return; }
   for (let i = 0; i < menu.length; i++) if (hit(menu[i], x, y)) { sel = i; activate(menu[i]); return; }
 });
 cv.addEventListener('pointermove', (e) => { if (ptrs.has(e.pointerId)) { const [x, y] = toLocal(e); const p = ptrs.get(e.pointerId); p.x = x; p.y = y; } else if (e.pointerType === 'mouse') { const [x, y] = toLocal(e); for (let i = 0; i < menu.length; i++) if (hit(menu[i], x, y)) sel = i; } });
-const up = (e) => { const p = ptrs.get(e.pointerId); ptrs.delete(e.pointerId); if (p && mode === 'garage') garageUp(e.pointerId, p.x, p.y); };
-cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+const up = (e) => {
+  const p = ptrs.get(e.pointerId);
+  ptrs.delete(e.pointerId);
+  if (!p || mode !== 'garage') return;
+  if (e.type === 'pointerup') garageUp(e.pointerId, p.x, p.y);
+  else if (G?.down?.id === e.pointerId) G.down = null;
+};
+cv.addEventListener('pointerup', up);
+cv.addEventListener('pointercancel', up);
+cv.addEventListener('lostpointercapture', up);
 const hit = (b, x, y) => b && x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h;
 const TB = () => ({ l: { x: 6, y: H - 34, w: 30, h: 28 }, r: { x: 40, y: H - 34, w: 30, h: 28 }, f: { x: W - 50, y: H - 40, w: 44, h: 34 } });
 function zone(x, y) { const t = TB(); if (x < W / 2) return x < (t.l.x + t.l.w + t.r.x) / 2 ? 'left' : 'right'; return 'fire'; }
 const pauseBtn = () => ({ x: W - 13, y: 3, w: 10, h: 10 });
+function hitPause(e, x, y) {
+  if (e.pointerType === 'mouse') return hit(pauseBtn(), x, y);
+  const rect = cv.getBoundingClientRect();
+  return x >= W - 44 * W / rect.width && y <= 44 * H / rect.height;
+}
 function readInput() {
   let left = keys.ArrowLeft || keys.KeyA, right = keys.ArrowRight || keys.KeyD, thrust = keys.Space || keys.ArrowUp || keys.KeyW;
   for (const p of ptrs.values()) if (p.touch) { const z = zone(p.x, p.y); if (z === 'left') left = true; else if (z === 'right') right = true; else thrust = true; }

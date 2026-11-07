@@ -130,4 +130,13 @@ export function initTouch(el, onAnyTouch) {
   el.addEventListener('touchmove', move, { passive: false });
   el.addEventListener('touchend', end);
   el.addEventListener('touchcancel', end);
+  window.addEventListener('blur', () => {
+    stickId = null;
+    touch.x = touch.y = 0;
+    base.classList.remove('on');
+    base.style.left = base.style.top = '';
+    setKnob(0, 0);
+    state.clear();
+    refresh();
+  });
 }

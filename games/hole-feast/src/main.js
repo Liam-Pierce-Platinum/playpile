@@ -105,10 +105,11 @@ const keys = {}; let mouse = null, joy = null;
 addEventListener('keydown', (e) => { keys[e.code] = true; Sfx.unlock(); if (e.code === 'KeyM') toggleMute(); if ((e.code === 'Enter' || e.code === 'Space') && G.state === 'over' && G.canAgain) start(G.ci); });
 addEventListener('keyup', (e) => { keys[e.code] = false; });
 const cv = renderer.domElement;
-cv.addEventListener('pointerdown', (e) => { Sfx.unlock(); if (e.pointerType !== 'mouse') { joy = { id: e.pointerId, x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY }; const j = $('joy'); j.style.left = e.clientX + 'px'; j.style.top = e.clientY + 'px'; j.classList.add('on'); } });
+cv.addEventListener('pointerdown', (e) => { Sfx.unlock(); if (e.pointerType !== 'mouse' && !joy) { cv.setPointerCapture(e.pointerId); joy = { id: e.pointerId, x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY }; const j = $('joy'); j.style.left = e.clientX + 'px'; j.style.top = e.clientY + 'px'; j.classList.add('on'); } });
 addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') mouse = { x: e.clientX, y: e.clientY }; else if (joy && e.pointerId === joy.id) { joy.x = e.clientX; joy.y = e.clientY; const dx = joy.x - joy.x0, dy = joy.y - joy.y0, l = Math.hypot(dx, dy), m = Math.min(l, 50) / (l || 1); $('knob').style.transform = `translate(${dx * m}px,${dy * m}px)`; } });
-const endJoy = (e) => { if (joy && e.pointerId === joy.id) { joy = null; $('joy').classList.remove('on'); $('knob').style.transform = ''; } };
-addEventListener('pointerup', endJoy); addEventListener('pointercancel', endJoy);
+const endJoy = (e) => { if (joy && (!e || e.pointerId === joy.id)) { joy = null; $('joy').classList.remove('on'); $('knob').style.transform = ''; } };
+for (const event of ['pointerup','pointercancel','lostpointercapture']) cv.addEventListener(event, endJoy);
+addEventListener('blur', () => { endJoy(); mouse = null; });
 document.addEventListener('mouseleave', () => { mouse = null; });
 
 function inputDir() {

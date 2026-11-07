@@ -81,6 +81,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .round.snd.off svg .x { display: inline; }
 .round.snd.off { background: rgba(255, 200, 180, 0.9); }
 
+@media (pointer: coarse) {
+  .scrim, .shop .grid { touch-action: pan-y; }
+  .btn { min-height: 44px; }
+}
+
 /* short landscape screens (phones on their side): results card goes two columns so RETRY never needs scrolling */
 @media (max-height: 460px) and (min-aspect-ratio: 1/1) {
   .panel.over { width: min(640px, 100%); display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; row-gap: 8px; align-items: center; padding: 12px 16px 16px; }

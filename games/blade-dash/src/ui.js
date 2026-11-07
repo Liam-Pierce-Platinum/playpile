@@ -21,10 +21,22 @@ export class UI {
     this.root.appendChild(this.pauseBtn);
     // hold-to-slow button for touch screens (the keyboard uses Space)
     this.focusBtn = h('button', 'focusbtn', '<b>集中</b><span>hold: slow-mo</span>');
-    const on = (e) => { e.preventDefault(); e.stopPropagation(); this.g.audio.unlock(); this.g.setFocus(true); this.focusBtn.classList.add('down'); };
-    const off = () => { this.g.setFocus(false); this.focusBtn.classList.remove('down'); };
+    let focusPointer = null;
+    const on = (e) => {
+      if (focusPointer !== null || e.button !== 0) return;
+      e.preventDefault(); e.stopPropagation(); this.g.audio.unlock();
+      focusPointer = e.pointerId;
+      try { this.focusBtn.setPointerCapture(e.pointerId); } catch (_) { /* older browsers */ }
+      this.g.setFocus(true); this.focusBtn.classList.add('down');
+    };
+    const off = (e) => {
+      if (e && e.pointerId !== focusPointer) return;
+      focusPointer = null;
+      this.g.setFocus(false); this.focusBtn.classList.remove('down');
+    };
     this.focusBtn.addEventListener('pointerdown', on);
-    for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) this.focusBtn.addEventListener(ev, off);
+    for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) this.focusBtn.addEventListener(ev, off);
+    addEventListener('blur', () => off());
     this.root.appendChild(this.focusBtn);
     this.toasts = h('div', 'toasts'); this.root.appendChild(this.toasts);
     this.hud(false);

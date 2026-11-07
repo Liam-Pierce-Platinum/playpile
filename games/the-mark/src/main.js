@@ -416,6 +416,7 @@ addEventListener('blur', () => { G.holding = false; });
 
 // touch: one finger drags the aim, two fingers pinch the zoom
 const touches = new Map(); let pinch0 = 0;
+addEventListener('blur', () => { touches.clear(); pinch0 = 0; $('tBreath').classList.remove('on'); });
 canvas.addEventListener('touchstart', (e) => {
   Audio.init(); e.preventDefault();
   for (const t of e.changedTouches) touches.set(t.identifier, { x: t.clientX, y: t.clientY });
@@ -435,9 +436,15 @@ canvas.addEventListener('touchmove', (e) => {
     else if (d / pinch0 < 0.74) { if (G.zoomIdx > 0) G.zoomIdx--; else setScope(false); Audio.zoom(); pinch0 = d; }
   }
 }, { passive: false });
-const endTouch = (e) => { for (const t of e.changedTouches) touches.delete(t.identifier); };
+const endTouch = (e) => {
+  for (const t of e.changedTouches) touches.delete(t.identifier);
+  if (touches.size === 2) {
+    const [a, b] = [...touches.values()];
+    pinch0 = Math.hypot(a.x - b.x, a.y - b.y);
+  }
+};
 canvas.addEventListener('touchend', endTouch); canvas.addEventListener('touchcancel', endTouch);
-const tbtn = (id, down, up) => { const b = $(id); b.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); Audio.init(); down(b); }, { passive: false }); b.addEventListener('mousedown', (e) => { e.stopPropagation(); Audio.init(); down(b); }); if (up) { b.addEventListener('touchend', (e) => { e.preventDefault(); up(b); }); b.addEventListener('mouseup', () => up(b)); b.addEventListener('mouseleave', () => up(b)); } };
+const tbtn = (id, down, up) => { const b = $(id); b.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); Audio.init(); down(b); }, { passive: false }); b.addEventListener('mousedown', (e) => { e.stopPropagation(); Audio.init(); down(b); }); if (up) { b.addEventListener('touchend', (e) => { e.preventDefault(); up(b); }); b.addEventListener('touchcancel', () => up(b)); b.addEventListener('mouseup', () => up(b)); b.addEventListener('mouseleave', () => up(b)); } };
 tbtn('tFire', () => fire());
 tbtn('tScope', () => setScope(!G.scoped));
 tbtn('tZoom', () => { if (!G.scoped) setScope(true); else G.zoomIdx = (G.zoomIdx + 1) % 3; Audio.zoom(); });

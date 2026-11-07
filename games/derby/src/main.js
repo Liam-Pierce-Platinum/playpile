@@ -98,7 +98,11 @@ class Game {
       if (this.mode === 'play' && this.spectate && !this.over && (e.code === 'Space' || e.code === 'Enter')) this.showResults();
     });
     addEventListener('keyup', (e) => this.keys.delete(e.code));
-    addEventListener('blur', () => { this.keys.clear(); if (this.mode === 'play' && !this.ui.open && !this.over) this.ui.show('pause'); });
+    addEventListener('blur', () => {
+      this.keys.clear(); this.stick.id = null; this.stick.on = false;
+      this.btn.boost = this.btn.rev = null;
+      if (this.mode === 'play' && !this.ui.open && !this.over) this.ui.show('pause');
+    });
     // touch: a floating stick on the left half, BOOST and REVERSE buttons on the right
     const btnAt = (tx, ty) => {
       for (const [k, b] of Object.entries(this.touchButtons())) if (Math.hypot(tx - b.x, ty - b.y) < b.r * 1.25) return k;
@@ -110,7 +114,7 @@ class Game {
       if (this.mode === 'play' && this.spectate && !this.over && !this.ui.open) { this.showResults(); return; }
       for (const t of e.changedTouches) {
         const b = btnAt(t.clientX, t.clientY);
-        if (b) { this.btn[b] = t.identifier; continue; }
+        if (b) { if (this.btn[b] === null) this.btn[b] = t.identifier; continue; }
         if (this.stick.id === null && t.clientX < innerWidth * 0.6) { Object.assign(this.stick, { id: t.identifier, ox: t.clientX, oy: t.clientY, x: t.clientX, y: t.clientY, on: true }); }
       }
     }, { passive: false });

@@ -66,13 +66,14 @@ class Game {
     const cv = this.canvas;
     cv.addEventListener('pointerdown', (e) => {
       this.audio.unlock();
-      if (this.mode !== 'play' || this.ui.open) return;
+      if (this.mode !== 'play' || this.ui.open || this.drag || e.button !== 0) return;
       this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY };
       try { cv.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
     });
     cv.addEventListener('pointermove', (e) => { if (this.drag && this.drag.id === e.pointerId) { this.drag.x = e.clientX; this.drag.y = e.clientY; } });
     const up = (e) => { if (this.drag && this.drag.id === e.pointerId) this.drag = null; };
     cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+    cv.addEventListener('lostpointercapture', up);
     cv.addEventListener('wheel', (e) => { if (this.mode === 'play') { this.wheel += Math.sign(e.deltaY) * 0.9; e.preventDefault(); } }, { passive: false });
     addEventListener('keydown', (e) => {
       this.audio.unlock();

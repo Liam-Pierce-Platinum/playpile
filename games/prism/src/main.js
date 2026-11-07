@@ -157,7 +157,7 @@ function press() {
   unlock();
   if (G.state === 'play') doTap();
 }
-cv.addEventListener('pointerdown', (e) => { e.preventDefault(); press(); });
+cv.addEventListener('pointerdown', (e) => { if (!e.isPrimary || e.button !== 0) return; e.preventDefault(); press(); });
 $('hud').addEventListener('pointerdown', (e) => { if (e.target === $('hud') || e.target.id === 'score' || e.target.id === 'hbest') { e.preventDefault(); press(); } });
 addEventListener('keydown', (e) => {
   if (e.repeat) return;

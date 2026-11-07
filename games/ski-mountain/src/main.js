@@ -105,6 +105,8 @@ const tend = (e) => { for (const t of e.changedTouches) { const s = touches.get(
 canvas.addEventListener('touchend', tend); canvas.addEventListener('touchcancel', tend);
 $('tgrab').addEventListener('touchstart', (e) => { e.preventDefault(); wake(); I.touchGrab = true; }, { passive: false });
 $('tgrab').addEventListener('touchend', (e) => { e.preventDefault(); I.touchGrab = false; }, { passive: false });
+$('tgrab').addEventListener('touchcancel', () => { I.touchGrab = false; });
+addEventListener('blur', () => { touches.clear(); I.touchGrab = I.touchJump = false; rawDX = rawDY = 0; });
 
 function readInput(dt) {
   let ts = 0, tt = 0;

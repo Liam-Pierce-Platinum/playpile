@@ -119,7 +119,7 @@ class Game {
     if (this.state !== 'play') return;
     this.paused = v;
     this.manual.root.classList.toggle('hidden', v);
-    if (v) { if (!quiet) this.ui.pause(); this.releaseButtons(); this.audio.mode = 'menu'; }
+    if (v) { if (!quiet) this.ui.pause(); this.releaseButtons(true); this.audio.mode = 'menu'; }
     else { this.ui.clear(); this.audio.mode = 'play'; }
   }
 
@@ -160,8 +160,10 @@ class Game {
   // ---------- input ----------
   bindInput() {
     const cv = this.cv;
+    let modulePointer = null;
     cv.addEventListener('pointerdown', (e) => {
       this.audio.unlock();
+      if (modulePointer !== null || e.button !== 0) return;
       if (this.state === 'title' && this.ui.screen === 'title') { this.action('campaign', Math.min(this.save.unlocked, CAMPAIGN.length) - 1); return; }
       if (this.state !== 'play' || this.paused || this.intro > 0) {
         if ((this.state === 'boom' || this.state === 'defused') && this.resultShown && this.endT > 0.8 && this.ui.screen === 'result') { /* clicks on the desk do nothing; use the card */ }
@@ -176,10 +178,21 @@ class Game {
       const s = this.L.slots[i], M = this.mods[i];
       let el = D.hitModule(M, bx - s.x, by - s.y);
       if (!el && e.pointerType !== 'mouse') el = M.type === 'wires' ? this.nearestWire(M, bx - s.x, by - s.y) : this.nearestHit(M, bx - s.x, by - s.y);
-      if (el) { try { cv.setPointerCapture(e.pointerId); } catch (_) { /* fine */ } this.use(i, el); }
+      if (el) {
+        modulePointer = e.pointerId;
+        try { cv.setPointerCapture(e.pointerId); } catch (_) { /* fine */ }
+        this.use(i, el);
+      }
     });
-    const up = () => this.releaseButtons();
-    addEventListener('pointerup', up); addEventListener('pointercancel', up);
+    const endPress = (e) => {
+      if (e && e.pointerId !== modulePointer) return;
+      modulePointer = null;
+      this.releaseButtons(e?.type !== 'pointerup');
+    };
+    addEventListener('pointerup', endPress);
+    addEventListener('pointercancel', endPress);
+    cv.addEventListener('lostpointercapture', endPress);
+    addEventListener('blur', () => endPress());
     cv.addEventListener('pointermove', (e) => {
       if (e.pointerType !== 'mouse' || !this.mods || this.state !== 'play') { this.hover = null; return; }
       const [bx, by] = this.toBomb(e.clientX, e.clientY), i = this.slotAt(bx, by);
@@ -209,9 +222,15 @@ class Game {
     const M = this.mods[i];
     this.manual.show(M.type, { wires: M.data.colors?.length });
   }
-  releaseButtons() {
+  releaseButtons(cancelled = false) {
     if (!this.mods || this.state !== 'play') return;
-    this.mods.forEach((M, i) => { if (M.type === 'button' && M.down) { this.audio.play('release'); M.anim.press = 1; this.result(i, act(M, { t: 'up' }, { digit: this.digit() })); } });
+    this.mods.forEach((M, i) => {
+      if (M.type !== 'button' || !M.down) return;
+      M.anim.press = 1;
+      if (cancelled) { M.down = false; M.held = 0; return; }
+      this.audio.play('release');
+      this.result(i, act(M, { t: 'up' }, { digit: this.digit() }));
+    });
   }
   key(e, down) {
     const k = e.key;

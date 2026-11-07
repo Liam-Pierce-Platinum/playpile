@@ -14,13 +14,22 @@ function toGame(cx, cy) {
 }
 export function initInput(canvas) {
   input.canvas = canvas;
+  input.touch = matchMedia('(pointer: coarse)').matches;
+  // The HUD rebuilds button rectangles while it draws. Store finger ownership
+  // separately so releasing a finger clears the action after any redraw.
+  const buttonTouches = new Map();
   addEventListener('keydown', (e) => {
     if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code) && e.target === document.body) e.preventDefault();
     if (!input.keys.has(e.code)) input.pressed.add(e.code);
     input.keys.add(e.code);
   });
   addEventListener('keyup', (e) => input.keys.delete(e.code));
-  addEventListener('blur', () => { input.keys.clear(); input.held.clear(); input.mouse.down = false; });
+  addEventListener('blur', () => {
+    input.keys.clear(); input.pressed.clear(); input.held.clear();
+    input.mouse.down = input.mouse.clicked = false;
+    input.stick = null; input.stickVec.x = input.stickVec.y = 0;
+    buttonTouches.clear();
+  });
   canvas.addEventListener('mousemove', (e) => { const p = toGame(e.clientX, e.clientY); input.mouse.x = p.x; input.mouse.y = p.y; input.mouse.moved = now(); });
   canvas.addEventListener('mousedown', (e) => { if (e.button === 0) { input.mouse.down = true; input.mouse.clicked = true; input.mouse.moved = now(); } });
   addEventListener('mouseup', () => { input.mouse.down = false; });
@@ -30,7 +39,14 @@ export function initInput(canvas) {
     for (const t of e.changedTouches) {
       const p = toGame(t.clientX, t.clientY);
       const b = input.buttons.find((b) => Math.hypot(b.x - p.x, b.y - p.y) < b.r + 8);
-      if (b) { input.pressed.add(b.id); input.held.add(b.id); b.touch = t.identifier; continue; }
+      if (b) {
+        if (!input.held.has(b.id)) {
+          input.pressed.add(b.id);
+          input.held.add(b.id);
+          buttonTouches.set(t.identifier, b.id);
+        }
+        continue;
+      }
       if (p.x < GW * 0.5 && !input.stick) input.stick = { id: t.identifier, ox: p.x, oy: p.y, x: p.x, y: p.y };
     }
   };
@@ -48,7 +64,8 @@ export function initInput(canvas) {
   const tEnd = (e) => {
     for (const t of e.changedTouches) {
       if (input.stick && t.identifier === input.stick.id) { input.stick = null; input.stickVec.x = input.stickVec.y = 0; }
-      for (const b of input.buttons) if (b.touch === t.identifier) { input.held.delete(b.id); b.touch = null; }
+      const id = buttonTouches.get(t.identifier);
+      if (id !== undefined) { input.held.delete(id); buttonTouches.delete(t.identifier); }
     }
   };
   canvas.addEventListener('touchstart', tStart, { passive: false });

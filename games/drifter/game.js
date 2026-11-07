@@ -38,11 +38,11 @@ let rings = [], shake = 0;   // SHIFT is a press, not a hold - see hyperspace be
 // (fires the moment the finger lands). Every finger counts, so you can
 // turn and thrust at once. The old "quick tap anywhere fires" rule was
 // invisible and fired shots when a turn was only a short press.
-let touchMode = false, fingers = [], touchShots = 0;
+let touchMode = matchMedia('(pointer: coarse)').matches, fingers = [], touchShots = 0;
 const zone = (x) => x < D.W * 0.25 ? 'L' : x < D.W * 0.5 ? 'R' : x < D.W * 0.75 ? 'T' : 'F';
 const toCanvas = (t) => { const r = D.cv.getBoundingClientRect();
   return { x: (t.clientX - r.left) / r.width * D.W, y: (t.clientY - r.top) / r.height * D.H }; };
-const readFingers = (e) => { fingers = [...e.touches].map(toCanvas); };
+const readFingers = (e) => { fingers = [...e.touches].filter(t => t.target === D.cv).map(toCanvas); };
 D.cv.addEventListener('touchstart', (e) => {
   touchMode = true; readFingers(e);
   for (const t of e.changedTouches) if (zone(toCanvas(t).x) === 'F') touchShots++;
@@ -50,6 +50,7 @@ D.cv.addEventListener('touchstart', (e) => {
 D.cv.addEventListener('touchmove', readFingers);
 addEventListener('touchend', readFingers);
 addEventListener('touchcancel', readFingers);
+addEventListener('blur', () => { fingers = []; touchShots = 0; });
 addEventListener('mousedown', () => { touchMode = false; });
 addEventListener('keydown', () => { touchMode = false; });
 const finger = (f) => fingers.some(f);

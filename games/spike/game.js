@@ -1038,10 +1038,12 @@ D.cv.addEventListener('touchstart', (e) => {
 });
 addEventListener('touchend', (e) => {
   for (const t of e.changedTouches) {
-    if (performance.now() - (tDown.get(t.identifier) || 0) < 200 && !e.touches.length) tJump = true;
+    if (tDown.has(t.identifier) && performance.now() - tDown.get(t.identifier) < 200 && !e.touches.length) tJump = true;
     tDown.delete(t.identifier);
   }
 });
+addEventListener('touchcancel', e => { for (const t of e.changedTouches) tDown.delete(t.identifier); tJump = false; });
+addEventListener('blur', () => { tDown.clear(); tJump = false; });
 const touchJump = () => { const j = tJump; tJump = false; return j; };
 
 /** one slime, driven by a set of buttons */

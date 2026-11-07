@@ -70,3 +70,11 @@ body.touch #help{display:none}
 body.touch #bottom{bottom:150px}
 @media (max-width:640px){#board{font-size:11px;min-width:110px}#timer{font-size:22px}#feed{top:190px;font-size:11px}#weapon{min-width:160px;font-size:15px}h1{font-size:44px}#banner.count{font-size:80px}#banner{font-size:44px}}
 @keyframes pulse{to{transform:scale(1.08)}}
+
+@media (pointer: coarse) {
+  html,body { touch-action: manipulation; }
+  .panel { max-height: calc(100dvh - 36px); overflow: auto; touch-action: pan-y; overscroll-behavior: contain; }
+  .panel button { min-height: 44px; }
+  #stick { left: max(12px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom)); width: clamp(76px, 27vmin, 130px); height: clamp(76px, 27vmin, 130px); }
+  #firebtn { right: max(12px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); width: clamp(72px, 24vmin, 120px); height: clamp(72px, 24vmin, 120px); }
+}

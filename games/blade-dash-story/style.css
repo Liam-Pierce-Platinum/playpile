@@ -123,3 +123,11 @@ input[type=range] { accent-color: var(--red); width: 190px; }
 @keyframes nope { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 .coins { color: #a87a14 !important; }
 @media (max-height: 500px) { .wr canvas { width: 120px; height: 153px; } .card .body { padding: 10px 14px; } .title { gap: 10px; } .logo h1 { font-size: 44px; } .logo .sub { font-size: 20px; } .logo p { margin-top: 6px; font-size: 13px; } .title .menu { gap: 8px; } .title .btn { padding: 7px 14px; font-size: 16px; } }
+
+@media (pointer: coarse) {
+  html,body { touch-action: manipulation; }
+  #c,.focusbtn { touch-action: none; }
+  .card .body { touch-action: pan-y; overscroll-behavior: contain; }
+  .card button,.title .btn,.skipbtn { min-height: 44px; }
+  .focusbtn { left: max(16px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom)); }
+}

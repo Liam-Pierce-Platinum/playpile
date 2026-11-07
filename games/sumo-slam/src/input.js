@@ -53,10 +53,13 @@ export class Input {
     const end = (e) => { if (e.pointerId === T.id) { T.active = false; T.id = -1; this.resetStick(); } };
     zone.addEventListener('pointerup', end);
     zone.addEventListener('pointercancel', end);
+    zone.addEventListener('lostpointercapture', end);
     btn.addEventListener('pointerdown', (e) => { e.preventDefault(); this.usedTouch = true; T.dash = true; btn.classList.add('down'); try { btn.setPointerCapture(e.pointerId); } catch (er) { /* fine */ } });
     const up = () => { T.dash = false; btn.classList.remove('down'); };
     btn.addEventListener('pointerup', up);
     btn.addEventListener('pointercancel', up);
+    btn.addEventListener('lostpointercapture', up);
+    addEventListener('blur', up);
   }
 
   resetStick() {

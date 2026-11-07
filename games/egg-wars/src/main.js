@@ -5,7 +5,7 @@ import * as S from './sfx.js';
 import * as N from './net.js';
 
 const Q = new URLSearchParams(location.search);
-const TOUCH = Q.has('touch') || ('ontouchstart' in window && matchMedia('(pointer:coarse)').matches);
+const TOUCH = Q.has('touch') || matchMedia('(pointer: coarse)').matches;
 const $ = (id) => document.getElementById(id);
 const V3 = THREE.Vector3;
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -304,7 +304,7 @@ addEventListener('keydown', (ev) => { keys[ev.code] = true; S.unlock();
 });
 addEventListener('keyup', (ev) => { keys[ev.code] = false; if (ev.code === 'Tab') $('board').classList.add('hidden'); });
 const cv = renderer.domElement;
-cv.addEventListener('mousedown', (ev) => { S.unlock(); if (!TOUCH && !locked && state !== 'menu') cv.requestPointerLock?.(); if (ev.button === 0) mouseDown = true; if (ev.button === 2) zoom = WEAPONS[me.w].zoom && me.alive; });
+cv.addEventListener('mousedown', (ev) => { S.unlock(); if (!TOUCH && !locked && state !== 'menu') { try { cv.requestPointerLock?.()?.catch?.(() => {}); } catch {} } if (ev.button === 0) mouseDown = true; if (ev.button === 2) zoom = WEAPONS[me.w].zoom && me.alive; });
 addEventListener('mouseup', (ev) => { if (ev.button === 0) mouseDown = false; if (ev.button === 2) zoom = false; });
 cv.addEventListener('contextmenu', (ev) => ev.preventDefault());
 addEventListener('wheel', () => cycleW());
@@ -314,20 +314,38 @@ const unlocked = (w) => levelOf(save.xp).l >= WEAPONS[w].lvl;
 function selectW(w) { if (!unlocked(w) || w === me.w) return; me.w = w; me.cd = 0.3; me.rl = 0; zoom = false; save.w = w; persist(); S.play('click'); }
 function cycleW() { for (let i = 1; i <= 3; i++) { const w = (me.w + i) % 3; if (unlocked(w)) { selectW(w); return; } } }
 if (TOUCH) {
-  $('touch').classList.remove('hidden'); document.body.classList.add('touch');
+  document.body.classList.add('touch');
   const tz = $('touch');
   tz.addEventListener('pointerdown', (ev) => { S.unlock(); if (ev.target.tagName === 'BUTTON') return;
     if (ev.clientX < innerWidth * 0.45 && !touch.stick) { touch.stick = { id: ev.pointerId, x: ev.clientX, y: ev.clientY }; $('stick').style.cssText = `left:${ev.clientX - 60}px;top:${ev.clientY - 60}px;display:block`; }
-    else if (!touch.look) touch.look = { id: ev.pointerId, x: ev.clientX, y: ev.clientY }; });
+    else if (ev.clientX >= innerWidth * 0.45 && !touch.look) touch.look = { id: ev.pointerId, x: ev.clientX, y: ev.clientY };
+    tz.setPointerCapture(ev.pointerId);
+  });
   tz.addEventListener('pointermove', (ev) => {
     if (touch.stick && ev.pointerId === touch.stick.id) { let dx = (ev.clientX - touch.stick.x) / 50, dy = (ev.clientY - touch.stick.y) / 50; const L = Math.hypot(dx, dy); if (L > 1) { dx /= L; dy /= L; } touch.mx = dx; touch.mz = dy; $('nub').style.transform = `translate(${dx * 40}px,${dy * 40}px)`; }
     if (touch.look && ev.pointerId === touch.look.id) { me.yaw -= (ev.clientX - touch.look.x) * 0.006; me.pitch = clamp(me.pitch - (ev.clientY - touch.look.y) * 0.006, -1.45, 1.45); touch.look.x = ev.clientX; touch.look.y = ev.clientY; } });
   const up = (ev) => { if (touch.stick && ev.pointerId === touch.stick.id) { touch.stick = null; touch.mx = touch.mz = 0; $('stick').style.display = 'none'; } if (touch.look && ev.pointerId === touch.look.id) touch.look = null; };
-  tz.addEventListener('pointerup', up); tz.addEventListener('pointercancel', up);
-  const hold = (id, k) => { const b = $(id); b.addEventListener('pointerdown', (e) => { e.preventDefault(); touch[k] = true; }); b.addEventListener('pointerup', () => { touch[k] = false; }); b.addEventListener('pointerleave', () => { touch[k] = false; }); };
+  for (const event of ['pointerup','pointercancel','lostpointercapture']) tz.addEventListener(event, up);
+  const hold = (id, k) => {
+    const b = $(id);
+    let pointer = null;
+    b.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      if (pointer !== null) return;
+      pointer = e.pointerId; b.setPointerCapture(pointer); touch[k] = true;
+    });
+    for (const event of ['pointerup','pointercancel','lostpointercapture']) b.addEventListener(event, e => {
+      if (pointer === e.pointerId) { pointer = null; touch[k] = false; }
+    });
+    addEventListener('blur', () => { pointer = null; touch[k] = false; });
+  };
+  addEventListener('blur', () => {
+    touch.stick = touch.look = null; touch.mx = touch.mz = 0; $('stick').style.display = 'none';
+  });
   hold('tFire', 'fire'); hold('tJump', 'jump');
   $('tSwap').addEventListener('pointerdown', () => cycleW()); $('tRel').addEventListener('pointerdown', () => startReload(me));
   $('tZoom').addEventListener('pointerdown', () => { zoom = !zoom && WEAPONS[me.w].zoom; });
+  $('tMenu').addEventListener('click', openMenu);
 }
 
 // ---------------- viewmodel
@@ -338,6 +356,7 @@ const handG = new THREE.Mesh(sphG, mat(0xf3ead8)); vmScene.add(handG);
 // ---------------- match flow
 function startMatch() {
   state = 'play'; timeLeft = MATCH_TIME; matchXP = 0; timeScale = 1; endT = 0;
+  if (TOUCH) $('touch').classList.remove('hidden');
   botSkill = clamp(0.35 + levelOf(save.xp).l * 0.05, 0.35, 0.85);
   for (const e of ents) { e.k = 0; e.d = 0; e.streak = 0; if (!e.remote) { e.alive = false; e.respawn = 0.1 + Math.random() * 0.4; } }
   me.spect = false; me.respawn = 0;
@@ -349,6 +368,7 @@ function checkEnd() { if (state === 'play' && (timeLeft <= 0 || ents.some((e) =>
 function endMatch(fromNet) {
   if (state !== 'play') return;
   state = 'end'; endT = 0; timeScale = 0.25; S.play('end');
+  $('touch').classList.add('hidden');
   if (N.st.online && N.st.isHost && !fromNet) N.send({ t: 'end' });
   const r = ranking(), place = r.indexOf(me) + 1, before = levelOf(save.xp).l;
   const bonus = [0, 400, 250, 150][place] || 75, gain = matchXP + bonus;
@@ -371,6 +391,7 @@ function endMatch(fromNet) {
 }
 function openMenu() {
   state = 'menu'; me.spect = true; me.alive = false; me.m.g.visible = false; timeScale = 1; $('results').classList.add('hidden'); $('dead').classList.remove('on');
+  $('touch').classList.add('hidden');
   if (document.pointerLockElement) document.exitPointerLock();
   const lv = levelOf(save.xp);
   const chip = (arr, key) => arr.map((x, i) => `<button class="chip ${save[key] === i ? 'sel' : ''}" ${lv.l < x.lvl ? 'disabled' : ''} data-k="${key}" data-i="${i}">${x.n}${lv.l < x.lvl ? ' (L' + x.lvl + ')' : ''}</button>`).join('');
@@ -382,7 +403,7 @@ function openMenu() {
     <h3>Shell</h3><div class="chips">${chip(SHELLS, 'color')}</div>
     <h3>Hat</h3><div class="chips">${chip(HATS, 'hat')}</div>
     <h3>Arsenal</h3><div class="chips">${WEAPONS.map((w) => `<span class="chip ${lv.l >= w.lvl ? '' : 'off'}">${w.name}${lv.l >= w.lvl ? '' : ' (L' + w.lvl + ')'}</span>`).join('')}</div>
-    <p class="sub">WASD move &middot; mouse aim &middot; click shoot &middot; Space jump &middot; R reload &middot; 1-3/Q swap &middot; RMB scope &middot; Tab scores</p>`;
+    <p class="sub">${TOUCH ? 'Drag left to move and right to look. Hold Fire to shoot.' : 'WASD move · mouse aim · click shoot · Space jump · R reload · 1–3/Q swap · RMB scope · Tab scores'}</p>`;
   $('menu').classList.remove('hidden');
   $('menu').querySelectorAll('button.chip').forEach((b) => b.onclick = () => { save[b.dataset.k] = +b.dataset.i; persist(); rebuildMe(); openMenu(); S.play('click'); });
   $('mPlay').onclick = () => { S.unlock(); startMatch(); };

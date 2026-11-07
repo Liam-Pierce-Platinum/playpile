@@ -24,6 +24,8 @@ try { filter = new PaintFilter(screenCanvas); filter.setPaper(paperTile(512, 4))
 catch (e) { console.warn('painting filter off:', e.message); plain = screenCanvas.getContext('2d'); }
 function VW_INIT() { return 1280; }
 const VW = 1280, VH = 720;
+const touchDevice = matchMedia('(pointer: coarse)').matches;
+const touchActions = document.getElementById('touch-actions');
 
 const app = {
   save: loadSave(),
@@ -62,13 +64,44 @@ const app = {
   toggleMusic() { this.save.music = !this.save.music; setMusic(this.save.music); writeSave(this.save); },
 };
 window.inkvale = app; // handy for tests
+if (touchDevice) touchActions.addEventListener('click', e => {
+  const button = e.target.closest('button');
+  const battle = app.screen;
+  if (!button || !(battle instanceof Battle)) return;
+  initAudio();
+  if (button.dataset.key === 'resume') {
+    battle.state = 'play'; if (battle.coop) battle.cmd({ k: 'resume' });
+  } else {
+    if (button.dataset.key === 'h') battle.cancel();
+    battle.key(button.dataset.key);
+  }
+});
+function updateTouchActions() {
+  const battle = app.screen;
+  const show = !app.loading && battle instanceof Battle && ['brief','play','paused'].includes(battle.state);
+  touchActions.hidden = !show;
+  if (!show) return;
+  for (const b of touchActions.children) {
+    const key = b.dataset.key;
+    b.hidden = battle.state === 'play' ? (key === 'Enter' || key === 'resume') : key !== (battle.state === 'brief' ? 'Enter' : 'resume');
+    const spell = key === '1' ? 'wash' : key === '2' ? 'wall' : null;
+    if (spell) {
+      b.disabled = battle.game.spells[spell].cd > 0;
+      const pressed = String(battle.mode === spell);
+      if (b.getAttribute('aria-pressed') !== pressed) b.setAttribute('aria-pressed', pressed);
+    }
+    if (key === 'h') b.disabled = !battle.myHero();
+    if (key === ' ') b.disabled = !battle.game.canCallWave();
+    if (key === 'Escape') b.disabled = !battle.mode && !battle.sel;
+  }
+}
 
 setSfx(app.save.sfx);
 setMusic(app.save.music);
 
 let grain = null;
 function resize() {
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const dpr = Math.min(touchDevice ? 1.5 : 2, window.devicePixelRatio || 1);
   canvas.width = Math.round(innerWidth * dpr);
   canvas.height = Math.round(innerHeight * dpr);
   canvas.style.width = innerWidth + 'px';
@@ -100,16 +133,34 @@ function toView(e) {
   const dpr = canvas.width / r.width;
   return { x: ((e.clientX - r.left) * dpr - app.ox) / app.S, y: ((e.clientY - r.top) * dpr - app.oy) / app.S };
 }
+let activePointer = null;
 canvas.addEventListener('pointerdown', e => {
+  if (activePointer !== null) return;
+  if (e.pointerType !== 'mouse') { activePointer = e.pointerId; canvas.setPointerCapture(activePointer); }
   initAudio();
   const p = toView(e);
   app.screen?.pointerMove?.(p.x, p.y);
   app.screen?.pointerDown?.(p.x, p.y, e);
 });
-canvas.addEventListener('pointermove', e => { const p = toView(e); app.screen?.pointerMove?.(p.x, p.y); });
+canvas.addEventListener('pointermove', e => {
+  if (activePointer !== null && e.pointerId !== activePointer) return;
+  const p = toView(e); app.screen?.pointerMove?.(p.x, p.y);
+});
 // the drawn spells finish when the pointer comes up - anywhere, so a stroke
 // that ends off the canvas still lands
-addEventListener('pointerup', e => { const p = toView(e); app.screen?.pointerUp?.(p.x, p.y, e); });
+addEventListener('pointerup', e => {
+  if (activePointer !== null && e.pointerId !== activePointer) return;
+  if (e.pointerType !== 'mouse' && e.pointerId !== activePointer) return;
+  activePointer = null;
+  const p = toView(e); app.screen?.pointerUp?.(p.x, p.y, e);
+});
+function cancelStroke(e) {
+  if (e && e.pointerId !== activePointer) return;
+  activePointer = null;
+  if (app.screen instanceof Battle) app.screen.stroke = null;
+}
+for (const event of ['pointercancel','lostpointercapture']) canvas.addEventListener(event, cancelStroke);
+addEventListener('blur', () => cancelStroke());
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 addEventListener('keydown', e => {
   initAudio();
@@ -146,6 +197,7 @@ function frame(now) {
     text(g, app.loading.label, VW / 2, VH / 2, { size: 34, align: 'center', title: true });
   } else if (app.screen) app.screen.draw(g);
   g.restore();
+  if (touchDevice) updateTouchActions();
   // 3. keep it smooth: if frames run long, paint at a lower resolution
   perf.push(dt);
   if (perf.length > 90) {

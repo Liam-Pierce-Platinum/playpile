@@ -250,25 +250,33 @@ D.cv.addEventListener('mousedown', (e) => {
 });
 let touchT = 0, touchCell = null;
 D.cv.addEventListener('touchstart', (e) => {
-  if (menu || over || !started) return;
-  const r = D.cv.getBoundingClientRect(), t = e.touches[0];
+  if (menu || over || !started || touchCell) return;
+  const r = D.cv.getBoundingClientRect(), t = e.changedTouches[0];
   touchCell = {
+    id: t.identifier, x: t.clientX, y: t.clientY,
     mx: Math.floor(((t.clientX - r.left) / r.width * D.W - ox) / cell),
     my: Math.floor(((t.clientY - r.top) / r.height * D.H - oy) / cell),
   };
   touchT = performance.now();
 }, { passive: true });
-D.cv.addEventListener('touchend', () => {
+D.cv.addEventListener('touchend', e => {
   if (!touchCell || menu || over || !started) return;
+  const t = Array.from(e.changedTouches).find(point => point.identifier === touchCell.id);
+  if (!t) return;
+  const moved = Math.hypot(t.clientX-touchCell.x,t.clientY-touchCell.y) > 10;
   const { mx, my } = touchCell;
   touchCell = null;
-  if (mx < 0 || my < 0 || mx >= cols || my >= rows) return;
+  if (moved || mx < 0 || my < 0 || mx >= cols || my >= rows) return;
   const c = board[my][mx];
   if (performance.now() - touchT > 360) {
     if (!c.open) { c.flag = !c.flag; left += c.flag ? -1 : 1; D.beep(640, .05, 'sine', .04); }
   } else if (c.open) chord(mx, my);
   else open(mx, my);
 });
+D.cv.addEventListener('touchcancel', e => {
+  if (touchCell && Array.from(e.changedTouches).some(t => t.identifier === touchCell.id)) touchCell = null;
+});
+addEventListener('blur', () => { touchCell = null; });
 
 // =====================================================================
 // the drawing

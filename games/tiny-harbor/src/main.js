@@ -345,14 +345,32 @@ class Game {
       knob.style.transform = `translate(${dx}px, ${dy}px)`;
       this.joy.x = dx / max; this.joy.y = dy / max;
     };
-    joy.addEventListener('pointerdown', (e) => { this.audio.unlock(); this.joy.id = e.pointerId; joy.setPointerCapture(e.pointerId); joyMove(e); });
+    joy.addEventListener('pointerdown', (e) => {
+      if (this.joy.id != null || e.button !== 0) return;
+      e.preventDefault(); this.audio.unlock();
+      this.joy.id = e.pointerId;
+      try { joy.setPointerCapture(e.pointerId); } catch (_) { /* older browsers */ }
+      joyMove(e);
+    });
     joy.addEventListener('pointermove', (e) => { if (e.pointerId === this.joy.id) joyMove(e); });
-    const joyEnd = (e) => { if (e.pointerId !== this.joy.id) return; this.joy.id = null; this.joy.x = this.joy.y = 0; knob.style.transform = ''; };
-    joy.addEventListener('pointerup', joyEnd); joy.addEventListener('pointercancel', joyEnd);
+    const joyEnd = (e) => { if (e && e.pointerId !== this.joy.id) return; this.joy.id = null; this.joy.x = this.joy.y = 0; knob.style.transform = ''; };
+    for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) joy.addEventListener(event, joyEnd);
     const act = T.querySelector('.act');
-    act.addEventListener('pointerdown', (e) => { e.preventDefault(); this.audio.unlock(); act.setPointerCapture(e.pointerId); this.pressed = true; this.held = true; act.classList.add('down'); });
-    const actEnd = () => { this.held = false; act.classList.remove('down'); };
-    act.addEventListener('pointerup', actEnd); act.addEventListener('pointercancel', actEnd);
+    let actionPointer = null;
+    act.addEventListener('pointerdown', (e) => {
+      if (actionPointer !== null || e.button !== 0) return;
+      e.preventDefault(); this.audio.unlock(); actionPointer = e.pointerId;
+      try { act.setPointerCapture(e.pointerId); } catch (_) { /* older browsers */ }
+      this.pressed = true; this.held = true; act.classList.add('down');
+    });
+    const actEnd = (e) => {
+      if (e && e.pointerId !== actionPointer) return;
+      actionPointer = null; this.held = false; act.classList.remove('down');
+    };
+    for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) act.addEventListener(event, actEnd);
+    const resetTouch = () => { joyEnd(); actEnd(); this.pressed = false; };
+    addEventListener('blur', resetTouch);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) resetTouch(); });
     T.querySelector('.eat').addEventListener('pointerdown', () => this.eat());
     T.querySelector('.menu').addEventListener('pointerdown', () => { if (this.mode === 'lamp') this.exitLamp(); else this.ui.show('pause'); });
     T.querySelector('.jr').addEventListener('pointerdown', () => this.ui.show('journal'));

@@ -250,21 +250,35 @@ function buildGrid(kind) {
   els.pgrid.style.gridTemplateColumns = 'repeat(' + g.cols + ', 1fr)';
   els.pgrid.classList.toggle('wide', g.cols > 8);
   els.pgrid.innerHTML = '';
+  const put = (i) => {
+    chip = -1;
+    if (bucket) fillFrom(SAVE, kind, i, brush);
+    else paint(SAVE, kind, i, brush, brushSize);
+    after();
+  };
   for (let i = 0; i < g.cols * g.rows; i++) {
     const cell = document.createElement('button');
     cell.className = 'pcell';
     cell.dataset.i = i;
-    const put = () => {
-      chip = -1;
-      if (bucket) fillFrom(SAVE, kind, i, brush);
-      else paint(SAVE, kind, i, brush, brushSize);
-      after();
-    };
-    cell.onmousedown = put;
-    // dragging paints, but it must never drag a BUCKET across the grid
-    cell.onmouseenter = (ev) => { if (ev.buttons === 1 && !bucket) put(); };
+    cell.onclick = ev => { if (ev.detail === 0) put(i); };
     els.pgrid.appendChild(cell);
   }
+  let pointer = null, lastCell = null;
+  els.pgrid.onpointerdown = ev => {
+    const cell = ev.target.closest('.pcell');
+    if (!cell || pointer !== null || ev.button !== 0) return;
+    ev.preventDefault(); pointer = ev.pointerId;
+    els.pgrid.setPointerCapture(pointer);
+    lastCell = cell; put(Number(cell.dataset.i));
+  };
+  els.pgrid.onpointermove = ev => {
+    if (ev.pointerId !== pointer || bucket) return;
+    const cell = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('.pcell');
+    if (!cell || cell === lastCell || !els.pgrid.contains(cell)) return;
+    lastCell = cell; put(Number(cell.dataset.i));
+  };
+  const stopPaint = ev => { if (ev.pointerId === pointer) { pointer = null; lastCell = null; } };
+  els.pgrid.onpointerup = els.pgrid.onpointercancel = els.pgrid.onlostpointercapture = stopPaint;
   gridKind = kind;
 }
 
@@ -360,18 +374,17 @@ function buildTurntable() {
 
   // dragging across the preview turns them too, which is what people try first
   let drag = null;
-  box.onmousedown = (ev) => { drag = ev.clientX; };
-  box.onmousemove = (ev) => {
-    if (drag === null) return;
-    const dx = ev.clientX - drag;
+  box.onpointerdown = ev => { if (drag || ev.button !== 0 || ev.target.closest('button')) return; drag = { id: ev.pointerId, x: ev.clientX }; box.setPointerCapture(drag.id); };
+  box.onpointermove = ev => {
+    if (ev.pointerId !== drag?.id) return;
+    const dx = ev.clientX - drag.x;
     if (Math.abs(dx) < 6) return;
-    drag = ev.clientX;
+    drag.x = ev.clientX;
     facing = mod2(facing + dx * 0.06);
     if (!turning) setTurning(true); else drawPreviews();
   };
-  const stop = () => { drag = null; };
-  box.onmouseup = stop;
-  box.onmouseleave = stop;
+  const stop = ev => { if (ev.pointerId === drag?.id) drag = null; };
+  box.onpointerup = box.onpointercancel = box.onlostpointercapture = stop;
 }
 
 function mod2(a) { const T = Math.PI * 2; return ((a % T) + T) % T; }

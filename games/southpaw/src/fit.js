@@ -24,6 +24,8 @@ function fitOne(el, availH) {
 }
 
 export function fitAll() {
+  // On phones the panels scroll at their actual size so text and targets stay usable.
+  if (document.documentElement.classList.contains('pp-touch')) return;
   for (const o of document.querySelectorAll('.overlay:not(.hidden)')) {
     const cs = getComputedStyle(o);
     const availH = innerHeight - PAD - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);

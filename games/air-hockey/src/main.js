@@ -90,7 +90,11 @@ function aim(e) {
   if (side === undefined) {
     if (e.type === 'pointermove' && e.pointerType !== 'mouse') return; // stray touch move
     side = pointerSide(e, x, y);
-    if (e.pointerType !== 'mouse') pointers.set(e.pointerId, side);
+    if (e.pointerType !== 'mouse') {
+      if ([...pointers.values()].includes(side)) return;
+      pointers.set(e.pointerId, side);
+      cv.setPointerCapture(e.pointerId);
+    }
   }
   if (S.game.mode === 'bot' && side === 1) return;
   if (side === 0) { const m = S.game.m[0]; S.moved += Math.hypot(Math.min(W, Math.max(0, x)) - m.tx, Math.min(H, Math.max(H / 2, y)) - m.ty); }
@@ -104,6 +108,8 @@ cv.addEventListener('pointermove', (e) => {
 const drop = (e) => pointers.delete(e.pointerId);
 cv.addEventListener('pointerup', drop);
 cv.addEventListener('pointercancel', drop);
+cv.addEventListener('lostpointercapture', drop);
+window.addEventListener('blur', () => pointers.clear());
 cv.addEventListener('contextmenu', (e) => e.preventDefault());
 
 const KEYS = { ArrowLeft: [-1, 0], KeyA: [-1, 0], ArrowRight: [1, 0], KeyD: [1, 0], ArrowUp: [0, -1], KeyW: [0, -1], ArrowDown: [0, 1], KeyS: [0, 1] };

@@ -310,15 +310,28 @@ $('go').addEventListener('click', (e) => { e.stopPropagation(); initAudio(); sta
 
 // ---------- input ----------
 const ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hit = new THREE.Vector3(), ndc = new THREE.Vector2();
-let ptr = null, keys = {};
+let ptr = null, keys = {}, steerPointer = null, boostPointer = null;
 function aimAt(cx, cy) { ndc.set(cx / innerWidth * 2 - 1, -cy / innerHeight * 2 + 1); ray.setFromCamera(ndc, cam);
   if (ray.ray.intersectPlane(plane, hit) && G.me) G.me.ta = Math.atan2(hit.z - G.me.z, hit.x - G.me.x); }
-canvas.addEventListener('pointermove', (e) => { ptr = [e.clientX, e.clientY]; });
-canvas.addEventListener('pointerdown', (e) => { initAudio(); ptr = [e.clientX, e.clientY]; if (e.pointerType === 'mouse' && G.me) G.me.boosting = true; else document.body.classList.add('touch'); });
-addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse' && G.me) G.me.boosting = false; });
+canvas.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse' || e.pointerId === steerPointer) ptr = [e.clientX, e.clientY]; });
+canvas.addEventListener('pointerdown', (e) => {
+  if (e.pointerType !== 'mouse' && steerPointer !== null) return;
+  initAudio(); ptr = [e.clientX, e.clientY];
+  if (e.pointerType === 'mouse') { if (G.me) G.me.boosting = true; }
+  else { steerPointer = e.pointerId; canvas.setPointerCapture(steerPointer); document.body.classList.add('touch'); }
+});
 const bb = $('boost');
-bb.addEventListener('pointerdown', (e) => { e.stopPropagation(); initAudio(); if (G.me) G.me.boosting = true; });
-bb.addEventListener('pointerup', () => { if (G.me) G.me.boosting = false; });
+bb.addEventListener('pointerdown', (e) => { if (boostPointer !== null) return; e.preventDefault(); initAudio(); boostPointer = e.pointerId; bb.setPointerCapture(boostPointer); if (G.me) G.me.boosting = true; });
+function endPointer(e) {
+  if (!e || e.pointerId === steerPointer) steerPointer = null;
+  if (!e || e.pointerId === boostPointer || e.pointerType === 'mouse') {
+    boostPointer = null;
+    if (G.me) G.me.boosting = false;
+  }
+}
+for (const event of ['pointerup','pointercancel','lostpointercapture']) addEventListener(event, endPointer);
+addEventListener('blur', () => { keys = {}; endPointer(); });
+if (matchMedia('(pointer: coarse)').matches) document.body.classList.add('touch');
 addEventListener('keydown', (e) => { keys[e.code] = true; initAudio(); if (e.code === 'Space') { if (G.state === 'dead' && !over.classList.contains('hide')) $('go').click(); else if (G.me) G.me.boosting = true; } if (e.code === 'Enter' && !over.classList.contains('hide')) $('go').click(); });
 addEventListener('keyup', (e) => { keys[e.code] = false; if (e.code === 'Space' && G.me) G.me.boosting = false; });
 function resize() { renderer.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); }

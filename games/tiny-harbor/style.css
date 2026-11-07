@@ -182,3 +182,26 @@ body.is-touch .prompt { bottom: 140px; }
   .reel { right: 12px; }
   .toasts { top: 120px; }
 }
+
+body.is-touch .joy { left: max(12px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom)); touch-action: none; }
+body.is-touch .tbtn { touch-action: none; }
+body.is-touch .tbtn.act { right: max(16px, env(safe-area-inset-right)); bottom: max(22px, env(safe-area-inset-bottom)); }
+body.is-touch .reel { right: max(12px, env(safe-area-inset-right)); top: 46%; }
+body.is-touch .reel .track, body.is-touch .reel .prog { height: clamp(100px, 36vh, 240px); }
+
+@media (max-width: 420px) {
+  .hud-goal { max-width: calc(100% - 185px); }
+  .hud-goal .flag { display: none; }
+  .prompt { max-width: calc(100% - 24px); white-space: normal; font-size: 14px; }
+  body.is-touch .hud-inv { bottom: 148px; }
+  body.is-touch .prompt { bottom: 220px; }
+}
+@media (max-height: 450px) {
+  body.is-touch .joy { width: 92px; height: 92px; }
+  body.is-touch .joy i { width: 40px; height: 40px; margin: -20px; }
+  body.is-touch .tbtn.act { width: 72px; height: 72px; }
+  body.is-touch .tbtn.eat { right: 98px; bottom: 16px; width: 46px; height: 46px; }
+  body.is-touch .tbtn.alt { right: 98px; bottom: 67px; width: 56px; height: 56px; }
+  body.is-touch .hud-inv { bottom: 112px; }
+  body.is-touch .prompt { bottom: 20px; }
+}

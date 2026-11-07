@@ -4,7 +4,7 @@ import * as THREE from 'three';
 const Q = new URLSearchParams(location.search);
 const MUTE = Q.has('mute');
 const $ = (id) => document.getElementById(id);
-const TOUCH = matchMedia('(pointer: coarse)').matches || Q.has('touch');
+let TOUCH = document.documentElement.classList.contains('pp-touch') || matchMedia('(pointer: coarse)').matches || Q.has('touch');
 if (TOUCH) document.body.classList.add('touch');
 const store = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
 
@@ -285,17 +285,28 @@ addEventListener('keydown', (e) => { keys[e.code] = true; if (e.code === 'KeyR' 
 addEventListener('keyup', (e) => { keys[e.code] = false; });
 function cycleWeapon() { const n = WEAPONS.filter((w) => w.unlock <= G.best).length; setWeapon((G.weapon + 1) % n); }
 function look(dx, dy, s = 0.0022) { G.yaw -= dx * s; G.pitch = THREE.MathUtils.clamp(G.pitch - dy * s, -1.45, 1.45); G.lookAcc += Math.hypot(dx, dy); }
+function lockMouse() {
+  if (TOUCH) return;
+  try { cv.requestPointerLock?.()?.catch?.(() => {}); } catch {}
+}
 addEventListener('mousemove', (e) => { if (document.pointerLockElement === cv) look(e.movementX, e.movementY); });
 cv.addEventListener('mousedown', (e) => {
-  if (TOUCH) return; ac();
+  if (TOUCH || e.sourceCapabilities?.firesTouchEvents) return; ac();
   if (G.state === 'dead') { if (G.stateT > 0.5) G.start(); return; }
-  if (document.pointerLockElement !== cv) { try { cv.requestPointerLock(); } catch {} return; }
+  if (document.pointerLockElement !== cv) { lockMouse(); return; }
   if (e.button === 0) G.fire();
 });
 // touch: left stick, right-side drag looks, fire button
 const stick = { id: null, x: 0, y: 0 }, lookT = { id: null, x: 0, y: 0 };
+if (TOUCH) $('hint').textContent = 'DRAG LEFT TO MOVE · DRAG RIGHT TO AIM · FIRE TO SHOOT';
 addEventListener('touchstart', (e) => {
+  if (!TOUCH) {
+    TOUCH = true;
+    document.body.classList.add('touch');
+    $('hint').textContent = 'DRAG LEFT TO MOVE · DRAG RIGHT TO AIM · FIRE TO SHOOT';
+  }
   ac();
+  if (e.target.closest('#title')) return;
   if (G.state === 'dead' && G.stateT > 0.5) { G.start(); return; }
   for (const t of e.changedTouches) {
     const el = t.target;
@@ -311,7 +322,20 @@ addEventListener('touchmove', (e) => {
     if (t.identifier === lookT.id) { look(t.clientX - lookT.x, t.clientY - lookT.y, 0.005); lookT.x = t.clientX; lookT.y = t.clientY; }
   }
 }, { passive: true });
-addEventListener('touchend', (e) => { for (const t of e.changedTouches) { if (t.identifier === stick.id) { stick.id = null; G.move.set(0, 0); $('stick').firstChild.style.transform = ''; } if (t.identifier === lookT.id) lookT.id = null; } });
+function releaseStick() {
+  stick.id = null;
+  G.move.set(0, 0);
+  $('stick').firstChild.style.transform = '';
+}
+function releaseTouch(e) {
+  for (const t of e.changedTouches) {
+    if (t.identifier === stick.id) releaseStick();
+    if (t.identifier === lookT.id) lookT.id = null;
+  }
+}
+addEventListener('touchend', releaseTouch);
+addEventListener('touchcancel', releaseTouch);
+addEventListener('blur', () => { releaseStick(); lookT.id = null; });
 
 G.fire = () => {
   if (G.state !== 'play' || G.cool > 0) return false;
@@ -440,7 +464,7 @@ function frame(now) { const dt = Math.min(0.05, (now - last) / 1000); last = now
 G.start(G.level);
 if (Q.has('title')) {
   G.paused = true; $('title').classList.remove('hide'); $('best').textContent = 'BEST LEVEL ' + G.best;
-  $('play').onclick = () => { $('title').classList.add('hide'); G.paused = false; ac(); if (!TOUCH) try { cv.requestPointerLock(); } catch {} };
+  $('play').onclick = (e) => { $('title').classList.add('hide'); G.paused = false; ac(); if (!e.sourceCapabilities?.firesTouchEvents) lockMouse(); };
 }
 setTimeout(() => { $('hint').style.opacity = 0; }, 7000);
 requestAnimationFrame(frame);

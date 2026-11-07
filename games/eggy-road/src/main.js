@@ -357,10 +357,10 @@ addEventListener('keyup', (e) => {
 });
 const touches = new Map();
 const tRecalc = () => { keys.delete('g'); keys.delete('b'); for (const v of touches.values()) keys.add(v); recalc(); };
-canvas.addEventListener('pointerdown', (e) => { audio.init(); touches.set(e.pointerId, e.clientX > innerWidth / 2 ? 'g' : 'b'); tRecalc(); });
+canvas.addEventListener('pointerdown', (e) => { audio.init(); canvas.setPointerCapture(e.pointerId); touches.set(e.pointerId, e.clientX > innerWidth / 2 ? 'g' : 'b'); tRecalc(); });
 addEventListener('pointerup', (e) => { touches.delete(e.pointerId); tRecalc(); });
-addEventListener('pointercancel', (e) => { touches.delete(e.pointerId); tRecalc(); });
-addEventListener('blur', () => { keys.clear(); touches.clear(); recalc(); });
+for (const event of ['pointercancel','lostpointercapture']) addEventListener(event, e => { touches.delete(e.pointerId); tRecalc(); });
+addEventListener('blur', () => { keys.clear(); touches.clear(); tRecalc(); recalc(); });
 
 // ---------- render ----------
 const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(), cA = new THREE.Color(), cB = new THREE.Color();

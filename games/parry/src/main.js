@@ -138,10 +138,14 @@ addEventListener('keydown', (e) => {
   if (G.mode === 'brief' && (d != null || e.code === 'Enter' || e.code === 'Space')) { G.startStage(G.briefStage, true); }
 });
 addEventListener('keyup', (e) => { const d = KEYDIR[e.code]; if (d != null) release(d); });
-addEventListener('blur', () => { for (let d = 0; d < 4; d++) release(d); G.pause(); });
-document.addEventListener('visibilitychange', () => { if (document.hidden) G.pause(); });
-
 const ptrs = new Map();
+function pauseAndRelease() {
+  ptrs.clear();
+  for (let d = 0; d < 4; d++) release(d);
+  G.pause();
+}
+addEventListener('blur', pauseAndRelease);
+document.addEventListener('visibilitychange', () => { if (document.hidden) pauseAndRelease(); });
 function dirFrom(dx, dy) { return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0); }
 cv.addEventListener('pointerdown', (e) => {
   audio.unlock();
@@ -162,6 +166,7 @@ cv.addEventListener('pointermove', (e) => {
 });
 const up = (e) => { const p = ptrs.get(e.pointerId); ptrs.delete(e.pointerId); if (p && p.d >= 0 && ![...ptrs.values()].some((q) => q.d === p.d)) release(p.d); };
 cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+cv.addEventListener('lostpointercapture', up);
 cv.addEventListener('contextmenu', (e) => e.preventDefault());
 
 function release(d) { G.held[d] = false; }

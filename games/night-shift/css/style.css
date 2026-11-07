@@ -162,6 +162,27 @@ button.ghost.small{font-size:11px;padding:8px 18px;opacity:.55}
   border:1px solid rgba(255,207,74,.5);color:var(--gold);font-size:12px;letter-spacing:.16em;font-weight:700;
   background:linear-gradient(180deg,rgba(255,207,74,.12),rgba(255,207,74,.03));transition:transform .06s,background .06s}
 .hand-brake.on{transform:scale(.95);background:linear-gradient(180deg,rgba(255,207,74,.42),rgba(255,207,74,.12))}
+.walk-knob,.walk-actions,#btn-down-floor{display:none}
+#touch:is([data-mode="foot"],[data-mode="inside"]) :is(.pedals,.hand-brake,.wheel svg){display:none}
+#touch:is([data-mode="foot"],[data-mode="inside"]) .wheel-zone{width:clamp(72px,25vmin,112px);border-radius:50%;border:2px solid #eaf2ff99;background:#06102096}
+#touch:is([data-mode="foot"],[data-mode="inside"]) .wheel{display:grid;place-items:center}
+#touch:is([data-mode="foot"],[data-mode="inside"]) .walk-knob{display:block;width:32%;height:32%;border-radius:50%;background:#eaf2ffb3;pointer-events:none}
+#touch:is([data-mode="foot"],[data-mode="inside"]) .walk-actions{display:flex;gap:6px;position:absolute;right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));pointer-events:auto}
+#touch[data-mode="inside"] #btn-down-floor{display:block}
+.walk-actions button,#btn-touch-reload{min-width:44px;min-height:44px;border:1px solid #b8c9d99e;border-radius:7px;background:#101826d9;color:#eaf2ff;padding:5px 10px;font:700 12px/1.15 Arial,sans-serif;pointer-events:auto;touch-action:none}
+#btn-touch-reload{position:absolute;right:max(10px,env(safe-area-inset-right));bottom:clamp(178px,48vmin,208px)}
+#touch:is([data-mode="foot"],[data-mode="inside"]) #btn-touch-reload{bottom:max(62px,calc(env(safe-area-inset-bottom) + 54px))}
+@media (pointer:coarse){
+  html,body{touch-action:manipulation}
+  #game,.wheel-zone,.pedal,.hand-brake{touch-action:none}
+  #garage,#shop{touch-action:pan-y;overscroll-behavior:contain}
+  #btn-pause,#btn-use{min-width:44px;min-height:44px}
+  .wheel-zone{width:clamp(85px,30vmin,160px)}
+  .pedal{width:clamp(52px,16vmin,83px);height:clamp(60px,19vmin,100px)}
+  .hand-brake{bottom:calc(max(10px,env(safe-area-inset-bottom)) + clamp(67px,21vmin,108px));width:clamp(112px,34vmin,180px)}
+  #hud .btn-fire{width:52px;height:52px;right:max(12px,env(safe-area-inset-right));bottom:clamp(226px,62vmin,260px)}
+  body:has(#touch:is([data-mode="foot"],[data-mode="inside"])) .btn-fire{bottom:max(115px,calc(env(safe-area-inset-bottom) + 106px))}
+}
 
 /* ---------- garage ---------- */
 #garage{flex-direction:column;align-items:stretch;justify-content:flex-start;

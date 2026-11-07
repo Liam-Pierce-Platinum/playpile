@@ -144,10 +144,10 @@ class Game {
       this.state = 'title';
     };
     document.getElementById('help').innerHTML = this.input.isTouch
-      ? 'Wheel to steer, <b>GAS</b> and <b>BRAKE</b>.<br><b>USE</b> to get out, go in, or take a car. <b>FIRE</b> to shoot.<br>They have to kill you - break their line of sight.'
+      ? 'Turn the wheel to steer and hold the pedals to drive.<br><b>USE</b> to get out, go in, or take a car. On foot, drag the stick to walk.<br>Touch the scene to aim, then hold <b>FIRE</b> to shoot.'
       : '<b>W A S D</b> drive &middot; <b>SHIFT</b> sprint &middot; <b>F</b> get out / go in / take a car<br><b>MOUSE</b> aim &middot; <b>CLICK</b> shoot &middot; <b>R</b> reload<br>They have to KILL you. Break line of sight and stay alive.';
     document.getElementById('title-hint').textContent = this.input.isTouch
-      ? 'Wheel, pedals and USE on screen' : 'W A S D  ·  F';
+      ? 'Wheel and pedals to drive · stick to walk · tap the scene to aim' : 'W A S D  ·  F';
   }
 
   // ---------------- before the job ----------------

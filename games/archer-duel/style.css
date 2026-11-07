@@ -35,3 +35,11 @@ button { font-family: inherit; }
 .card b { display: block; font-size: 17px; letter-spacing: .08em; margin-bottom: 6px; color: var(--red); }
 .card:hover { transform: translateY(-3px); }
 @media (max-width: 520px) { .bar { font-size: 11px; } .card { width: 140px; min-height: 120px; font-size: 13px; } #stage { font-size: 14px; } }
+
+@media (pointer: coarse) {
+  html,body { touch-action: manipulation; }
+  #panel { justify-content: safe center; overflow: auto; overscroll-behavior: contain; touch-action: pan-y; }
+  #panel button,#menuBtn,#muteBtn { min-height: 44px; min-width: 44px; }
+  #tip { box-sizing: border-box; padding-inline: 64px; font-size: 12px; }
+  #menuBtn,#muteBtn { bottom: max(10px,env(safe-area-inset-bottom)); }
+}

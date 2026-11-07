@@ -130,6 +130,7 @@ canvas.addEventListener('pointermove', (e) => {
   }
 });
 canvas.addEventListener('pointerdown', (e) => {
+  if (!e.isPrimary || e.button !== 0) return;
   SFX.initAudio();
   if (S.mode !== 'play') return;
   if (e.pointerType !== 'mouse') {

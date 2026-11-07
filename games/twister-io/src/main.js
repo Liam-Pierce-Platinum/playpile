@@ -78,6 +78,7 @@ canvas.addEventListener('pointerdown', (e) => {
     if (e.button === 0 || e.button === 2) doFling();
   } else if (!input.joy) {
     input.joy = { id: e.pointerId, ox: e.clientX, oy: e.clientY, x: e.clientX, y: e.clientY, t: performance.now() };
+    try { canvas.setPointerCapture(e.pointerId); } catch (_) { /* older browsers */ }
     joyEl.style.left = e.clientX + 'px'; joyEl.style.top = e.clientY + 'px';
     joyEl.classList.add('on'); joyEl.firstChild.style.transform = '';
   }
@@ -89,12 +90,25 @@ const endJoy = (e) => {
 };
 window.addEventListener('pointerup', endJoy);
 window.addEventListener('pointercancel', endJoy);
+canvas.addEventListener('lostpointercapture', endJoy);
 const flingBtn = document.getElementById('flingBtn'), dashBtn = document.getElementById('dashBtn');
 flingBtn.addEventListener('pointerdown', (e) => { e.stopPropagation(); snd.init(); flingBtn.classList.add('down'); doFling(); });
-flingBtn.addEventListener('pointerup', () => flingBtn.classList.remove('down'));
-dashBtn.addEventListener('pointerdown', (e) => { e.stopPropagation(); input.dash = true; dashBtn.classList.add('down'); });
-const dashUp = () => { input.dash = false; dashBtn.classList.remove('down'); };
-dashBtn.addEventListener('pointerup', dashUp); dashBtn.addEventListener('pointerleave', dashUp); dashBtn.addEventListener('pointercancel', dashUp);
+for (const event of ['pointerup', 'pointercancel', 'pointerleave']) {
+  flingBtn.addEventListener(event, () => flingBtn.classList.remove('down'));
+}
+let dashPointer = null;
+dashBtn.addEventListener('pointerdown', (e) => {
+  if (dashPointer !== null || e.button !== 0) return;
+  e.stopPropagation();
+  dashPointer = e.pointerId;
+  try { dashBtn.setPointerCapture(e.pointerId); } catch (_) { /* older browsers */ }
+  input.dash = true; dashBtn.classList.add('down');
+});
+const dashUp = (e) => {
+  if (e && e.pointerId !== dashPointer) return;
+  dashPointer = null; input.dash = false; dashBtn.classList.remove('down');
+};
+for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) dashBtn.addEventListener(event, dashUp);
 document.getElementById('pauseBtn').addEventListener('click', () => pause());
 
 window.addEventListener('keydown', (e) => {
@@ -122,7 +136,14 @@ window.addEventListener('keyup', (e) => {
   input.keys.delete(k);
   if (k === 'shift' || k === ' ') input.kbDash = false;
 });
-window.addEventListener('blur', () => { input.keys.clear(); input.kbDash = false; input.dash = false; if (state === 'play' && !paused && !Q.has('bot')) pause(); });
+function resetTouch() {
+  input.joy = null; joyEl.classList.remove('on');
+  flingBtn.classList.remove('down'); dashUp();
+}
+window.addEventListener('blur', () => {
+  input.keys.clear(); input.kbDash = false; resetTouch();
+  if (state === 'play' && !paused && !Q.has('bot')) pause();
+});
 
 function doFling() { if (state === 'play' && !paused && game.player && !game.player.dead) game.player.wantFling = true; }
 
@@ -192,6 +213,7 @@ function toTitle() {
 function pause() {
   if (state !== 'play' || paused) return;
   paused = true;
+  resetTouch();
   ui.pause(data, resume, () => { paused = false; toTitle(); }, () => { paused = false; startRound(curMode); });
 }
 function resume() { paused = false; last = performance.now(); const s = document.querySelector('.scrim'); if (s) s.remove(); }

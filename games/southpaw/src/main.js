@@ -21,7 +21,7 @@ import { text } from './font.js';
 import { getArena, THEMES } from './arena.js';
 import { P } from './palette.js';
 import { CHOICES, randomLook, defaultLook, cleanLook } from './looks.js';
-import './fit.js';           // every menu shrinks to fit a small window (PLAYPILE's player)
+import './fit.js';
 
 const $ = (s) => document.querySelector(s);
 const STEP = 1 / 60;
@@ -31,6 +31,45 @@ const v = createView(canvas);
 const hv = createView(document.createElement('canvas'), { fixed: { w: 384, h: 216, scale: 1 }, alpha: true });
 const R = createRenderer();
 const input = createInput(window);
+const touchUI = document.documentElement.classList.contains('pp-touch');
+const boxingLabels = {
+  ArrowLeft:'Jab', ArrowUp:'Cross', ArrowRight:'Hook', ArrowDown:'Upper', ShiftLeft:'Guard',
+  Space:'Low', KeyQ:'Slip', KeyE:'Duck', KeyF:'Star', Escape:'Pause',
+};
+const wrestlingLabels = {
+  ArrowLeft:'Chop', ArrowUp:'Forearm', ArrowRight:'Boot', ArrowDown:'Kick', ShiftLeft:'Block',
+  Space:'Grab / pin', KeyQ:'Sidestep', KeyE:'Run', KeyF:'Bomb', Escape:'Pause',
+};
+const wrestlingHold = { ...wrestlingLabels, ArrowLeft:'Suplex', ArrowUp:'Slam', ArrowRight:'Whip', ArrowDown:'DDT' };
+const sumoLabels = {
+  ArrowLeft:'Charge', ArrowUp:'Thrust', ArrowRight:'Belt', ArrowDown:'Pull',
+  Space:'Low', KeyQ:'Dodge L', KeyE:'Dodge R', Escape:'Pause',
+};
+const sumoGrip = { ...sumoLabels, ArrowLeft:'Throw', ArrowUp:'Drive', ArrowDown:'Lift' };
+const touchHints = {
+  box: ['TAP PUNCHES TO COMBO - HOLD LOW FOR BODY', 'HOLD GUARD - SLIP OR DUCK TO EVADE'],
+  wrestle: ['HOLD RUN FOR THE ROPES - GRAB OR PIN', 'LOCK-UP: TAP A STRIKE IN THE GREEN'],
+  sumo: ['WAIT FOR HAKKEYOI - TAP A MOVE TO CHARGE', 'BELT GRIP UNLOCKS DRIVE, THROW AND LIFT'],
+};
+let lastPadLabels = null, lastPadPause = false;
+function syncTouchPad(fight, human) {
+  if (!touchUI || human == null) return;
+  const state = fight.f[human].state;
+  const labels = fight.kind === 'wrestle' ? (state === 'hold' ? wrestlingHold : wrestlingLabels)
+    : fight.kind === 'sumo' ? (state === 'grip' ? sumoGrip : sumoLabels)
+    : boxingLabels;
+  const canPause = G.mode === 'fight';
+  if (labels === lastPadLabels && canPause === lastPadPause) return;
+  const buttons = document.querySelectorAll('#pp-pad button[data-key]');
+  if (!buttons.length) return;
+  lastPadLabels = labels;
+  lastPadPause = canPause;
+  for (const button of buttons) {
+    const label = labels[button.dataset.key];
+    button.hidden = !label || (!canPause && button.dataset.key === 'Escape');
+    if (label) button.textContent = label;
+  }
+}
 
 const G = {
   mode: 'attract',          // attract | vs | fight | results | host | guest
@@ -363,7 +402,7 @@ window.addEventListener('keydown', (e) => {
   initAudio();
   if (G.mode === 'vs') { leaveVS(); return; }
   if (e.code === 'Escape') {
-    if (G.mode === 'fight' && !G.resultShown) { G.paused = !G.paused; if (G.paused) show('pause'); else hideAll(); }
+    if (G.mode === 'fight' && !G.resultShown) { G.paused = !G.paused; input.clear(); if (G.paused) show('pause'); else hideAll(); }
     else if (current && current !== 'title' && current !== 'results' && G.mode === 'attract') show('title');
   }
 });
@@ -708,7 +747,9 @@ function frame(t) {
       human: G.human >= 0 && (G.mode === 'fight' || G.mode === 'host' || G.mode === 'guest') ? G.human : null,
       aim: input.aimHeld && (G.mode === 'fight' || G.mode === 'host' || G.mode === 'guest'),
       trail: input.trail, lastGesture: input.lastGesture, gestureT: input.gestureT, netNote: G.netNote,
+      touch: touchUI,
     };
+    syncTouchPad(G.fight, ui.human);
     if (G.mode === 'attract') { setCrowd(0.15); ui.noHud = true; }
     R.draw(v, hv, G.fight, now, dt, ui);
     if ((G.mode === 'fight' || G.mode === 'host' || G.mode === 'guest') && G.fight.round === 1 && G.fight.phase !== 'over') {
@@ -717,7 +758,7 @@ function frame(t) {
         const a = Math.min(1, (12 - G.startT) / 1.5);
         hv.g.globalAlpha = a;
         hv.rect(0, 186, 384, 30, 'rgba(18,14,22,0.8)');
-        const hint = modeOf(G.fight).hint;
+        const hint = touchUI ? touchHints[G.fight.kind || 'box'] : modeOf(G.fight).hint;
         text(hv, hint[0], 192, 190, P.cream, { align: 'center' });
         text(hv, hint[1], 192, 200, '#b9a48c', { align: 'center' });
         hv.g.globalAlpha = 1;

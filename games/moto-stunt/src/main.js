@@ -428,7 +428,8 @@ for (const b of document.querySelectorAll('[data-t]')) {
   const k = b.dataset.t;
   b.addEventListener('pointerdown', (e) => { e.preventDefault(); unlock(); touch[k] = 1; b.classList.add('on'); b.setPointerCapture(e.pointerId); });
   const up = () => { touch[k] = 0; b.classList.remove('on'); };
-  b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up);
+  for (const event of ['pointerup','pointercancel','lostpointercapture']) b.addEventListener(event, up);
+  addEventListener('blur', up);
 }
 if (Q.has('touch') || matchMedia('(pointer: coarse)').matches) document.body.classList.add('touch');
 function readInput() {

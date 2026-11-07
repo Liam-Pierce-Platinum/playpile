@@ -47,3 +47,9 @@ h2{font-size:44px;font-weight:900}h2.gold{color:#e09b00}
 #rboard{list-style:none;text-align:left;max-width:280px;margin:8px auto;font-size:14px}#rboard li{display:flex;padding:2px 0}#rboard li b{margin-left:auto}#rboard li.me{font-weight:900;color:#c2410c}
 #runlock{font-weight:900;color:#16a34a;min-height:1.2em}
 @media (max-width:640px){#board{font-size:11px;min-width:130px;padding:6px 8px}#sizebox{width:120px;font-size:12px}#timer{font-size:24px;top:62px}#msg b{font-size:38px}h1{font-size:38px}.panel{padding:16px}}
+
+@media (pointer: coarse) {
+  html,body { touch-action: manipulation; }
+  .panel { touch-action: pan-y; overscroll-behavior: contain; }
+  .panel button { min-height: 44px; }
+}

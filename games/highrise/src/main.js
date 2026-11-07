@@ -13,10 +13,15 @@ import { Building, FLOORS } from './building.js';
 import { loadEdits } from './edits.js';
 import { Editor } from './editor.js';
 import { Intro } from './intro.js';
+import { mountTouchCombat, touchCombat } from '../../_shared/touch-combat.js';
 
 const canvas = document.getElementById('gl');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(1.5, devicePixelRatio || 1));
+renderer.setPixelRatio(Math.min(touchCombat ? 1 : 1.5, devicePixelRatio || 1));
+function fitRenderer(w, h) {
+  const dpr = renderer.getPixelRatio();
+  if (canvas.width !== Math.floor(w*dpr) || canvas.height !== Math.floor(h*dpr)) renderer.setSize(w,h,false);
+}
 
 // A FIXED, FLAT LIGHT RIG, on purpose.
 //
@@ -224,16 +229,17 @@ addEventListener('keydown', (e) => {
   if (/^Digit[1-9]$/.test(e.code)) keys.slot = +e.code.slice(5);
 });
 addEventListener('keyup', (e) => { const k = CODE[e.code]; if (k) keys[k] = false; });
-addEventListener('mousemove', (e) => {
-  if (!document.pointerLockElement) return;
-  game.player.look(e.movementX, e.movementY);
+function look(dx, dy) {
+  if (!game.player || game.paused) return;
+  game.player.look(dx, dy);
   // handed to the arms, so the weapon lags the camera instead of being
   // welded to it
   if (game.combat) {
-    game.combat.lookDX = (game.combat.lookDX || 0) + e.movementX * 0.010;
-    game.combat.lookDY = (game.combat.lookDY || 0) + e.movementY * 0.010;
+    game.combat.lookDX = (game.combat.lookDX || 0) + dx * 0.010;
+    game.combat.lookDY = (game.combat.lookDY || 0) + dy * 0.010;
   }
-});
+}
+addEventListener('mousemove', e => { if (document.pointerLockElement) look(e.movementX,e.movementY); });
 addEventListener('mousedown', (e) => {
   if (e.button === 0) keys.fire = true;
   if (e.button === 2) keys.melee = true;      // a shove, always available
@@ -265,7 +271,24 @@ const deadEl = document.getElementById('dead');
 let intro = null;
 let introSeen = false;
 
+const setTouch = touchCombat ? mountTouchCombat({
+  move(x,y) { keys.a=x<-.25; keys.d=x>.25; keys.w=y<-.25; keys.s=y>.25; },
+  look(dx,dy) { look(dx*1.7,dy*1.7); },
+  actions:[['Fire','fire'],['Reload','r'],['Strike','melee'],['Slide','space'],['Heal','bandage'],['Weapon','wheel'],['Sprint','shift'],['Crouch','ctrl']].map(([label,key])=>({
+    label, primary:key==='fire', down(){keys[key]=key==='wheel'?1:true;}, up:key==='wheel'?undefined:()=>{keys[key]=false;}
+  })),
+  onMenu() {
+    if (intro) { intro.finish(); return; }
+    game.paused = true;
+    bootEl.style.display = 'grid';
+    document.getElementById('enter-tower').textContent = 'Resume';
+    setTouch(false);
+  }
+}) : () => {};
+document.body.classList.toggle('phone-controls', touchCombat);
+
 const start = () => {
+  if (!game.player) return;
   if (!game.player.alive) restart();
   bootEl.style.display = 'none';
   deadEl.style.display = 'none';
@@ -273,10 +296,12 @@ const start = () => {
     introSeen = true;
     game.paused = true;
     intro = new Intro(renderer);
+    setTouch(true, true);
     window.__intro = intro;   // tools/intro.mjs scrubs it
     intro.onDone = () => {
       intro = null;
       game.paused = false;
+      if (touchCombat) { setTouch(true); return; }
       // ---- YOU CANNOT TAKE THE POINTER WITHOUT A GESTURE ------------
       //
       // Liam: *"if the person plays the whole cut scene through they end
@@ -309,8 +334,9 @@ const start = () => {
     };
     return;
   }
-  canvas.requestPointerLock();
+  if (!touchCombat) canvas.requestPointerLock();
   game.paused = false;
+  setTouch(true);
 };
 
 // ANY KEY OR CLICK SKIPS IT. Attached to the window rather than to the
@@ -322,6 +348,7 @@ addEventListener('mousedown', skipIntro, true);
 bootEl.addEventListener('click', start);
 deadEl.addEventListener('click', start);
 document.addEventListener('pointerlockchange', () => {
+  if (touchCombat) return;
   if (window.__editor && window.__editor.on) return;
   if (!document.pointerLockElement && game.player && game.player.alive) {
     game.paused = true;
@@ -374,6 +401,9 @@ game.combat = combat;
 // that populates itself a second after you are standing in it.
 loadFloor(1);
 game.player.pos.y = 0;
+const enterTower = document.getElementById('enter-tower');
+enterTower.textContent = 'Play';
+enterTower.disabled = false;
 
 // ---------------------------------------------------------------------
 // THE EDITOR (F6)
@@ -420,7 +450,7 @@ function frame(now) {
   // the scene ends and the first thing the player does is his own.
   if (intro) {
     const iw = innerWidth, ih = innerHeight;
-    if (canvas.width !== iw * renderer.getPixelRatio()) renderer.setSize(iw, ih, false);
+    fitRenderer(iw, ih);
     intro.update(dt, iw / ih);
     return;
   }
@@ -430,7 +460,7 @@ function frame(now) {
   // tea, and come back to the same fight you paused.
   if (editor && editor.on) {
     const ew = innerWidth, eh = innerHeight;
-    if (canvas.width !== ew * renderer.getPixelRatio()) renderer.setSize(ew, eh, false);
+    fitRenderer(ew, eh);
     editor.cam.aspect = ew / eh; editor.cam.updateProjectionMatrix();
     editor.update(dt, ew, eh);
 
@@ -503,7 +533,7 @@ function frame(now) {
   game.player.applyTo(camera, building.solids);
 
   const w = innerWidth, h = innerHeight;
-  if (canvas.width !== w * renderer.getPixelRatio()) renderer.setSize(w, h, false);
+  fitRenderer(w, h);
   camera.aspect = w / h; camera.updateProjectionMatrix();
   renderer.render(scene, camera);
   // AND THEN THE ARMS, over the top, at their own field of view. See the
@@ -538,6 +568,7 @@ function frame(now) {
   const hurtEl = document.getElementById('hurt');
   hurtEl.style.opacity = Math.max(0, 1 - (game.t - p.lastHurt) * 2.2) * 0.85;
   if (!p.alive && deadEl.style.display !== 'grid') {
+    setTouch(false);
     deadEl.style.display = 'grid';
     document.exitPointerLock();
     game.paused = true;

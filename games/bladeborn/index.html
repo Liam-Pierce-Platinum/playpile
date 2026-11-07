@@ -81,7 +81,28 @@
   #home label span{width:150px} #home label input[type=range]{flex:1;accent-color:#bbb} #home label output{width:56px;text-align:right;color:#999}
   #home h2{font:28px Impact,sans-serif;letter-spacing:8px;color:#ddd;margin:0 0 14px;font-weight:normal}
   @media (max-width:700px){#home h1{font-size:56px;letter-spacing:8px}#home .col{margin-left:16px}}
+  .touch-copy{display:none}
+  .touch-combat .touch-copy{display:block}
+  .touch-combat .keyboard-copy,.touch-combat #skip,.touch-combat label:has(#s-fx){display:none}
+  .touch-combat #home,.touch-combat .screen{overflow:auto;overscroll-behavior:contain;touch-action:pan-y}
+  .touch-combat #home{align-items:flex-start;padding:max(12px,env(safe-area-inset-top)) 0}
+  .touch-combat #home .col{margin: auto max(16px,env(safe-area-inset-right)) auto max(16px,env(safe-area-inset-left));min-width:0}
+  .touch-combat #home h1,.touch-combat .screen h1{font-size:clamp(28px,9vw,54px)!important;letter-spacing:.1em}
+  .touch-combat #home .tag{margin-bottom:12px}
+  .touch-combat #home .page > button,.touch-combat #home .chap{min-height:44px;font-size:19px;letter-spacing:.15em}
+  .touch-combat #hp,.touch-combat #hpl,.touch-combat #fin,.touch-combat #wave,.touch-combat #kills,.touch-combat #obj{left:max(10px,env(safe-area-inset-left))}
+  .touch-combat #hp,.touch-combat #fin{width:min(29vw,160px)}
+  .touch-combat #hp{height:8px;bottom:104px}.touch-combat #hpl{font-size:11px;bottom:116px}.touch-combat #fin{bottom:134px}
+  .touch-combat #wave,.touch-combat #kills{font-size:12px;letter-spacing:1px}.touch-combat #wave{top:9px}.touch-combat #kills{top:27px}
+  .touch-combat #obj{top:10px;max-width:34vw;font-size:10px;letter-spacing:.04em}
+  .touch-combat #hint{left:14px;right:auto;bottom:172px;max-width:33vw;font-size:11px;text-align:left}
+  .touch-combat #sight{top:10px;width:110px;margin-left:-55px}
+  .touch-combat #sightl{font-size:9px;letter-spacing:.07em}
+  .touch-combat #banner,.touch-combat #card b{font-size:clamp(24px,7vw,42px);letter-spacing:.16em}
+  .touch-combat #subs{width:min(90%,550px);font-size:15px}
+  .touch-combat #combo{right:12px}.touch-combat #combo b{font-size:46px}
 </style>
+<link rel="stylesheet" href="../_shared/touch-combat.css">
 <script type="importmap">
 { "imports": {
   "three": "./vendor/three/build/three.module.js",
@@ -124,7 +145,7 @@
       <label><span>SUBTITLES</span><input id="s-subs" type="checkbox"><output></output></label>
       <label><span>POST EFFECTS</span><input id="s-fx" type="checkbox"><output>restart</output></label>
       <button class="back" id="s-reset">DEFAULTS</button><button class="back" data-go="main">BACK</button></div>
-    <div class="page hidden" data-page="controls"><h2>CONTROLS</h2><div class="txt">
+    <div class="page hidden" data-page="controls"><h2>CONTROLS</h2><p class="txt touch-copy">Drag your left thumb to move. Drag the right side to look. Tap Claws to draw or stow them, then alternate Left claw and Right claw to attack or climb. Hold Block to defend, and tap Use to interact or take down an unaware enemy. Double-tap Left claw for a charged finisher. Jump, Sprint and Crouch also work while you move.</p><div class="txt keyboard-copy">
       <kbd>WASD</kbd> move &nbsp; <kbd>Mouse</kbd> look &nbsp; <kbd>Space</kbd> jump &nbsp; <kbd>Shift</kbd> sprint &nbsp; <kbd>C</kbd>/<kbd>Ctrl</kbd> crouch<br>
       <kbd>LMB</kbd> + <kbd>RMB</kbd> together: unsheathe &nbsp; HOLD both: sheathe<br>
       <kbd>LMB</kbd> / <kbd>RMB</kbd> claw strike at the crosshair &nbsp; hold <kbd>MIDDLE</kbd>: block (time it = parry)<br>

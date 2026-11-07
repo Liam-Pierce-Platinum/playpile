@@ -12,10 +12,21 @@
   html, body { margin: 0; height: 100%; background: #2b2320; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
   canvas { display: block; position: absolute; left: 0; top: 0; }
   #ui { z-index: 2; }
+  #touch-actions{position:fixed;z-index:3;right:max(7px,env(safe-area-inset-right));bottom:max(7px,env(safe-area-inset-bottom));display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;padding-left:7px;pointer-events:none}
+  #touch-actions[hidden],#touch-actions button[hidden]{display:none}
+  #touch-actions button{pointer-events:auto;min-width:44px;min-height:44px;padding:5px 7px;color:#2b2320;border:1px solid #594537;background:#efe2c4;border-radius:7px;font:700 12px/1.1 Arial,sans-serif;box-shadow:1px 2px 0 #221916;touch-action:manipulation}
+  #touch-actions button[aria-pressed="true"]{background:#43623b;color:#fff}
+  #touch-actions button:disabled{opacity:.65}
+  @media (orientation:landscape) and (min-aspect-ratio:2/1){#touch-actions{flex-direction:column;bottom:auto;top:max(7px,env(safe-area-inset-top));width:64px}}
 </style>
 </head>
 <body>
 <canvas id="screen"></canvas>
+<div id="touch-actions" aria-label="Battle controls" hidden>
+  <button data-key="Enter">Begin</button><button data-key="resume">Resume</button>
+  <button data-key="1">Ink wash</button><button data-key="2">Stone wall</button><button data-key="h">Hero</button>
+  <button data-key=" ">Wave</button><button data-key="Escape">Cancel</button><button data-key="p">Pause</button>
+</div>
 <script type="module" src="src/main.js"></script>
 </body>
 </html>

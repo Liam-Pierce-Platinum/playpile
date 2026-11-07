@@ -112,9 +112,17 @@ document.addEventListener('visibilitychange', () => { if (document.hidden && G.s
 const touch = { l: false, r: false, b: false, n: false };
 function bindTouch(id, k) {
   const el = $(id);
-  el.addEventListener('pointerdown', (e) => { e.preventDefault(); touch[k] = true; el.classList.add('on'); snd.wake(); });
-  const up = () => { touch[k] = false; el.classList.remove('on'); };
-  el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up); el.addEventListener('pointerleave', up);
+  const pointers = new Set();
+  const update = () => { touch[k] = pointers.size > 0; el.classList.toggle('on', touch[k]); };
+  el.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    pointers.add(e.pointerId);
+    el.setPointerCapture(e.pointerId);
+    update();
+    snd.wake();
+  });
+  el.addEventListener('lostpointercapture', (e) => { pointers.delete(e.pointerId); update(); });
+  addEventListener('blur', () => { pointers.clear(); update(); });
 }
 bindTouch('tL', 'l'); bindTouch('tR', 'r'); bindTouch('tBrake', 'b'); bindTouch('tNitro', 'n');
 $('tPause').addEventListener('pointerdown', (e) => { e.preventDefault(); pause(true); });

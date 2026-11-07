@@ -260,7 +260,7 @@ els.bFire.onclick = () => { sfx.unlock(); if (canAct()) game.fire(); };
 const maxPull = () => Math.max(110, Math.min(300, Math.min(view.vw, view.vh) * 0.42));
 canvas.addEventListener('pointerdown', (e) => {
   sfx.unlock();
-  if (!canAct()) return;
+  if (aim.drag || !canAct()) return;
   canvas.setPointerCapture(e.pointerId);
   aim.drag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, x: e.clientX, y: e.clientY, live: false, a0: game.cur.angle, p0: game.cur.power };
 });
@@ -281,10 +281,15 @@ canvas.addEventListener('pointermove', (e) => {
 const endDrag = (e) => {
   const d = aim.drag; if (!d || d.id !== e.pointerId) return;
   aim.drag = null;
-  if (d.live && canAct() && e.type === 'pointerup') game.fire();
+  if (d.live && canAct()) {
+    if (e.type === 'pointerup') game.fire();
+    else game.setAim(d.a0, d.p0);
+  }
 };
 canvas.addEventListener('pointerup', endDrag);
 canvas.addEventListener('pointercancel', endDrag);
+canvas.addEventListener('lostpointercapture', endDrag);
+addEventListener('blur', () => { if (aim.drag) endDrag({ pointerId: aim.drag.id, type: 'blur' }); });
 
 // ---------------------------------------------------------------- keyboard
 const keys = {};

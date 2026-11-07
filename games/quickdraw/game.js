@@ -275,7 +275,9 @@ function newRound() {
  * @param redo true when a twitch aborted the last one, so it does not
  *             count as a volley and no penalty is served
  */
+let touchShot = false;
 function newVolley(redo) {
+  touchShot = false;
   if (!redo) volley++;
   // A PENALTY IS SERVED BY WHATEVER VOLLEY COMES NEXT, re-done or not:
   // the third twitch is answered by the very next word, which is the
@@ -354,6 +356,7 @@ function step(dt, g) {
   if (screen === 'shop') { drawTown(g); shop(g); return; }
 
   const taps = D.tapped();
+  const releases = D.released();
 
   // P2's crosshair
   if (twoPlayer) {
@@ -408,7 +411,9 @@ function step(dt, g) {
     }
 
     // ---- you ---------------------------------------------------------
-    handle(me, myPtr, dt, taps > 0);
+    if (D.touch && releases && !inBox(myPtr, holster(me))) touchShot = true;
+    handle(me, myPtr, dt, D.touch ? touchShot : taps > 0);
+    if (me.fired) touchShot = false;
 
     // ---- him ---------------------------------------------------------
     if (twoPlayer) {
@@ -1039,7 +1044,7 @@ const home = new Home(D, {
     { label: 'TWO PLAYER', sub: 'mouse against the arrow keys', fn: () => startDuel(true) },
     { label: 'THE SHOP', sub: '', fn: () => { screen = 'shop'; } },
   ],
-  hint: 'head is instant · an arm is that arm gone · three early draws costs you your gun',
+  hint: matchMedia('(pointer: coarse)').matches ? 'Hold the holster. When DRAW appears, slide to aim and release to fire.' : 'head is instant · an arm is that arm gone · three early draws costs you your gun',
   wash: 'rgba(20,10,8,.55)',
 });
 

@@ -21,14 +21,16 @@ import { Campaign } from './campaign/campaign.js';
 import { initHome, homeShot, homePose } from './campaign/home.js';
 import { loadSettings } from './campaign/save.js';
 import { installTeach } from './teach.js';
+import { mountTouchCombat, touchCombat } from '../../_shared/touch-combat.js';
 
 const Q = new URLSearchParams(location.search);
 const SETTINGS = loadSettings();
 const $ = id => document.getElementById(id);
+document.documentElement.classList.toggle('touch-combat', touchCombat);
 
 // --- renderer / scene ---
 const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+renderer.setPixelRatio(Math.min(devicePixelRatio, touchCombat ? 1 : 1.5));
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
@@ -43,7 +45,8 @@ const camera = new THREE.PerspectiveCamera(68, innerWidth / innerHeight, 0.05, 2
 const hemi = new THREE.HemisphereLight(0xc8d6ec, 0x5c4c3c, 1.1); scene.add(hemi);
 const sun = new THREE.DirectionalLight(0xffe4c8, 2.6);
 sun.position.set(14, 26, 10); sun.castShadow = true;
-sun.shadow.mapSize.set(2048, 2048); const sc = sun.shadow.camera; sc.left = sc.bottom = -34; sc.right = sc.top = 34; sc.near = 1; sc.far = 80;
+const shadowSize = touchCombat ? 1024 : 2048;
+sun.shadow.mapSize.set(shadowSize, shadowSize); const sc = sun.shadow.camera; sc.left = sc.bottom = -34; sc.right = sc.top = 34; sc.near = 1; sc.far = 80;
 sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03; scene.add(sun); scene.add(sun.target);
 // cool rim from behind to carve the cube men out of the grey (no shadows, cheap)
 const rim = new THREE.DirectionalLight(0xa8c4ff, 0.9); rim.position.set(-12, 9, -16); scene.add(rim);
@@ -58,7 +61,7 @@ physics.addContactMaterial(new CANNON.ContactMaterial(ragMat, physics.defaultMat
 buildWorld(scene, physics);
 
 // --- post ---
-const useFx = !Q.has('nofx') && SETTINGS.fx !== false;
+const useFx = !touchCombat && !Q.has('nofx') && SETTINGS.fx !== false;
 let composer = null, gtao = null, grade = null;
 if (useFx) {
   composer = new EffectComposer(renderer);
@@ -112,6 +115,7 @@ G.shake = a => { a *= G.settings.shake ?? 1; G.shakeAmt = Math.min(1, Math.max(G
 G.hitstop = s => { G.stopT = Math.max(G.stopT, s); };
 // slow motion: drop to scale, hold, ramp back up over the last half
 G.slowmo = (scale, dur) => { if (scale <= G.slowS || G.slowT <= 0) { G.slowS = scale; G.slowT = dur; G.slowDur = dur; } };
+G.touchMode = touchCombat;
 installTeach(G);
 G.timeScale = () => { if (G.slowT <= 0) return 1; const k = G.slowT / G.slowDur; return k > 0.5 ? G.slowS : G.slowS + (1 - G.slowS) * (1 - k * 2); };
 G.fovKick = a => { cc.fovK += a; };
@@ -207,13 +211,35 @@ addEventListener('mousemove', e => {
   }
 });
 document.addEventListener('pointerlockchange', () => {
-  if (document.pointerLockElement !== canvas && G.playing && !G.paused && !G.over && !Q.has('play')) setPause(true);
+  if (!touchCombat && document.pointerLockElement !== canvas && G.playing && !G.paused && !G.over && !Q.has('play')) setPause(true);
 });
+const sendKey = (code, down) => dispatchEvent(new KeyboardEvent(down ? 'keydown' : 'keyup', { code }));
+const keyAction = (label, code) => ({ label, down: () => sendKey(code, true), up: () => sendKey(code, false) });
+const clawAction = (label, side, token) => ({ label, primary: true,
+  down: () => { G.teachInput?.(token); G.hero.mouseDown(side); }, up: () => G.hero.mouseUp(side) });
+const updateTouch = touchCombat ? mountTouchCombat({
+  move(x, y) {
+    for (const [key, held] of Object.entries({ KeyW: y < -0.25, KeyS: y > 0.25, KeyA: x < -0.25, KeyD: x > 0.25 })) {
+      if (Boolean(G.input.keys[key]) !== held) sendKey(key, held);
+    }
+  },
+  look(dx, dy) {
+    const k = (G.settings.sens || 1) * 0.0045;
+    G.input.lastMouse = performance.now();
+    G.input.yaw -= dx * k;
+    G.input.pitch = Math.max(-1.2, Math.min(0.9, G.input.pitch - dy * k * (G.settings.invertY ? -1 : 1)));
+  },
+  actions: [keyAction('Use', 'KeyE'), keyAction('Crouch', 'KeyC'), keyAction('Sprint', 'ShiftLeft'),
+    { label: 'Claws', down: () => G.hero.toggleClaws() }, keyAction('Jump', 'Space'),
+    { label: 'Block', down: () => { G.teachInput?.('MMB'); G.hero.blockDown(); }, up: () => G.hero.blockUp() },
+    clawAction('Left claw', 'L', 'LMB'), clawAction('Right claw', 'R', 'RMB')],
+  onMenu: () => { if (G.cut) G.cut.skip(); else setPause(true); },
+}) : null;
 function setPause(p) {
   G.paused = p; $('pause').classList.toggle('hidden', !p);
   if (p) document.exitPointerLock?.(); else lock();
 }
-function lock() { if (Q.has('play')) return; try { canvas.requestPointerLock()?.catch?.(() => {}); } catch (_) {} }
+function lock() { if (touchCombat || Q.has('play')) return; try { canvas.requestPointerLock()?.catch?.(() => {}); } catch (_) {} }
 function start() {
   initAudio(); setVolume(G.settings.volume ?? 1); $('home').classList.add('hidden'); $('hud').classList.remove('hidden');
   G.playing = true; window.__playing = true; if (!G.cut) G.camOverride = null; lock();
@@ -256,7 +282,9 @@ function updateHud(rdt) {
   $('wave').textContent = 'WAVE ' + G.wave; $('kills').textContent = 'KILLS ' + G.kills;
   if (G.combo !== lastCombo) { lastCombo = G.combo; $('cn').textContent = G.combo; $('cn').style.transform = 'scale(1.35)'; setTimeout(() => $('cn').style.transform = '', 70); }
   $('combo').style.opacity = G.combo > 1 ? 1 : 0;
-  $('hint').textContent = G.hintOverride ? G.hintOverride : h.slamReady ? 'SLAM READY: same button twice' : G.td ? 'E  ' + ({ silent: 'SILENT TAKEDOWN', pounce: 'DROP TAKEDOWN', ledgepull: 'LEDGE TAKEDOWN', ambush: 'WALL AMBUSH' })[G.td.k] : !h.clawsOut ? 'Click LEFT + RIGHT together to unsheathe' : h.climbing ? 'Alternate LMB / RMB to climb  ·  A/D swing  ·  MIDDLE = stealth kill below  ·  Space wall-jump' : (G.finMeter >= 1 ? 'FINISHER READY: double-click LMB  ·  ' : '') + 'LMB / RMB strike where you aim  ·  hold MIDDLE to block  ·  in the air: same button twice = slam';
+  $('hint').textContent = touchCombat
+    ? (G.hintOverride?.replace(/^W \/ S/, 'Stick').replace(/^WASD/, 'Stick').replace(/\bSPACE\b/g, 'JUMP').replace(/\bSHIFT\b/g, 'SPRINT').replace(/\bE {2}/g, 'USE: ') || (G.td ? 'USE: TAKEDOWN' : !h.clawsOut ? 'Tap Claws to unsheathe' : G.finMeter >= 1 ? 'FINISHER: double-tap Left claw' : 'Drag left to move · drag right to look'))
+    : G.hintOverride ? G.hintOverride : h.slamReady ? 'SLAM READY: same button twice' : G.td ? 'E  ' + ({ silent: 'SILENT TAKEDOWN', pounce: 'DROP TAKEDOWN', ledgepull: 'LEDGE TAKEDOWN', ambush: 'WALL AMBUSH' })[G.td.k] : !h.clawsOut ? 'Click LEFT + RIGHT together to unsheathe' : h.climbing ? 'Alternate LMB / RMB to climb  ·  A/D swing  ·  MIDDLE = stealth kill below  ·  Space wall-jump' : (G.finMeter >= 1 ? 'FINISHER READY: double-click LMB  ·  ' : '') + 'LMB / RMB strike where you aim  ·  hold MIDDLE to block  ·  in the air: same button twice = slam';
   { // sight meter: how close anyone is to spotting you
     let a = 0, seen = false, alert = false;
     for (const e of G.enemies) { if (e.mode === 'alert') alert = true; else { a = Math.max(a, e.aware); if (e.seesHero) seen = true; } }
@@ -320,6 +348,7 @@ function frame(now) {
     if (t !== G.aimT) { G.aimT?.setHighlight(false); t?.setHighlight(true); G.aimT = t; }
   }
   updateHud(rdt);
+  updateTouch?.(G.playing && !G.paused && !G.over, Boolean(G.cut));
   if (composer) { grade.uniforms.time.value = now * 0.001 % 100; grade.uniforms.hurt.value = G.hurtFlash; grade.uniforms.punch.value = G.camPunch + G.shakeAmt * 0.5 + G.punchAmt * 0.6;
     // motion blur along screen-space camera motion while dashing or diving
     const h = G.hero, mv = (h.dashT > 0 || h.diving) ? Math.min(1, Math.hypot(h.vel.x, h.vel.y, h.vel.z) / 25) : 0;

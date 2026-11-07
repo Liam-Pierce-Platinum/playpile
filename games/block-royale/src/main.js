@@ -239,7 +239,7 @@ class Game {
     const pos = e => ({ x: e.clientX, y: e.clientY });
     cv.addEventListener('pointerdown', e => {
       this.snd.unlock();
-      if (this.scene !== 'play' || this.ui.open) return;
+      if (this.scene !== 'play' || this.ui.open || this.ptr || e.button !== 0) return;
       const p = pos(e);
       this.ptr = { x: p.x, y: p.y, sx: p.x, sy: p.y, type: e.pointerType, moved: false, id: e.pointerId };
       try { cv.setPointerCapture(e.pointerId); } catch (er) { /* fine */ }
@@ -259,10 +259,19 @@ class Game {
       this.ptr = null;
     };
     cv.addEventListener('pointerup', up);
-    cv.addEventListener('pointercancel', e => { if (this.drag) this.drop(false); this.ptr = null; });
+    const cancel = (e) => {
+      if (!this.ptr || (e && this.ptr.id !== e.pointerId)) return;
+      if (this.drag) this.drop(false);
+      this.ptr = null;
+    };
+    cv.addEventListener('pointercancel', cancel);
+    cv.addEventListener('lostpointercapture', cancel);
     cv.addEventListener('contextmenu', e => e.preventDefault());
     addEventListener('keydown', e => this.key(e));
-    addEventListener('blur', () => { if (this.scene === 'play' && !this.ui.open && this.run && !this.run.over) this.ui.show('pause'); });
+    addEventListener('blur', () => {
+      cancel();
+      if (this.scene === 'play' && !this.ui.open && this.run && !this.run.over) this.ui.show('pause');
+    });
   }
   hitCharm(p) { return (this.L.charms || []).findIndex(c => p.x >= c.x && p.x <= c.x + c.w && p.y >= c.y && p.y <= c.y + c.h); }
   hitGlyph(p) { return (this.L.glyphs || []).findIndex(c => Math.hypot(p.x - c.cx, p.y - c.cy) <= c.r + 6); }

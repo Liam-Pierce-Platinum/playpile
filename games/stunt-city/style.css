@@ -46,3 +46,21 @@ body.touch #hint{display:none}
 #tB{right:104px;bottom:110px}#tG{right:16px;bottom:110px}#tN{right:16px;bottom:196px;width:60px;height:60px;font-size:14px;border-color:#7ff6ff}
 body.touch #spd{bottom:auto;top:56px;right:16px}
 body.touch #spd b{font-size:30px}
+
+@media (pointer: coarse) {
+  html,body { touch-action: manipulation; }
+  .tb { touch-action: none; }
+  #garage,#card { max-height: calc(100dvh - 24px); overflow: auto; overscroll-behavior: contain; touch-action: pan-y; }
+  #garBtn,#garage button,#card button { min-height: 44px; }
+  #hint { display: none; }
+  .tb { width: clamp(46px,16vmin,66px); height: clamp(46px,16vmin,66px); padding: 0; font-size: 14px; }
+  #tL { left: max(10px,env(safe-area-inset-left)); bottom: 12px; }
+  #tR { left: calc(max(10px,env(safe-area-inset-left)) + clamp(54px,18vmin,76px)); bottom: 12px; }
+  #tG,#tB { bottom: 12px; }
+  #tG { right: max(10px,env(safe-area-inset-right)); }
+  #tB { right: calc(max(10px,env(safe-area-inset-right)) + clamp(54px,18vmin,76px)); }
+  #tD,#tN { bottom: clamp(65px,22vmin,90px); }
+  #tD { right: calc(max(10px,env(safe-area-inset-right)) + clamp(54px,18vmin,76px)); }
+  #tN { right: max(10px,env(safe-area-inset-right)); width: clamp(46px,16vmin,66px); height: clamp(46px,16vmin,66px); }
+  #tReset { left: max(10px,env(safe-area-inset-left)); bottom: clamp(65px,22vmin,90px); }
+}

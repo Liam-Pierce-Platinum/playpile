@@ -207,13 +207,14 @@ addEventListener('keyup', (e) => { keys[e.code] = false; });
 addEventListener('pointerdown', unlockAudio);
 (function touch() {
   const st = $('stick'), knob = st.querySelector('i'); let id = null, cx = 0, cy = 0;
-  st.addEventListener('pointerdown', (e) => { id = e.pointerId; const r = st.getBoundingClientRect(); cx = r.left + r.width / 2; cy = r.top + r.height / 2; st.setPointerCapture(id); });
+  st.addEventListener('pointerdown', (e) => { if (id !== null) return; id = e.pointerId; const r = st.getBoundingClientRect(); cx = r.left + r.width / 2; cy = r.top + r.height / 2; st.setPointerCapture(id); });
   st.addEventListener('pointermove', (e) => {
     if (e.pointerId !== id) return; let dx = e.clientX - cx, dy = e.clientY - cy; const l = Math.hypot(dx, dy), m = 50;
     if (l > m) { dx *= m / l; dy *= m / l; } touchV.x = dx / m; touchV.y = dy / m; knob.style.transform = `translate(${dx}px,${dy}px)`;
   });
-  const end = () => { id = null; touchV.x = touchV.y = 0; knob.style.transform = ''; };
-  st.addEventListener('pointerup', end); st.addEventListener('pointercancel', end);
+  const end = (e) => { if (e && e.pointerId !== id) return; id = null; touchV.x = touchV.y = 0; knob.style.transform = ''; };
+  for (const event of ['pointerup','pointercancel','lostpointercapture']) st.addEventListener(event, end);
+  addEventListener('blur', () => { end(); touchRam = false; });
   const rb = $('ram'); rb.addEventListener('pointerdown', (e) => { e.preventDefault(); touchRam = true; });
 })();
 

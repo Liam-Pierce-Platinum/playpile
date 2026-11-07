@@ -43,5 +43,17 @@ body.touch #touch { display: flex; }
 body.touch #weap { bottom: auto; top: 76px; }
 #touch button { pointer-events: auto; width: 84px; height: 84px; border-radius: 50%; font: bold 26px Georgia, serif;
   background: #eee0bdcc; color: #1b130d; border: 4px solid #1b130d; }
-#touch #tf { width: 96px; height: 70px; border-radius: 35px; font-size: 20px; background: #e8b23acc; margin-bottom: 8px; }
+#touch .touch-player { display: flex; gap: 5px; justify-content: space-between; }
+#touch .touch-player[hidden], body.touch #card:not(.hide) ~ #touch { display: none; }
+#touch .touch-player:has(+ [hidden]) { width: 100%; }
+#touch [data-touch-action="fire"] { border-radius: 35px; font-size: 13px; background: #e8b23acc; }
+#touch #touchMenu { position: fixed; right: 12px; top: 62px; width: auto; height: 44px; padding: 0 10px; font-size: 14px; border-radius: 22px; }
 #touch button:active { transform: scale(.92); }
+
+@media (pointer: coarse) {
+  html,body { touch-action: manipulation; }
+  #card { box-sizing: border-box; max-height: calc(100dvh - 24px); overflow: auto; touch-action: pan-y; }
+  #card button { min-height: 44px; }
+  #touch { padding: 0 max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left)); }
+  #touch button { touch-action: none; width: clamp(44px,13vmin,70px); height: clamp(44px,13vmin,70px); }
+}

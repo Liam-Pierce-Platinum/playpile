@@ -17,6 +17,7 @@ export function initInput(onKey) {
   let sid = null, ox = 0, oy = 0;
   const R = 46;
   zone.addEventListener('touchstart', e => {
+    if (sid !== null) { e.preventDefault(); return; }
     input.touch = true; document.body.classList.add('touch');
     const t = e.changedTouches[0]; sid = t.identifier; ox = t.clientX; oy = t.clientY;
     base.style.left = ox + 'px'; base.style.top = oy + 'px'; base.classList.add('on'); knob.style.transform = 'translate(-50%,-50%)';
@@ -43,6 +44,13 @@ export function initInput(onKey) {
   };
   try { if (matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0 && matchMedia('(hover: none)').matches) { input.touch = true; document.body.classList.add('touch'); } } catch (e) { /* old browser */ }
   hold('bAct', 'TouchAct'); hold('bBoost', 'TouchBoost'); hold('bPing', 'TouchPing');
+  addEventListener('blur', () => {
+    sid = null;
+    input.stick = null;
+    edge.clear();
+    base.classList.remove('on');
+    for (const b of document.querySelectorAll('#tbtns .on')) b.classList.remove('on');
+  });
   addEventListener('touchstart', () => { input.touch = true; document.body.classList.add('touch'); }, { passive: true });
 }
 

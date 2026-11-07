@@ -254,7 +254,7 @@ function setPhase(p) {
 }
 
 // ---------- input ----------
-const keys = new Set(); let pointerDown = false, pointerX0 = 0, steerTouch = 0;
+const keys = new Set(); let runPointer = null, pointerX0 = 0, steerTouch = 0;
 addEventListener('keydown', (e) => {
   keys.add(e.code); sfx.unlock();
   if (e.code === 'KeyM') { G.mute = !G.mute; sfx.mute(G.mute); }
@@ -264,14 +264,15 @@ addEventListener('keydown', (e) => {
 });
 addEventListener('keyup', (e) => keys.delete(e.code));
 const cv = $('c');
-cv.addEventListener('pointerdown', (e) => { pointerDown = true; pointerX0 = e.clientX; steerTouch = 0; sfx.unlock(); });
-addEventListener('pointermove', (e) => { if (pointerDown) steerTouch = clamp((e.clientX - pointerX0) / 60, -1, 1); });
-addEventListener('pointerup', () => { pointerDown = false; steerTouch = 0; });
-addEventListener('pointercancel', () => { pointerDown = false; steerTouch = 0; });
+cv.addEventListener('pointerdown', (e) => { if (runPointer !== null) return; runPointer = e.pointerId; cv.setPointerCapture(runPointer); pointerX0 = e.clientX; steerTouch = 0; sfx.unlock(); });
+cv.addEventListener('pointermove', (e) => { if (e.pointerId === runPointer) steerTouch = clamp((e.clientX - pointerX0) / 60, -1, 1); });
+function stopRun(e) { if (!e || e.pointerId === runPointer) { runPointer = null; steerTouch = 0; } }
+for (const event of ['pointerup','pointercancel','lostpointercapture']) cv.addEventListener(event, stopRun);
+addEventListener('blur', () => { keys.clear(); stopRun(); });
 function wantRun() {
   if (G.auto) return phase === 'green' && fakeT < 0 && phaseDur - phaseT > 0.4 + (G.autoGreed || 0);
   if (G.forceRun) return true;
-  return keys.has('Space') || keys.has('KeyW') || keys.has('ArrowUp') || pointerDown;
+  return keys.has('Space') || keys.has('KeyW') || keys.has('ArrowUp') || runPointer !== null;
 }
 function steerIn() { if (G.auto) { let tx = player.x; for (const o of obst) if (o.z < player.z && player.z - o.z < 7 && Math.abs(o.x - player.x) < o.r + 0.7) tx = o.x + (player.x >= o.x ? 1 : -1) * (o.r + 1.4); return clamp((tx - player.x) * 0.8, -1, 1); } return (keys.has('KeyD') || keys.has('ArrowRight') ? 1 : 0) - (keys.has('KeyA') || keys.has('ArrowLeft') ? 1 : 0) + steerTouch; }
 

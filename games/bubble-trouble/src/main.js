@@ -43,9 +43,18 @@ if (matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window) { touch
 resize();
 for (const b of touchEl.querySelectorAll('[data-k]')) {
   const k = b.dataset.k;
-  const on = (ev) => { ev.preventDefault(); A.wake(); if (!tch[k] && k in latch) latch[k] = 1; tch[k] = 1; b.classList.add('on'); };
-  const off = (ev) => { ev.preventDefault(); tch[k] = 0; b.classList.remove('on'); };
-  b.addEventListener('pointerdown', on); b.addEventListener('pointerup', off); b.addEventListener('pointercancel', off); b.addEventListener('pointerleave', off);
+  const pointers = new Set();
+  const update = () => { tch[k] = Number(pointers.size > 0); b.classList.toggle('on', Boolean(tch[k])); };
+  b.addEventListener('pointerdown', (ev) => {
+    ev.preventDefault();
+    A.wake();
+    if (!tch[k] && k in latch) latch[k] = 1;
+    pointers.add(ev.pointerId);
+    b.setPointerCapture(ev.pointerId);
+    update();
+  });
+  b.addEventListener('lostpointercapture', (ev) => { pointers.delete(ev.pointerId); update(); });
+  addEventListener('blur', () => { pointers.clear(); if (k in latch) latch[k] = 0; update(); });
 }
 document.getElementById('tpause').addEventListener('pointerdown', (e) => { e.preventDefault(); togglePause(); });
 

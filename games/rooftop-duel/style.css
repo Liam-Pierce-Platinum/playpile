@@ -39,3 +39,11 @@ body.solo .tb.b { left:auto; right:16px; }
 body.duo .tb.c, body.duo .tb.d { display:flex; }
 body.touch #menuBtn { bottom:auto; top:58px; }
 body.nohud #hud, body.nohud #menuBtn { display:none; }
+
+@media (pointer: coarse) {
+  html,body { touch-action: manipulation; }
+  #panel { justify-content: safe center; overflow: auto; overscroll-behavior: contain; touch-action: pan-y; }
+  #panel button,#menuBtn { min-height: 44px; }
+  #menuBtn { top: max(46px,env(safe-area-inset-top)); bottom: auto; }
+  #hint { display: none; }
+}

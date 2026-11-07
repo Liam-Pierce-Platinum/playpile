@@ -373,15 +373,16 @@ function brain(ar, foe, skill, dt) {
 let drag = null;
 const dots = new THREE.InstancedMesh(new THREE.SphereGeometry(0.05, 6, 4), inkMat, 24); dots.count = 0; dots.frustumCulled = false; scene.add(dots);
 function ctrl() { return G.mode === '2p' ? A[G.turn] : A[0]; }
-canvas.addEventListener('pointerdown', (e) => { audio(); if (AC && AC.state === 'suspended') AC.resume(); if (G.state !== 'play' || G.auto) return; const ar = ctrl(); if (NET && G.turn !== MY) return; if (!ar.alive || (G.mode === '2p' && turnWait > 0) || arrows.some((a) => a.fly && G.mode === '2p')) return; drag = { x: e.clientX, y: e.clientY, ar, pw: 0 }; SFX.draw(); });
+canvas.addEventListener('pointerdown', (e) => { audio(); if (AC && AC.state === 'suspended') AC.resume(); if (drag || G.state !== 'play' || G.auto) return; const ar = ctrl(); if (NET && G.turn !== MY) return; if (!ar.alive || (G.mode === '2p' && turnWait > 0) || arrows.some((a) => a.fly && G.mode === '2p')) return; canvas.setPointerCapture(e.pointerId); drag = { id: e.pointerId, x: e.clientX, y: e.clientY, ar, pw: 0 }; SFX.draw(); });
 addEventListener('pointermove', (e) => {
-  if (!drag) return; const dx = drag.x - e.clientX, dy = e.clientY - drag.y; const len = Math.hypot(dx, dy); if (len < 6) return;
+  if (!drag || drag.id !== e.pointerId) return; const dx = drag.x - e.clientX, dy = e.clientY - drag.y; const len = Math.hypot(dx, dy); if (len < 6) { drag.pw = drag.ar.draw = 0; return; }
   const f = drag.ar.f; let ang = Math.atan2(dy, dx); let rel = f > 0 ? ang : Math.PI - ang; rel = Math.atan2(Math.sin(rel), Math.cos(rel)); rel = clamp(rel, -1.2, 1.45);
   drag.ar.ang = f > 0 ? rel : Math.PI - rel; drag.pw = Math.min(1, len / (Math.min(innerWidth, innerHeight) * 0.32)); drag.ar.draw = drag.pw;
   if (NET && performance.now() - ON.aimT > 66) { ON.aimT = performance.now(); NET.send({ t: 'aim', ang: drag.ar.ang, draw: drag.pw }); }
 });
-function release() {
-  if (!drag) return; const ar = drag.ar; const pw = drag.pw; drag = null; ar.draw = 0; dots.count = 0;
+function release(e) {
+  if (!drag || (e.type !== 'blur' && drag.id !== e.pointerId)) return; const ar = drag.ar; const pw = drag.pw; drag = null; ar.draw = 0; dots.count = 0;
+  if (e.type !== 'pointerup') return;
   if (G.state !== 'play' || pw < 0.12 || !ar.alive || ar.reload > 0) return;
   playerLoose(ar, ar.ang, pw);
 }
@@ -392,7 +393,7 @@ function playerLoose(ar, ang, pw) {
   ar.reload = G.mode === '1p' ? 0.85 * Math.pow(0.7, pk('quick')) : 0;
   if (firstShot) { firstShot = false; $('tip').style.opacity = '0'; }
 }
-addEventListener('pointerup', release); addEventListener('pointercancel', release);
+for (const event of ['pointerup','pointercancel','lostpointercapture','blur']) addEventListener(event, release);
 function preview() {
   if (!drag || drag.pw < 0.05) { dots.count = 0; return; }
   const ar = drag.ar; let [x, y] = ar.spawn(ar.ang); const sp = 12 + 23 * drag.pw; let vx = Math.cos(ar.ang) * sp, vy = Math.sin(ar.ang) * sp; const dt = 0.02; const n = G.mode === '1p' ? 9 + pk('eye') * 9 : 12; const M = new THREE.Matrix4(); let c = 0;

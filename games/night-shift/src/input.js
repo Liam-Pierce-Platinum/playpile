@@ -13,11 +13,10 @@ export class Input {
     // the renderer is the only thing that knows the camera
     this.aimX = 0; this.aimY = 0; this.aimHas = false;
     this.fire = false;
-    this.touch = { steer: 0, gas: false, brake: false, hand: false, active: false };
+    this.touch = { steer: 0, walkY: 0, gas: false, brake: false, hand: false, active: false };
     this.wheelAngle = 0;
     this.pressed = new Set();
-    this.isTouch = matchMedia('(hover: none) and (pointer: coarse)').matches
-      || navigator.maxTouchPoints > 1;
+    this.isTouch = matchMedia('(pointer: coarse)').matches;
     this.bindKeys();
     this.bindWheel();
     this.bindPedals();
@@ -46,14 +45,23 @@ export class Input {
     addEventListener('mousemove', toBuf);
     addEventListener('mousedown', e => { if (e.button === 0) { toBuf(e); this.fire = true; } });
     addEventListener('mouseup', e => { if (e.button === 0) this.fire = false; });
+    let aimPointer = null;
+    cv.addEventListener('pointerdown', e => {
+      if (!this.isTouch || e.pointerType === 'mouse' || aimPointer !== null) return;
+      e.preventDefault(); aimPointer = e.pointerId; cv.setPointerCapture(aimPointer); toBuf(e);
+    });
+    cv.addEventListener('pointermove', e => { if (e.pointerId === aimPointer) toBuf(e); });
+    for (const event of ['pointerup','pointercancel','lostpointercapture']) cv.addEventListener(event, e => { if (e.pointerId === aimPointer) aimPointer = null; });
+    addEventListener('blur', () => { aimPointer = null; });
     addEventListener('contextmenu', e => e.preventDefault());
   }
 
   bindWheel() {
     const zone = document.getElementById('wheel-zone');
     const wheel = document.getElementById('wheel');
+    const walkKnob = document.getElementById('walk-knob');
     if (!zone) return;
-    let id = null, lastAng = 0;
+    let id = null, lastAng = 0, driving = true;
     const centre = () => {
       const r = zone.getBoundingClientRect();
       return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
@@ -61,8 +69,10 @@ export class Input {
     const ang = (e, c) => Math.atan2(e.clientY - c.y, e.clientX - c.x);
 
     zone.addEventListener('pointerdown', e => {
+      if (id !== null) return;
       id = e.pointerId;
       zone.setPointerCapture(id);
+      driving = window.NIGHTSHIFT?.mode === 'drive';
       lastAng = ang(e, centre());
       this.touch.active = true;
       e.preventDefault();
@@ -70,6 +80,13 @@ export class Input {
     zone.addEventListener('pointermove', e => {
       if (e.pointerId !== id) return;
       const c = centre();
+      if (!driving) {
+        const dx = e.clientX - c.x, dy = e.clientY - c.y;
+        const radius = Math.max(zone.clientWidth * .36, Math.hypot(dx, dy));
+        this.touch.steer = dx / radius; this.touch.walkY = dy / radius;
+        walkKnob.style.transform = `translate(${22 * dx / radius}px,${22 * dy / radius}px)`;
+        return;
+      }
       const a = ang(e, c);
       let d = a - lastAng;
       while (d > Math.PI) d -= Math.PI * 2;
@@ -82,12 +99,17 @@ export class Input {
       e.preventDefault();
     });
     const up = e => {
-      if (e.pointerId !== id) return;
+      if (e && e.pointerId !== id) return;
       id = null;
       this.touch.active = false;
+      if (!driving || !e) {
+        this.touch.steer = this.touch.walkY = this.wheelAngle = 0;
+        wheel.style.transform = walkKnob.style.transform = '';
+      }
     };
-    zone.addEventListener('pointerup', up);
-    zone.addEventListener('pointercancel', up);
+    for (const event of ['pointerup','pointercancel','lostpointercapture']) zone.addEventListener(event, up);
+    addEventListener('blur', () => up());
+    this.releaseWheel = () => up();
     this._wheelEl = wheel;
   }
 
@@ -95,30 +117,22 @@ export class Input {
     const hook = (elId, set) => {
       const el = document.getElementById(elId);
       if (!el) return;
-      const on = e => { set(true); el.classList.add('on'); e.preventDefault(); };
-      const off = e => { set(false); el.classList.remove('on'); e.preventDefault(); };
+      let pointer = null;
+      const on = e => { if (pointer !== null) return; pointer = e.pointerId; el.setPointerCapture(pointer); set(true); el.classList.add('on'); e.preventDefault(); };
+      const off = e => { if (e && e.pointerId !== pointer) return; pointer = null; set(false); el.classList.remove('on'); };
       el.addEventListener('pointerdown', on);
-      el.addEventListener('pointerup', off);
-      el.addEventListener('pointercancel', off);
-      el.addEventListener('pointerleave', off);
+      for (const event of ['pointerup','pointercancel','lostpointercapture']) el.addEventListener(event, off);
+      addEventListener('blur', () => off());
     };
     hook('pedal-gas', v => this.touch.gas = v);
     hook('pedal-brake', v => this.touch.brake = v);
+    hook('pedal-hand', v => this.touch.hand = v);
+    hook('btn-sprint', v => v ? this.keys.add('shift') : this.keys.delete('shift'));
+    hook('btn-fire', v => this.fire = v);
+    document.getElementById('btn-down-floor')?.addEventListener('click', () => this.pressed.add('q'));
+    document.getElementById('btn-touch-reload')?.addEventListener('click', () => this.pressed.add('r'));
     const use = document.getElementById('btn-use');
-    if (use) {
-      const tap = e => { e.preventDefault(); this.useTap = true; };
-      use.addEventListener('touchstart', tap, { passive: false });
-      use.addEventListener('mousedown', tap);
-    }
-    const fire = document.getElementById('btn-fire');
-    if (fire) {
-      const on = e => { e.preventDefault(); this.fire = true; };
-      const off = e => { e.preventDefault(); this.fire = false; };
-      fire.addEventListener('touchstart', on, { passive: false });
-      fire.addEventListener('touchend', off, { passive: false });
-      fire.addEventListener('mousedown', on);
-      fire.addEventListener('mouseup', off);
-    }
+    use?.addEventListener('click', () => { this.useTap = true; });
 
   }
 
@@ -126,6 +140,13 @@ export class Input {
   poll(dt) {
     const k = this.keys;
     let steer = 0, throttle = 0, brake = 0, hand = false;
+    if (this.isTouch) {
+      const mode = window.NIGHTSHIFT?.mode || 'drive';
+      if (mode !== this.touchMode) {
+        this.releaseWheel?.(); this.touchMode = mode;
+        document.getElementById('touch').dataset.mode = mode;
+      }
+    }
 
     // ---- keyboard ----
     if (k.has('a') || k.has('arrowleft') || k.has('q')) steer -= 1;
@@ -176,7 +197,7 @@ export class Input {
     if (k.has('s') || k.has('arrowdown')) wy += 1;
     if (this.touch.gas) wy -= 1;
     if (this.touch.brake) wy += 1;
-    this.walkY = wy;
+    this.walkY = this.touch.walkY || wy;
   }
 
   // Edge-triggered key check, cleared each frame by endFrame().

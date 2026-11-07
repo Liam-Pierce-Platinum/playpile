@@ -358,6 +358,7 @@ function pause(on) {
 
 // ---------------------------------------------------------------- input
 cv.addEventListener('pointerdown', (e) => {
+  if (!e.isPrimary || e.button !== 0) return;
   e.preventDefault();
   initAudio();
   if (screen === 'play' && !paused) g.throw();

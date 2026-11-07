@@ -343,23 +343,23 @@ body.noscan #stage::after { display: none; }
 #touchpad { display: none; }
 body.touch #touchpad { display: block; position: fixed; inset: 0; z-index: 40;
   pointer-events: none; touch-action: none; }
-#touchpad.hidden { display: none; }
-.tp-row { position: absolute; bottom: 14px; display: flex; gap: 10px;
+.touch #touchpad.hidden { display: none; }
+.tp-row { position: absolute; bottom: max(8px, env(safe-area-inset-bottom)); display: flex; gap: 6px;
   pointer-events: none; }
-.tp-l { left: 14px; }
-.tp-r { right: 14px; flex-direction: row-reverse; }
-.tp-p { top: 12px; right: 14px; bottom: auto; }
+.tp-l { left: max(8px, env(safe-area-inset-left)); }
+.tp-r { right: max(8px, env(safe-area-inset-right)); flex-direction: row-reverse; }
+.tp-p { top: max(8px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right)); bottom: auto; }
 .tp-btn { pointer-events: auto; -webkit-user-select: none; user-select: none;
   -webkit-tap-highlight-color: transparent;
-  min-width: 62px; height: 62px; padding: 0 10px;
+  min-width: clamp(44px,15vmin,62px); height: clamp(44px,15vmin,62px); padding: 0 7px;
   display: flex; align-items: center; justify-content: center;
   font: 700 13px/1 ui-monospace, monospace; letter-spacing: 1px;
   color: #ffcf70; background: rgba(30, 24, 38, 0.62);
   box-shadow: inset 2px 2px 0 0 #5f4d6b, inset -2px -2px 0 0 #171320; }
-.tp-btn:active { color: #fff; background: rgba(96, 74, 122, 0.8);
+.tp-btn:is(:active,.held) { color: #fff; background: rgba(96, 74, 122, 0.8);
   box-shadow: inset 2px 2px 0 0 #171320, inset -2px -2px 0 0 #5f4d6b; }
 #tp-left, #tp-right { font-size: 22px; }
-#tp-carry, #tp-bail { min-width: 54px; height: 44px; font-size: 10px; }
+#tp-carry, #tp-bail { min-width: 44px; height: 44px; font-size: 10px; }
 #tp-pause { min-width: 44px; height: 44px; font-size: 20px; }
 /* on a phone the browser's own gestures fight the board: no bounce, no
  * pinch-zoom, no text selection, no long-press callout */
@@ -367,9 +367,23 @@ body.touch { overscroll-behavior: none; -webkit-user-select: none; user-select: 
   -webkit-touch-callout: none; }
 body.touch #screen { touch-action: none; }
 
-/* --- portrait, on a phone ------------------------------------------------ */
+/* Portrait still works. A short hint leaves the board and pause usable. */
 #rotate { display: none; }
-body.touch #rotate { position: fixed; inset: 0; z-index: 60;
-  align-items: center; justify-content: center; background: #171320; }
-@media (orientation: portrait) { body.touch #rotate { display: flex; } }
-@media (orientation: landscape) { body.touch #rotate { display: none; } }
+@media (orientation: portrait) {
+  body.touch.touch-running #rotate { display: block; position: fixed; z-index: 42; top: max(60px,env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); pointer-events: none; animation: portrait-tip 5s both; }
+  #rotate .plate { margin: 0; width: max-content; max-width: 85vw; padding: 5px 10px; box-shadow: none; }
+  #rotate .plate h2 { margin: 0; font-size: 13px; }
+  #rotate .plate p { display: none; }
+}
+@keyframes portrait-tip { 0%,72% { opacity: 1; } 100% { opacity: 0; } }
+.pgrid { touch-action: none; }
+.youbox { touch-action: pan-y; }
+@media (pointer: coarse) {
+  .overlay button:not(.pcell) { min-height: 44px; }
+  .overlay { touch-action: pan-y; overscroll-behavior: contain; }
+  .overlay:has(.pgrid) { touch-action: auto; }
+}
+@media (pointer: coarse) and (max-width: 650px) {
+  .shoprow { flex-direction: column; align-items: stretch; }
+  .plate { padding: 12px; }
+}

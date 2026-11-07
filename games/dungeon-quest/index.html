@@ -45,12 +45,13 @@
       <div class="pxbox stealthbox" id="stealth-box" hidden>
         <span id="stealth-text">HIDDEN</span>
       </div>
+      <button class="touch-only" id="touch-menu" type="button" aria-expanded="false" aria-controls="sidebar">MENU</button>
     </div>
 
     <div class="hud-bl">
       <div class="pxbox potions">
-        <div class="slot" id="slot-good"><kbd>1</kbd><span class="pname">—</span><span class="pcount">0</span></div>
-        <div class="slot" id="slot-bad"><kbd>2</kbd><span class="pname">—</span><span class="pcount">0</span></div>
+        <button type="button" class="slot" id="slot-good" aria-label="Drink potion"><kbd>1</kbd><span class="pname">—</span><span class="pcount">0</span></button>
+        <button type="button" class="slot" id="slot-bad" aria-label="Use offensive potion"><kbd>2</kbd><span class="pname">—</span><span class="pcount">0</span></button>
       </div>
     </div>
 
@@ -76,6 +77,11 @@
   <div id="sidebar" hidden>
     <div class="sb-head" data-px="2" data-px-color="#16121f">CONTROLS</div>
     <div class="sb-body">
+      <div class="touch-only" id="touch-menu-tools">
+        <button class="wide start" id="touch-resume" type="button">RESUME</button>
+        <button class="wide" id="touch-map-list" type="button" hidden>VISITED LEVELS</button>
+        <p>Drag the world to look around. The stick moves you, and the buttons on the right handle combat. Tap USE by a chest, merchant or door.</p>
+      </div>
       <div class="krow"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span data-px="1">MOVE</span></div>
       <div class="krow"><kbd>SHIFT</kbd><span data-px="1">RUN</span></div>
       <div class="krow"><kbd>C</kbd><span data-px="1">CROUCH</span></div>
@@ -180,10 +186,11 @@
         <button class="wide start" id="btn-start">ENTER THE VALLEY</button>
         <div class="purse">PURSE <b id="title-coin">0</b></div>
       </div>
-      <div class="title-keys">
+      <div class="title-keys desktop-keys">
         <b>WASD</b> move · <b>←</b> attack · <b>↓</b> block · <b>→</b> special<br>
         <b>↑</b> jump · <b>C</b> crouch · <b>SPACE</b> pick up
       </div>
+      <div class="title-keys touch-only">Move with the stick · drag to look · tap USE near objects</div>
       <button class="tiny" id="btn-wipe">erase save</button>
     </div>
   </div>
@@ -194,6 +201,7 @@
     <div id="cutscene-text"></div>
     <div class="cs-bar bottom"></div>
     <div id="cutscene-skip">ANY KEY &#8594; NEXT &#183; ESC &#8594; SKIP</div>
+    <div class="touch-only cutscene-actions"><button id="touch-cutscene-next" type="button">NEXT</button><button id="touch-cutscene-skip" type="button">SKIP</button></div>
   </div>
 
   <!-- ============ TAVERN ============ -->
@@ -243,7 +251,8 @@
       <div class="travel-head" data-px="3" data-px-color="#e8dfc8">THE ROAD GOES ON</div>
       <canvas id="travel-canvas" width="480" height="300"></canvas>
       <div id="travel-caption"></div>
-      <div class="travel-skip">ANY KEY &#8212; SKIP</div>
+      <div class="travel-skip desktop-keys">ANY KEY &#8212; SKIP</div>
+      <button class="touch-only" type="button">CONTINUE</button>
     </div>
   </div>
 

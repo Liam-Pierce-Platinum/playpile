@@ -331,7 +331,8 @@ cvs.addEventListener('pointerdown', (e) => { audio(); ptr.x = e.clientX; ptr.y =
 addEventListener('pointerup', (e) => { if (e.pointerType !== 'touch') boostHeld = false; });
 const bb = $('boost');
 bb.addEventListener('pointerdown', (e) => { e.stopPropagation(); audio(); boostHeld = true; bb.setPointerCapture(e.pointerId); });
-bb.addEventListener('pointerup', () => (boostHeld = false)); bb.addEventListener('pointercancel', () => (boostHeld = false));
+for (const event of ['pointerup','pointercancel','lostpointercapture']) bb.addEventListener(event, () => (boostHeld = false));
+addEventListener('blur', () => { boostHeld = false; for (const key in keys) keys[key] = false; });
 addEventListener('keydown', (e) => { audio(); keys[e.code] = true; if (e.code === 'Space') e.preventDefault();
   if ((e.code === 'Space' || e.code === 'Enter') && !$('card').classList.contains('hide')) startRun(); if (e.code === 'Enter' && state === 'title') startRun(); });
 addEventListener('keyup', (e) => (keys[e.code] = false));

@@ -272,7 +272,12 @@ addEventListener('keydown', (e) => {
   else if (G.demo && (e.code === 'Enter' || e.code === 'Space')) startMatch(save.cur || 0);
 });
 addEventListener('keyup', (e) => { keys.delete(e.code); if (KEYMAP[e.code] === 'throw') inp.throwHeld = false; });
-addEventListener('blur', () => { keys.clear(); inp.throwHeld = false; });
+addEventListener('blur', () => {
+  keys.clear();
+  G.joy = null;
+  inp.throwHeld = inp.catchPress = inp.dashPress = false;
+  for (const button of $('touch').querySelectorAll('.on')) button.classList.remove('on');
+});
 const cvs = $('c');
 function toWorld(cx, cy) { const v = G.view; return { x: (cx - v.ox) / v.s, y: (cy - v.oy) / v.s }; }
 cvs.addEventListener('mousemove', (e) => { G.mouse = toWorld(e.clientX, e.clientY); });

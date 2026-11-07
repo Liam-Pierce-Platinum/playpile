@@ -6,6 +6,7 @@ a,button,input,select,textarea{touch-action:manipulation}
 button,a{ -webkit-tap-highlight-color:transparent }
 :focus-visible{outline:3px solid #f4d68c;outline-offset:5px}
 [hidden]{display:none!important}
+.arcade-site .skip:not(:focus){left:auto;inset-inline-start:0;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%)}
 .arcade-site :is(h1,h2,h3,h4,h5,h6){font-family:var(--heading);font-weight:400;letter-spacing:0;line-height:1.15;text-transform:none}
 .arcade-site h1{font-size:clamp(36px,5vw,60px)}
 .arcade-site h2{font-size:32px}.arcade-site h3{font-size:27px}.arcade-site h4{font-size:24px}
@@ -23,6 +24,7 @@ button,a{ -webkit-tap-highlight-color:transparent }
 .arcade-nav a:hover,.arcade-nav a[aria-current=page]{color:#f4eacb;background:#343b46;border-color:#59616b;box-shadow:3px 3px #11151e}
 .arcade-nav a[aria-current=page]{border-bottom-color:#a9d99e}
 .arcade-site #accountSlot{margin-left:auto}.arcade-site #accountSlot button{font-family:var(--sans);font-size:14px;border-radius:0;background:#303641;border:2px solid #59616b;padding:7px 10px;color:var(--text)}
+.arcade-header-tools{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-inline-start:auto;min-width:0}
 .arcade-site .pp-av{image-rendering:pixelated;border-radius:0!important}
 .arcade-site .row{margin:36px 0;display:block}
 .arcade-site .rowhead{margin-bottom:20px;gap:15px;align-items:baseline;flex-wrap:wrap}
@@ -190,6 +192,7 @@ html.arcade-still .arcade-boot{display:none}
 
 @media(min-width:1250px){.game-feed{grid-template-columns:repeat(5,minmax(0,1fr))}}
 @media(max-width:700px){
+  .arcade-header-tools #accountSlot button{max-width:108px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .feed-heading{grid-template-columns:minmax(0,1fr);padding:12px 14px}
   .feed-heading h1{font-size:38px}
   .game-feed{gap:14px 10px}

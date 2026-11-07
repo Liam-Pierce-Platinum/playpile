@@ -83,7 +83,12 @@ class Game {
       if (HOLD.includes(e.code)) { e.preventDefault(); this.keyHold.add(e.code); }
     });
     addEventListener('keyup', (e) => this.keyHold.delete(e.code));
-    addEventListener('blur', () => { this.pointers.clear(); this.keyHold.clear(); if (this.mode === 'play' && !this.ui.open && this.w && !this.w.done) this.ui.show('pause'); });
+    const pauseOnInterrupt = () => {
+      this.pointers.clear(); this.keyHold.clear();
+      if (this.mode === 'play' && !this.ui.open && this.w && !this.w.done) this.ui.show('pause');
+    };
+    addEventListener('blur', pauseOnInterrupt);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) pauseOnInterrupt(); });
   }
   get holding() { return this.pointers.size > 0 || this.keyHold.size > 0; }
 

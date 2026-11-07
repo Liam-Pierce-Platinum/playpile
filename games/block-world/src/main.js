@@ -376,16 +376,19 @@ addEventListener('keyup', (e) => { keys[e.code] = false; if (e.code === 'Space')
 addEventListener('wheel', (e) => { if (L && L.sandbox && G.state === 'play') { const i = (PALETTE.indexOf(sel) + (e.deltaY > 0 ? 1 : -1) + PALETTE.length) % PALETTE.length; sel = PALETTE[i]; drawHotbar(); } });
 
 // touch: left = joystick, right = look; buttons
-const touchMode = Q.has('touch') || ('ontouchstart' in window && matchMedia('(pointer: coarse)').matches);
+const touchMode = Q.has('touch') || matchMedia('(pointer: coarse)').matches;
 if (touchMode) document.body.classList.add('touch');
 const tp = { stick: null, look: null };
-canvas.addEventListener('touchstart', (e) => { unlock(); for (const t of e.changedTouches) { if (t.clientX < innerWidth * .45 && !tp.stick) { tp.stick = { id: t.identifier, x: t.clientX, y: t.clientY }; $('stick').style.cssText = `left:${t.clientX}px;top:${t.clientY}px;display:block`; } else if (!tp.look) tp.look = { id: t.identifier, x: t.clientX, y: t.clientY }; } e.preventDefault(); }, { passive: false });
+canvas.addEventListener('touchstart', (e) => { unlock(); for (const t of e.changedTouches) { if (t.clientX < innerWidth * .45 && !tp.stick) { tp.stick = { id: t.identifier, x: t.clientX, y: t.clientY }; $('stick').style.cssText = `left:${t.clientX}px;top:${t.clientY}px;display:block`; } else if (t.clientX >= innerWidth * .45 && !tp.look) tp.look = { id: t.identifier, x: t.clientX, y: t.clientY }; } e.preventDefault(); }, { passive: false });
 canvas.addEventListener('touchmove', (e) => { for (const t of e.changedTouches) {
   if (tp.stick && t.identifier === tp.stick.id) { let dx = (t.clientX - tp.stick.x) / 50, dy = (t.clientY - tp.stick.y) / 50; const l = Math.hypot(dx, dy); if (l > 1) { dx /= l; dy /= l; } input.s = dx; input.f = -dy; $('knob').style.transform = `translate(${dx * 34}px,${dy * 34}px)`; }
   if (tp.look && t.identifier === tp.look.id) { P.yaw -= (t.clientX - tp.look.x) * .006; P.pitch = Math.max(-1.5, Math.min(1.5, P.pitch - (t.clientY - tp.look.y) * .006)); tp.look.x = t.clientX; tp.look.y = t.clientY; }
 } e.preventDefault(); }, { passive: false });
-canvas.addEventListener('touchend', (e) => { for (const t of e.changedTouches) { if (tp.stick && t.identifier === tp.stick.id) { tp.stick = null; input.f = input.s = 0; $('stick').style.display = 'none'; $('knob').style.transform = ''; } if (tp.look && t.identifier === tp.look.id) tp.look = null; } });
-const tb = (id, fn, up) => { const b = $(id); b.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); unlock(); fn(); }, { passive: false }); if (up) b.addEventListener('touchend', (e) => { e.preventDefault(); up(); }); };
+function resetStick() { tp.stick = null; input.f = input.s = 0; $('stick').style.display = 'none'; $('knob').style.transform = ''; }
+function endTouch(e) { for (const t of e.changedTouches) { if (t.identifier === tp.stick?.id) resetStick(); if (t.identifier === tp.look?.id) tp.look = null; } }
+for (const event of ['touchend','touchcancel']) canvas.addEventListener(event, endTouch);
+addEventListener('blur', () => { resetStick(); tp.look = null; input.jumpHeld = false; });
+const tb = (id, fn, up) => { const b = $(id); b.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); unlock(); fn(); }, { passive: false }); if (up) for (const event of ['touchend','touchcancel']) b.addEventListener(event, (e) => { e.preventDefault(); up(); }, { passive: false }); };
 tb('tJump', () => { input.jumpHeld = true; }, () => { input.jumpHeld = false; });
 tb('tPlace', doPlace); tb('tBreak', doBreak);
 

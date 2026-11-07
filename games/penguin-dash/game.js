@@ -908,6 +908,11 @@ function toScreen(e) { const r = cv.getBoundingClientRect(); mouse.sx = (e.clien
 addEventListener('mousemove', toScreen);
 cv.addEventListener('mousedown', e => { toScreen(e); SFX.init(); if (e.button === 0) { clickQueued = true; mouse.down = true; } });
 addEventListener('mouseup', () => { mouse.down = false; });
+cv.addEventListener('pointerdown', e => {
+  if (e.pointerType !== 'touch' || !e.isPrimary) return;
+  e.preventDefault();
+  toScreen(e); SFX.init(); clickQueued = true;
+});
 cv.addEventListener('contextmenu', e => e.preventDefault());
 const keys = {};
 addEventListener('keydown', e => {
@@ -916,6 +921,7 @@ addEventListener('keydown', e => {
   keys[e.code] = true;
 });
 addEventListener('keyup', e => { keys[e.code] = false; });
+addEventListener('blur', () => { mouse.down = false; clickQueued = false; for (const code in keys) keys[code] = false; });
 
 // ---------------------------------------------------------------- state
 let mode = 'menu', time = 0, shake = 0;

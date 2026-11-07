@@ -396,7 +396,7 @@ let swipe = null; const trails = [];
 touch.addEventListener('pointerdown', (e) => {
   snd.unlock();
   if (G.state === 'after') { if (G.afterT < 1.0) G.afterT = 0; return; }
-  if (G.state !== 'aim' || G.paused) return;
+  if (swipe || G.state !== 'aim' || G.paused) return;
   touch.setPointerCapture(e.pointerId);
   swipe = { id: e.pointerId, pts: [[e.clientX, e.clientY, e.timeStamp || performance.now()]] };
 });
@@ -415,8 +415,9 @@ const endSwipe = () => {
   const shot = swipeToShot(pts);
   if (shot) shoot(shot);
 };
-touch.addEventListener('pointerup', endSwipe);
-touch.addEventListener('pointercancel', () => { swipe = null; });
+touch.addEventListener('pointerup', (e) => { if (swipe?.id === e.pointerId) endSwipe(); });
+touch.addEventListener('lostpointercapture', (e) => { if (swipe?.id === e.pointerId) swipe = null; });
+addEventListener('blur', () => { swipe = null; });
 
 const _v = new THREE.Vector3(), _d = new THREE.Vector3();
 function project(x, y, z) { cam.updateMatrixWorld(); _v.set(x, y, z).project(cam); return [(_v.x + 1) / 2 * W, (1 - _v.y) / 2 * H]; }

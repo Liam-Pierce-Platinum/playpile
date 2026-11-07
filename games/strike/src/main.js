@@ -274,20 +274,21 @@ function aimCam() {
 function pinCam() { return { pos: V(0, 0.85, -15.0), look: V(0, 0.1, -18.7) }; }
 
 // ---------- input ----------
-const ptr = { down: false, mode: null, pts: [], sx: 0, sy: 0, bx: 0 };
+const ptr = { id: null, mode: null, pts: [], sx: 0, sy: 0, bx: 0 };
 const glEl = R.r.domElement;
 function pxPerMeter() { const a = R.project(-0.5, 0, -0.3), b = R.project(0.5, 0, -0.3); return Math.max(40, b.x - a.x); }
 function onDown(e) {
   if (e.target.closest && e.target.closest('button')) return;
+  if (ptr.id !== null || e.button !== 0) return;
   A.initAudio();
   if (G.state === 'roll' || G.state === 'result' || G.state === 'sweep') { G.fast = 4; return; }
   if (G.state !== 'aim' || G.bot) return;
-  G.stateT = 0; ptr.down = true; ptr.mode = null; ptr.sx = e.clientX; ptr.sy = e.clientY; ptr.bx = G.ballX;
+  G.stateT = 0; ptr.id = e.pointerId; ptr.mode = null; ptr.sx = e.clientX; ptr.sy = e.clientY; ptr.bx = G.ballX;
   ptr.pts = [{ x: e.clientX, y: e.clientY, t: e.timeStamp || performance.now() }];
   fx.trail = [];
 }
 function onMove(e) {
-  if (!ptr.down || G.state !== 'aim') return;
+  if (e.pointerId !== ptr.id || G.state !== 'aim') return;
   const dx = e.clientX - ptr.sx, dy = e.clientY - ptr.sy;
   if (!ptr.mode && Math.hypot(dx, dy) > 10) ptr.mode = Math.abs(dx) > Math.abs(dy) * 1.2 ? 'move' : dy < 0 ? 'swipe' : 'move';
   if (ptr.mode === 'move') { G.ballX = Math.max(-0.42, Math.min(0.42, ptr.bx + dx / pxPerMeter())); }
@@ -299,7 +300,8 @@ function onMove(e) {
   }
 }
 function onUp(e) {
-  if (!ptr.down) return; ptr.down = false; G.aim.live = false;
+  if (e.pointerId !== ptr.id) return;
+  ptr.id = null; G.aim.live = false;
   // a fast flick on a laggy frame can arrive as down -> up with no move in between: judge it from the release point
   if (!ptr.mode && G.state === 'aim') { const dx = e.clientX - ptr.sx, dy = e.clientY - ptr.sy; if (-dy > R.h * 0.08 && Math.abs(dx) < -dy * 1.2) ptr.mode = 'swipe'; }
   if (ptr.mode === 'swipe' && G.state === 'aim') {
@@ -310,7 +312,12 @@ function onUp(e) {
     if (r) throwBall({ angle: r.angle, speed: r.speed, spin: r.spin });
   }
 }
-glEl.addEventListener('pointerdown', onDown); window.addEventListener('pointermove', onMove); window.addEventListener('pointerup', onUp); window.addEventListener('pointercancel', onUp);
+function cancelSwipe() { ptr.id = null; G.aim.live = false; fx.trail = []; }
+glEl.addEventListener('pointerdown', onDown);
+window.addEventListener('pointermove', onMove);
+window.addEventListener('pointerup', onUp);
+window.addEventListener('pointercancel', e => { if (e.pointerId === ptr.id) cancelSwipe(); });
+window.addEventListener('blur', cancelSwipe);
 $('hud').addEventListener('pointerdown', onDown);
 
 const keys = {};
@@ -347,7 +354,7 @@ function keyAim(dt) {
 // Shown over the ball for the first throws, and again whenever the player idles on the aim screen.
 function updateGhost() {
   const el = $('ghost');
-  const want = G.state === 'aim' && !G.bot && !ptr.down && !G.aim.kb && G.pinsDrop === 0 && (save.throws < 3 || G.stateT > 6);
+  const want = G.state === 'aim' && !G.bot && ptr.id === null && !G.aim.kb && G.pinsDrop === 0 && (save.throws < 3 || G.stateT > 6);
   el.classList.toggle('hidden', !want);
   if (!want) return;
   const p = R.project(G.ballX, L.ballR, -0.3);

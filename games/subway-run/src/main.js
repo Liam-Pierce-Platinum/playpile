@@ -204,9 +204,26 @@ addEventListener('keydown', (e) => {
   const a = KEYS[e.code]; if (a) { e.preventDefault(); if (!e.repeat) act(a); }
 });
 let tp = null;
-canvas.addEventListener('pointerdown', (e) => { tp = { x: e.clientX, y: e.clientY, done: false }; A.init(); });
-addEventListener('pointermove', (e) => { if (!tp || tp.done) return; const dx = e.clientX - tp.x, dy = e.clientY - tp.y; if (Math.hypot(dx, dy) > 28) { tp.done = true; act(Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 'left' : 'right') : dy < 0 ? 'jump' : 'roll'); } });
-addEventListener('pointerup', () => { if (tp && !tp.done && S.state === 'play') act('jump'); tp = null; });
+canvas.addEventListener('pointerdown', (e) => {
+  if (tp) return;
+  tp = { id: e.pointerId, x: e.clientX, y: e.clientY, done: false };
+  canvas.setPointerCapture(e.pointerId);
+  A.init();
+});
+canvas.addEventListener('pointermove', (e) => {
+  if (tp?.id !== e.pointerId || tp.done) return;
+  const dx = e.clientX - tp.x, dy = e.clientY - tp.y;
+  if (Math.hypot(dx, dy) < 24) return;
+  tp.done = true;
+  act(Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 'left' : 'right') : dy < 0 ? 'jump' : 'roll');
+});
+canvas.addEventListener('pointerup', (e) => {
+  if (tp?.id !== e.pointerId) return;
+  if (!tp.done && S.state === 'play') act('jump');
+  tp = null;
+});
+canvas.addEventListener('lostpointercapture', (e) => { if (tp?.id === e.pointerId) tp = null; });
+addEventListener('blur', () => { tp = null; });
 
 // ---------- UI ----------
 const $ = (id) => document.getElementById(id);

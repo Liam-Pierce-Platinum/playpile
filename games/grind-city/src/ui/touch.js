@@ -98,7 +98,8 @@ export function installTouch(canvas, api) {
   for (const k in rows) root.appendChild(rows[k]);
   const btn = {};
   for (const p of PADS) {
-    const b = mk('tp-btn');
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'tp-btn';
     b.id = p.id;
     b.textContent = p.label;
     rows[p.row].appendChild(b);
@@ -114,12 +115,21 @@ export function installTouch(canvas, api) {
   // a push you cannot HOLD is not a push. `touchcancel` matters too -
   // drag your thumb off the pad mid-push and without it you keep pushing
   // forever.
+  const resets = [];
   const bind = (el, on, off) => {
-    const down = (e) => { e.preventDefault(); e.stopPropagation(); on(); };
-    const up = (e) => { e.preventDefault(); e.stopPropagation(); if (off) off(); };
-    el.addEventListener('touchstart', down, { passive: false });
-    el.addEventListener('touchend', up, { passive: false });
-    el.addEventListener('touchcancel', up, { passive: false });
+    let pointer = null;
+    const down = e => {
+      if (pointer !== null || !api.playing()) return;
+      e.preventDefault(); e.stopPropagation(); pointer = e.pointerId;
+      el.setPointerCapture(pointer); el.classList.add('held'); on();
+    };
+    const up = e => {
+      if (pointer === null || (e && e.pointerId !== pointer)) return;
+      pointer = null; el.classList.remove('held'); off?.();
+    };
+    el.addEventListener('pointerdown', down);
+    for (const event of ['pointerup','pointercancel','lostpointercapture']) el.addEventListener(event, up);
+    resets.push(() => up());
   };
   bind(btn.pushL, () => api.push('left', true), () => api.push('left', false));
   bind(btn.pushR, () => api.push('right', true), () => api.push('right', false));
@@ -171,6 +181,8 @@ export function installTouch(canvas, api) {
   };
   canvas.addEventListener('touchend', end, { passive: false });
   canvas.addEventListener('touchcancel', end, { passive: false });
+  const reset = () => { id = null; for (const clear of resets) clear(); };
+  addEventListener('blur', reset);
 
   // the browser's own gestures are all wrong here: a two-finger pinch
   // zooms the page, a swipe down pulls the address bar back, and a long
@@ -179,7 +191,11 @@ export function installTouch(canvas, api) {
     document.addEventListener(ev, (e) => e.preventDefault(), { passive: false });
 
   return {
-    show(on) { root.classList.toggle('hidden', !on); },
+    show(on) {
+      if (!on && !root.classList.contains('hidden')) reset();
+      root.classList.toggle('hidden', !on);
+      document.body.classList.toggle('touch-running', on);
+    },
     root,
   };
 }

@@ -62,6 +62,7 @@ export class Input {
     this.wheel = 0;
     this.locked = false;
     this.dragging = false;
+    this.touchCamera = null;
     this.mouseButtons = new Set();
     this.justClicked = new Set();
     this.sensitivity = 0.0028;
@@ -86,7 +87,7 @@ export class Input {
       }
     });
     addEventListener('keyup', (e) => this.keys.delete(e.code));
-    addEventListener('blur', () => { this.keys.clear(); this.mouseButtons.clear(); });
+    addEventListener('blur', () => this.releaseControls());
 
     dom.addEventListener('mousedown', (e) => {
       if (!this.enabled) return;
@@ -100,6 +101,23 @@ export class Input {
       if (e.button === 0) this.dragging = false;
     });
     dom.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    dom.addEventListener('pointerdown', (e) => {
+      if (!this.enabled || e.pointerType !== 'touch' || this.touchCamera) return;
+      e.preventDefault();
+      this.touchCamera = { id: e.pointerId, x: e.clientX, y: e.clientY };
+      dom.setPointerCapture(e.pointerId);
+    });
+    dom.addEventListener('pointermove', (e) => {
+      const touch = this.touchCamera;
+      if (!this.enabled || touch?.id !== e.pointerId) return;
+      this.mouseDX += (e.clientX - touch.x) * this.sensitivity * 1.65;
+      this.mouseDY += (e.clientY - touch.y) * this.sensitivity * 1.65;
+      touch.x = e.clientX; touch.y = e.clientY;
+    });
+    dom.addEventListener('lostpointercapture', (e) => {
+      if (this.touchCamera?.id === e.pointerId) this.touchCamera = null;
+    });
 
     addEventListener('mousemove', (e) => {
       if (!this.enabled) return;
@@ -119,8 +137,19 @@ export class Input {
     });
   }
 
-  requestLock() { if (!this.locked) this.dom.requestPointerLock?.(); }
+  requestLock() {
+    if (this.locked) return;
+    try { this.dom.requestPointerLock?.()?.catch?.(() => {}); } catch {}
+  }
   releaseLock() { if (this.locked) document.exitPointerLock?.(); }
+  releaseControls() {
+    this.keys.clear();
+    this.mouseButtons.clear();
+    this.dragging = false;
+    this.touchCamera = null;
+    this.lastTap.clear();
+    this.endFrame();
+  }
 
   /** Movement as a -1..1 pair. y is forward. Analog stick wins if it is moved. */
   axis() {

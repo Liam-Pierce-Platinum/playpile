@@ -32,3 +32,11 @@ button:disabled { opacity: .4; cursor: default; }
 .up .pips { letter-spacing: 2px; color: #b8562e; }
 .up button { margin: 0; padding: 6px 12px; font-size: 15px; min-width: 76px; }
 @media (max-width: 600px) { #dist { font-size: 30px; } #banner { font-size: 32px; } h1 { font-size: 36px; } }
+
+@media (pointer: coarse) {
+  html,body { touch-action: manipulation; }
+  .card { box-sizing: border-box; max-height: calc(100dvh - 24px); overflow: auto; touch-action: pan-y; }
+  .card button,#muteBtn { min-height: 44px; }
+  #pedals { bottom: max(14px,env(safe-area-inset-bottom)); }
+  #hint { padding-inline: 12px; font-size: 14px; box-sizing: border-box; }
+}

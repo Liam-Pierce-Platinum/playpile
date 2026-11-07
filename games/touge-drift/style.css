@@ -59,3 +59,24 @@ input[type=range] { accent-color: var(--orange); width: 190px; }
 .how { display: flex; gap: 12px; align-items: center; width: 100%; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; color: #222; line-height: 1.35; }
 .how .k { min-width: 64px; text-align: center; padding: 6px; border: 2px solid var(--ink); border-radius: 4px; background: var(--ink); color: var(--paper); font-family: 'Russo One', sans-serif; font-size: 12px; }
 .how b { color: #000; }
+
+.pausebtn { top: max(12px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); }
+.touch-actions { position: absolute; right: max(14px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); display: flex; gap: 8px; }
+.touch-actions[hidden] { display: none; }
+.touch-action { min-width: 68px; min-height: 44px; border: 2px solid var(--paper); border-radius: 6px; background: rgba(14,14,18,.86); color: var(--paper); font: inherit; text-transform: uppercase; touch-action: none; }
+.touch-action.held { background: var(--orange); color: var(--ink); }
+.scrim { overflow: auto; align-items: safe center; touch-action: pan-y; }
+.scrim.title { display: grid; }
+.scrim .title { width: 100%; }
+.scrim .tag, .scrim .keys { max-width: 100%; }
+.scrim .card input[type=range] { width: min(190px, 56%); }
+
+@media (max-height: 500px) {
+  .scrim .title { gap: 8px; }
+  .logo h1 { font-size: clamp(36px, 11vh, 72px); }
+  .logo .kanji { font-size: clamp(82px, 25vh, 128px); }
+  .menu { gap: 7px; }
+  .btn, .btn.sm { min-height: 44px; padding: 6px 12px; }
+  .card { gap: 8px; padding: 12px; }
+  .over .big { font-size: 36px; }
+}

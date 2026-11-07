@@ -9,6 +9,14 @@ export const clearTaught = () => { try { localStorage.removeItem(KEY); } catch (
 
 // input tokens -> the label on the chip and the events that resume
 const LABEL = { KeyC: 'C', ControlLeft: 'CTRL', LMB: 'LMB', RMB: 'RMB', MMB: 'MIDDLE MOUSE', dbl: 'LMB LMB', Space: 'SPACE', KeyE: 'E', KeyS: 'S (hold)', KeyA: 'A', KeyD: 'D' };
+const TOUCH_LABEL = { KeyC: 'CROUCH', ControlLeft: 'CROUCH', LMB: 'LEFT CLAW', RMB: 'RIGHT CLAW', MMB: 'BLOCK', dbl: 'LEFT CLAW TWICE', Space: 'JUMP', KeyE: 'USE', KeyS: 'DRAG DOWN', KeyA: 'DRAG LEFT', KeyD: 'DRAG RIGHT' };
+const TOUCH_TIP = {
+  block: 'Hold Block to defend.', parry: 'Tap Block just as the swing lands.', finisher: 'Aim at him and double-tap Left claw.',
+  climb: 'Tap a claw when you are near a wall.', leap: 'Look at the next trunk or pillar and tap Jump.',
+  corner: 'Drag your movement thumb sideways.', slide: 'Drag your movement thumb down.',
+  slam: 'Double-tap the same claw in the air.', takedown: 'He has not seen you. Tap Use.',
+  sight: 'Tap Crouch, break line of sight or climb higher to hide.',
+};
 const MOVES = {
   block: ['BLOCK', ['MMB'], 'Hold the middle mouse button: blocks his swing.'],
   parry: ['PARRY', ['MMB'], 'Block right as it lands: he drops to his knees.'],
@@ -26,10 +34,12 @@ export function installTeach(G) {
   try { if (/[?&]noteach/.test(location.search)) return; } catch (_) {}
   const taught = read();
   let el = null, cur = null, cool = 0;
-  const show = (title, keys, sub) => {
+  const show = (id, title, keys, sub) => {
     try {
       if (!el) { el = document.createElement('div'); el.id = 'teach'; el.style.cssText = 'position:absolute;left:0;right:0;top:58%;text-align:center;pointer-events:none;z-index:30;font:600 15px Arial;color:#fff;text-shadow:0 0 12px #000;transition:opacity .2s'; document.body.appendChild(el); }
-      const chips = keys.map(k => `<b style="display:inline-block;margin:0 4px;padding:3px 9px;border:1px solid #ddd;border-radius:3px;background:rgba(160,20,20,.55);letter-spacing:2px">${LABEL[k] || k}</b>`).join(' / ');
+      const labels = G.touchMode ? TOUCH_LABEL : LABEL;
+      const chips = [...new Set(keys.map(k => labels[k] || k))].map(label => `<b style="display:inline-block;margin:0 4px;padding:3px 9px;border:1px solid #ddd;border-radius:3px;background:rgba(160,20,20,.55);letter-spacing:2px">${label}</b>`).join(' / ');
+      if (G.touchMode && TOUCH_TIP[id]) sub = TOUCH_TIP[id];
       el.innerHTML = `<div style="font-size:28px;letter-spacing:8px;margin-bottom:8px">${title}</div>${chips}<div style="margin-top:8px;opacity:.85">${sub || ''}</div>`;
       el.style.opacity = 1;
     } catch (_) {}
@@ -38,7 +48,7 @@ export function installTeach(G) {
   G.teach = (id, title, keys, sub) => {
     if (cur || taught.has(id) || !G.playing || G.cut) return false;
     const m = MOVES[id] || [title, Array.isArray(keys) ? keys : [keys], sub];
-    cur = { id, keys: m[1], t: 0 }; show(title || m[0], m[1], sub || m[2]);
+    cur = { id, keys: m[1], t: 0 }; show(id, title || m[0], m[1], sub || m[2]);
     return true;
   };
   // called from the input handlers with a token: 'LMB' 'RMB' 'MMB' or a key code

@@ -364,7 +364,7 @@ let drag = null;
 cv.addEventListener('pointerdown', (e) => {
   Audio.warm();
   // a press while the ball is still settling is kept: the aim appears the moment it stops
-  if (S.screen !== 'play' || !S.player || S.player.done || drag) return;
+  if (S.screen !== 'play' || !S.player || S.player.done || drag || e.button !== 0) return;
   S.idle = 0;
   drag = { x: e.clientX, y: e.clientY, id: e.pointerId };
   S.kb.on = false;
@@ -393,14 +393,20 @@ function dragAim() {
 }
 const endDrag = (e) => {
   if (!drag || (e && e.pointerId !== drag.id)) return;
-  if (drag.cx != null && canAim()) dragAim();
+  // A quick flick can deliver down and up in a single frame.
+  drag.cx = e.clientX; drag.cy = e.clientY;
+  if (canAim()) dragAim();
   drag = null;
   if (S.aim && canAim() && S.aim.power > 0.03) doShoot(S.player, S.aim.ang, S.aim.power);
   S.aim = null;
 };
 cv.addEventListener('pointerup', endDrag);
 window.addEventListener('pointerup', () => Audio.warm(), true);
-cv.addEventListener('pointercancel', () => { drag = null; S.aim = null; });
+function cancelDrag() { if (drag) { drag = null; S.aim = null; } }
+const cancelPointer = (e) => { if (drag?.id === e.pointerId) cancelDrag(); };
+cv.addEventListener('pointercancel', cancelPointer);
+cv.addEventListener('lostpointercapture', cancelPointer);
+addEventListener('blur', cancelDrag);
 
 const keys = {};
 window.addEventListener('keydown', (e) => {

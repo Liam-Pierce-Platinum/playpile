@@ -354,10 +354,12 @@ addEventListener('keydown', (e) => {
   if ((e.code === 'Enter' || e.code === 'Space') && state === 'done' && !$('done').classList.contains('hide')) nextLevel();
 });
 addEventListener('keyup', (e) => { keys[e.code] = false; });
-canvas.addEventListener('pointerdown', (e) => { sfx.init(); ptr = { id: e.pointerId, x0: e.clientX, x: e.clientX }; try { canvas.setPointerCapture(e.pointerId); } catch (_) {} });
+canvas.addEventListener('pointerdown', (e) => { if (ptr) return; sfx.init(); ptr = { id: e.pointerId, x0: e.clientX, x: e.clientX }; try { canvas.setPointerCapture(e.pointerId); } catch (_) {} });
 canvas.addEventListener('pointermove', (e) => { if (ptr && ptr.id === e.pointerId) { ptr.x = e.clientX; const lim = Math.min(innerWidth, 900) * 0.2; if (Math.abs(ptr.x - ptr.x0) > lim) ptr.x0 = ptr.x - Math.sign(ptr.x - ptr.x0) * lim; } });
 const endPtr = (e) => { if (ptr && ptr.id === e.pointerId) ptr = null; };
 canvas.addEventListener('pointerup', endPtr); canvas.addEventListener('pointercancel', endPtr);
+canvas.addEventListener('lostpointercapture', endPtr);
+addEventListener('blur', () => { ptr = null; for (const code in keys) keys[code] = false; });
 function readInput() {
   let f = (keys.KeyW || keys.ArrowUp) ? 1 : 0; const b = (keys.KeyS || keys.ArrowDown) ? 1 : 0;
   let s = ((keys.KeyD || keys.ArrowRight) ? 1 : 0) - ((keys.KeyA || keys.ArrowLeft) ? 1 : 0);

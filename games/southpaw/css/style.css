@@ -198,3 +198,42 @@ input:focus { border-color: #ffcf70; }
 .modecol .tag b { color: #ffcf70; }
 .modescout { font-size: 11px; color: #c3b09a; min-height: 70px; }
 .modescout b { color: #f4e3c6; letter-spacing: 1px; }
+
+.touch-copy { display: none; }
+html.pp-touch .touch-copy { display: block; }
+html.pp-touch .keyboard-copy { display: none; }
+html.pp-touch #stage { height: 100dvh; }
+html.pp-touch .overlay { padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); }
+html.pp-touch .overlay, html.pp-touch .plate { touch-action: pan-y; }
+html.pp-touch .plate { padding: 13px 14px; }
+html.pp-touch .row, html.pp-touch .wallet { flex-wrap: wrap; gap: 7px; }
+html.pp-touch .overlay :is(button, input) { min-height: 44px; }
+html.pp-touch .overlay input { max-width: 100%; }
+html.pp-touch .overlay :is(.stats, .howto .col, .lockopts, .modecol) { min-width: min(240px, 100%); }
+html.pp-touch .home-left { width: min(100%, 460px); gap: 8px; }
+html.pp-touch .home .logo { font-size: clamp(34px, 10vw, 58px); }
+html.pp-touch .home-foot { margin-top: 2px; }
+html.pp-touch .menu .big { padding: 6px 10px; font-size: 14px; letter-spacing: 1px; }
+html.pp-touch .stat .pips { flex-wrap: wrap; }
+html.pp-touch .vsbox { width: min(650px, 100%); gap: 8px; }
+html.pp-touch .vsside { min-width: 0; width: 100%; padding: 6px; }
+html.pp-touch .vsside canvas { width: min(100%, 24vmin, 150px); height: auto; aspect-ratio: 1; }
+html.pp-touch .vsside b { font-size: 14px; overflow-wrap: anywhere; text-align: center; }
+html.pp-touch .vsword { font-size: clamp(24px, 8vw, 52px); }
+html.pp-touch .hint { font-size: 12px; letter-spacing: 1px; bottom: max(8px, env(safe-area-inset-bottom)); }
+html.pp-touch #pp-pad.pad-boxing { --s: clamp(44px, 12vmin, 56px); }
+html.pp-touch #pp-pad.pad-boxing .pad-right { grid-template-columns: repeat(3, minmax(var(--s), 55px)); gap: 4px; }
+html.pp-touch #pp-pad.pad-boxing .pad-right button { font-size: 10px; overflow-wrap: anywhere; }
+html.pp-touch #pp-pad.pad-boxing .pad-right button:nth-child(-n+4) { border-color: #f0ae69; }
+html.pp-touch #pp-pad.pad-boxing .pad-right button[data-key="Space"] { border-color: #8fd4e9; }
+
+@media (max-height: 430px) and (orientation: landscape) {
+  html.pp-touch .overlay.home { justify-content: flex-start; }
+  html.pp-touch .home-left { justify-content: flex-start; }
+  html.pp-touch .menu { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+}
+@media (max-width: 410px) {
+  html.pp-touch .stats { grid-template-columns: 1fr; }
+  html.pp-touch .lockprev { max-width: 100%; }
+  html.pp-touch .lockprev canvas { width: min(220px, 100%); height: auto; aspect-ratio: 1; }
+}

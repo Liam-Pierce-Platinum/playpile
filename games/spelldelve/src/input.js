@@ -25,8 +25,15 @@ export function initInput(canvas, h) {
     Audio.init();
   });
   addEventListener('keyup', (e) => keys.delete(e.key.toLowerCase()));
-  addEventListener('blur', () => { keys.clear(); input.fire = false; mouseR = false; });
   let mouseL = false, mouseR = false;
+  addEventListener('blur', () => {
+    keys.clear();
+    input.fire = mouseL = mouseR = touchState.fire = dashQueued = false;
+    touchState.cast.fill(false);
+    touchState.stickId = null;
+    showStick(false);
+    for (const button of document.querySelectorAll('#touch .down')) button.classList.remove('down');
+  });
   canvas.addEventListener('mousemove', (e) => { input.mouseX = e.clientX; input.mouseY = e.clientY; input.hasMouse = true; input.touch = false; });
   canvas.addEventListener('mousedown', (e) => {
     Audio.init(); input.touch = false;

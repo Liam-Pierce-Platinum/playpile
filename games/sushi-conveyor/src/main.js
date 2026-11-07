@@ -368,18 +368,38 @@ class Game {
   input() {
     const cv = this.canvas;
     this.drag = null; this.pend = null;
+    let servingPointer = null;
     cv.addEventListener('pointerdown', (e) => {
       this.audio.unlock();
-      if (this.mode !== 'play' || this.ui.open || !this.S || this.S.over) return;
+      if (this.mode !== 'play' || this.ui.open || !this.S || this.S.over || servingPointer !== null || e.button !== 0) return;
       e.preventDefault();
+      servingPointer = e.pointerId;
       try { cv.setPointerCapture(e.pointerId); } catch (err) { /* old browser */ }
       const p = this.toWorld(e.clientX, e.clientY);
       this.down(p.x, p.y, e.pointerType === 'touch');
     });
-    cv.addEventListener('pointermove', (e) => { const p = this.toWorld(e.clientX, e.clientY); this.hover = p; this.move(p.x, p.y); });
-    const up = (e) => { const p = this.toWorld(e.clientX, e.clientY); this.up(p.x, p.y); };
-    cv.addEventListener('pointerup', up);
-    cv.addEventListener('pointercancel', up);
+    cv.addEventListener('pointermove', (e) => {
+      if (servingPointer !== null && servingPointer !== e.pointerId) return;
+      const p = this.toWorld(e.clientX, e.clientY);
+      this.hover = p; this.move(p.x, p.y);
+    });
+    cv.addEventListener('pointerup', (e) => {
+      if (servingPointer !== e.pointerId) return;
+      servingPointer = null;
+      const p = this.toWorld(e.clientX, e.clientY);
+      this.up(p.x, p.y);
+    });
+    const cancel = (e) => {
+      if (servingPointer === null || (e && servingPointer !== e.pointerId)) return;
+      servingPointer = null; this.pend = null;
+      const d = this.drag; this.drag = null;
+      if (!d) return;
+      if (d.src === 'hand') this.toHand(d.p);
+      else this.toBelt(d.p, d.p.x, d.p.y);
+    };
+    cv.addEventListener('pointercancel', cancel);
+    cv.addEventListener('lostpointercapture', cancel);
+    addEventListener('blur', () => cancel());
     addEventListener('keydown', (e) => {
       this.audio.unlock();
       if (e.repeat) return;

@@ -21,3 +21,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f4f4f2;font-family:
 .touch #fire{display:flex;right:24px;bottom:34px;width:86px;height:86px;border-radius:50%;background:#d4170d;color:#fff;align-items:center;justify-content:center;font-size:14px}
 .touch #wbtn{display:flex;right:122px;bottom:40px;width:56px;height:40px;background:#111;color:#fff;align-items:center;justify-content:center;font-size:11px}
 .touch #hint{bottom:160px}
+.touch #title{z-index:2}
+.touch #wbtn{height:44px}
+@media(max-height:460px){
+  .touch #stick{width:94px;height:94px;left:14px;bottom:14px}
+  .touch #stick i{left:22px;top:22px}
+  .touch #fire{width:68px;height:68px;right:14px;bottom:14px}
+  .touch #wbtn{right:92px;bottom:14px}
+  .touch #hint{bottom:116px;padding:0 12px;letter-spacing:1px}
+}

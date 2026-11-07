@@ -60,4 +60,6 @@ h2 { font-size: clamp(34px, 8vw, 60px); color: #ff7a3d; text-shadow: 0 5px 0 #1a
   .ctrl .desk, .keys.desk { display: none; }
   .ctrl .mob { display: flex; }
   body:not(.menu) #pads { display: block; }
+  #shopList { touch-action: pan-y; }
+  .panel button.big { min-height: 44px; }
 }

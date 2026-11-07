@@ -42,3 +42,10 @@ button.ghost{background:none;box-shadow:none;border:none;margin-top:8px;font-siz
 #levels button[disabled]{opacity:.35}
 #totStars{font-weight:800;margin-bottom:12px}
 @media (max-width:600px){#hint{font-size:11px}#lvl,#alive{font-size:13px}#timer{font-size:28px}}
+
+@media (pointer: coarse) {
+  html,body { touch-action: manipulation; }
+  #hint { width: max-content; max-width: calc(100% - 24px); white-space: normal; text-align: center; }
+  #card,#menu { box-sizing: border-box; max-height: calc(100dvh - 24px); overflow: auto; touch-action: pan-y; }
+  #card button,#menu button { min-height: 44px; }
+}

@@ -30,6 +30,7 @@
 //   own resolution and the browser scales the canvas, which is why the
 //   edges stay crisp instead of turning into a soft modern smear.
 import * as THREE from './three.module.js';
+import { bindPrimaryTouch } from './touch.js';
 
 export { THREE };
 
@@ -168,11 +169,10 @@ export class Deck3D {
       if (e.cancelable) e.preventDefault(); };
     const up = () => { this.mouse.down = false; this._rels++; };
     this.cv.addEventListener('mousemove', move);
-    this.cv.addEventListener('mousedown', down);
+    this.cv.addEventListener('mousedown', e => { this.touch = false; down(e); });
     addEventListener('mouseup', up);
-    this.cv.addEventListener('touchstart', down, { passive: false });
-    this.cv.addEventListener('touchmove', (e) => { move(e); if (e.cancelable) e.preventDefault(); }, { passive: false });
-    addEventListener('touchend', up);
+    bindPrimaryTouch(this.cv, { down: (touch) => { this.touch = true; down(touch); }, move, up,
+      cancel: () => { this.mouse.down = false; this._rels = 0; } });
 
     const fit = () => {
       const s = Math.min(innerWidth / this.W, innerHeight / this.H);

@@ -30,6 +30,7 @@ export class Input {
     // ---- touch ----
     const zone = document.getElementById('stickzone'), stick = document.getElementById('stick'), knob = stick.querySelector('i');
     zone.addEventListener('pointerdown', e => {
+      if (this.stick.id !== null) return;
       e.preventDefault(); this.touch = true;
       const s = this.stick; s.id = e.pointerId; s.ox = e.clientX; s.oy = e.clientY; s.x = s.y = 0;
       stick.style.display = 'block'; stick.style.left = (e.clientX - 60) + 'px'; stick.style.top = (e.clientY - 60) + 'px'; stick.style.bottom = 'auto';
@@ -42,10 +43,10 @@ export class Input {
       s.x = x; s.y = y; knob.style.transform = `translate(${x * 40}px, ${y * 40}px)`;
     });
     const endStick = e => { const s = this.stick; if (e.pointerId !== s.id) return; s.id = null; s.x = s.y = 0; stick.style.display = 'none'; };
-    zone.addEventListener('pointerup', endStick); zone.addEventListener('pointercancel', endStick);
+    zone.addEventListener('lostpointercapture', endStick);
     // look: any touch on the right part of the screen that is not a button
     canvas.addEventListener('pointerdown', e => {
-      if (e.pointerType !== 'touch') return;
+      if (e.pointerType !== 'touch' || this.look.id !== null) return;
       this.touch = true; const L = this.look; L.id = e.pointerId; L.x = e.clientX; L.y = e.clientY;
     });
     addEventListener('pointermove', e => {
@@ -64,6 +65,14 @@ export class Input {
       const up = () => { this.tbtn.delete(k); if (k !== 'sprint') b.classList.remove('on'); };
       b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('pointerleave', up);
     }
+    addEventListener('blur', () => {
+      endStick({ pointerId: this.stick.id });
+      this.look.id = null;
+      this.sprintToggle = this.mouseBack = false;
+      this.tbtn.clear();
+      this.clear();
+      for (const b of document.querySelectorAll('#tbtns .on')) b.classList.remove('on');
+    });
   }
   lock() { try { const p = this.canvas.requestPointerLock(); if (p && p.catch) p.catch(() => {}); } catch (e) {} }
   unlock() { if (document.pointerLockElement) document.exitPointerLock(); }

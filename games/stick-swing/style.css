@@ -36,3 +36,12 @@ small{opacity:.55}
 .skb{width:38px;height:38px;padding:0;font-size:12px;color:#fbf6ec;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
 .skb.sel{outline:3px solid #3a2e2a;clip-path:none;transform:rotate(45deg) scale(.8)}
 .skb.lock{filter:grayscale(1) brightness(.7)}
+
+@media (pointer: coarse) {
+  html,body { touch-action: manipulation; }
+  #menu,#menu .card { touch-action: pan-y; overscroll-behavior: contain; }
+  #grid { grid-template-columns: repeat(auto-fit,minmax(44px,1fr)); }
+  #grid button,#btns button { min-height: 44px; min-width: 44px; }
+  #btns { gap: 3px; }
+  #hud { padding: 6px; gap: 5px; }
+}

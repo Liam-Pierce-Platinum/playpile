@@ -405,12 +405,19 @@ addEventListener('pointerdown', () => AU.unlock());
   const show = () => document.body.classList.add('touch');
   if (matchMedia('(pointer:coarse)').matches) show();
   addEventListener('touchstart', show, { once: true, passive: true });
-  st.addEventListener('pointerdown', (e) => { id = e.pointerId; const r = st.getBoundingClientRect(); ox = r.left + r.width / 2; oy = r.top + r.height / 2; st.setPointerCapture(id); mv(e); });
-  const mv = (e) => { if (e.pointerId !== id) return; let dx = (e.clientX - ox) / 55, dy = (e.clientY - oy) / 55; const l = Math.hypot(dx, dy); if (l > 1) { dx /= l; dy /= l; } touch.steer = -dx; touch.thr = clamp(-dy * 1.6 + 0.35, -1, 1); knob.style.transform = `translate(${dx * 40}px,${dy * 40}px)`; };
+  let radius = 55;
+  st.addEventListener('pointerdown', (e) => { if (id !== null) return; id = e.pointerId; const r = st.getBoundingClientRect(); ox = r.left + r.width / 2; oy = r.top + r.height / 2; radius = r.width * 0.42; st.setPointerCapture(id); mv(e); });
+  const mv = (e) => { if (e.pointerId !== id) return; let dx = (e.clientX - ox) / radius, dy = (e.clientY - oy) / radius; const l = Math.hypot(dx, dy); if (l > 1) { dx /= l; dy /= l; } touch.steer = -dx; touch.thr = clamp(-dy * 1.6 + 0.35, -1, 1); knob.style.transform = `translate(${dx * radius * .72}px,${dy * radius * .72}px)`; };
   st.addEventListener('pointermove', mv);
   const up = (e) => { if (e.pointerId !== id) return; id = null; touch.steer = 0; touch.thr = 0; knob.style.transform = ''; };
-  st.addEventListener('pointerup', up); st.addEventListener('pointercancel', up);
-  fb.addEventListener('pointerdown', (e) => { e.preventDefault(); touch.fire = true; }); fb.addEventListener('pointerup', () => (touch.fire = false)); fb.addEventListener('pointercancel', () => (touch.fire = false));
+  let fireId = null;
+  fb.addEventListener('pointerdown', (e) => {
+    e.preventDefault(); if (fireId !== null) return;
+    fireId = e.pointerId; fb.setPointerCapture(fireId); touch.fire = true;
+  });
+  const stopFire = e => { if (e.pointerId === fireId) { fireId = null; touch.fire = false; } };
+  for (const event of ['pointerup','pointercancel','lostpointercapture']) { st.addEventListener(event, up); fb.addEventListener(event, stopFire); }
+  addEventListener('blur', () => { if (id !== null) up({ pointerId: id }); if (fireId !== null) stopFire({ pointerId: fireId }); });
 })();
 
 // ---------- game state ----------

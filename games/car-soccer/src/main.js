@@ -75,7 +75,7 @@ function startMatch(opts = {}) {
   document.body.classList.add('inmatch');
   setMusicMode('match');
   if (G.firstMatch || Q.get('hint')) {
-    G.hint = { text: touch.used ? 'LEFT THUMB drive · JUMP twice to flip · hold BOOST' : mode === '2p' ? 'P1: WASD + Space + L-Shift   ·   P2: Arrows + Enter + R-Shift' : 'A/D drive · SPACE jump (twice = flip) · SHIFT boost', t: 7 };
+    G.hint = { text: mode === '2p' ? 'P1: WASD + Space + L-Shift   ·   P2: Arrows + Enter + R-Shift' : touch.used ? 'LEFT THUMB drive · JUMP twice to flip · hold BOOST' : 'A/D drive · SPACE jump (twice = flip) · SHIFT boost', t: 7 };
   }
 }
 function beginKickoff() {
@@ -445,6 +445,7 @@ function orientHint() {
   if (portrait && G.state === 'match' && !G.rotateTimer) G.rotateTimer = setTimeout(() => { G.rotateShown = true; $('rotate').classList.add('hidden'); }, 5000);
 }
 function refreshTitle() {
+  document.querySelector('#modes [data-mode="2p"]').textContent = touch.used ? '2P · KEYBOARD / PADS' : '2 PLAYERS';
   document.querySelectorAll('#modes button').forEach((b) => b.classList.toggle('on', b.dataset.mode === save.mode));
   document.querySelectorAll('#diffs button').forEach((b) => b.classList.toggle('on', b.dataset.diff === save.diff));
   $('diffs').classList.toggle('dim', save.mode === '2p');

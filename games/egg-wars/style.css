@@ -62,3 +62,19 @@ input { background: #fff; color: #5a3a28; width: 90px; text-transform: uppercase
 #tJump { right: 130px; bottom: 40px; } #tSwap { right: 24px; bottom: 200px; } #tRel { right: 130px; bottom: 110px; } #tZoom { right: 110px; bottom: 190px; }
 body.touch #ammo { bottom: auto; top: 60px; right: auto; left: 16px; text-align: left; } body.touch #feed { top: 110px; }
 @media (max-width: 600px) { #score { font-size: 12px; } .panel h1 { font-size: 34px; } #hp { width: 150px; } }
+
+@media (pointer: coarse) {
+  html,body { touch-action: manipulation; }
+  #touch { touch-action: none; }
+  #touch button { min-height: 44px; min-width: 44px; }
+  #tMenu { top: max(44px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right)); }
+  .panel { touch-action: pan-y; overscroll-behavior: contain; max-height: calc(100dvh - 28px); }
+  .panel button { min-height: 44px; }
+  .panel input { font-size: 16px; }
+  #hud { padding-top: env(safe-area-inset-top); }
+  #board { max-height: calc(100dvh - 100px); overflow: auto; }
+}
+@media (pointer: coarse) and (max-height: 480px) {
+  .panel h1 { font-size: 32px; }
+  #hint { bottom: 8px; font-size: 11px; max-width: 43%; margin-inline: auto; }
+}

@@ -314,10 +314,11 @@ addEventListener('keydown', (e) => {
 });
 addEventListener('keyup', (e) => (keys[e.code] = false));
 const cv = renderer.domElement;
-cv.addEventListener('pointerdown', (e) => { ac(); joy = { id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, dy: 0 }; const j = $('joy'); j.style.display = 'block'; j.style.left = e.clientX + 'px'; j.style.top = e.clientY + 'px'; });
+cv.addEventListener('pointerdown', (e) => { if (joy || state !== 'play') return; ac(); cv.setPointerCapture(e.pointerId); joy = { id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, dy: 0 }; const j = $('joy'); j.style.display = 'block'; j.style.left = e.clientX + 'px'; j.style.top = e.clientY + 'px'; });
 addEventListener('pointermove', (e) => { if (!joy || e.pointerId !== joy.id) return; let dx = e.clientX - joy.x, dy = e.clientY - joy.y; const l = Math.hypot(dx, dy); if (l > 45) { dx *= 45 / l; dy *= 45 / l; } joy.dx = dx; joy.dy = dy; $('knob').style.transform = `translate(${dx}px,${dy}px)`; });
-const up = (e) => { if (joy && e.pointerId === joy.id) { joy = null; $('joy').style.display = 'none'; $('knob').style.transform = ''; } };
-addEventListener('pointerup', up); addEventListener('pointercancel', up);
+const up = (e) => { if (joy && (!e || e.pointerId === joy.id)) { joy = null; $('joy').style.display = 'none'; $('knob').style.transform = ''; } };
+for (const event of ['pointerup','pointercancel','lostpointercapture']) cv.addEventListener(event, up);
+addEventListener('blur', () => up());
 function inputDir() {
   let x = 0, z = 0;
   if (keys.KeyW || keys.ArrowUp) z += 1; if (keys.KeyS || keys.ArrowDown) z -= 1;

@@ -29,10 +29,12 @@ export class Input {
       if (e.pointerType === 'mouse') this.mouse = null;
       else if (this.stick && this.stick.id === e.pointerId) this.stick = null;
     };
-    canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
+    canvas.addEventListener('pointerup', up);
+    canvas.addEventListener('pointercancel', up);
+    canvas.addEventListener('lostpointercapture', up);
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
   }
-  clear() { this.mouse = null; this.stick = null; }
+  clear() { this.keys.clear(); this.mouse = null; this.stick = null; }
   vector(psx, psy) {
     let x = 0, y = 0;
     const k = this.keys;

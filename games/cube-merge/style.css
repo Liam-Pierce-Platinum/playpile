@@ -25,3 +25,10 @@ body.touch #boost{display:block}
 .card button{font:inherit;font-weight:900;font-size:20px;letter-spacing:3px;padding:12px 40px;border-radius:30px;border:0;background:linear-gradient(90deg,#6ef,#e7f);color:#120828;cursor:pointer}
 .card small{display:block;margin-top:14px;opacity:.65;font-size:12px}
 @media (max-width:600px){#head{font-size:34px}#board{font-size:11px;min-width:100px}#banner{font-size:28px}}
+
+@media (pointer: coarse) {
+  html,body { touch-action: manipulation; }
+  #boost { touch-action: none; right: max(12px,env(safe-area-inset-right)); bottom: max(12px,env(safe-area-inset-bottom)); width: clamp(58px,22vmin,84px); height: clamp(58px,22vmin,84px); }
+  #over { justify-content: safe center; overflow: auto; touch-action: pan-y; }
+  #over button { min-height: 44px; }
+}

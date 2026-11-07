@@ -303,7 +303,8 @@ if (TOUCH) {
   const end = (e) => { for (const t of e.changedTouches) { if (t.identifier === stickId) { stickId = null; touch.x = touch.z = 0; knob.style.transform = ''; $('stick').style.opacity = .35; } if (t.identifier === lookId) lookId = null; } };
   cv.addEventListener('touchend', end); cv.addEventListener('touchcancel', end);
   $('tj').addEventListener('touchstart', (e) => { sfx.init(); touch.jump = true; touch.jumpEdge = true; e.preventDefault(); }, { passive: false });
-  $('tj').addEventListener('touchend', () => { touch.jump = false; });
+  for (const event of ['touchend','touchcancel']) $('tj').addEventListener(event, () => { touch.jump = false; });
+  addEventListener('blur', () => { stickId = lookId = null; touch.x = touch.z = 0; touch.jump = touch.jumpEdge = false; knob.style.transform = ''; $('stick').style.opacity = .35; });
   $('tp').addEventListener('touchstart', (e) => { plantPin(); e.preventDefault(); }, { passive: false });
 }
 function startPlay() { sfx.init(); paused = false; $('menu').classList.add('hide'); }

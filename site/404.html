@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
-<head><script type="importmap">{"imports":{"/site/account.js":"/site/account.js?v=342c8789","/site/analytics.js":"/site/analytics.js?v=342c8789","/site/arcade-art.js":"/site/arcade-art.js?v=342c8789","/site/arcade-client.js":"/site/arcade-client.js?v=342c8789","/site/arcade-copy.js":"/site/arcade-copy.js?v=342c8789","/site/arcade-data.js":"/site/arcade-data.js?v=342c8789","/site/arcade-profile.js":"/site/arcade-profile.js?v=342c8789","/site/arcade-shell.js":"/site/arcade-shell.js?v=342c8789","/site/arcade-ui.js":"/site/arcade-ui.js?v=342c8789","/site/avatar.js":"/site/avatar.js?v=342c8789","/site/catalogue.js":"/site/catalogue.js?v=342c8789","/site/categories.js":"/site/categories.js?v=342c8789","/site/multiplayer.js":"/site/multiplayer.js?v=342c8789","/site/online.js":"/site/online.js?v=342c8789","/site/pages.js":"/site/pages.js?v=342c8789","/site/pixel-ui.js":"/site/pixel-ui.js?v=342c8789","/site/progress.js":"/site/progress.js?v=342c8789","/site/rating.js":"/site/rating.js?v=342c8789","/site/seo.js":"/site/seo.js?v=342c8789","/site/shell.js":"/site/shell.js?v=342c8789","/ads/ads.js":"/ads/ads.js?v=342c8789"}}</script><meta charset="utf-8">
+<head><script type="importmap">{"imports":{"/site/account.js":"/site/account.js?v=3651dd4b","/site/analytics.js":"/site/analytics.js?v=3651dd4b","/site/arcade-art.js":"/site/arcade-art.js?v=3651dd4b","/site/arcade-client.js":"/site/arcade-client.js?v=3651dd4b","/site/arcade-copy.js":"/site/arcade-copy.js?v=3651dd4b","/site/arcade-data.js":"/site/arcade-data.js?v=3651dd4b","/site/arcade-locale.js":"/site/arcade-locale.js?v=3651dd4b","/site/arcade-locales.js":"/site/arcade-locales.js?v=3651dd4b","/site/arcade-profile.js":"/site/arcade-profile.js?v=3651dd4b","/site/arcade-return.js":"/site/arcade-return.js?v=3651dd4b","/site/arcade-shell.js":"/site/arcade-shell.js?v=3651dd4b","/site/arcade-ui.js":"/site/arcade-ui.js?v=3651dd4b","/site/avatar.js":"/site/avatar.js?v=3651dd4b","/site/catalogue.js":"/site/catalogue.js?v=3651dd4b","/site/categories.js":"/site/categories.js?v=3651dd4b","/site/multiplayer.js":"/site/multiplayer.js?v=3651dd4b","/site/online.js":"/site/online.js?v=3651dd4b","/site/pages.js":"/site/pages.js?v=3651dd4b","/site/pixel-ui.js":"/site/pixel-ui.js?v=3651dd4b","/site/progress.js":"/site/progress.js?v=3651dd4b","/site/rating.js":"/site/rating.js?v=3651dd4b","/site/seo.js":"/site/seo.js?v=3651dd4b","/site/shell.js":"/site/shell.js?v=3651dd4b","/ads/ads.js":"/ads/ads.js?v=3651dd4b"}}</script><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Not found — PLAYPILE</title>
 <link rel="stylesheet" href="/site/style.css">
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
-<script type="module" src="/site/account.js?v=342c8789"></script>
+<script type="module" src="/site/account.js?v=3651dd4b"></script>
 <link rel="icon" href="/site/icon.svg" type="image/svg+xml">
 <link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/site/icon-180.png">
@@ -15,13 +15,15 @@
 <!-- NO AD CODE ON THIS PAGE, on purpose: AdSense policy forbids ads on
      screens without publisher content, and with Auto ads switched on in the
      account Google may place one anywhere its script is loaded. -->
-<link rel="stylesheet" href="/site/arcade-characters.css?v=342c8789">
-<link rel="stylesheet" href="/site/arcade.css?v=342c8789">
+<link rel="stylesheet" href="/site/arcade-characters.css?v=3651dd4b">
+<link rel="stylesheet" href="/site/arcade.css?v=3651dd4b">
+<link rel="stylesheet" href="/site/arcade-return.css?v=3651dd4b">
+<link rel="stylesheet" href="/site/arcade-locale.css?v=3651dd4b">
 </head>
 <body class="arcade-site">
 <a class="skip" href="#main">Skip to the games</a>
 
-<header class="top arcade-top"><div class="bar"><a class="logo" href="/" aria-label="PlayPile home">PLAY<b>PILE</b><span class="logo-pixel" aria-hidden="true"></span></a><nav class="arcade-nav" aria-label="Main menu"><a href="/browse/">Browse games</a><a href="/category/">Categories</a><a href="/me/">Profile</a><a href="/settings/" aria-current="page">Settings</a></nav><div id="accountSlot"></div></div></header>
+<header class="top arcade-top"><div class="bar"><a class="logo" href="/" aria-label="PlayPile home">PLAY<b>PILE</b><span class="logo-pixel" aria-hidden="true"></span></a><nav class="arcade-nav" aria-label="Main menu"><a href="/browse/">Browse Games</a><a href="/category/">Categories</a><a href="/me/">Profile</a><a href="/settings/" aria-current="page">Settings</a></nav><div class="arcade-header-tools"><div id="localeSlot"></div><div id="accountSlot"></div></div></div></header>
 
 <div class="shell">
 
@@ -33,7 +35,7 @@
         <h1>There is nothing here</h1>
         <p>That page does not exist. It may have been a game that moved, or a link with
            a typo in it. Everything that does exist is one click away.</p>
-        <p style="margin-top:18px"><a class="btn" href="/" id="allbtn">Browse games</a></p>
+        <p style="margin-top:18px"><a class="btn" href="/" id="allbtn">Browse Games</a></p>
       </section>
     </div>
 
@@ -58,6 +60,6 @@ document.getElementById('allbtn').textContent = 'All ' + GAMES.length + ' games'
 // no ad slots on this page, but it does load the ad script, so it owes
 // the visitor the same cookie notice as everywhere else
 </script>
-<script type="module" src="/site/arcade-client.js?v=342c8789"></script>
+<script type="module" src="/site/arcade-client.js?v=3651dd4b"></script>
 </body>
 </html>

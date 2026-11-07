@@ -146,8 +146,9 @@ import { HalfCourt, FLOOR as HALF_FLOOR } from './half.js';
 // fighting for the same strip; and `units` goes up with the width so the
 // same amount of court is still in shot - the extra pixels go into the
 // floor either side, which is where the running happens.
+const touchDevice = matchMedia('(pointer: coarse)').matches;
 const D = new Deck3D({ key: 'hoops', w: 960, h: 600, units: 28, bg: '#101826',
-                       tilt: 0.13, scale: 2 });
+                       tilt: 0.13, scale: touchDevice ? 1.2 : 2 });
 
 const G = -17;
 const FLOOR = -5.4;
@@ -172,6 +173,72 @@ let mode = 'half';                  // 'half' | 'still'
 let court = 'half';                 // which court the match game is on: 'half' | 'full'
 let half = null;                    // the court game, made on first use
 let teamSize = 3;                   // how many a side
+
+const touchControls = document.getElementById('hoops-mobile');
+const joinDialog = document.getElementById('join-room');
+const joinCode = document.getElementById('join-code');
+joinDialog.addEventListener('close', () => {
+  if (joinDialog.returnValue === 'join' && /^[a-z0-9]{4}$/i.test(joinCode.value)) joinOnline(joinCode.value.toUpperCase());
+});
+function showRoomEntry() {
+  if (!touchDevice) { online.typing = true; online.entry = ''; return; }
+  joinCode.value = ''; joinDialog.returnValue = ''; joinDialog.showModal(); joinCode.focus();
+}
+
+function bindTouchControls() {
+  const stick = document.getElementById('hoops-stick');
+  const knob = stick.firstElementChild;
+  const pause = document.getElementById('hoops-pause');
+  let movePointer = null;
+  const actions = new Map();
+  const moveKeys = ['a', 'd', 'w', 's'];
+  function move(e) {
+    if (e.pointerId !== movePointer) return;
+    const r = stick.getBoundingClientRect();
+    const dx = (e.clientX - r.left - r.width / 2) / (r.width * .38);
+    const dy = (e.clientY - r.top - r.height / 2) / (r.height * .38);
+    knob.style.transform = `translate(${22 * clamp(dx, -1, 1)}px, ${22 * clamp(dy, -1, 1)}px)`;
+    [dx < -.24, dx > .24, dy < -.24, dy > .24].forEach((held, i) => held ? D.keys.add(moveKeys[i]) : D.keys.delete(moveKeys[i]));
+  }
+  function resetMove() { movePointer = null; knob.style.transform = ''; moveKeys.forEach(key => D.keys.delete(key)); }
+  stick.addEventListener('pointerdown', e => {
+    if (movePointer !== null) return;
+    e.preventDefault(); movePointer = e.pointerId; stick.setPointerCapture(movePointer); move(e);
+  });
+  stick.addEventListener('pointermove', move);
+  function release(e) {
+    if (e.pointerId === movePointer) resetMove();
+    const button = actions.get(e.pointerId);
+    if (button) { D.keys.delete(button.dataset.key); button.classList.remove('held'); actions.delete(e.pointerId); }
+  }
+  for (const event of ['pointerup','pointercancel','lostpointercapture']) touchControls.addEventListener(event, release);
+  for (const button of touchControls.querySelectorAll('[data-key]')) button.addEventListener('pointerdown', e => {
+    if (button.classList.contains('held')) return;
+    e.preventDefault(); button.setPointerCapture(e.pointerId); actions.set(e.pointerId, button);
+    button.classList.add('held'); D.keys.add(button.dataset.key);
+  });
+  function reset() { resetMove(); for (const id of actions.keys()) release({ pointerId: id }); }
+  pause.addEventListener('pointerdown', e => e.stopPropagation());
+  pause.addEventListener('click', () => {
+    reset(); D.paused = !D.paused;
+    D.mouse.down = false; drag = null; arcLine.visible = false;
+    if (half) { half.drag = null; half.arcLine.visible = false; }
+    pause.textContent = D.paused ? 'Resume' : 'Pause';
+    touchControls.classList.toggle('paused', D.paused);
+  });
+  addEventListener('blur', reset);
+  D.cv.addEventListener('touchcancel', () => { drag = null; arcLine.visible = false; if (half) { half.drag = null; half.arcLine.visible = false; } });
+  return () => {
+    const visible = Boolean(started && (mode === 'half' ? !half?.over : !over));
+    if (!visible && !touchControls.hidden) reset();
+    touchControls.hidden = !visible;
+    touchControls.classList.toggle('still', mode !== 'half');
+    if (touchControls.classList.contains('paused') && !D.paused) {
+      touchControls.classList.remove('paused'); pause.textContent = 'Pause';
+    }
+  };
+}
+const updateTouchUI = touchDevice ? bindTouchControls() : null;
 
 // ONE CAMERA FOR BOTH COURTS. Liam: *"same camera angle for half court and
 // stuff to"*. So the half-width, the tilt and the height are the SAME
@@ -633,8 +700,8 @@ function drawHalfHud() {
   } else {
     const you = h.you;
     const hint = half.ball.holder === you
-      ? 'drag to shoot  ·  click a team-mate to pass'
-      : 'click the man with the ball to swat  ·  SHIFT to guard';
+      ? (touchDevice ? 'drag to shoot · tap a team-mate to pass' : 'drag to shoot  ·  click a team-mate to pass')
+      : (touchDevice ? 'hold Guard · tap Jump / block at the ball' : 'click the man with the ball to swat  ·  SHIFT to guard');
     D.text(hint, D.W / 2, D.H - 26, 11, '#8b96a8', 'center');
   }
 }
@@ -774,7 +841,8 @@ function drawHud() {
 const board = new Board('hoops', { unit: 'SCORE' });
 const home = new Home(D, {
   title: 'HOOPS',
-  lines: ['A and D run up and down the floor, W and S go away and towards you',
+  lines: touchDevice ? ['Use the left stick to run, drag on the court to shoot.',
+          'Tap a teammate to pass, or hold Guard on defense.', 'Turn sideways for a bigger court.'] : ['A and D run up and down the floor, W and S go away and towards you',
           'drag to shoot, click a team-mate to pass, click the ball to swat',
           'SHIFT guards him  ·  half court is first to eleven, full court is two minutes'],
   board,
@@ -869,7 +937,7 @@ const home = new Home(D, {
         if (h.online) {
           if (h.online === 'HOST A ROOM') hostOnline();
           else if (h.online === 'LEAVE') leaveOnline();
-          else { online.typing = true; online.entry = ''; }
+          else showRoomEntry();
           DD.beep(600, 0.06, 'triangle', 0.05);
           return;
         }
@@ -877,7 +945,7 @@ const home = new Home(D, {
       if (panelTab === 'kit') wardrobePanel.click(DD, x, y + 26, 0);
     },
   },
-  hint: 'WASD move · DRAG shoot · CLICK pass or swat · SHIFT guard · SPACE jump · P pause',
+  hint: touchDevice ? 'STICK move · DRAG shoot · TAP pass or swat' : 'WASD move · DRAG shoot · CLICK pass or swat · SHIFT guard · SPACE jump · P pause',
 });
 
 // ---------------------------------------------------------------------
@@ -1019,4 +1087,4 @@ if (D.shot) {
   for (let i = 0; i < 40; i++) stepNet(1 / 60);
 }
 
-D.run(step);
+D.run(dt => { step(dt); updateTouchUI?.(); });

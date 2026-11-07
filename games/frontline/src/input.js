@@ -50,7 +50,14 @@ export class Input {
     const stick = document.getElementById('stick'), knob = document.getElementById('knob');
     const T = this.touch;
     let sx = 0, sy = 0;
-    const btn = (id, on, off) => { const b = document.getElementById(id); if (!b) return; b.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); on(); }, { passive: false }); b.addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); if (off) off(); }, { passive: false }); };
+    const btn = (id, on, off) => {
+      const b = document.getElementById(id);
+      if (!b) return;
+      b.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); on(); }, { passive: false });
+      for (const type of ['touchend', 'touchcancel']) {
+        b.addEventListener(type, (e) => { e.preventDefault(); e.stopPropagation(); if (off) off(); }, { passive: false });
+      }
+    };
     btn('t-fire', () => { T.fire = true; this.mouse.left = true; }, () => { T.fire = false; this.mouse.left = false; });
     btn('t-aim', () => { T.aim = !T.aim; this.mouse.right = T.aim; });
     btn('t-reload', () => this.pressed.add('KeyR'));
@@ -82,5 +89,13 @@ export class Input {
     }, { passive: true });
     const end = (e) => { for (const t of e.changedTouches) { if (t.identifier === T.moveId) { T.moveId = null; T.mx = T.mz = 0; knob.style.transform = ''; stick.classList.remove('on'); } if (t.identifier === T.lookId) T.lookId = null; } };
     addEventListener('touchend', end); addEventListener('touchcancel', end);
+    addEventListener('blur', () => {
+      T.moveId = T.lookId = null;
+      T.mx = T.mz = this.mouse.dx = this.mouse.dy = 0;
+      T.fire = T.aim = false;
+      this.pressed.clear();
+      knob.style.transform = '';
+      stick.classList.remove('on');
+    });
   }
 }

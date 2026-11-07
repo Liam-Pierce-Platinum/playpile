@@ -70,6 +70,7 @@ for (const el of document.querySelectorAll('[data-k]')) {
   const upd = () => { touchIn[k] = ids.size ? 1 : 0; el.classList.toggle('on', ids.size > 0); };
   el.addEventListener('pointerdown', (e) => { e.preventDefault(); ids.add(e.pointerId); upd(); try { el.setPointerCapture(e.pointerId); } catch {} });
   for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) el.addEventListener(ev, (e) => { ids.delete(e.pointerId); upd(); });
+  addEventListener('blur', () => { ids.clear(); upd(); });
 }
 document.addEventListener('touchmove', (e) => { if (e.target.closest && e.target.closest('#touch')) e.preventDefault(); }, { passive: false });
 

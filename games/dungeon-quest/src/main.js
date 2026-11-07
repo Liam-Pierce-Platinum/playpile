@@ -68,6 +68,8 @@ const hud = new Hud();
 const cutscene = new Cutscene();
 const travel = new TravelMap();
 const sidebar = document.getElementById('sidebar');
+const touchUI = document.documentElement.classList.contains('pp-touch');
+const useKey = touchUI ? 'USE' : 'SPACE';
 
 /** Witch bolts home on this, which tracks the player. */
 const playerAnchor = new THREE.Object3D();
@@ -773,13 +775,13 @@ function updateInteractions() {
     }
   }
 
-  if (nearMirror) hud.setPrompt('<kbd>SPACE</kbd> LOOK IN THE MIRROR');
-  else if (nearTavern) hud.setPrompt('<kbd>SPACE</kbd> ENTER ' + nearTavern.name);
-  else if (nearShop) hud.setPrompt('<kbd>SPACE</kbd> TRADE WITH THE MERCHANT');
-  else if (nearChest) hud.setPrompt('<kbd>SPACE</kbd> OPEN CHEST');
+  if (nearMirror) hud.setPrompt(`<kbd>${useKey}</kbd> LOOK IN THE MIRROR`);
+  else if (nearTavern) hud.setPrompt(`<kbd>${useKey}</kbd> ENTER ${nearTavern.name}`);
+  else if (nearShop) hud.setPrompt(`<kbd>${useKey}</kbd> TRADE WITH THE MERCHANT`);
+  else if (nearChest) hud.setPrompt(`<kbd>${useKey}</kbd> OPEN CHEST`);
   else if (nearCorpse) {
     // arrows are HELD for now, not tapped -- the prompt has to say so
-    hud.setPrompt(`HOLD <kbd>&#8592;</kbd>+<kbd>&#8594;</kbd> TO PULL ARROWS (${nearCorpse.lootable})`);
+    hud.setPrompt(`HOLD ${touchUI ? '<kbd>ATK</kbd> + <kbd>SPECIAL</kbd>' : '<kbd>&#8592;</kbd>+<kbd>&#8594;</kbd>'} TO PULL ARROWS (${nearCorpse.lootable})`);
   }
   else hud.setPrompt(null);
 }
@@ -1166,7 +1168,7 @@ function startRun(classId, look, showIntro = true) {
     // buried in a menu they will never open.
     if (briefedFor === classId) { beginPlaying(); return; }
     briefedFor = classId;
-    briefing.show(classId, input.pad.connected, beginPlaying);
+    briefing.show(classId, touchUI ? 'touch' : input.pad.connected ? 'pad' : 'keyboard', beginPlaying);
   });
   refreshMapRow();
 }
@@ -2029,7 +2031,7 @@ function updateCage(dt) {
       progress.save();
       input.enabled = true;
       hud.announce('IT IS FREE');
-      ctx.hint('SPACE TO RIDE');
+      ctx.hint(useKey + ' TO RIDE');
       cageState = null;
     }
   }
@@ -2399,7 +2401,42 @@ document.getElementById('fx-btns').addEventListener('click', (e) => {
   pipeline.enabled = b.dataset.fx === 'on';
 });
 
-canvas.addEventListener('click', () => { if (mode === 'play') input.requestLock(); });
+canvas.addEventListener('click', (event) => {
+  if (mode === 'play' && !touchUI && event.pointerType !== 'touch' && !event.sourceCapabilities?.firesTouchEvents) input.requestLock();
+});
+
+const touchMenu = document.getElementById('touch-menu');
+const touchLevels = document.getElementById('touch-map-list');
+function closeTouchMenu() {
+  sidebar.classList.remove('touch-open');
+  touchMenu.setAttribute('aria-expanded', 'false');
+}
+touchMenu.addEventListener('click', () => {
+  if (mode !== 'play') return;
+  touchLevels.hidden = !levelSelectAvailable();
+  mode = 'touchmenu';
+  input.releaseControls();
+  input.enabled = false;
+  sidebar.classList.remove('hidden');
+  sidebar.classList.add('touch-open');
+  sidebar.scrollTop = 0;
+  touchMenu.setAttribute('aria-expanded', 'true');
+  document.getElementById('touch-resume').focus();
+});
+document.getElementById('touch-resume').addEventListener('click', () => {
+  if (mode !== 'touchmenu') return;
+  closeTouchMenu();
+  mode = 'play';
+  input.enabled = true;
+  touchMenu.focus();
+});
+touchLevels.addEventListener('click', () => {
+  closeTouchMenu();
+  openLevelSelect();
+});
+document.getElementById('btn-title').addEventListener('click', closeTouchMenu);
+document.getElementById('slot-good').addEventListener('click', () => { if (mode === 'play') drinkPotion(); });
+document.getElementById('slot-bad').addEventListener('click', () => { if (mode === 'play') potionSlotTwo(); });
 
 /* ================= dev tools ================= */
 // Deliberately plain buttons in the sidebar rather than hidden key combos --

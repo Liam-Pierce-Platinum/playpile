@@ -1,0 +1,55 @@
+.combat-touch {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  touch-action: none;
+  user-select: none;
+}
+.combat-touch[hidden] { display: none; }
+.combat-touch button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 4px 8px;
+  border: 1px solid #d2d5dbad;
+  border-radius: 7px;
+  background: #10161dd6;
+  color: white;
+  font: 700 12px/1 Arial, sans-serif;
+  letter-spacing: 0;
+  touch-action: none;
+}
+.combat-touch button.held { background: #ecdfab; color: #171a20; }
+.combat-actions {
+  position: absolute;
+  right: max(10px, env(safe-area-inset-right));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: repeat(3, minmax(44px, auto));
+  gap: 5px;
+}
+.combat-actions .primary-action { background: #4f3528de; }
+.combat-actions .primary-action.held { background: #ecdfab; }
+.combat-menu {
+  position: absolute;
+  right: max(10px, env(safe-area-inset-right));
+  top: max(8px, env(safe-area-inset-top));
+}
+.combat-joystick {
+  width: 70px;
+  height: 70px;
+  position: absolute;
+  left: max(56px, calc(env(safe-area-inset-left) + 39px));
+  top: calc(100% - max(54px, calc(env(safe-area-inset-bottom) + 39px)));
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  border: 2px solid #ffffff7f;
+  border-radius: 50%;
+  background: #161c22a0;
+}
+.combat-joystick.held { background: #161c22cf; }
+.combat-joystick i { width: 26px; height: 26px; border-radius: 50%; background: #e0e7edbb; }
+.combat-touch.cinematic { pointer-events: none; }
+.combat-touch.cinematic .combat-menu { pointer-events: auto; }
+.combat-touch.cinematic :is(.combat-actions, .combat-joystick) { display: none; }

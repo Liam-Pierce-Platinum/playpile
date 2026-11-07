@@ -551,10 +551,10 @@ function setCursor(e) { cursor.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY
 if (isTouch) {
   $('touch').classList.remove('hidden');
   const stick = $('stick'), knob = $('knob');
-  stick.addEventListener('pointerdown', (e) => { Audio.init(); touchState.stickId = e.pointerId; stick.setPointerCapture(e.pointerId); moveStick(e); });
+  stick.addEventListener('pointerdown', (e) => { if (touchState.stickId != null) return; Audio.init(); touchState.stickId = e.pointerId; stick.setPointerCapture(e.pointerId); moveStick(e); });
   stick.addEventListener('pointermove', (e) => { if (e.pointerId === touchState.stickId) moveStick(e); });
   const endStick = (e) => { if (e.pointerId !== touchState.stickId) return; touchState.stickId = null; touchState.mx = touchState.mz = 0; knob.style.transform = ''; };
-  stick.addEventListener('pointerup', endStick); stick.addEventListener('pointercancel', endStick);
+  stick.addEventListener('lostpointercapture', endStick);
   function moveStick(e) {
     const r = stick.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
     let dx = (e.clientX - cx) / (r.width / 2), dy = (e.clientY - cy) / (r.height / 2); const l = Math.hypot(dx, dy); if (l > 1) { dx /= l; dy /= l; }
@@ -571,7 +571,10 @@ let tapStart = null;
 canvas.addEventListener('pointerdown', (e) => {
   if (e.pointerType === 'mouse') return;
   Audio.init();
-  if (G.phase === 'build') { tapStart = { x: e.clientX, y: e.clientY, id: e.pointerId, moved: false, px: buildPan[0], pz: buildPan[1] }; return; }
+  if (G.phase === 'build') {
+    if (!tapStart) tapStart = { x: e.clientX, y: e.clientY, id: e.pointerId, moved: false, px: buildPan[0], pz: buildPan[1] };
+    return;
+  }
   if (touchState.lookId == null) { touchState.lookId = e.pointerId; touchState.lx = e.clientX; touchState.ly = e.clientY; }
 });
 canvas.addEventListener('pointermove', (e) => {
@@ -589,10 +592,20 @@ canvas.addEventListener('pointermove', (e) => {
 });
 const endTouch = (e) => {
   if (e.pointerType === 'mouse') return;
-  if (G.phase === 'build' && tapStart && e.pointerId === tapStart.id) { if (!tapStart.moved) { setCursor(e); updateGhost(); placePiece(); } tapStart = null; }
+  if (tapStart && e.pointerId === tapStart.id) {
+    if (G.phase === 'build' && !tapStart.moved && e.type === 'pointerup') { setCursor(e); updateGhost(); placePiece(); }
+    tapStart = null;
+  }
   if (e.pointerId === touchState.lookId) touchState.lookId = null;
 };
 canvas.addEventListener('pointerup', endTouch); canvas.addEventListener('pointercancel', endTouch);
+addEventListener('blur', () => {
+  tapStart = null;
+  touchState.stickId = touchState.lookId = null;
+  touchState.mx = touchState.mz = 0;
+  touchState.fire = false;
+  $('knob').style.transform = '';
+});
 
 // ------------------------------------------------------------------ building (player side)
 const raycaster = new THREE.Raycaster();

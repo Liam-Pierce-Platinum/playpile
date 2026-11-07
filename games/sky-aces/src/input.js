@@ -49,6 +49,7 @@ export class Input {
     const R = 60;
     area.addEventListener('touchstart', (e) => {
       e.preventDefault();
+      if (sid !== null) return;
       const t = e.changedTouches[0]; sid = t.identifier; ox = t.clientX; oy = t.clientY;
       stick.style.left = ox + 'px'; stick.style.top = oy + 'px'; stick.classList.add('on');
       this.touch.sx = 0; this.touch.sy = 0; this.touch.active = true;
@@ -77,6 +78,13 @@ export class Input {
     hold('#tFire', 'fire'); hold('#tBoost', 'boost');
     const tap = (id, code) => root.querySelector(id).addEventListener('touchstart', (e) => { e.preventDefault(); this.edges.add(code); }, { passive: false });
     tap('#tMsl', 'TouchMissile'); tap('#tRoll', 'TouchRoll');
+    window.addEventListener('blur', () => {
+      if (sid !== null) end({ changedTouches: [{ identifier: sid }] });
+      this.touch.fire = this.touch.boost = false;
+      this.edges.clear();
+      root.querySelector('#tFire').classList.remove('on');
+      root.querySelector('#tBoost').classList.remove('on');
+    });
   }
 
   edge(code) { return this.edges.has(code); }

@@ -98,6 +98,7 @@ class Game {
       if (this.touch.aim && this.touch.aim.id === e.pointerId) this.touch.aim = null;
     };
     cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+    cv.addEventListener('lostpointercapture', up);
     addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse' && e.button === 0) this.mouseDown = false; });
     addEventListener('keydown', (e) => {
       this.audio.unlock();
@@ -119,7 +120,11 @@ class Game {
       if (e.code === 'KeyT') this.setTouch(false);
     });
     addEventListener('keyup', (e) => this.keys.delete(e.code));
-    addEventListener('blur', () => { this.keys.clear(); this.mouseDown = false; if (this.state === 'play' && !this.ui.open) this.pause(); });
+    addEventListener('blur', () => {
+      this.keys.clear(); this.mouseDown = false;
+      this.touch.move = this.touch.aim = null;
+      if (this.state === 'play' && !this.ui.open) this.pause();
+    });
   }
   setTouch(on) { if (this.touch.on === on) return; this.touch.on = on; document.body.classList.toggle('touch', on); }
   pause() { if (this.state === 'play' && !this.ui.open) { this.audio.play('click'); this.ui.show('pause'); } }

@@ -9,6 +9,7 @@ button { font: inherit; color: inherit; }
 .pausebtn { position: fixed; z-index: 3; top: max(10px, env(safe-area-inset-top)); left: max(10px, env(safe-area-inset-left)); width: 40px; height: 40px; border-radius: 12px; border: 1.5px solid var(--line); background: rgba(10, 6, 30, 0.45); display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; backdrop-filter: blur(4px); }
 .pausebtn i { width: 4px; height: 14px; border-radius: 2px; background: #fff; opacity: 0.85; }
 .pausebtn:hover { border-color: rgba(var(--ar), 0.8); }
+@media (pointer: coarse) { .pausebtn { width: 44px; height: 44px; } }
 
 .scrim { position: absolute; inset: 0; display: grid; place-items: center; padding: 14px; background: rgba(4, 2, 14, 0.55); animation: fade 0.18s; overflow-y: auto; }
 .scrim.clear { background: radial-gradient(ellipse at center, rgba(4, 2, 14, 0.5) 30%, rgba(4, 2, 14, 0.78)); }

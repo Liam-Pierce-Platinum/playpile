@@ -42,3 +42,11 @@ button{font-family:inherit}
 .bar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);margin:8px 0;overflow:hidden}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,#1a8cff,#3ff6ff);box-shadow:0 0 10px #3ff6ff;width:0;transition:width 1s}
 @media (max-width:600px){#lb{font-size:11px;min-width:130px}#stats b{font-size:34px}h1{font-size:40px}}
+
+@media (pointer: coarse) {
+  html,body { touch-action: manipulation; }
+  #menu .panel,#card .panel { max-height: calc(100dvh - 34px); overflow: auto; touch-action: pan-y; overscroll-behavior: contain; }
+  #menu button,#card button { min-height: 44px; }
+  #boost { right: max(12px,env(safe-area-inset-right)); bottom: max(12px,env(safe-area-inset-bottom)); touch-action: none; }
+  #hint { width: min(52vw, 320px); font-size: 11px; }
+}

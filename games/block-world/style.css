@@ -65,3 +65,10 @@ button{font-family:inherit}
 body.touch #buildBox em{display:none}body.touch #buildBox{bottom:auto;top:62px}
 body.touch #hotbar{bottom:auto;top:62px}body.touch .slot{width:36px;height:36px}
 @media (max-width:560px){#timer{font-size:26px}#toast{font-size:30px}.pill{padding:2px 8px}}
+
+@media (pointer: coarse) {
+  html,body { touch-action: manipulation; }
+  .screen { justify-content: safe center; touch-action: pan-y; overscroll-behavior: contain; }
+  .screen button { min-height: 44px; }
+  .tb { touch-action: none; }
+}

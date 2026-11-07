@@ -237,12 +237,13 @@ const keys = {}; let ptr = null, touch0 = null, touchDir = null, autoP = QS.has(
 const ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), v3 = new THREE.Vector3(), v2 = new THREE.Vector2();
 addEventListener('keydown', (e) => { keys[e.code] = true; unlock(); });
 addEventListener('keyup', (e) => { keys[e.code] = false; });
-canvas.addEventListener('pointerdown', (e) => { unlock(); if (e.pointerType !== 'mouse') touch0 = { x: e.clientX, y: e.clientY }; });
+canvas.addEventListener('pointerdown', (e) => { unlock(); if (e.pointerType !== 'mouse' && !touch0) { canvas.setPointerCapture(e.pointerId); touch0 = { id: e.pointerId, x: e.clientX, y: e.clientY }; } });
 addEventListener('pointermove', (e) => {
   if (e.pointerType === 'mouse') ptr = { x: e.clientX, y: e.clientY };
-  else if (touch0) { const dx = e.clientX - touch0.x, dy = e.clientY - touch0.y; if (dx * dx + dy * dy > 144) { touchDir = Math.atan2(dy, dx); if (dx * dx + dy * dy > 3600) { touch0.x += dx * 0.3; touch0.y += dy * 0.3; } } }
+  else if (touch0?.id === e.pointerId) { const dx = e.clientX - touch0.x, dy = e.clientY - touch0.y; if (dx * dx + dy * dy > 144) { touchDir = Math.atan2(dy, dx); if (dx * dx + dy * dy > 3600) { touch0.x += dx * 0.3; touch0.y += dy * 0.3; } } }
 });
-addEventListener('pointerup', () => { touch0 = null; });
+for (const event of ['pointerup','pointercancel','lostpointercapture']) canvas.addEventListener(event, (e) => { if (touch0?.id === e.pointerId) touch0 = null; });
+addEventListener('blur', () => { touch0 = null; for (const key in keys) keys[key] = false; });
 function playerInput(p) {
   const kx = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0), kz = (keys.KeyS || keys.ArrowDown ? 1 : 0) - (keys.KeyW || keys.ArrowUp ? 1 : 0);
   if (kx || kz) { p.th = Math.atan2(kz, kx); ptr = null; touchDir = null; return; }

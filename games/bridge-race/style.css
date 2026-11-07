@@ -29,3 +29,10 @@ button.big{font-size:22px;padding:12px 38px;background:linear-gradient(#ffb3c4,#
 #hats button.on{background:#ffe1ea;outline:3px solid #ff8fa8}
 #hats button.lock{opacity:.7}
 .keys{font-size:13px;opacity:.75;margin-top:14px!important}
+
+@media (pointer: coarse) {
+  html,body { touch-action: manipulation; }
+  .panel { box-sizing: border-box; max-height: calc(100dvh - 28px); overflow: auto; touch-action: pan-y; overscroll-behavior: contain; }
+  .panel button,#menuBtn { min-height: 44px; }
+  #hud { padding-inline: max(9px, env(safe-area-inset-left)) max(9px, env(safe-area-inset-right)); gap: 7px; }
+}

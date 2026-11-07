@@ -36,3 +36,4 @@ h2 { font-size: 38px; color: #ffd23f; -webkit-text-stroke: 2px #1b1530; }
 #tBoost { right: 22px; bottom: 30px; background: #5cd6ff; }
 #tDrift { right: 118px; bottom: 18px; background: #ffd23f; width: 70px; height: 70px; font-size: 14px; }
 @media (max-width: 520px) { #shop { grid-template-columns: 1fr; } h2 { font-size: 30px; } .big { font-size: 42px; } }
+@media (pointer: coarse) { .panel { touch-action: pan-y; } .panel button { min-height: 44px; } }

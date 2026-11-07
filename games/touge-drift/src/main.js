@@ -22,7 +22,7 @@ class Game {
     try { Object.assign(this.save, JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')); } catch (e) { /* blocked */ }
     this.audio.music = this.save.music; this.audio.sfx = this.save.sfx;
     this.keys = new Set();
-    this.touch = { l: false, r: false };
+    this.touch = { l: false, r: false, brake: false, nitro: false };
     this.isTouch = matchMedia('(pointer: coarse)').matches;
     this.mode = 'title';
     this.time = 0;
@@ -61,7 +61,12 @@ class Game {
       if (this.mode === 'play' && e.code === 'KeyR') this.start(this.runMode);
     });
     addEventListener('keyup', (e) => this.keys.delete(e.code));
-    addEventListener('blur', () => { this.keys.clear(); if (this.mode === 'play' && !this.ui.open) this.ui.show('pause'); });
+    addEventListener('blur', () => {
+      this.keys.clear();
+      this.touchIds.clear();
+      this.touch.l = this.touch.r = false;
+      if (this.mode === 'play' && !this.ui.open) this.ui.show('pause');
+    });
     // touch: hold the left or right half to steer (gas is automatic); both halves = handbrake
     const set = (e, on) => {
       for (const t of e.changedTouches) {
@@ -82,12 +87,12 @@ class Game {
     if (k.has('KeyA') || k.has('ArrowLeft')) steer -= 1;
     if (k.has('KeyD') || k.has('ArrowRight')) steer += 1;
     let throttle = k.has('KeyW') || k.has('ArrowUp') ? 1 : 0;
-    const brake = k.has('KeyS') || k.has('ArrowDown') ? 1 : 0;
+    const brake = k.has('KeyS') || k.has('ArrowDown') || t.brake ? 1 : 0;
     let hand = k.has('Space');
-    const nitro = k.has('ShiftLeft') || k.has('ShiftRight');
+    const nitro = k.has('ShiftLeft') || k.has('ShiftRight') || t.nitro;
     if (this.isTouch && (t.l || t.r || this.touchIds.size === 0)) {
       if (t.l && !t.r) steer = -1; else if (t.r && !t.l) steer = 1; else if (t.l && t.r) hand = true;
-      throttle = 1;
+      throttle = brake ? 0 : 1;
     }
     return { steer, throttle, brake, hand, nitro };
   }
@@ -633,7 +638,7 @@ class Game {
       x.globalAlpha = Math.min(1, k * 3);
       this.label(n > 3 ? '' : `${n}`, W / 2, H * 0.42, 110 + (1 - k) * 40, n === 1 ? '#ff6a3a' : '#ffffff');
       x.globalAlpha = 1;
-      this.label(this.isTouch ? 'HOLD LEFT / RIGHT SIDE TO STEER  ·  BOTH = HANDBRAKE' : 'W GAS  ·  A / D STEER  ·  TURN AT SPEED TO DRIFT  ·  SPACE HANDBRAKE', W / 2, H * 0.42 + 100, 15, '#ffd060');
+      this.label(this.isTouch ? 'HOLD LEFT / RIGHT TO STEER' : 'W GAS  ·  A / D STEER  ·  TURN AT SPEED TO DRIFT  ·  SPACE HANDBRAKE', W / 2, H * 0.42 + 100, 15, '#ffd060');
     } else if (this.count > -0.8) {
       x.globalAlpha = Math.max(0, 1 + this.count / 0.8);
       this.label('GO!', W / 2, H * 0.42, 120, '#ff8a3a');
@@ -645,7 +650,9 @@ class Game {
 Game.prototype.gauge = function () {
   const x = this.x, W = this.W, H = this.H, c = this.car;
   // rev gauge, bottom right
-  const gx = W - 92, gy = H - 86, gr = 66;
+  const gx = this.isTouch ? W - 68 : W - 92;
+  const gy = this.isTouch ? H - 102 : H - 86;
+  const gr = this.isTouch ? 48 : 66;
   x.fillStyle = 'rgba(10,10,14,0.75)'; x.beginPath(); x.arc(gx, gy, gr + 8, 0, 7); x.fill();
   x.strokeStyle = '#3a3a44'; x.lineWidth = 8; x.beginPath(); x.arc(gx, gy, gr - 6, Math.PI * 0.75, Math.PI * 2.25); x.stroke();
   const sp = clamp(c.speed / 1300, 0, 1);
@@ -657,10 +664,12 @@ Game.prototype.gauge = function () {
   this.label(`${Math.round(c.speed * 0.2)}`, gx, gy + 22, 26);
   this.label('km/h', gx, gy + 44, 11, '#bbbbbb');
   // nitro
-  const nb = 140;
-  x.fillStyle = 'rgba(0,0,0,0.5)'; x.fillRect(W - 24 - nb - 150, H - 30, nb, 8);
-  x.fillStyle = c.nitro > 0.05 ? '#4ab8ff' : '#2a4a66'; x.fillRect(W - 24 - nb - 150, H - 30, nb * c.nitro, 8);
-  this.label(this.isTouch ? 'NITRO' : 'SHIFT NITRO', W - 24 - 150, H - 44, 12, c.nitro > 0.05 ? '#8fd4ff' : '#7a8899', 'right');
+  const nb = this.isTouch ? Math.min(140, W * 0.3) : 140;
+  const nitroX = this.isTouch ? 16 : W - 24 - nb - 150;
+  const nitroY = H - (this.isTouch ? 76 : 30);
+  x.fillStyle = 'rgba(0,0,0,0.5)'; x.fillRect(nitroX, nitroY, nb, 8);
+  x.fillStyle = c.nitro > 0.05 ? '#4ab8ff' : '#2a4a66'; x.fillRect(nitroX, nitroY, nb * c.nitro, 8);
+  this.label(this.isTouch ? 'NITRO' : 'SHIFT NITRO', nitroX + nb, nitroY - 14, 12, c.nitro > 0.05 ? '#8fd4ff' : '#7a8899', 'right');
 };
 
 Game.prototype.raceHud = function () {

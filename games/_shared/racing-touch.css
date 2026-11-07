@@ -1,0 +1,24 @@
+.pp-touch .screen { padding: 12px; align-items: start; overscroll-behavior: contain; touch-action: pan-y; }
+.pp-touch .screen .inner { gap: 12px; }
+.pp-touch .screen .logo { font-size: clamp(38px, 10vw, 58px); letter-spacing: .12em; }
+.pp-touch .screen .kicker { text-align: center; letter-spacing: .12em; }
+.pp-touch .screen .cards { grid-template-columns: repeat(auto-fit, minmax(min(100%, 154px), 1fr)); gap: 8px; }
+.pp-touch .screen button { min-height: 44px; }
+.pp-touch .screen .card { padding: 9px; }
+.pp-touch .screen .card .t { font-size: 15px; }
+.pp-touch .screen .card canvas { height: 64px; }
+.pp-touch .screen .opts { gap: 7px 10px; width: 100%; }
+.pp-touch .screen .seg button { padding-inline: 9px; }
+.pp-touch #help { display: none; }
+.pp-touch #map { width: 90px; height: 90px; right: 12px; bottom: 166px; opacity: .88; }
+.pp-touch #dash { left: 50%; right: auto; bottom: 16px; transform: translateX(-50%); }
+.pp-touch #speed,.pp-touch #gear { font-size: 26px; }
+.pp-touch #carbox { width: 135px; left: 10px; bottom: 65px; padding: 5px 7px; font-size: 10px; }
+.pp-touch #tower { max-height: 23vh; overflow: hidden; }
+.pp-touch #timing { right: 12px; top: 58px; }
+@media (max-width: 520px) {
+  .pp-touch #dash { left: 12px; bottom: 76px; transform: none; }
+  .pp-touch #carbox { bottom: 128px; }
+  .pp-touch #timing { max-width: 38vw; }
+  .pp-touch #where { max-width: 50vw; }
+}

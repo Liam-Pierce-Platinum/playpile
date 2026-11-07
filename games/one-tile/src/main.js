@@ -46,14 +46,17 @@ function flushText() {
   ctx.globalAlpha = 1; texts = [];
 }
 
-// ---------------------------------------------------------------- resize (integer scaling only)
+// ---------------------------------------------------------------- resize
 function resize() {
   const dpr = window.devicePixelRatio || 1;
   const pw = Math.floor(innerWidth * dpr), ph = Math.floor(innerHeight * dpr);
   K = Math.max(1, Math.floor(Math.min(pw / VW, ph / VH)));
   canvas.width = VW * K; canvas.height = VH * K;
-  canvas.style.width = (VW * K / dpr) + 'px'; canvas.style.height = (VH * K / dpr) + 'px';
-  canvas.style.left = Math.round((innerWidth - VW * K / dpr) / 2) + 'px'; canvas.style.top = Math.round((innerHeight - VH * K / dpr) / 2) + 'px';
+  const fit = Math.min(innerWidth / VW, innerHeight / VH);
+  const scale = matchMedia('(pointer: coarse)').matches ? fit : Math.min(fit, K / dpr);
+  const w = VW * scale, h = VH * scale;
+  canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+  canvas.style.left = Math.round((innerWidth - w) / 2) + 'px'; canvas.style.top = Math.round((innerHeight - h) / 2) + 'px';
   ctx.imageSmoothingEnabled = false;
 }
 addEventListener('resize', resize);
@@ -859,12 +862,14 @@ function loop(now) {
 
 // ---------------------------------------------------------------- input
 function toGame(e) { const r = canvas.getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width * VW, y: (e.clientY - r.top) / r.height * VH }; }
-let drawing = null, scrubbing = false;
+let drawing = null, scrubbing = false, boardPointer = null;
 function hitButton(x, y) { for (let i = buttons.length - 1; i >= 0; i--) { const q = buttons[i]; if (x >= q.x && y >= q.y && x < q.x + q.w && y < q.y + q.h) return q; } return null; }
 function scrubFromX(x) { const N = maxScrub(); return Math.round((x - SCRUB.x) / (SCRUB.w - 1) * N); }
 
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 canvas.addEventListener('pointerdown', e => {
+  if (boardPointer !== null) return;
+  boardPointer = e.pointerId;
   initAudio();
   const p = toGame(e); mouse.x = p.x; mouse.y = p.y; mouse.down = true; mouse.inside = true;
   try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* old browsers */ }
@@ -896,6 +901,7 @@ canvas.addEventListener('pointerdown', e => {
   }
 });
 canvas.addEventListener('pointermove', e => {
+  if (boardPointer !== null && e.pointerId !== boardPointer) return;
   const p = toGame(e); mouse.x = p.x; mouse.y = p.y; mouse.inside = true;
   if (game.scene !== 'play' || !game.P) return;
   const P = game.P;
@@ -915,7 +921,13 @@ canvas.addEventListener('pointermove', e => {
     else { const h = hoverTile(); if (h) { const st = P.trace.states; for (let i = st.length - 1; i >= 1; i--) if (st[i].x === h.x && st[i].y === h.y) { P.hoverTick = i; break; } } }
   }
 });
-addEventListener('pointerup', () => { touchDir = null; mouse.down = false; drawing = null; scrubbing = false; });
+function endBoardGesture(e) {
+  if (e && e.pointerId !== boardPointer) return;
+  boardPointer = null; touchDir = null; mouse.down = false; drawing = null; scrubbing = false;
+}
+addEventListener('pointerup', endBoardGesture);
+addEventListener('pointercancel', endBoardGesture);
+canvas.addEventListener('lostpointercapture', endBoardGesture);
 canvas.addEventListener('pointerleave', () => { mouse.inside = false; if (game.P) game.P.hoverTick = null; });
 canvas.addEventListener('wheel', e => {
   e.preventDefault(); if (game.scene !== 'play' || game.pause) return; const P = game.P; if (!P.planMode) return;
@@ -1011,8 +1023,7 @@ addEventListener('keydown', e => {
   if (k === 'r' || k === 'R') { if (P.failTick >= 0) setScrub(P.failTick); return; }
 });
 addEventListener('keyup', e => { const d = DIRKEY[e.key]; if (!d) return; const i = held.indexOf(d); if (i >= 0) held.splice(i, 1); });
-addEventListener('blur', () => { held.length = 0; touchDir = null; });
-addEventListener('blur', () => { mouse.down = false; drawing = null; scrubbing = false; });
+addEventListener('blur', () => { held.length = 0; endBoardGesture(); });
 
 // ---------------------------------------------------------------- test hooks
 window.__OT = {

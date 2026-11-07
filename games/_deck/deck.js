@@ -28,6 +28,8 @@
 //   and it starts on the first tap because browsers require that.
 const KEYS_STOP = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Space'];
 
+import { bindPrimaryTouch } from './touch.js';
+
 export class Deck {
   /**
    * @param {object} o
@@ -99,11 +101,10 @@ export class Deck {
     };
     const up = (e) => { this.mouse.down = false; this._rels++; };
     this.cv.addEventListener('mousemove', move);
-    this.cv.addEventListener('mousedown', down);
+    this.cv.addEventListener('mousedown', e => { this.touch = false; down(e); });
     addEventListener('mouseup', up);
-    this.cv.addEventListener('touchstart', (e) => { move(e); down(e); }, { passive: false });
-    this.cv.addEventListener('touchmove', (e) => { move(e); if (e.cancelable) e.preventDefault(); }, { passive: false });
-    addEventListener('touchend', up);
+    bindPrimaryTouch(this.cv, { down: (touch) => { this.touch = true; move(touch); down(touch); }, move, up,
+      cancel: () => { this.mouse.down = false; this._rels = 0; } });
 
     // ---- fit --------------------------------------------------------
     const fit = () => {

@@ -76,7 +76,17 @@
   font-size: clamp(15px, 2vw, 18px);
 }
 
+.player-computer .stage .mexit {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: #141c29e8;
+}
+
 @media (max-width: 560px) {
+  body:has(.player-computer) .shell > main { padding-inline: 9px; }
+  .arcade-site .stagebar button, .arcade-site .stagebar .lnk { min-height: 44px; }
+  .player-computer .stage .curtain .btn { min-height: 44px; }
   .player-monitor > .screen-well { border-width: 2px; }
   .player-monitor > .monitor-chin { padding-inline: 6px; }
 }

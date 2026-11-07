@@ -340,8 +340,22 @@ addEventListener('keydown', (e) => {
   if (!$('title').classList.contains('hide') && (e.code === 'Enter' || e.code === 'Space')) hide('title');
 });
 addEventListener('keyup', (e) => { const k = KEY[e.code]; if (k) input[k] = 0; });
-if ('ontouchstart' in window || Q.has('touch')) document.body.classList.add('touch');
-document.querySelectorAll('.tb').forEach((b) => { const k = b.dataset.k; const on = (v) => (e) => { e.preventDefault(); initAudio(); input[k] = v; b.classList.toggle('on', !!v); }; b.addEventListener('pointerdown', on(1)); b.addEventListener('pointerup', on(0)); b.addEventListener('pointercancel', on(0)); b.addEventListener('pointerleave', on(0)); });
+if (matchMedia('(pointer: coarse)').matches || Q.has('touch')) document.body.classList.add('touch');
+document.querySelectorAll('.tb[data-k]').forEach(b => {
+  const k = b.dataset.k;
+  let pointer = null;
+  b.addEventListener('pointerdown', e => {
+    e.preventDefault(); if (pointer !== null) return;
+    pointer = e.pointerId; b.setPointerCapture(pointer); initAudio(); input[k] = 1; b.classList.add('on');
+  });
+  function release(e) {
+    if (e && e.pointerId !== pointer) return;
+    pointer = null; input[k] = 0; b.classList.remove('on');
+  }
+  for (const event of ['pointerup','pointercancel','lostpointercapture']) b.addEventListener(event, release);
+  addEventListener('blur', () => release());
+});
+$('tReset').addEventListener('click', () => { if (car.mode !== 'crash') respawn(); });
 addEventListener('pointerdown', () => initAudio());
 addEventListener('resize', () => { renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); });
 if (Q.has('title')) { show('title'); $('playBtn').onclick = () => { initAudio(); hide('title'); }; }

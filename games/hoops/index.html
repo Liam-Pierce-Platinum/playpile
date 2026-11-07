@@ -11,10 +11,33 @@
     font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;color:#8b96a8}
   #app{line-height:0}
   canvas{image-rendering:auto;border-radius:2px}
+  #hoops-mobile[hidden]{display:none}
+  #hoops-mobile{position:fixed;inset:0;pointer-events:none;color:#fff;font:700 13px/1.2 Arial,sans-serif}
+  #hoops-mobile button,#hoops-stick{pointer-events:auto;touch-action:none;color:#fff;background:#101826d9;border:1px solid #ffb15e;border-radius:10px}
+  #hoops-mobile button{min-width:44px;min-height:44px;padding:5px 10px;font:inherit}
+  #hoops-mobile button.held{background:#ffb15e;color:#17121a}
+  #hoops-stick{position:absolute;left:max(10px,env(safe-area-inset-left));bottom:max(10px,env(safe-area-inset-bottom));width:clamp(66px,24vmin,98px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center}
+  #hoops-stick i{display:block;width:31%;height:31%;border-radius:50%;background:#ffb15e;pointer-events:none}
+  #hoops-actions{position:absolute;right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px;max-width:55%}
+  #hoops-pause{position:absolute;right:max(10px,env(safe-area-inset-right));top:max(8px,env(safe-area-inset-top))}
+  #hoops-mobile.still :is(#hoops-stick,#hoops-actions),#hoops-mobile.paused :is(#hoops-stick,#hoops-actions){display:none}
+  #join-room{max-width:calc(100vw - 32px);border:1px solid #ffb15e;background:#101826;color:#fff;border-radius:12px}
+  #join-room::backdrop{background:#000a}
+  #join-room :is(input,button){min-height:44px;font:16px Arial,sans-serif}
+  #join-room input{width:7em;text-transform:uppercase}
 </style>
 </head>
 <body>
 <div id="app"></div>
+<div id="hoops-mobile" hidden>
+  <div id="hoops-stick" aria-label="Movement joystick"><i></i></div>
+  <div id="hoops-actions"><button type="button" data-key="Shift">Guard</button><button type="button" data-key="q">Pass</button><button type="button" data-key="Space">Jump / block</button></div>
+  <button type="button" id="hoops-pause">Pause</button>
+</div>
+<dialog id="join-room"><form method="dialog">
+  <label for="join-code">Room code</label> <input id="join-code" maxlength="4" pattern="[a-zA-Z0-9]{4}" required autocomplete="off" autocapitalize="characters">
+  <button value="join">Join</button> <button value="cancel" formnovalidate>Cancel</button>
+</form></dialog>
 <script type="module" src="./game.js"></script>
 </body>
 </html>

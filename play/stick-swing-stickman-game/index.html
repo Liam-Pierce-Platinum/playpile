@@ -424,6 +424,7 @@ function fillViewport(on) {
   document.body.classList.toggle('mfull-on', on);
   measurePlayer();
   refreshTools();
+  if (!on && nativeFullscreen() !== stageEl) corner.scrollIntoView({ block: 'nearest', inline: 'nearest' });
 }
 function exitNative() {
   if (nativeFullscreen() !== stageEl) return;

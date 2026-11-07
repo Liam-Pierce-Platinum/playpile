@@ -138,9 +138,6 @@ function translatePage() {
   for (const el of doc.querySelectorAll('[data-i18n]')) setText(el, translate(el.dataset.i18n), false);
   const input = doc.getElementById('q');
   if (input) { input.placeholder = translate('searchHint'); input.dir = 'auto'; }
-  const exit = doc.querySelector('.stage .mexit');
-  if (exit) exit.setAttribute('aria-label', translate('exitFullscreen'));
-
   const count = doc.getElementById('gameCount');
   const raw = count?.textContent.match(/^(\d+) games?$/);
   if (raw && locale !== 'en') setText(count, translate('gameCount', { count: Number(raw[1]) }), false);

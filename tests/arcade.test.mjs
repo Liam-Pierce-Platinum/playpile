@@ -21,7 +21,7 @@ test('all twelve category animation atlases exist and new sheets contain six com
 });
 test('every current game remains available with real source, a thumbnail, crawlable text and controls',async()=>{
  assert.equal(GAMES.length,101);assert.deepEqual(Object.keys(GAME_COPY).sort(),GAMES.map(g=>g.slug).sort());
- for(const g of GAMES){const html=await read(playUrl(g).slice(1)+'index.html');assert.ok(html.includes(escapeHTML(g.blurb)),g.slug+' missing static copy');assert.ok(html.includes('id="frame"'),g.slug+' missing game frame');assert.ok(html.includes('window.__PLAYPILE_WEB=1'),g.slug+' not a hosted game');assert.ok(html.includes('id="keys"'));await fs.access(path.join(root,'shots/t/'+g.slug+'.webp'));await fs.access(path.join(root,'games',(g.web||g.slug).split('?')[0],'index.html'));}
+ for(const g of GAMES){const html=await read(playUrl(g).slice(1)+'index.html');assert.ok(html.includes(escapeHTML(g.blurb)),g.slug+' missing static copy');assert.ok(html.includes('id="frame"'),g.slug+' missing game frame');assert.ok(html.includes('id="game-fullscreen"'),g.slug+' missing the fullscreen control');assert.ok(html.includes('window.__PLAYPILE_WEB=1'),g.slug+' not a hosted game');assert.ok(html.includes('id="keys"'));await fs.access(path.join(root,'shots/t/'+g.slug+'.webp'));await fs.access(path.join(root,'games',(g.web||g.slug).split('?')[0],'index.html'));}
 });
 test('home and Browse show all games once, with an automatic intro only on home',async()=>{
  const expected=GAMES.map(g=>g.slug);

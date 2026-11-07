@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head><script type="importmap">{"imports":{"/site/account.js":"/site/account.js?v=34ace97b","/site/analytics.js":"/site/analytics.js?v=34ace97b","/site/arcade-art.js":"/site/arcade-art.js?v=34ace97b","/site/arcade-client.js":"/site/arcade-client.js?v=34ace97b","/site/arcade-copy.js":"/site/arcade-copy.js?v=34ace97b","/site/arcade-data.js":"/site/arcade-data.js?v=34ace97b","/site/arcade-locale.js":"/site/arcade-locale.js?v=34ace97b","/site/arcade-locales.js":"/site/arcade-locales.js?v=34ace97b","/site/arcade-profile.js":"/site/arcade-profile.js?v=34ace97b","/site/arcade-return.js":"/site/arcade-return.js?v=34ace97b","/site/arcade-shell.js":"/site/arcade-shell.js?v=34ace97b","/site/arcade-ui.js":"/site/arcade-ui.js?v=34ace97b","/site/avatar.js":"/site/avatar.js?v=34ace97b","/site/catalogue.js":"/site/catalogue.js?v=34ace97b","/site/categories.js":"/site/categories.js?v=34ace97b","/site/multiplayer.js":"/site/multiplayer.js?v=34ace97b","/site/online.js":"/site/online.js?v=34ace97b","/site/pages.js":"/site/pages.js?v=34ace97b","/site/pixel-ui.js":"/site/pixel-ui.js?v=34ace97b","/site/progress.js":"/site/progress.js?v=34ace97b","/site/rating.js":"/site/rating.js?v=34ace97b","/site/seo.js":"/site/seo.js?v=34ace97b","/site/shell.js":"/site/shell.js?v=34ace97b","/ads/ads.js":"/ads/ads.js?v=34ace97b"}}</script><script>window.__PLAYPILE_WEB=1;</script>
+<head><script type="importmap">{"imports":{"/site/account.js":"/site/account.js?v=00895d8c","/site/analytics.js":"/site/analytics.js?v=00895d8c","/site/arcade-art.js":"/site/arcade-art.js?v=00895d8c","/site/arcade-client.js":"/site/arcade-client.js?v=00895d8c","/site/arcade-copy.js":"/site/arcade-copy.js?v=00895d8c","/site/arcade-data.js":"/site/arcade-data.js?v=00895d8c","/site/arcade-locale.js":"/site/arcade-locale.js?v=00895d8c","/site/arcade-locales.js":"/site/arcade-locales.js?v=00895d8c","/site/arcade-profile.js":"/site/arcade-profile.js?v=00895d8c","/site/arcade-return.js":"/site/arcade-return.js?v=00895d8c","/site/arcade-shell.js":"/site/arcade-shell.js?v=00895d8c","/site/arcade-ui.js":"/site/arcade-ui.js?v=00895d8c","/site/avatar.js":"/site/avatar.js?v=00895d8c","/site/catalogue.js":"/site/catalogue.js?v=00895d8c","/site/categories.js":"/site/categories.js?v=00895d8c","/site/multiplayer.js":"/site/multiplayer.js?v=00895d8c","/site/online.js":"/site/online.js?v=00895d8c","/site/pages.js":"/site/pages.js?v=00895d8c","/site/pixel-ui.js":"/site/pixel-ui.js?v=00895d8c","/site/progress.js":"/site/progress.js?v=00895d8c","/site/rating.js":"/site/rating.js?v=00895d8c","/site/seo.js":"/site/seo.js?v=00895d8c","/site/shell.js":"/site/shell.js?v=00895d8c","/ads/ads.js":"/ads/ads.js?v=00895d8c"}}</script><script>window.__PLAYPILE_WEB=1;</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>HIGHRISE — Free Tower Shooter Game Online | PLAYPILE</title>
@@ -18,7 +18,7 @@
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
 <link rel="stylesheet" href="/site/progress.css">
-<script type="module" src="/site/account.js?v=34ace97b"></script>
+<script type="module" src="/site/account.js?v=00895d8c"></script>
 <link rel="icon" href="/site/icon.svg" type="image/svg+xml">
 <link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/site/icon-180.png">
@@ -30,11 +30,11 @@
      here and does not add a second copy. -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
      crossorigin="anonymous"></script>
-<link rel="stylesheet" href="/site/arcade-characters.css?v=34ace97b">
-<link rel="stylesheet" href="/site/arcade.css?v=34ace97b">
-<link rel="stylesheet" href="/site/arcade-player.css?v=34ace97b">
-<link rel="stylesheet" href="/site/arcade-return.css?v=34ace97b">
-<link rel="stylesheet" href="/site/arcade-locale.css?v=34ace97b">
+<link rel="stylesheet" href="/site/arcade-characters.css?v=00895d8c">
+<link rel="stylesheet" href="/site/arcade.css?v=00895d8c">
+<link rel="stylesheet" href="/site/arcade-player.css?v=00895d8c">
+<link rel="stylesheet" href="/site/arcade-return.css?v=00895d8c">
+<link rel="stylesheet" href="/site/arcade-locale.css?v=00895d8c">
 </head>
 <body class="arcade-site">
 <a class="skip" href="#stage">Skip to the game</a>
@@ -64,6 +64,14 @@
             <div class="monitor" aria-hidden="true"></div>
             <div class="screen-well">
               <div class="stage" id="stage" tabindex="-1">
+                <div class="stage-controls">
+                  <button id="game-fullscreen" class="stage-fullscreen" type="button" aria-label="Enter fullscreen" title="Enter fullscreen">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path class="fullscreen-enter" d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/>
+                      <path class="fullscreen-exit" d="M4 9h5V4m11 5h-5V4M9 20v-5H4m11 5v-5h5"/>
+                    </svg>
+                  </button>
+                </div>
                 <iframe id="frame" title="game" allow="autoplay; fullscreen; gamepad; pointer-lock"
                         allowfullscreen hidden></iframe>
                 <div class="curtain" id="curtain">
@@ -87,7 +95,7 @@
           <span class="where" id="how"></span>
           <span class="olpill" id="olpill" hidden></span>
           <span class="sp"></span>
-          <button id="full" type="button">
+          <button id="full" type="button" aria-pressed="false">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
             Fullscreen <kbd>F</kbd></button>
           <button id="reload" type="button">
@@ -297,7 +305,7 @@ function launch(role) {
   trackPlay(g.slug);
   curtain.style.display = 'none';
   setTimeout(() => { try { frame.focus(); } catch (e) {} }, 400);
-  if (smallDisplay.matches) fillViewport(true);
+  if (smallDisplay.matches && !pickedFullscreen) fillViewport(true);
   else measurePlayer();
 }
 start.addEventListener('click', async () => {
@@ -319,7 +327,7 @@ const ol = (WEB || g.how === 'local') && mountOnline({
   launch: (role) => launch(role),
   stop: () => {
     frame.removeAttribute('src'); frame.hidden = true; curtain.style.display = ''; start.disabled = false;
-    document.body.classList.remove('player-playing'); fillViewport(false);
+    document.body.classList.remove('player-playing'); fillViewport(false); exitNative();
   },
   solo: () => start.click(),
 });
@@ -338,19 +346,22 @@ const smallDisplay = matchMedia('(max-width: 740px), (max-height: 510px), (point
 const stageEl = document.getElementById('stage');
 const screenWell = stageEl.parentElement;
 const viewport = window.visualViewport;
-const controls = document.createElement('div');
-controls.className = 'stage-controls';
-const mexit = document.createElement('button');
-mexit.className = 'mexit'; mexit.type = 'button'; mexit.textContent = '✕'; mexit.setAttribute('aria-label', 'Exit full screen'); mexit.title = 'Back to cabinet';
-const expand = document.createElement('button');
-expand.className = 'stage-expand'; expand.type = 'button'; expand.textContent = '⛶'; expand.setAttribute('aria-label', 'Use device fullscreen'); expand.title = 'Use device fullscreen';
-controls.append(mexit);
+const corner = document.getElementById('game-fullscreen');
+const nativeFullscreen = () => document.fullscreenElement || document.webkitFullscreenElement;
+const expanded = () => stageEl.classList.contains('mfull') || nativeFullscreen() === stageEl;
+let pickedFullscreen = false;
+let wasNative = false;
+let entering = false;
 const backing = SCORES[g.slug];
 let backingEnabled = musicOn();
 const musicButtons = [];
 function refreshTools() {
-  expand.setAttribute('aria-label', translate('deviceFullscreen'));
-  expand.title = translate('deviceFullscreen');
+  const isFull = expanded();
+  const fullscreenLabel = translate(isFull ? 'exitFullscreen' : 'enterFullscreen');
+  corner.setAttribute('aria-label', fullscreenLabel);
+  corner.title = fullscreenLabel;
+  corner.toggleAttribute('data-expanded', isFull);
+  full.setAttribute('aria-pressed', String(isFull));
   const label = translate(backingEnabled ? 'backingOn' : 'backingOff');
   for (const [button, compact] of musicButtons) {
     button.textContent = compact ? '♫' : label;
@@ -371,7 +382,7 @@ if (backing) {
     button.className = 'stage-music'; button.type = 'button';
     button.addEventListener('click', toggleBacking);
     musicButtons.push([button, compact]);
-    if (compact) controls.append(button); else full.before(button);
+    if (compact) corner.before(button); else full.before(button);
   }
   window.addEventListener('storage', event => {
     if (event.key === MUSIC_PREF) { backingEnabled = musicOn(); refreshTools(); }
@@ -384,15 +395,8 @@ if (backing) {
     } catch {}
   });
 }
-controls.append(expand);
 addEventListener('pp-locale', refreshTools);
 refreshTools();
-stageEl.prepend(controls);
-const nativeFullscreen = () => document.fullscreenElement || document.webkitFullscreenElement;
-const requestNative = stageEl.requestFullscreen || stageEl.webkitRequestFullscreen;
-expand.hidden = !requestNative || document.fullscreenEnabled === false;
-let restoreCabinet = false;
-let wasNative = false;
 
 function measurePlayer() {
   const height = viewport?.height || document.documentElement.clientHeight;
@@ -408,41 +412,53 @@ function fillViewport(on) {
   stageEl.classList.toggle('mfull', on);
   document.body.classList.toggle('mfull-on', on);
   measurePlayer();
-  if (!on && nativeFullscreen() === stageEl) {
-    const exit = document.exitFullscreen || document.webkitExitFullscreen;
-    try { Promise.resolve(exit?.call(document)).catch(() => {}); } catch {}
-  }
+  refreshTools();
 }
-async function enterNative() {
-  if (!requestNative) return;
-  try { await requestNative.call(stageEl, { navigationUI: 'hide' }); }
-  catch { /* the viewport layout remains available */ }
+function exitNative() {
+  if (nativeFullscreen() !== stageEl) return;
+  const exit = document.exitFullscreen || document.webkitExitFullscreen;
+  try { Promise.resolve(exit?.call(document)).catch(refreshTools); } catch { refreshTools(); }
 }
 function syncFullscreen() {
   const active = nativeFullscreen() === stageEl;
-  if (wasNative && !active && restoreCabinet) fillViewport(false);
-  if (!active) restoreCabinet = false;
+  if (wasNative && !active) fillViewport(false);
   wasNative = active;
+  if (active && !stageEl.classList.contains('mfull')) exitNative();
   measurePlayer();
+  refreshTools();
+}
+async function enterNative() {
+  if (entering) return;
+  entering = true;
+  try {
+    if (stageEl.requestFullscreen && document.fullscreenEnabled !== false) {
+      await stageEl.requestFullscreen({ navigationUI: 'hide' });
+    } else if (stageEl.webkitRequestFullscreen && document.webkitFullscreenEnabled !== false) {
+      await stageEl.webkitRequestFullscreen();
+    }
+  } catch { /* The CSS fullscreen layout remains active. */ }
+  finally { entering = false; syncFullscreen(); }
+}
+function toggleFullscreen(event) {
+  pickedFullscreen = true;
+  const open = !expanded();
+  fillViewport(open);
+  if (open) enterNative(); else exitNative();
+  if (event.detail && !frame.hidden) frame.focus({ preventScroll: true });
 }
 for (const event of ['fullscreenchange','webkitfullscreenchange']) document.addEventListener(event, syncFullscreen);
 addEventListener('resize', measurePlayer);
 viewport?.addEventListener('resize', measurePlayer);
 viewport?.addEventListener('scroll', measurePlayer);
 measurePlayer();
-mexit.addEventListener('click', () => { fillViewport(false); full.focus({ preventScroll: true }); });
-expand.addEventListener('click', enterNative);
-full.addEventListener('click', () => {
-  if (stageEl.classList.contains('mfull')) { fillViewport(false); return; }
-  fillViewport(true);
-  restoreCabinet = true;
-  enterNative();
-});
+corner.addEventListener('click', toggleFullscreen);
+full.addEventListener('click', toggleFullscreen);
 reload.addEventListener('click', () => { if (frame.src) frame.src = frame.src; });
 // the two shortcuts the stage bar advertises, so they are not a lie
 addEventListener('keydown', (e) => {
   if (e.target.matches('input,textarea,select,[contenteditable]') || e.ctrlKey || e.metaKey || e.altKey) return;
-  if (e.key === 'f' || e.key === 'F') full.click();
+  if ((e.key === 'f' || e.key === 'F') && !e.repeat) corner.click();
+  if (e.key === 'Escape' && stageEl.classList.contains('mfull') && nativeFullscreen() !== stageEl) corner.click();
   if (e.key === 'r' || e.key === 'R') reload.click();
 });
 
@@ -479,6 +495,6 @@ const ro = new ResizeObserver(adSpacing);
 ro.observe(document.querySelector('.stage'));
 const sidePanel=document.querySelector('.side .panel'); if(sidePanel) ro.observe(sidePanel);
 </script>
-<script type="module" src="/site/arcade-client.js?v=34ace97b"></script>
+<script type="module" src="/site/arcade-client.js?v=00895d8c"></script>
 </body>
 </html>

@@ -9,9 +9,15 @@ import { headerHTML, footerHTML, searchHTML, worldCardHTML, worldHeroHTML, gameC
 import { friendsList } from '../site/multiplayer.js';
 import { gameHead, aboutHtml, keysHtml, tagsHtml, crumbsHtml, related, miniHtml, playUrl } from '../site/pages.js';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const release=createHash('sha256').update(await fs.readFile(path.join(root,'site/arcade.css'))).update(await fs.readFile(path.join(root,'site/account.js'))).digest('hex').slice(0,8);
+const modulePaths=(await fs.readdir(path.join(root,'site'))).filter(file=>file.endsWith('.js')).sort().map(file=>'/site/'+file).concat('/ads/ads.js');
+const releaseHash=createHash('sha256');
+for(const file of [...modulePaths,'/site/arcade.css','/site/arcade-characters.css'])releaseHash.update(await fs.readFile(path.join(root,file.slice(1))));
+const release=releaseHash.digest('hex').slice(0,8);
+// One version for the whole module graph. A returning visitor must not mix a
+// cached portal shell/avatar/catalogue with the new arcade entry points.
+const importMap='<script type="importmap">'+JSON.stringify({imports:Object.fromEntries(modulePaths.map(url=>[url,url+'?v='+release]))})+'</script>';
 const read=p=>fs.readFile(path.join(root,p),'utf8');
-const write=async(p,s)=>{if(p.endsWith('.html'))s=s.replace(/(href|src)="(\/site\/(?:arcade[^"?]*\.(?:js|css)|account\.js))(?:\?[^\"]*)?"/g,(_,attr,url)=>`${attr}="${url}?v=${release}"`).replace(/\r\n?/g,'\n').replace(/[\t ]+$/gm,'');await fs.mkdir(path.dirname(path.join(root,p)),{recursive:true});await fs.writeFile(path.join(root,p),s);};
+const write=async(p,s)=>{if(p.endsWith('.html'))s=s.replace(/<script type="importmap">[\s\S]*?<\/script>\s*/g,'').replace('<head>','<head>'+importMap).replace(/(href|src)="(\/site\/(?:arcade[^"?]*\.(?:js|css)|account\.js))(?:\?[^\"]*)?"/g,(_,attr,url)=>`${attr}="${url}?v=${release}"`).replace(/\r\n?/g,'\n').replace(/[\t ]+$/gm,'');await fs.mkdir(path.dirname(path.join(root,p)),{recursive:true});await fs.writeFile(path.join(root,p),s);};
 const styles='<link rel="stylesheet" href="/site/arcade-characters.css">\n<link rel="stylesheet" href="/site/arcade.css">';
 const client='<script type="module" src="/site/arcade-client.js"></script>';
 const head=(title,description,url)=>`<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} — PLAYPILE</title><meta name="description" content="${esc(description)}"><link rel="canonical" href="https://playpile.net${url}"><meta property="og:title" content="${esc(title)} — PLAYPILE"><meta property="og:description" content="${esc(description)}"><meta property="og:image" content="https://playpile.net/site/icon-512.png"><meta name="theme-color" content="#152b2c"><link rel="icon" href="/site/icon.svg" type="image/svg+xml"><link rel="manifest" href="/site/manifest.webmanifest"><link rel="stylesheet" href="/site/style.css"><link rel="stylesheet" href="/site/account.css"><link rel="stylesheet" href="/site/progress.css">${styles}<script>window.__PLAYPILE_WEB=1;</script><script type="module" src="/site/account.js"></script>`;

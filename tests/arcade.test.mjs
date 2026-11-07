@@ -32,3 +32,12 @@ test('local save keys and avatar ids survive the redesign',async()=>{
 test('Luke’s Diner wrapper instructions match the game help',()=>{
  const controls=Object.fromEntries(GAMES.find(g=>g.slug==='lukes-diner').controls);assert.match(controls['Q W E'],/tables/);assert.match(controls['A S D'],/stools/);
 });
+
+test('returning visitors load one version of the shell, catalogue and pixel avatar modules',async()=>{
+ for(const page of ['index.html','browse/index.html','me/index.html','site/about.html','play/puck-blitz-air-hockey-game/index.html']){
+  const html=await read(page),matches=[...html.matchAll(/<script type="importmap">([\s\S]*?)<\/script>/g)];
+  assert.equal(matches.length,1,page);const map=JSON.parse(matches[0][1]).imports;
+  const versions=['/site/shell.js','/site/catalogue.js','/site/avatar.js','/site/arcade-art.js','/site/arcade-profile.js','/ads/ads.js'].map(url=>{assert.ok(map[url]?.startsWith(url+'?v='),url);return map[url].split('?v=')[1];});
+  assert.equal(new Set(versions).size,1,page);assert.ok(html.indexOf('type="importmap"')<html.indexOf('type="module"'),page);
+ }
+});

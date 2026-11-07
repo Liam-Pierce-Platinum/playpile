@@ -4,14 +4,16 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { GAMES } from '../site/catalogue.js';
-import { WORLDS, worldFor, newest, featured } from '../site/arcade-data.js';
-import { headerHTML, footerHTML, searchHTML, worldCardHTML, worldHeroHTML, gameCardHTML, mascotHTML, escapeHTML as esc } from '../site/arcade-ui.js';
+import { WORLDS, newest, featured } from '../site/arcade-data.js';
+import { headerHTML, footerHTML, searchHTML, worldCardHTML, worldHeroHTML, gameCardHTML, escapeHTML as esc } from '../site/arcade-ui.js';
 import { friendsList } from '../site/multiplayer.js';
 import { gameHead, aboutHtml, keysHtml, tagsHtml, crumbsHtml, related, miniHtml, playUrl } from '../site/pages.js';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const modulePaths=(await fs.readdir(path.join(root,'site'))).filter(file=>file.endsWith('.js')).sort().map(file=>'/site/'+file).concat('/ads/ads.js');
+const siteFiles=await fs.readdir(path.join(root,'site'));
+const modulePaths=siteFiles.filter(file=>file.endsWith('.js')).sort().map(file=>'/site/'+file).concat('/ads/ads.js');
+const arcadeStyles=siteFiles.filter(file=>/^arcade.*\.css$/.test(file)).sort().map(file=>'/site/'+file);
 const releaseHash=createHash('sha256');
-for(const file of [...modulePaths,'/site/arcade.css','/site/arcade-characters.css'])releaseHash.update(await fs.readFile(path.join(root,file.slice(1))));
+for(const file of [...modulePaths,...arcadeStyles])releaseHash.update(await fs.readFile(path.join(root,file.slice(1))));
 const release=releaseHash.digest('hex').slice(0,8);
 // One version for the whole module graph. A returning visitor must not mix a
 // cached portal shell/avatar/catalogue with the new arcade entry points.
@@ -21,21 +23,39 @@ const write=async(p,s)=>{if(p.endsWith('.html'))s=s.replace(/<script type="impor
 const styles='<link rel="stylesheet" href="/site/arcade-characters.css">\n<link rel="stylesheet" href="/site/arcade.css">';
 const client='<script type="module" src="/site/arcade-client.js"></script>';
 const head=(title,description,url)=>`<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} — PLAYPILE</title><meta name="description" content="${esc(description)}"><link rel="canonical" href="https://playpile.net${url}"><meta property="og:title" content="${esc(title)} — PLAYPILE"><meta property="og:description" content="${esc(description)}"><meta property="og:image" content="https://playpile.net/site/icon-512.png"><meta name="theme-color" content="#152b2c"><link rel="icon" href="/site/icon.svg" type="image/svg+xml"><link rel="manifest" href="/site/manifest.webmanifest"><link rel="stylesheet" href="/site/style.css"><link rel="stylesheet" href="/site/account.css"><link rel="stylesheet" href="/site/progress.css">${styles}<script>window.__PLAYPILE_WEB=1;</script><script type="module" src="/site/account.js"></script>`;
-const page=(title,desc,url,content,mode='browse',extra='')=>`<!doctype html><html lang="en"><head>${head(title,desc,url)}${extra}</head><body class="arcade-site" data-arcade-page="${mode}"><a class="skip" href="#main">Skip to content</a>${headerHTML(mode==='profile'?'me':mode==='settings'?'settings':'browse')}<main id="main" class="arcade-main">${content}${footerHTML()}</main>${client}</body></html>`;
+const page=(title,desc,url,content,mode='browse',extra='',intro='')=>`<!doctype html><html lang="en"><head>${head(title,desc,url)}${extra}</head><body class="arcade-site" data-arcade-page="${mode}"><a class="skip" href="#main">Skip to content</a>${intro}${headerHTML(mode==='profile'?'me':mode)}<main id="main" class="arcade-main">${content}${footerHTML()}</main>${client}</body></html>`;
 const members=w=>w.id==='new'?newest(GAMES):w.id==='popular'?featured(GAMES):w.id==='friends'?friendsList(GAMES):GAMES.filter(g=>g.cat===w.cat);
 
-// Start screen: three useful choices, no duplicated game shelves.
-await write('index.html',`<!doctype html><html lang="en"><head>${head('Your next one more go','Free browser games in a little retro arcade. Browse the categories, find a game and jump in.','/')}<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914" crossorigin="anonymous"></script></head><body class="arcade-site arcade-start" data-arcade-page="start"><a class="skip" href="#startMenu">Skip to the menu</a><main class="desk" id="main"><div class="computer"><div class="monitor"><div class="screen-well"><div class="computer-screen"><div class="screen-stars" aria-hidden="true"></div><span class="boot-label">PLAYPILE / READY TO PLAY</span><h1 class="start-title">PLAYPILE</h1><p class="start-tagline">Got time for one more go?</p><nav class="start-menu" id="startMenu" aria-label="Start menu"><a href="/browse/"><span class="menu-symbol" aria-hidden="true">▶</span>Browse games</a><a href="/me/"><span class="menu-symbol" aria-hidden="true">♟</span>Profile</a><a href="/settings/"><span class="menu-symbol" aria-hidden="true">✚</span>Settings</a></nav><p class="start-count">${GAMES.length} games · no downloads · just play</p><span class="screen-corner">${mascotHTML('arcade')}</span></div></div><div class="monitor-chin"><b>PLAYPILE</b><small>HOME ARCADE</small><span class="power-light" aria-hidden="true"></span><span class="power-switch" aria-hidden="true"></span></div></div><div class="monitor-neck" aria-hidden="true"></div><div class="monitor-foot" aria-hidden="true"></div><div class="keyboard" aria-hidden="true">${'<i></i>'.repeat(33)}</div></div></main>${footerHTML()}${client}</body></html>`);
-
-await write('browse/index.html',page('Pick your next adventure','Pick a category and find your next browser game. Racing, puzzles, sport, multiplayer and more.','/browse/',`<div class="browse-heading"><div><div class="eyebrow">Choose your next stop</div><h1>What are we playing?</h1><p>Pick a character. Find your kind of game</p></div>${searchHTML()}</div><section class="world-grid" id="worlds" aria-label="Game categories">${WORLDS.map(w=>worldCardHTML(w,members(w).length)).join('')}</section><section id="browseResults" aria-live="polite" aria-label="Search results" hidden></section><div class="browse-tools"><span>Take your time. There’s a whole pile to get through</span><a class="text-link" href="/browse/all/">Show me every game →</a></div>`));
+// The intro is a visual layer over the already rendered catalogue. It plays once per tab.
+const boot=`<div class="arcade-boot" id="arcadeBoot" aria-hidden="true" hidden><div class="computer"><div class="monitor"><div class="screen-well"><div class="computer-screen"><span class="boot-label">HOME ARCADE</span><span class="start-title">PLAYPILE</span></div></div><div class="monitor-chin"><b>PLAYPILE</b><small>HOME ARCADE</small><span class="power-light"></span><span class="power-switch"></span></div></div><div class="monitor-neck"></div><div class="monitor-foot"></div><div class="keyboard">${'<i></i>'.repeat(33)}</div></div></div>
+<script>
+  if (!location.search && !location.hash && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    try {
+      if (localStorage.getItem('pd.ui.motion') !== 'reduced' && !sessionStorage.getItem('pd.ui.booted')) {
+        sessionStorage.setItem('pd.ui.booted', '1');
+        document.getElementById('arcadeBoot').hidden = false;
+      }
+    } catch {}
+  }
+</script>`;
+const catalogue=`<div class="browse-heading feed-heading"><div><h1>Browse games</h1><p>Find something fun and jump in.</p></div>${searchHTML()}</div>
+<section aria-label="Game library"><div class="feed-status"><p id="gameCount" role="status">${GAMES.length} games</p><button class="feed-clear" id="clearSearch" type="button" hidden>Clear search</button></div>
+<div class="game-grid game-feed" id="gameFeed">${GAMES.map(game=>gameCardHTML(game,{compact:true})).join('')}</div>
+<p class="empty-state" id="searchEmpty" hidden>Try a different title, genre or art style.</p></section>`;
+const browseTitle='Browse free games';
+const browseDesc='Browse and play free browser games on PlayPile. Find games by name, genre or art style.';
+const ads='<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914" crossorigin="anonymous"></script>';
+await write('index.html',page(browseTitle,browseDesc,'/',catalogue,'browse',ads,boot));
+await write('browse/index.html',page(browseTitle,browseDesc,'/',catalogue));
+await write('browse/all/index.html',page(browseTitle,browseDesc,'/',catalogue));
+await write('category/index.html',page('Game categories','Find games by category, from racing and puzzles to multiplayer.','/category/',`<div class="browse-heading"><div><h1>Categories</h1><p>Pick a character. Find your kind of game.</p></div><a class="backlink" href="/browse/">Browse all games →</a></div><section class="world-grid" aria-label="Game categories">${WORLDS.map(w=>worldCardHTML(w,members(w).length)).join('')}</section>`,'categories'));
 
 for(const world of WORLDS){
  const games=members(world);
  let info='';
  if(world.id==='friends') info='<p class="category-note">Look for <b>Play online</b> to join from different devices. Car Soccer, Tank Duel and Getaway Flop share one screen. The controls below each game show you how</p>';
- await write(world.href.slice(1)+'index.html',page(world.name+' games',world.intro,world.href,worldHeroHTML(world,games.length)+info+`<div class="game-grid">${games.map(gameCardHTML).join('')}</div>`));
+ await write(world.href.slice(1)+'index.html',page(world.name+' games',world.intro,world.href,worldHeroHTML(world,games.length)+info+`<div class="game-grid">${games.map(gameCardHTML).join('')}</div>`,'categories'));
 }
-await write('browse/all/index.html',page('The whole pile','Every game on PlayPile, together in one place.','/browse/all/',`<div class="browse-heading"><div><a class="backlink" href="/browse/">← Pick a category</a><h1>The whole pile</h1><p>${GAMES.length} games. Yours to get lost in</p></div>${searchHTML()}</div><div class="game-grid" id="worlds">${GAMES.slice().sort((a,b)=>a.title.localeCompare(b.title)).map(gameCardHTML).join('')}</div><section id="browseResults" aria-live="polite" aria-label="Search results" hidden></section>`));
 
 const infoPages=[['01','About','The person and the idea behind the pile','/site/about.html'],['02','Updates','What’s new, what’s fixed and what changed','/site/updates.html'],['03','Dev log','A peek under the hood','/devlog/'],['04','My picks','A few good places to start','/articles/'],['05','Contact','Found a bug? Got an idea? Say hello','/site/contact.html'],['06','Privacy & saves','Your saved games and your choices','/site/settings.html']];
 await write('settings/index.html',page('Settings & info','Display options, site information and a way to get in touch.','/settings/',`<a class="backlink" href="/">← Back to the computer</a><div class="eyebrow">The useful stuff</div><h1>Settings & info</h1><p>Need something outside the games? You’re in the right place</p><section class="display-options"><h2>Make yourself comfortable</h2><label><input type="checkbox" id="reduceMotion">Keep the characters still and skip the zoom</label><p class="pp-fine">Your device’s reduced-motion setting is respected too</p></section><section class="settings-grid" aria-label="Site pages">${infoPages.map(([n,title,desc,href])=>`<a class="settings-card" href="${href}"><span>${n} / OPEN FILE</span><strong>${title} →</strong><p>${desc}</p></a>`).join('')}</section><h2>A few more things</h2><nav class="settings-secondary" aria-label="Policies and support"><a href="/site/parents.html">For parents</a><a href="/site/privacy.html">Privacy policy</a><a href="/site/cookies.html">Cookies</a><a href="/site/terms.html">Terms</a><a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a><a href="/site/advertise.html">Advertising</a></nav>`,'settings'));
@@ -88,6 +108,7 @@ await write('site/about.html',about);
 
 // Keep the newer destinations discoverable without duplicating every game on Home.
 let sitemap=await read('sitemap.xml');
-for(const url of ['/browse/','/browse/all/','/browse/new/','/browse/popular/','/settings/'])if(!sitemap.includes('https://playpile.net'+url+'<'))sitemap=sitemap.replace('</urlset>',`<url><loc>https://playpile.net${url}</loc></url>\n</urlset>`);
+for(const url of ['/browse/','/browse/all/'])sitemap=sitemap.replace(`<url><loc>https://playpile.net${url}</loc></url>\n`,'');
+for(const url of ['/category/','/browse/new/','/browse/popular/','/settings/'])if(!sitemap.includes('https://playpile.net'+url+'<'))sitemap=sitemap.replace('</urlset>',`<url><loc>https://playpile.net${url}</loc></url>\n</urlset>`);
 await write('sitemap.xml',sitemap);
-console.log(`Built start screen, 12 category screens, profile, settings, ${GAMES.length} game pages and shared information layouts`);
+console.log(`Built the catalogue and boot intro, 12 category screens, profile, settings, ${GAMES.length} game pages and shared information layouts`);

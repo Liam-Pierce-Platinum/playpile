@@ -23,8 +23,18 @@ test('every current game remains available with real source, a thumbnail, crawla
  assert.equal(GAMES.length,101);assert.deepEqual(Object.keys(GAME_COPY).sort(),GAMES.map(g=>g.slug).sort());
  for(const g of GAMES){const html=await read(playUrl(g).slice(1)+'index.html');assert.ok(html.includes(escapeHTML(g.blurb)),g.slug+' missing static copy');assert.ok(html.includes('id="frame"'),g.slug+' missing game frame');assert.ok(html.includes('window.__PLAYPILE_WEB=1'),g.slug+' not a hosted game');assert.ok(html.includes('id="keys"'));await fs.access(path.join(root,'shots/t/'+g.slug+'.webp'));await fs.access(path.join(root,'games',(g.web||g.slug).split('?')[0],'index.html'));}
 });
-test('start screen exposes three destinations and does not duplicate the game catalogue',async()=>{
- const html=await read('index.html');for(const href of ['/browse/','/me/','/settings/'])assert.ok(html.includes('href="'+href+'"'));assert.ok(!html.includes('data-slug='));assert.ok(!html.includes('ad-home-'));assert.ok(html.includes('/site/privacy.html'));
+test('home and Browse show all games once, with an automatic intro only on home',async()=>{
+ const expected=GAMES.map(g=>g.slug);
+ for(const file of ['index.html','browse/index.html','browse/all/index.html']){
+  const html=await read(file);
+  assert.deepEqual([...html.matchAll(/data-slug="([^"]+)"/g)].map(m=>m[1]),expected,file);
+  for(const href of ['/browse/','/category/','/me/','/settings/'])assert.ok(html.includes(`href="${href}"`));
+  assert.equal(html.includes('id="arcadeBoot"'),file==='index.html');
+  assert.ok(html.includes('type="search"'));
+  assert.ok(!html.includes('class="start-menu"'));
+ }
+ const categories=await read('category/index.html');
+ for(const world of WORLDS)assert.ok(categories.includes(`kind="${world.id}"`),world.id);
 });
 test('each browse category has a character and no duplicated game cards',async()=>{
  for(const world of WORLDS){const html=await read(world.href.slice(1)+'index.html');assert.ok(html.includes(`kind="${world.id}"`));const slugs=[...html.matchAll(/data-slug="([^"]+)"/g)].map(m=>m[1]);assert.ok(slugs.length>0);assert.equal(slugs.length,new Set(slugs).size,world.id);assert.ok(!html.includes('class="catlist"'));}

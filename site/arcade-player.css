@@ -1,0 +1,82 @@
+/* Reuse the intro's computer casing. Keep the clipped housing separate so
+   the stage can expand to viewport fullscreen on phones. */
+.computer.player-computer {
+  width: 100%;
+  filter: none;
+  transform: none;
+}
+
+.player-monitor {
+  position: relative;
+  padding: clamp(8px, 1.65vw, 22px) clamp(8px, 1.85vw, 25px) clamp(8px, 1.2vw, 17px);
+}
+
+.player-monitor > .monitor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.player-monitor > .screen-well,
+.player-monitor > .monitor-chin {
+  position: relative;
+}
+
+.player-monitor > .screen-well {
+  padding: clamp(4px, .95vw, 11px);
+}
+
+.player-monitor > .monitor-chin {
+  gap: 9px;
+  min-height: 23px;
+  padding: clamp(5px, 1vw, 13px) 4px 0;
+  font-family: var(--heading, Arcade, monospace);
+  font-size: clamp(14px, 1.5vw, 20px);
+}
+
+.player-monitor .monitor-chin small {
+  margin-left: 0;
+  font: 700 10px/1 Arial, sans-serif;
+  letter-spacing: .08em;
+}
+
+.player-monitor .power-switch {
+  width: 20px;
+  height: 15px;
+}
+
+.player-computer > .monitor-neck {
+  width: clamp(84px, 19%, 160px);
+  height: clamp(9px, 1.3vw, 18px);
+}
+
+.player-computer > .monitor-foot {
+  width: clamp(144px, 36%, 265px);
+  height: clamp(9px, 1.2vw, 16px);
+}
+
+.player-computer .stage {
+  border: 3px solid #0f191c;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.player-computer .stage:is(.mfull, :fullscreen, :-webkit-full-screen) {
+  border: 0;
+  min-height: 0;
+}
+
+.player-computer .stage .curtain h2 {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-family: var(--heading, Arcade, monospace);
+}
+
+.player-computer .stage .curtain p {
+  font-size: clamp(15px, 2vw, 18px);
+}
+
+@media (max-width: 560px) {
+  .player-monitor > .screen-well { border-width: 2px; }
+  .player-monitor > .monitor-chin { padding-inline: 6px; }
+}

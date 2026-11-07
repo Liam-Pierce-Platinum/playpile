@@ -38,6 +38,10 @@ import { WIND, envProbe } from './scenery.js';
 import { setAnisotropy } from './textures.js';
 import { Runner, collide } from './world.js';
 import { racingLine, speedPlan, Driver } from './ai.js';
+import { createFeedback } from '../../_shared/feedback-sfx.js';
+
+const sound = createFeedback('apex', {left:'calc(50% - 22px)'});
+let soundGear;
 
 // ---------------------------------------------------------------------
 // renderer, scene, light
@@ -728,13 +732,13 @@ function frame(now) {
   requestAnimationFrame(frame);
   const dt = Math.min(0.05, (now - prev) / 1000);
   prev = now;
-  if (!S.track || !S.player) { if (S.track) { placeCamera(dt); renderer.render(scene, camera); } return; }
+  if (!S.track || !S.player) { sound.motor(false); soundGear = undefined; if (S.track) { placeCamera(dt); renderer.render(scene, camera); } return; }
 
   if (tap('Escape') && !S.resultsShown) {
     paused = !paused;
     showScreen(paused ? 'pause' : null);
   }
-  if (paused) { speedLines.clear(); renderer.render(scene, camera); return; }
+  if (paused) { sound.motor(false); soundGear = undefined; speedLines.clear(); renderer.render(scene, camera); return; }
   if (tap('KeyV')) { camMode = (camMode + 1) % CAMS.length; camReady = false; }
 
   // the test tools can run the world faster than the screen, in whole frames
@@ -758,6 +762,10 @@ function frame(now) {
   WIND.uTime.value += dt;
   if (S.track.sky) S.track.sky.position.copy(camera.position);
   const pc = S.player.car;
+  const rev = Math.min(1, pc.rpm / TUNE.redline);
+  sound.motor(!S.resultsShown && pc.rpm > 0, 48 + rev * 220, rev * 0.68, 'sawtooth');
+  if (soundGear !== undefined && soundGear !== pc.gear && !S.resultsShown) sound.burst(1250, 0.065, 0.11);
+  soundGear = pc.gear;
   sun.target.position.set(pc.x, S.player.y, pc.z);
   sun.position.set(pc.x - 90, S.player.y + 150, pc.z + 70);
   placeCamera(dt);

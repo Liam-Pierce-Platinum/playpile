@@ -101,7 +101,8 @@ import { Deck, clamp, rnd, pick } from '../_deck/deck.js';
 import { Board } from '../_deck/board.js';
 import { Home } from '../_deck/home.js';
 
-const D = new Deck({ key: 'quickdraw', w: 900, h: 520, bg: '#2a1512' });
+const D = new Deck({ key: 'quickdraw', w: 900, h: 520, bg: '#2a1512',
+  enterTaps: () => !twoPlayer || screen !== 'duel' });
 
 // ---------------------------------------------------------------------
 // what you can buy
@@ -278,6 +279,7 @@ function newRound() {
 let touchShot = false;
 function newVolley(redo) {
   touchShot = false;
+  p2Fired = false;
   if (!redo) volley++;
   // A PENALTY IS SERVED BY WHATEVER VOLLEY COMES NEXT, re-done or not:
   // the third twitch is answered by the very next word, which is the
@@ -499,7 +501,11 @@ function step(dt, g) {
 
 let p2Fired = false;
 addEventListener('keydown', (e) => {
-  if ((e.code === 'Enter' || e.code === 'ShiftRight' || e.code === 'Slash') && !e.repeat) p2Fired = true;
+  if (!twoPlayer || screen !== 'duel') return;
+  // Enter belongs to the right player in a shared duel. The Deck also
+  // counts Enter as a tap, which would fire the left player's gun too.
+  if (e.code === 'Enter') e.preventDefault();
+  if (phase === 'draw' && (e.code === 'Enter' || e.code === 'ShiftRight' || e.code === 'Slash') && !e.repeat) p2Fired = true;
 });
 function firedP2() { const v = p2Fired; p2Fired = false; return v; }
 
@@ -524,8 +530,7 @@ function handle(f, ptr, dt, fired) {
   // outright, because a rule you cannot break is a rule nobody learns.
   f.aimX = f.side < 0 ? Math.min(ptr.x, HALF()) : Math.max(ptr.x, HALF());
   f.aimY = ptr.y;
-  const ready = (D.t - f.drawnAt) > 0.10 * f.stats.draw;
-  if (!fired || !ready) return;
+  if (!fired || !drawReady(f)) return;
   if (!ownSide(f, ptr)) {
     msg = 'KEEP YOUR HAND ON YOUR OWN SIDE';
     msgT = 0.9;
@@ -536,6 +541,8 @@ function handle(f, ptr, dt, fired) {
 }
 
 const inBox = (p, b) => p.x > b.x && p.x < b.x + b.w && p.y > b.y && p.y < b.y + b.h;
+
+const drawReady = (f) => f.drawn && (D.t - f.drawnAt) > 0.10 * f.stats.draw;
 
 /** a shot: from the gun, through the point aimed at, into whatever it meets */
 function fireAt(from, target, ax, ay) {
@@ -1099,7 +1106,7 @@ window.__qd = {
 };
 const snap = (f) => f && ({ hp: f.hp, alive: f.alive, drawn: f.drawn, fired: f.fired,
                             arms: { ...f.arms }, kneeling: f.kneeling, name: f.name,
-                            owes: f.returnBy > 0, noGun: f.noGun,
+                            owes: f.returnBy > 0, noGun: f.noGun, drawReady: drawReady(f),
                             falseStarts: f.falseStarts });
 
 D.run(step);

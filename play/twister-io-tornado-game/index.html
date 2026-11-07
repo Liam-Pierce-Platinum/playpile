@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head><script type="importmap">{"imports":{"/site/account.js":"/site/account.js?v=3651dd4b","/site/analytics.js":"/site/analytics.js?v=3651dd4b","/site/arcade-art.js":"/site/arcade-art.js?v=3651dd4b","/site/arcade-client.js":"/site/arcade-client.js?v=3651dd4b","/site/arcade-copy.js":"/site/arcade-copy.js?v=3651dd4b","/site/arcade-data.js":"/site/arcade-data.js?v=3651dd4b","/site/arcade-locale.js":"/site/arcade-locale.js?v=3651dd4b","/site/arcade-locales.js":"/site/arcade-locales.js?v=3651dd4b","/site/arcade-profile.js":"/site/arcade-profile.js?v=3651dd4b","/site/arcade-return.js":"/site/arcade-return.js?v=3651dd4b","/site/arcade-shell.js":"/site/arcade-shell.js?v=3651dd4b","/site/arcade-ui.js":"/site/arcade-ui.js?v=3651dd4b","/site/avatar.js":"/site/avatar.js?v=3651dd4b","/site/catalogue.js":"/site/catalogue.js?v=3651dd4b","/site/categories.js":"/site/categories.js?v=3651dd4b","/site/multiplayer.js":"/site/multiplayer.js?v=3651dd4b","/site/online.js":"/site/online.js?v=3651dd4b","/site/pages.js":"/site/pages.js?v=3651dd4b","/site/pixel-ui.js":"/site/pixel-ui.js?v=3651dd4b","/site/progress.js":"/site/progress.js?v=3651dd4b","/site/rating.js":"/site/rating.js?v=3651dd4b","/site/seo.js":"/site/seo.js?v=3651dd4b","/site/shell.js":"/site/shell.js?v=3651dd4b","/ads/ads.js":"/ads/ads.js?v=3651dd4b"}}</script><script>window.__PLAYPILE_WEB=1;</script>
+<head><script type="importmap">{"imports":{"/site/account.js":"/site/account.js?v=3d82878b","/site/analytics.js":"/site/analytics.js?v=3d82878b","/site/arcade-art.js":"/site/arcade-art.js?v=3d82878b","/site/arcade-client.js":"/site/arcade-client.js?v=3d82878b","/site/arcade-copy.js":"/site/arcade-copy.js?v=3d82878b","/site/arcade-data.js":"/site/arcade-data.js?v=3d82878b","/site/arcade-locale.js":"/site/arcade-locale.js?v=3d82878b","/site/arcade-locales.js":"/site/arcade-locales.js?v=3d82878b","/site/arcade-profile.js":"/site/arcade-profile.js?v=3d82878b","/site/arcade-return.js":"/site/arcade-return.js?v=3d82878b","/site/arcade-shell.js":"/site/arcade-shell.js?v=3d82878b","/site/arcade-ui.js":"/site/arcade-ui.js?v=3d82878b","/site/avatar.js":"/site/avatar.js?v=3d82878b","/site/catalogue.js":"/site/catalogue.js?v=3d82878b","/site/categories.js":"/site/categories.js?v=3d82878b","/site/multiplayer.js":"/site/multiplayer.js?v=3d82878b","/site/online.js":"/site/online.js?v=3d82878b","/site/pages.js":"/site/pages.js?v=3d82878b","/site/pixel-ui.js":"/site/pixel-ui.js?v=3d82878b","/site/progress.js":"/site/progress.js?v=3d82878b","/site/rating.js":"/site/rating.js?v=3d82878b","/site/seo.js":"/site/seo.js?v=3d82878b","/site/shell.js":"/site/shell.js?v=3d82878b","/ads/ads.js":"/ads/ads.js?v=3d82878b"}}</script><script>window.__PLAYPILE_WEB=1;</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TWISTER.IO — Free Tornado io Game Online | PLAYPILE</title>
@@ -18,7 +18,7 @@
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
 <link rel="stylesheet" href="/site/progress.css">
-<script type="module" src="/site/account.js?v=3651dd4b"></script>
+<script type="module" src="/site/account.js?v=3d82878b"></script>
 <link rel="icon" href="/site/icon.svg" type="image/svg+xml">
 <link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/site/icon-180.png">
@@ -30,11 +30,11 @@
      here and does not add a second copy. -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
      crossorigin="anonymous"></script>
-<link rel="stylesheet" href="/site/arcade-characters.css?v=3651dd4b">
-<link rel="stylesheet" href="/site/arcade.css?v=3651dd4b">
-<link rel="stylesheet" href="/site/arcade-player.css?v=3651dd4b">
-<link rel="stylesheet" href="/site/arcade-return.css?v=3651dd4b">
-<link rel="stylesheet" href="/site/arcade-locale.css?v=3651dd4b">
+<link rel="stylesheet" href="/site/arcade-characters.css?v=3d82878b">
+<link rel="stylesheet" href="/site/arcade.css?v=3d82878b">
+<link rel="stylesheet" href="/site/arcade-player.css?v=3d82878b">
+<link rel="stylesheet" href="/site/arcade-return.css?v=3d82878b">
+<link rel="stylesheet" href="/site/arcade-locale.css?v=3d82878b">
 </head>
 <body class="arcade-site">
 <a class="skip" href="#stage">Skip to the game</a>
@@ -207,6 +207,8 @@ import { mountRating } from '/site/rating.js';
 import { mountOnline } from '/site/online.js';
 import { ONLINE } from '/site/multiplayer.js';
 import { catUrl } from '/site/seo.js';
+import { translate } from '/site/arcade-locale.js';
+import { SCORES, MUSIC_PREF, musicOn } from '/games/_shared/game-scores.js';
 
 // THE SLUG IS READ OFF THE PATH, and it has to stay that way: locally
 // server.js rewrites /play/<slug> to this file, and tools/deploy.mjs
@@ -285,13 +287,14 @@ how.textContent = note;
 function launch(role) {
   frame.src = role ? src + (src.includes('?') ? '&' : '?') + 'pponline=' + role : src;
   frame.hidden = false;
+  document.body.classList.add('player-playing');
   // a play counts when the game is actually started, not when the page is opened
   remember(g.slug);
   trackPlay(g.slug);
   curtain.style.display = 'none';
   setTimeout(() => { try { frame.focus(); } catch (e) {} }, 400);
-  // Keep the cabinet when a game fits the phone's current orientation.
-  if (TOUCH && !UPRIGHT.test(g.slug) && matchMedia('(orientation: portrait)').matches) fillViewport(true);
+  if (smallDisplay.matches) fillViewport(true);
+  else measurePlayer();
 }
 start.addEventListener('click', async () => {
   start.disabled = true;
@@ -310,7 +313,10 @@ const ol = (WEB || g.how === 'local') && mountOnline({
   g, stage: document.getElementById('stage'), frame, pill: document.getElementById('olpill'),
   before: () => interstitial(),
   launch: (role) => launch(role),
-  stop: () => { frame.removeAttribute('src'); frame.hidden = true; curtain.style.display = ''; start.disabled = false; if (TOUCH) fillViewport(false); },
+  stop: () => {
+    frame.removeAttribute('src'); frame.hidden = true; curtain.style.display = ''; start.disabled = false;
+    document.body.classList.remove('player-playing'); fillViewport(false);
+  },
   solo: () => start.click(),
 });
 if (ol) {
@@ -323,44 +329,115 @@ if (ol) {
   olhint.hidden = false;
   olhint.textContent = 'Online: ' + ONLINE[g.slug].note;
 }
-// ---- phones: fill the whole screen, real fullscreen + landscape lock where the browser allows ----
-const TOUCH = (navigator.maxTouchPoints > 0 || 'ontouchstart' in window) && matchMedia('(pointer: coarse)').matches;
-const UPRIGHT = /^(lukes-diner|crossing|curveball|drifter|hoops|home-run|merge|pipeworks|quickdraw|spike|stack|sweep|block-royale|helix-drop|stack-attack|subway-run|tunnel-dive|slope-rush|drift-tower|word-blitz|prism|one-tile|sushi-conveyor|bubble-trouble|firework-frenzy|stick-swing|golf-orbit|parry|strike|pinball|lanternfall|grapple-goblin|tiny-harbor)$/;
+// Fit the frame to the available browser area. Orientation remains in the player's hands.
+const smallDisplay = matchMedia('(max-width: 740px), (max-height: 510px), (pointer: coarse) and (max-width: 1100px)');
 const stageEl = document.getElementById('stage');
+const screenWell = stageEl.parentElement;
+const viewport = window.visualViewport;
+const controls = document.createElement('div');
+controls.className = 'stage-controls';
 const mexit = document.createElement('button');
-mexit.className = 'mexit'; mexit.type = 'button'; mexit.textContent = '✕'; mexit.setAttribute('aria-label', 'Exit full screen');
-stageEl.appendChild(mexit);
-function fillViewport(on, requestNative = true) {
-  stageEl.classList.toggle('mfull', on); document.body.classList.toggle('mfull-on', on);
-  if (on && requestNative) {
-    const rq = stageEl.requestFullscreen || stageEl.webkitRequestFullscreen;
-    try { const r = rq && rq.call(stageEl, { navigationUI: 'hide' });
-      if (r && r.then) r.then(() => { if (!UPRIGHT.test(g.slug) && screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {}); }).catch(() => {});
-    } catch (e) {}
-  } else if (!on) {
-    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
-    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+mexit.className = 'mexit'; mexit.type = 'button'; mexit.textContent = '✕'; mexit.setAttribute('aria-label', 'Exit full screen'); mexit.title = 'Back to cabinet';
+const expand = document.createElement('button');
+expand.className = 'stage-expand'; expand.type = 'button'; expand.textContent = '⛶'; expand.setAttribute('aria-label', 'Use device fullscreen'); expand.title = 'Use device fullscreen';
+controls.append(mexit);
+const backing = SCORES[g.slug];
+let backingEnabled = musicOn();
+const musicButtons = [];
+function refreshTools() {
+  expand.setAttribute('aria-label', translate('deviceFullscreen'));
+  expand.title = translate('deviceFullscreen');
+  const label = translate(backingEnabled ? 'backingOn' : 'backingOff');
+  for (const [button, compact] of musicButtons) {
+    button.textContent = compact ? '♫' : label;
+    button.setAttribute('aria-label', label);
+    button.setAttribute('aria-pressed', String(backingEnabled));
+    button.title = `${label} · ${backing[0]}`;
   }
-  // games size themselves on resize; nudge them once the new box has settled
-  setTimeout(() => { try { frame.contentWindow.dispatchEvent(new Event('resize')); } catch (e) {} }, 350);
 }
-mexit.addEventListener('click', () => fillViewport(false));
-full.addEventListener('click', async () => {
-  if (stageEl.classList.contains('mfull') || document.fullscreenElement) {
-    fillViewport(false);
-  } else if (TOUCH) {
-    fillViewport(true);
-  } else if (stageEl.requestFullscreen) {
-    try { await stageEl.requestFullscreen(); }
-    catch { fillViewport(true, false); }
-  } else {
-    fillViewport(true, false);
+if (backing) {
+  function toggleBacking() {
+    backingEnabled = !backingEnabled;
+    try { localStorage.setItem(MUSIC_PREF, backingEnabled ? 'on' : 'off'); } catch {}
+    try { frame.contentWindow?.__playpileMusic?.setEnabled(backingEnabled); } catch {}
+    refreshTools();
   }
+  for (const compact of [true, false]) {
+    const button = document.createElement('button');
+    button.className = 'stage-music'; button.type = 'button';
+    button.addEventListener('click', toggleBacking);
+    musicButtons.push([button, compact]);
+    if (compact) controls.append(button); else full.before(button);
+  }
+  window.addEventListener('storage', event => {
+    if (event.key === MUSIC_PREF) { backingEnabled = musicOn(); refreshTools(); }
+  });
+  frame.addEventListener('load', () => {
+    try {
+      const music = frame.contentWindow?.__playpileMusic;
+      if (!backingEnabled) music?.setEnabled(false);
+      else if (navigator.userActivation?.isActive) music?.wake();
+    } catch {}
+  });
+}
+controls.append(expand);
+addEventListener('pp-locale', refreshTools);
+refreshTools();
+stageEl.prepend(controls);
+const nativeFullscreen = () => document.fullscreenElement || document.webkitFullscreenElement;
+const requestNative = stageEl.requestFullscreen || stageEl.webkitRequestFullscreen;
+expand.hidden = !requestNative || document.fullscreenEnabled === false;
+let restoreCabinet = false;
+let wasNative = false;
+
+function measurePlayer() {
+  const height = viewport?.height || document.documentElement.clientHeight;
+  const width = viewport?.width || document.documentElement.clientWidth;
+  stageEl.style.setProperty('--play-view-width', `${Math.floor(width)}px`);
+  stageEl.style.setProperty('--play-view-height', `${Math.floor(height)}px`);
+  stageEl.style.setProperty('--play-view-top', `${viewport?.offsetTop || 0}px`);
+  stageEl.style.setProperty('--play-view-left', `${viewport?.offsetLeft || 0}px`);
+  const cabinetTop = screenWell.getBoundingClientRect().top + window.scrollY;
+  stageEl.style.setProperty('--cabinet-play-height', `${Math.floor(Math.max(height * .45, height - cabinetTop - 25))}px`);
+}
+function fillViewport(on) {
+  stageEl.classList.toggle('mfull', on);
+  document.body.classList.toggle('mfull-on', on);
+  measurePlayer();
+  if (!on && nativeFullscreen() === stageEl) {
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    try { Promise.resolve(exit?.call(document)).catch(() => {}); } catch {}
+  }
+}
+async function enterNative() {
+  if (!requestNative) return;
+  try { await requestNative.call(stageEl, { navigationUI: 'hide' }); }
+  catch { /* the viewport layout remains available */ }
+}
+function syncFullscreen() {
+  const active = nativeFullscreen() === stageEl;
+  if (wasNative && !active && restoreCabinet) fillViewport(false);
+  if (!active) restoreCabinet = false;
+  wasNative = active;
+  measurePlayer();
+}
+for (const event of ['fullscreenchange','webkitfullscreenchange']) document.addEventListener(event, syncFullscreen);
+addEventListener('resize', measurePlayer);
+viewport?.addEventListener('resize', measurePlayer);
+viewport?.addEventListener('scroll', measurePlayer);
+measurePlayer();
+mexit.addEventListener('click', () => { fillViewport(false); full.focus({ preventScroll: true }); });
+expand.addEventListener('click', enterNative);
+full.addEventListener('click', () => {
+  if (stageEl.classList.contains('mfull')) { fillViewport(false); return; }
+  fillViewport(true);
+  restoreCabinet = true;
+  enterNative();
 });
 reload.addEventListener('click', () => { if (frame.src) frame.src = frame.src; });
 // the two shortcuts the stage bar advertises, so they are not a lie
 addEventListener('keydown', (e) => {
-  if (e.target.matches('input,textarea')) return;
+  if (e.target.matches('input,textarea,select,[contenteditable]') || e.ctrlKey || e.metaKey || e.altKey) return;
   if (e.key === 'f' || e.key === 'F') full.click();
   if (e.key === 'r' || e.key === 'R') reload.click();
 });
@@ -398,6 +475,6 @@ const ro = new ResizeObserver(adSpacing);
 ro.observe(document.querySelector('.stage'));
 const sidePanel=document.querySelector('.side .panel'); if(sidePanel) ro.observe(sidePanel);
 </script>
-<script type="module" src="/site/arcade-client.js?v=3651dd4b"></script>
+<script type="module" src="/site/arcade-client.js?v=3d82878b"></script>
 </body>
 </html>

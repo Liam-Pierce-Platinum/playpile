@@ -409,6 +409,7 @@ class Actor {
 export function fire(world, sh) {
   const m = sh.mods;
   const [ox, oy] = sh.shooter.muzzle();
+  world.sound?.shot('boom', sh.shooter === world.player ? 1 : 0.5 / (1 + Math.hypot(ox-world.player.x, oy-world.player.y)*0.12));
   const aim = sh.aim;
   const fx = world.fx;
   fx.star(ox + Math.cos(aim) * 0.02, oy + Math.sin(aim) * 0.02, 0.4, aim, 0.1);
@@ -511,7 +512,7 @@ export class Player extends Actor {
 
     if (this.reload > 0) {
       this.reload -= dt;
-      if (this.reload <= 0) { this.shells = this.mods.shells; world.fx.bit(this.x, this.y + 0.9, 0, 2, 0.3, P.gold, 1); }
+      if (this.reload <= 0) { this.shells = this.mods.shells; world.fx.bit(this.x, this.y + 0.9, 0, 2, 0.3, P.gold, 1); world.sound?.burst(2600, 0.1, 0.16); }
     } else if (IN.reload && this.shells < this.mods.shells) {
       this.reload = this.mods.reload;
     } else if (IN.fire && this.shells > 0 && this.refire <= 0) {

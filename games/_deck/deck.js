@@ -37,6 +37,7 @@ export class Deck {
    * @param {number} o.w     virtual width
    * @param {number} o.h     virtual height
    * @param {string} [o.bg]  background, painted before every frame
+   * @param {function(): boolean} [o.enterTaps] whether Enter acts as a tap
    */
   constructor(o) {
     this.key = o.key; this.W = o.w; this.H = o.h;
@@ -61,16 +62,19 @@ export class Deck {
     this.mouse = { x: this.W / 2, y: this.H / 2, down: false, dx: 0, dy: 0 };
     this._taps = 0;          // presses since the game last looked
     this._rels = 0;          // releases since the game last looked
+    const tapKey = (event) => event.code === 'Space' ||
+      (event.key === 'Enter' && (o.enterTaps?.() ?? true));
 
     addEventListener('keydown', (e) => {
       if (KEYS_STOP.includes(e.key)) e.preventDefault();
+      if (e.isTrusted && !e.repeat && !e.ctrlKey && !e.altKey && !e.metaKey) this._audio();
       if (!e.repeat) { this.keys.add(e.key); this.keys.add(e.code); }
-      if (!e.repeat && (e.code === 'Space' || e.key === 'Enter')) this._taps++;
+      if (!e.repeat && tapKey(e)) this._taps++;
       if (e.key === 'p' || e.key === 'P') this.paused = !this.paused;
     });
     addEventListener('keyup', (e) => {
       this.keys.delete(e.key); this.keys.delete(e.code);
-      if (e.code === 'Space' || e.key === 'Enter') this._rels++;
+      if (tapKey(e)) this._rels++;
     });
 
     const pos = (e) => {
@@ -201,12 +205,14 @@ export class Deck {
 
   // ---- sound --------------------------------------------------------
   _audio() {
-    if (this.ac) { if (this.ac.state === 'suspended') this.ac.resume(); return; }
-    try { this.ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+    try {
+      if (!this.ac) this.ac = new (window.AudioContext || window.webkitAudioContext)();
+      if (this.ac.state !== 'running' && this.ac.state !== 'closed') this.ac.resume().catch(() => {});
+    } catch {}
   }
   /** a short tone. type: sine square saw triangle */
   beep(f = 440, dur = 0.08, type = 'square', vol = 0.05, slide = 0) {
-    if (!this.ac) return;
+    if (this.ac?.state !== 'running' || document.hidden) return;
     const t = this.ac.currentTime;
     const o = this.ac.createOscillator(), gn = this.ac.createGain();
     o.type = type; o.frequency.setValueAtTime(f, t);
@@ -218,7 +224,7 @@ export class Deck {
   }
   /** a burst of noise, for hits and crashes */
   noise(dur = 0.12, vol = 0.06, hp = 700) {
-    if (!this.ac) return;
+    if (this.ac?.state !== 'running' || document.hidden) return;
     const n = Math.floor(this.ac.sampleRate * dur);
     const buf = this.ac.createBuffer(1, n, this.ac.sampleRate);
     const d = buf.getChannelData(0);

@@ -61,9 +61,78 @@
   box-shadow: none;
 }
 
-.player-computer .stage:is(.mfull, :fullscreen, :-webkit-full-screen) {
-  border: 0;
+.stage-controls { display: none; }
+
+.player-playing.arcade-site .shell > main {
+  width: 100%;
+  padding-inline: clamp(9px, 1.5vw, 26px);
+}
+
+.player-playing.arcade-site .play { grid-template-columns: minmax(0, 1fr); }
+.player-playing.arcade-site .play .side { max-width: 420px; }
+
+.player-playing .player-computer .stage:not(.mfull, :fullscreen) {
+  height: var(--cabinet-play-height, 70dvh);
   min-height: 0;
+  max-height: none;
+  aspect-ratio: auto;
+}
+
+.player-computer .stage:is(.mfull, :fullscreen, :-webkit-full-screen) {
+  display: grid;
+  grid-template: "tools" 44px "game" minmax(0, 1fr) / minmax(0, 1fr);
+  gap: 0;
+  border: 0;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  border-radius: 0;
+  background: #101620;
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: auto;
+}
+
+.player-computer .stage.mfull {
+  inset: var(--play-view-top, 0) auto auto var(--play-view-left, 0);
+  width: var(--play-view-width, 100vw);
+  height: var(--play-view-height, 100dvh);
+}
+
+.player-computer .stage:is(:fullscreen, :-webkit-full-screen) {
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+}
+
+.stage:is(.mfull, :fullscreen, :-webkit-full-screen) .stage-controls {
+  grid-area: tools;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: #18232d;
+}
+
+.player-computer .stage:is(.mfull, :fullscreen, :-webkit-full-screen) :is(iframe, .curtain) {
+  grid-area: game;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.player-computer .stage:is(.mfull, :fullscreen, :-webkit-full-screen) .curtain {
+  position: relative;
+  inset: auto;
+}
+
+@media (orientation: landscape) {
+  .player-computer .stage:is(.mfull, :fullscreen, :-webkit-full-screen) {
+    grid-template: "game tools" minmax(0, 1fr) / minmax(0, 1fr) 44px;
+    direction: ltr;
+  }
+  .stage:is(.mfull, :fullscreen, :-webkit-full-screen) .stage-controls {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
 }
 
 .player-computer .stage .curtain h2 {
@@ -76,12 +145,24 @@
   font-size: clamp(15px, 2vw, 18px);
 }
 
-.player-computer .stage .mexit {
+.player-computer .stage .stage-controls button {
+  position: static;
+  display: grid;
+  place-items: center;
   width: 44px;
   height: 44px;
-  border-radius: 8px;
-  background: #141c29e8;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #f2ebd6;
+  font: 700 19px/1 Arial, sans-serif;
+  cursor: pointer;
+  flex: 0 0 44px;
 }
+.stage-controls button:hover { background: #314650; }
+.stage-controls .stage-music[aria-pressed="false"] { color: #a2acb5; text-decoration: line-through; }
+.stage-controls button:focus-visible { outline-offset: -4px; }
+.stage:is(:fullscreen, :-webkit-full-screen) .stage-expand { display: none !important; }
 
 @media (max-width: 560px) {
   body:has(.player-computer) .shell > main { padding-inline: 9px; }

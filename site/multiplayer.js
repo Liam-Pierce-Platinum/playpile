@@ -29,7 +29,10 @@ export const ONLINE = {
   'toy-soldier-blitz': { via: 'game', players: 2, note: 'Host a room from the game menu and share its code.' },
   'inkvale':           { via: 'game', players: 2, note: 'TWO WARDENS co-op: host from the game menu and share its code.' },
 };
-export const LOCAL2P = ['car-soccer', 'tank-duel', 'getaway-flop'];
+export const LOCAL2P = [
+  'air-hockey', 'archer-duel', 'car-soccer', 'dungeon-quest', 'getaway-flop',
+  'quickdraw', 'rooftop-duel', 'spike', 'sumo-slam', 'tank-duel',
+];
 
 export const isOnline = (slug) => !!ONLINE[slug];
 export const siteOnline = (slug) => !!(ONLINE[slug] && ONLINE[slug].via === 'site');

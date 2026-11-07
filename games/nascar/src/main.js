@@ -27,6 +27,10 @@ import { Cockpit } from './cockpit.js';
 import * as Season from './season.js';
 import { field } from './field.js';
 import { AIR } from './draft.js';
+import { createFeedback } from '../../_shared/feedback-sfx.js';
+
+const sound = createFeedback('nascar', {left:'calc(50% - 22px)'});
+let soundGear;
 
 const MPH = 2.23694;
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -360,7 +364,7 @@ function frame(now) {
   requestAnimationFrame(frame);
   const dt = Math.min(0.1, (now - last) / 1000);
   last = now;
-  if (!S.running) { sky.step(dt); draw(dt); return; }
+  if (!S.running) { sound.motor(false); soundGear = undefined; sky.step(dt); draw(dt); return; }
 
   if (tap('Escape')) {
     S.paused = !S.paused;
@@ -418,6 +422,12 @@ function frame(now) {
 
   placeCars();
   if (S.race) {
+    const car = S.race.player.car;
+    const rev = Math.min(1, car.rpm / TUNE.redline);
+    const racing = !S.paused && S.race.phase !== PHASE.FINISHED && car.rpm > 0;
+    sound.motor(racing, 39 + rev * 140, rev * 0.8, 'triangle');
+    if (racing && soundGear !== undefined && soundGear !== car.gear) sound.burst(850, 0.085, 0.12);
+    soundGear = racing ? car.gear : undefined;
     const pa = S.race.player.art;
     if (camMode === 1 && pa) {
       cockpit.attachTo(pa);

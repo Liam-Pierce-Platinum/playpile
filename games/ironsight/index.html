@@ -211,6 +211,7 @@
 <div id="vignette"></div>
 <div id="fps"></div>
 <script>try { if (parent !== window && parent.__PLAYPILE_WEB) window.__PLAYPILE_WEB = 1; } catch (e) {}
+if (location.hostname === "playpile.net" || location.hostname === "www.playpile.net") window.__PLAYPILE_WEB = 1;
 if (window.__PLAYPILE_WEB) addEventListener("DOMContentLoaded", () => { const b = document.querySelector("[data-act=online]"); if (b) { b.disabled = true; b.style.opacity = 0.45; b.querySelector("small").textContent = "Online play: run the game locally (needs its server)"; } });</script>
 <script type="module" src="src/main.js"></script>
 </body>

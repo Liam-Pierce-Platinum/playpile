@@ -22,28 +22,45 @@
 export function pplink() {
   const role = new URLSearchParams(location.search).get('pponline');
   if ((role !== 'host' && role !== 'guest') || window.parent === window) return null;
+  const origin = location.origin;
+  const pending = [];
+  let receive = null, flushQueued = false;
   const L = {
     role,
     host: role === 'host',
     live: true,
     ping: 0,
-    onmsg: null,
+    get onmsg() { return receive; },
+    set onmsg(handler) {
+      receive = handler;
+      if (!receive || flushQueued || !pending.length) return;
+      flushQueued = true;
+      // The parent may already have the first match packet while this game
+      // is still loading assets or assigning its receive handler.
+      queueMicrotask(() => {
+        flushQueued = false;
+        while (receive && pending.length) receive(pending.shift());
+      });
+    },
     onstatus: null,
-    send(d) { try { window.parent.postMessage({ pp: 'net', t: 'send', d }, '*'); } catch (e) { /* page going away */ } },
+    send(d) { try { window.parent.postMessage({ pp: 'net', t: 'send', d }, origin); } catch (e) { /* page going away */ } },
     // the player chose to quit the online match from inside the game
-    leave() { try { window.parent.postMessage({ pp: 'net', t: 'leave' }, '*'); } catch (e) { /* ditto */ } },
+    leave() { try { window.parent.postMessage({ pp: 'net', t: 'leave' }, origin); } catch (e) { /* ditto */ } },
   };
   addEventListener('message', (e) => {
-    if (e.source !== window.parent) return;
+    if (e.origin !== origin || e.source !== window.parent) return;
     const m = e.data;
     if (!m || m.pp !== 'net') return;
-    if (m.t === 'msg') { if (L.onmsg) L.onmsg(m.d); }
+    if (m.t === 'msg') {
+      if (receive && !flushQueued) receive(m.d);
+      else if (pending.length < 300) pending.push(m.d);
+    }
     else if (m.t === 'status') {
       L.live = m.s === 'live'; L.ping = m.ping || 0;
       if (L.onstatus) L.onstatus(m.s, L.ping);
     }
   });
-  window.parent.postMessage({ pp: 'net', t: 'ready', role }, '*');
+  window.parent.postMessage({ pp: 'net', t: 'ready', role }, origin);
   return L;
 }
 

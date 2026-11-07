@@ -19,12 +19,53 @@
     analytics.src = '/site/analytics.js';
     document.head.appendChild(analytics);
   }
+  // Track contexts before the game loads. A touchstart can run before a phone
+  // grants audio activation, even when it was the player's first move.
+  var audioContexts = new Map();
+  var audioConstructors = new Map();
+  for (var audioName of ['AudioContext', 'webkitAudioContext']) {
+    var AudioConstructor = window[audioName];
+    if (typeof AudioConstructor !== 'function' || typeof Proxy !== 'function') continue;
+    if (!audioConstructors.has(AudioConstructor)) {
+      audioConstructors.set(AudioConstructor, new Proxy(AudioConstructor, {
+        construct: function (target, args, newTarget) {
+          var context = Reflect.construct(target, args, newTarget);
+          var record = { started: context.state === 'running' };
+          audioContexts.set(context, record);
+          context.addEventListener('statechange', function () {
+            if (context.state === 'running') record.started = true;
+            if (context.state === 'closed') audioContexts.delete(context);
+          });
+          return context;
+        },
+      }));
+    }
+    try { window[audioName] = audioConstructors.get(AudioConstructor); } catch (e) { /* the game can still start audio directly */ }
+  }
+  if (audioConstructors.size) {
+    var restoreAudio = function (event) {
+      if (!event.isTrusted || document.hidden || (event.type === 'keydown' && (event.repeat || event.key === 'Escape' || event.ctrlKey || event.metaKey))) return;
+      for (var entry of audioContexts) {
+        var context = entry[0], record = entry[1];
+        if (context.state === 'running') record.started = true;
+        if (context.state === 'closed') audioContexts.delete(context);
+        // Leave a game's explicit pause alone once its audio has been running.
+        if (context.state !== 'interrupted' && (context.state !== 'suspended' || record.started)) continue;
+        try { context.resume().catch(function () {}); } catch (e) { /* another gesture can retry */ }
+      }
+    };
+    for (var audioEvent of ['pointerup','touchend','click','keydown']) window.addEventListener(audioEvent, restoreAudio, { capture:true, passive:true });
+  }
+  var gamePath = location.pathname?.match(/\/games\/([^/]+)\//);
+  if (gamePath && document.currentScript?.src) {
+    var scoreUrl = new URL('./catalogue-score.js?v=1', document.currentScript.src);
+    import(scoreUrl.href).then(function (module) { module.mountCatalogueScore(gamePath[1]); }).catch(function () {});
+  }
   var touch = false;
   try { touch = (navigator.maxTouchPoints > 0 || 'ontouchstart' in window) && matchMedia('(pointer: coarse)').matches; } catch (e) {}
   if (!touch) return;
   document.documentElement.classList.add('pp-touch');
-  var m = location.pathname.match(/\/games\/([^/]+)\//);
-  var slug = m ? m[1] : '';
+  var slug = gamePath ? gamePath[1] : '';
 
   // ---- 1. viewport ---------------------------------------------------------
   var vp = document.querySelector('meta[name="viewport"]');

@@ -1,0 +1,23 @@
+// Track title, palette, tempo, tonic MIDI, mode, eight melodic degrees, four roots.
+export const SCORES_C = {
+  derby: ['Scrap Heat','drift',148,43,'minor',[0,3,null,5,4,null,1,0],[0,5,6,0]],
+  highrise: ['Thirty-First Landing','noir',82,48,'phrygian',[0,null,1,4,null,3,1,null],[0,1,5,0]],
+  kickback: ['Two Shell Stairwell','workshop',132,50,'minor',[0,2,3,null,6,5,3,2],[0,3,5,6]],
+  exposure: ['A Frame of Light','tension',64,45,'phrygian',[0,null,null,1,null,4,null,null],[0,0,1,5]],
+  'dungeon-quest': ['Cliffs of the Old Kingdom','quest',96,50,'dorian',[0,2,4,6,7,null,5,4],[0,3,6,4]],
+  apex: ['Clean Air','pulse',146,54,'minor',[0,4,2,6,7,6,4,null],[0,5,2,6]],
+  nascar: ['Bumper to Bumper','surf',138,45,'pentatonic',[0,2,4,3,2,1,null,3],[0,3,4,0]],
+  'night-shift': ['A Different Car','noir',94,47,'minor',[2,null,4,3,0,null,2,1],[0,6,3,4]],
+  'grind-city': ['Concrete After School','rhythmic',105,53,'dorian',[0,null,3,5,4,2,null,6],[0,3,5,4]],
+  southpaw: ['The Red Corner','stadium',114,46,'minor',[0,0,4,null,3,4,6,7],[0,5,3,6]],
+  'penguin-dash': ['Fish Under the Ice','toy',112,55,'major',[4,2,1,null,2,4,6,5],[0,4,1,4]],
+  stack: ['Room for One More','cozy',83,60,'pentatonic',[0,null,1,3,4,null,6,4],[0,2,3,1]],
+  drifter: ['The Last Drop of Fuel','mystery',108,49,'phrygian',[0,1,4,null,6,5,null,1],[0,5,1,6]],
+  merge: ['The Fruit Jar Waltz','toy',89,58,'major',[2,4,5,2,3,1,null,0],[0,3,1,4]],
+  pipeworks: ['Copper and Cold Water','workshop',103,52,'dorian',[0,2,null,4,2,5,null,6],[0,4,3,6]],
+  sweep: ['One Safe Square','mystery',72,55,'minor',[0,null,5,null,2,4,null,1],[0,2,5,4]],
+  quickdraw: ['Dust on Dry Creek','surf',87,52,'pentatonic',[0,null,2,3,4,3,null,1],[0,3,2,0]],
+  hoops: ['Next on the Blacktop','rhythmic',109,48,'dorian',[0,3,null,4,6,4,2,null],[0,5,3,4]],
+  spike: ['Volley at Low Tide','surf',122,57,'major',[2,4,6,4,5,7,3,null],[0,4,5,3]],
+  crossing: ['Between the Bumpers','chip',128,59,'major',[0,2,1,3,2,null,5,4],[0,3,1,4]],
+};

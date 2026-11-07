@@ -401,12 +401,20 @@ export class HalfCourt {
     this.netSeats = order.map(([t, i]) => this.players.find((p) => p.team === t && p.idx === i)).filter(Boolean);
     // the man each connection is driving; everyone else stays a bot
     for (const p of this.players) p.remote = false;
-    this.netSeats.forEach((p, k) => { if (k > 0) p.remote = true; });
+    this.netSeats.forEach((p, k) => { if (k > 0) p.remote = role === 'guest' || net.hasSlot(k); });
     this.you.you = false;
     this.you = this.netSeats[slot] || this.netSeats[0];
     this.you.you = true;
     this.you.remote = false;
     this.you.stamMax = staminaMax();
+  }
+
+  setNetSeat(slot, connected) {
+    const player = this.netSeats?.[slot];
+    if (!player || player === this.you) return;
+    player.remote = connected;
+    player.netWant = null;
+    player.guard = false;
   }
 
   /** a guest's hands, arriving from the wire */

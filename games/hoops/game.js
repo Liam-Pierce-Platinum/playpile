@@ -56,8 +56,8 @@ async function hostOnline() {
   online.net = new Net({
     onStatus: onlineStatus,
     onInput: (slot, d) => { if (half) half.netInput(slot, d); },
-    onJoin: () => { if (half) half.say('A PLAYER JOINED', 1.6); },
-    onLeave: () => { if (half) half.say('A PLAYER LEFT', 1.6); },
+    onJoin: (slot) => { if (half) { half.setNetSeat(slot, true); half.say('A PLAYER JOINED', 1.6); } },
+    onLeave: (slot) => { if (half) { half.setNetSeat(slot, false); half.say('A PLAYER LEFT', 1.6); } },
   });
   online.role = 'host';
   onlineStatus('opening a room...', 'waiting');

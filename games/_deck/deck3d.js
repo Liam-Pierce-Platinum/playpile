@@ -135,6 +135,7 @@ export class Deck3D {
 
     addEventListener('keydown', (e) => {
       if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Space'].includes(e.key)) e.preventDefault();
+      if (e.isTrusted && !e.repeat && !e.ctrlKey && !e.altKey && !e.metaKey) this._audio();
       if (!e.repeat) { this.keys.add(e.key); this.keys.add(e.code); }
       if (!e.repeat && (e.code === 'Space' || e.key === 'Enter')) this._taps++;
       if (e.key === 'p' || e.key === 'P') this.paused = !this.paused;
@@ -404,11 +405,13 @@ export class Deck3D {
   record(s) { if (s > this.best) { this.best = s; return true; } return false; }
 
   _audio() {
-    if (this.ac) { if (this.ac.state === 'suspended') this.ac.resume(); return; }
-    try { this.ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+    try {
+      if (!this.ac) this.ac = new (window.AudioContext || window.webkitAudioContext)();
+      if (this.ac.state !== 'running' && this.ac.state !== 'closed') this.ac.resume().catch(() => {});
+    } catch {}
   }
   beep(f = 440, dur = 0.08, type = 'square', vol = 0.05, slide = 0) {
-    if (!this.ac) return;
+    if (this.ac?.state !== 'running' || document.hidden) return;
     const t = this.ac.currentTime;
     const o = this.ac.createOscillator(), g = this.ac.createGain();
     o.type = type; o.frequency.setValueAtTime(f, t);
@@ -418,7 +421,7 @@ export class Deck3D {
     o.connect(g); g.connect(this.ac.destination); o.start(t); o.stop(t + dur + 0.02);
   }
   noise(dur = 0.12, vol = 0.06, hp = 700) {
-    if (!this.ac) return;
+    if (this.ac?.state !== 'running' || document.hidden) return;
     const n = Math.floor(this.ac.sampleRate * dur);
     const buf = this.ac.createBuffer(1, n, this.ac.sampleRate);
     const d = buf.getChannelData(0);

@@ -27,6 +27,7 @@
 //     drop the gun and come at you with their hands when the magazine is
 //     empty and you are too close for them to reload.
 import * as THREE from '../vendor/three.module.js';
+import { createFeedback } from '../../_shared/feedback-sfx.js';
 import { GUNS, ORDER, weaponMesh, muzzleOf } from './guns.js';
 import { MARKERS } from './props.js';
 import { slide, unstick, buildNav } from './nav.js';
@@ -34,6 +35,7 @@ import { Hands } from './hands.js';
 import { makeActor } from './actor.js';
 import { think, Squad, canSee } from './ai.js';
 import { blocker } from './collide.js';
+const audio = createFeedback('highrise', {right:'max(68px,env(safe-area-inset-right))'});
 import { toWorld, toCell, W, D, EMPTY } from './plan.js';
 import { rng } from './rng.js';
 import { GEN } from './mode.js';
@@ -414,6 +416,7 @@ export class Combat {
     if (G.melee || this.reloading) return;
     if (this.mag[this.held] >= G.mag || !this.ammo[this.held]) return;
     this.reloading = G.reload;
+    audio.burst(2100, 0.09, 0.15);
     this.hands.play(G.shellByShell ? 'reloadShell' : 'reloadMag', G.reload);
   }
 
@@ -433,6 +436,7 @@ export class Combat {
 
     if (G.melee) return this.swing(player, P, G, dir, eye, this.held);
 
+    audio.shot(G.sound);
     this.cool = G.rate;
     this.kick = Math.min(1, this.kick + (G.recoil || 1) * 0.1);
     this.hands.punch((G.recoil || 1) * 0.055);
@@ -625,6 +629,7 @@ export class Combat {
     const anim = !G.combo ? 'swing'
       : this.combo === 0 ? 'punchR' : this.combo === 1 ? 'punchL' : 'elbow';
     this.hands.play(anim, this.cool * 1.5);
+    audio.shot(G.sound, 0.48);
 
     for (const c of this.cabinets()) {
       if (c.broken) continue;
@@ -1387,6 +1392,8 @@ export class Combat {
     if (a.burst > 0) { a.cool = G.rate * 1.9; a.burstN = (a.burstN || 0) + 1; }
     else { a.burst = 2 + Math.floor(Math.random() * 3); a.cool = 0.9 + Math.random() * 0.9; a.burstN = 0; }
     a.mag--;
+    const distance = Math.hypot(a.x - player.pos.x, a.base - player.pos.y, a.z - player.pos.z);
+    audio.shot(G.sound, 0.6 / (1 + distance * 0.17));
     a.anim.play('fire', 0.16);
 
     // his flash, from his actual muzzle, which is on his actual hand

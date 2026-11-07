@@ -51,7 +51,6 @@ app.shake = (n) => { trauma = Math.min(1, trauma + n); };
 
 // ------------------------------------------------------------------ starting things
 function begin(cfg) {
-  A.initAudio(); A.engineStart();
   game.start(cfg);
   app.state = 'play';
   input.enabled = true;
@@ -63,7 +62,7 @@ function begin(cfg) {
 app.startMission = (i) => { app.lastCfg = { mode: 'mission', mission: i }; begin(app.lastCfg); };
 app.startEndless = () => { app.lastCfg = { mode: 'endless' }; begin(app.lastCfg); };
 app.retry = () => { if (app.lastCfg) begin(app.lastCfg); };
-app.startOnline = (o) => { app.lastCfg = null; A.initAudio(); A.engineStart(); game.start({ mode: 'online', online: o }); app.state = 'play'; input.enabled = true; if (app.bot) setTimeout(attachBot, 50); };
+app.startOnline = (o) => { app.lastCfg = null; game.start({ mode: 'online', online: o }); app.state = 'play'; input.enabled = true; if (app.bot) setTimeout(attachBot, 50); };
 app.endOnline = (toLobby) => { game.running = false; game.clear(); app.state = 'menu'; input.enabled = false; input.unlock(); A.engineSet(false, 0, false); A.sLockTone(0); if (!toLobby) ui.title(); };
 app.onlineEnd = (res) => {
   const me = game.player;
@@ -274,6 +273,7 @@ function frame(now) {
     ui.tickPreview(dt, t);
     fx.update(dt, game.bullets, camera);
   }
+  A.updateMusic(!app.paused && app.state === 'play' ? 0.85 : app.state === 'menu' ? 0.55 : 0);
   world.update(dt, t, camera);
   renderer.render(scene, camera);
 }
@@ -287,8 +287,6 @@ else if (QS.has('play')) app.startMission(Math.min(MISSIONS.length - 1, Math.max
 else if (QS.has('endless')) app.startEndless();
 // a first visit (nothing flown yet) lands straight in mission 1; ?title forces the menu
 else if (!QS.has('title') && !QS.has('bot') && !Object.keys(save.done).length && !save.kills && !save.money) app.startMission(0);
-// browsers keep audio suspended until a gesture: wake it on the first one
-for (const ev of ['pointerdown', 'keydown']) addEventListener(ev, () => A.initAudio(), { capture: true });
 if (QS.has('bot')) { app.bot = true; attachBot(); }
 
 export function nextMission() { const i = MISSIONS.findIndex((m) => !save.done[m.id]); return i < 0 ? MISSIONS.length - 1 : i; }

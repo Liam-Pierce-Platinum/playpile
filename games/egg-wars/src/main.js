@@ -390,6 +390,11 @@ function endMatch(fromNet) {
   if (document.pointerLockElement) document.exitPointerLock();
 }
 function openMenu() {
+  N.close();
+  me.id = 'me';
+  for (const remote of ents.filter((egg) => egg.remote)) removeEnt(remote);
+  fillBots();
+  netTag('');
   state = 'menu'; me.spect = true; me.alive = false; me.m.g.visible = false; timeScale = 1; $('results').classList.add('hidden'); $('dead').classList.remove('on');
   $('touch').classList.add('hidden');
   if (document.pointerLockElement) document.exitPointerLock();
@@ -398,7 +403,7 @@ function openMenu() {
   $('menu').innerHTML = `<h1>EGG<br>WARS</h1><p class="sub">a claymation shell-out</p>
     <div class="xp"><div style="width:${lv.cur / lv.need * 100}%"></div><span>Level ${lv.l} &middot; ${lv.cur}/${lv.need} XP &middot; ${save.wins} wins</span></div>
     <button id="mPlay" class="big">PLAY vs BOTS</button>
-    <div class="row"><button id="mHost">HOST ONLINE</button><input id="mCode" maxlength="4" placeholder="CODE"><button id="mJoin">JOIN</button></div>
+    <div class="row"><button id="mHost">HOST ONLINE</button><input id="mCode" maxlength="4" placeholder="CODE" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Room code"><button id="mJoin">JOIN</button></div>
     <p id="mNet" class="sub"></p>
     <h3>Shell</h3><div class="chips">${chip(SHELLS, 'color')}</div>
     <h3>Hat</h3><div class="chips">${chip(HATS, 'hat')}</div>
@@ -407,9 +412,33 @@ function openMenu() {
   $('menu').classList.remove('hidden');
   $('menu').querySelectorAll('button.chip').forEach((b) => b.onclick = () => { save[b.dataset.k] = +b.dataset.i; persist(); rebuildMe(); openMenu(); S.play('click'); });
   $('mPlay').onclick = () => { S.unlock(); startMatch(); };
-  $('mHost').onclick = () => { const code = Math.random().toString(36).slice(2, 6).toUpperCase(); $('mNet').textContent = 'Opening room...'; N.host(code, onNet, (s) => { if (s === 'open') { me.id = N.st.myId; netTag('Room ' + code + ' - share this code'); startMatch(); } else netStatus(s); }); };
-  $('mJoin').onclick = () => { const code = $('mCode').value.trim().toUpperCase(); if (code.length < 4) return; $('mNet').textContent = 'Joining ' + code + '...';
-    N.join(code, onNet, (s) => { if (s === 'conn') { me.id = N.st.myId; for (const b of ents.filter((x) => x.bot)) removeEnt(b); netTag('Online: room ' + code); startMatch(); } else netStatus(s); }); };
+  $('mHost').onclick = () => {
+    S.unlock();
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const code = Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    $('mNet').textContent = 'Opening room…';
+    N.host(code, onNet, (s) => {
+      if (s === 'open') { me.id = N.st.myId; netTag('Room ' + code + ' - share this code'); startMatch(); }
+      else netStatus(s);
+    });
+  };
+  $('mJoin').onclick = () => {
+    const code = $('mCode').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (code.length !== 4) { $('mNet').textContent = 'Enter a four-character room code.'; return; }
+    S.unlock();
+    $('mNet').textContent = 'Joining ' + code + '…';
+    N.join(code, onNet, (s) => {
+      if (s === 'conn') {
+        me.id = N.st.myId;
+        for (const b of ents.filter((egg) => egg.bot)) removeEnt(b);
+        netTag('Online: room ' + code);
+        startMatch();
+      } else {
+        if (s === 'left' || (state !== 'menu' && s.startsWith('error:') && !N.st.online)) openMenu();
+        netStatus(s === 'left' ? 'The host left the room.' : s);
+      }
+    });
+  };
 }
 const netTag = (t) => { $('net').textContent = t; };
 const netStatus = (s) => { if ($('mNet')) $('mNet').textContent = s; netTag(s === 'left' ? 'A player left' : s.startsWith('error') ? 'Online ' + s : $('net').textContent); };
@@ -523,7 +552,14 @@ addEventListener('resize', resize); resize();
 // ---------------- boot
 me = mkEnt('me', 'You', SHELLS[save.color].c, save.hat);
 if (unlocked(save.w)) me.w = save.w;
-for (let i = 0; i < BOTS; i++) { const b = mkEnt('b' + i, BOT_NAMES[i], SHELLS[i % SHELLS.length].c, i % 4, { bot: true }); b.w = i % 3; }
+function fillBots() {
+  for (let i = 0; i < BOTS; i++) {
+    const id = 'b' + i;
+    if (!ents.some((egg) => egg.id === id)) mkEnt(id, BOT_NAMES[i], SHELLS[i % SHELLS.length].c, i % 4, { bot: true }).w = i % 3;
+  }
+}
+fillBots();
+addEventListener('pagehide', N.close);
 if (Q.has('title')) { openMenu(); for (const e of ents) if (e.bot) { e.respawn = 0.1; } } else startMatch();
 let last = performance.now();
 function frame(now) { requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000); last = now; step(dt); render(); hud(dt); }

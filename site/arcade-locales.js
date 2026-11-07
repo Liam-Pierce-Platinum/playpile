@@ -7,6 +7,9 @@ export const LANGUAGES = [
 ];
 
 const rows = [
+  ['backingOn','Music on','Muzik hidup','បើកតន្ត្រី','Musik aktif','ເປີດເພງ','သီချင်းဖွင့်ထားသည်','Bukas ang musika','เปิดเพลง','Música ligada','Bật nhạc','संगीत चालू','موسیقی آن','الموسيقى مفعّلة','Música activada'],
+  ['backingOff','Music off','Muzik mati','បិទតន្ត្រី','Musik nonaktif','ປິດເພງ','သီချင်းပိတ်ထားသည်','Patay ang musika','ปิดเพลง','Música desligada','Tắt nhạc','संगीत बंद','موسیقی آف','الموسيقى متوقفة','Música desactivada'],
+  ['deviceFullscreen','Use device fullscreen','Gunakan skrin penuh','ប្រើអេក្រង់ពេញ','Gunakan layar penuh','ໃຊ້ເຕັມໜ້າຈໍ','မျက်နှာပြင်အပြည့် သုံးပါ','Gamitin ang buong screen','ใช้เต็มหน้าจอ','Usar ecrã inteiro','Dùng toàn màn hình','पूरी स्क्रीन इस्तेमाल करें','پوری اسکرین استعمال کریں','استخدم ملء الشاشة','Usar pantalla completa'],
   ['language','Site language','Bahasa laman','ភាសាគេហទំព័រ','Bahasa situs','ພາສາເວັບໄຊ','ဝက်ဘ်ဆိုက် ဘာသာစကား','Wika ng site','ภาษาของเว็บไซต์','Idioma do site','Ngôn ngữ trang web','साइट की भाषा','سائٹ کی زبان','لغة الموقع','Idioma del sitio'],
   ['browse','Browse Games','Layari Permainan','រកមើលហ្គេម','Jelajahi Game','ເບິ່ງເກມ','ဂိမ်းများ ရှာဖွေပါ','Mag-browse ng Laro','เลือกดูเกม','Explorar jogos','Duyệt trò chơi','गेम देखें','گیمز دیکھیں','تصفّح الألعاب','Explorar juegos'],
   ['categories','Categories','Kategori','ប្រភេទ','Kategori','ໝວດໝູ່','အမျိုးအစားများ','Mga Kategorya','หมวดหมู่','Categorias','Thể loại','श्रेणियाँ','زمرے','الفئات','Categorías'],

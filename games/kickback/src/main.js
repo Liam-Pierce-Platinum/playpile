@@ -9,6 +9,7 @@ import { drawCity, buildCity } from './city.js';
 import { buildLevel, drawBackWall, drawLight, drawStructure, drawForeground, drawCrate, L, HX, TOP, stairSpan } from './level2d.js';
 import { B } from './rig2d.js';
 import { Player, Enemy, UPGRADES, G, GUN, rollMods, makeFX, fire, falloff, rayBoxes, enemyMark } from './game.js';
+import { createFeedback } from '../../_shared/feedback-sfx.js';
 
 const canvas = document.getElementById('view');
 initCanvas(canvas);
@@ -25,6 +26,7 @@ for (const s of level.spawns) {
 /* ---- the world, as everything that shoots needs to see it --------------- */
 const world = {
   solids: level.solids, level, enemies, player,
+  sound: createFeedback('kickback', {left:'calc(50% - 22px)'}),
   fx: null, freeze: 0,
   /* how long the crosshair has left to say the last shot landed */
   hit: 0, hitKill: false,
@@ -42,6 +44,7 @@ const world = {
   releaseToken(e) { if (this.token === e) this.token = null; },
   blow(bar) {
     if (!bar.alive) return;
+    this.sound.shot('thunk', 0.8);
     bar.alive = false;
     const i = this.solids.indexOf(bar.solid);
     if (i >= 0) this.solids.splice(i, 1);
@@ -147,6 +150,7 @@ function offer(crate) {
 }
 function pick(i) {
   if (!choosing || !choosing.picks[i]) return;
+  world.sound.tone(420, 620, 0.14, 0.12);
   const u = choosing.picks[i];
   player.owned[u.id] = (player.owned[u.id] || 0) + 1;
   player.regear();

@@ -21,7 +21,7 @@ let PeerLib = null;
 async function peerLib() {
   if (PeerLib) return PeerLib;
   // peerjs ships as a UMD bundle: importing it runs it, and it sets window.Peer
-  await import('../vendor/peerjs.min.js');
+  if (!window.Peer) await import('../vendor/peerjs.min.js');
   PeerLib = window.Peer;
   if (!PeerLib) throw new Error('the networking library did not load');
   return PeerLib;
@@ -152,10 +152,11 @@ export class LoopNet extends Base {
   sendHost(msg) { this._post({ k: 'd', to: 'host', d: msg }); }
   drop(id) { const key = this.conns.get(id); if (key) { this._post({ k: 'bye', to: key }); this.byKey.delete(key); } this._leave(id); }
   close() {
-    if (this.closed) return;
+    const notify = !this.closed;
     this.closed = true;
-    try { this._post({ k: 'bye', to: this.role === 'host' ? '*' : 'host' }); } catch (e) { /* */ }
+    if (notify) { try { this._post({ k: 'bye', to: this.role === 'host' ? '*' : 'host' }); } catch (e) { /* */ } }
     try { this.ch && this.ch.close(); } catch (e) { /* */ }
+    this.ch = null;
     this.conns.clear();
   }
 }

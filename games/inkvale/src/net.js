@@ -64,14 +64,29 @@ export class Net {
       });
       peer.on('open', () => { this.say('Waiting for your partner...'); resolve(this.code); });
       peer.on('connection', (c) => {
-        if (this.conn && this.conn.open) { c.close(); return; }       // two wardens, no more
+        if (this.conn) {
+          c.once('open', () => { c.send({ full: true }); setTimeout(() => c.close(), 250); });
+          return;
+        }
+        this.conn = c; // reserve the second seat while its handshake is pending
+        const timer = setTimeout(() => { if (!c.open) { leave(); c.close(); } }, 10000);
+        const leave = () => {
+          clearTimeout(timer);
+          if (this.conn !== c) return;
+          const joined = this.live;
+          this.live = false; this.conn = null; this.partner = null;
+          if (joined) { this.say('Your partner left.'); this.emit('leave'); }
+        };
         c.on('open', () => {
-          this.conn = c; this.live = true;
+          if (this.conn !== c) { c.close(); return; }
+          clearTimeout(timer);
+          this.live = true;
           c.send({ hello: true });
           this.say('Your partner is here.');
         });
-        c.on('data', (d) => this.recv(d));
-        c.on('close', () => { if (this.conn === c) { this.live = false; this.conn = null; this.partner = null; this.say('Your partner left.'); this.emit('leave'); } });
+        c.on('data', (d) => { if (this.conn === c && this.live) this.recv(d); });
+        c.on('close', leave);
+        c.on('error', () => { leave(); c.close(); });
       });
     });
   }
@@ -85,15 +100,23 @@ export class Net {
       const peer = new Peer(undefined, { debug: 0 });
       this.peer = peer;
       let done = false;
-      const bail = (msg) => { if (done) return; done = true; this.say(msg); reject(new Error(msg)); };
+      const timer = setTimeout(() => bail('No answer from that room.'), 10000);
+      const bail = (msg) => {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        peer.destroy();
+        this.say(msg); reject(new Error(msg));
+      };
       peer.on('error', (e) => bail(e && e.type === 'peer-unavailable' ? 'No room with that code.' : 'Could not connect.'));
       peer.on('open', () => {
         const c = peer.connect(PREFIX + this.code, { reliable: true });
         this.conn = c;
-        const t = setTimeout(() => bail('No answer from that room.'), 10000);
         c.on('data', (d) => {
-          if (d && d.hello) {
-            clearTimeout(t); done = true; this.live = true;
+          if (d?.full) { bail('That room already has two Wardens.'); return; }
+          if (d?.hello) {
+            if (done) return;
+            clearTimeout(timer); done = true; this.live = true;
             c.send({ hi });
             this.say('Connected. The host is choosing a battle.');
             resolve();
@@ -101,7 +124,10 @@ export class Net {
           }
           this.recv(d);
         });
-        c.on('close', () => { this.live = false; this.say('The host left.'); this.emit('leave'); });
+        c.on('close', () => {
+          if (!done) { bail('That room closed before the battle started.'); return; }
+          if (this.live) { this.live = false; this.say('The host left.'); this.emit('leave'); }
+        });
       });
     });
   }

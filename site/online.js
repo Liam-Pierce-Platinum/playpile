@@ -22,7 +22,7 @@
 // ROOM IDS on the broker are  playpile-v1-<slug>-<CODE>.  Quick match
 // uses the slots  playpile-v1-<slug>-Q1 .. Q6:  try to join Q1; if nobody
 // is there, wait in it yourself; if it is full, try Q2, and so on.
-import { ONLINE } from '/site/multiplayer.js';
+import { ONLINE } from './multiplayer.js';
 
 const LIB = '/games/_deck/peerjs.min.js';
 const PFX = 'playpile-v1-';
@@ -37,6 +37,7 @@ const ICE = [
 const QUICK_SLOTS = 6;
 const HEARTBEAT = 1000;          // ms between pings
 const LOST_AFTER = 6000;         // ms of silence before we call it
+const DIAL_TIMEOUT = 9000;
 
 const roomCode = () => Array.from({ length: 4 }, () => CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]).join('');
 export const cleanCode = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
@@ -62,6 +63,7 @@ export class Room {
     this.peer = null; this.conn = null;
     this.role = null; this.code = ''; this.state = 'idle';
     this.ping = 0; this.heard = 0; this.timer = 0;
+    this.cancelDial = null; this.cancelPending = null;
   }
   id(code) { return PFX + this.slug + '-' + code; }
   set(state, info) { if (this.state === 'closed') return; this.state = state; if (this.cb.status) this.cb.status(state, info); }
@@ -86,7 +88,10 @@ export class Room {
     for (let i = 0; i < 5; i++) {
       const c = roomCode();
       try { this.peer = await this.newPeer(this.id(c)); this.code = c; break; }
-      catch (e) { if (e.type !== 'unavailable-id') throw e; }   // code taken: roll again
+      catch (e) {
+        if (this.state === 'closed') return null;
+        if (e.type !== 'unavailable-id') throw e;
+      }
     }
     if (this.state === 'closed') { this.destroy(); return null; }
     if (!this.peer) throw new Error('could not get a room code');
@@ -96,10 +101,29 @@ export class Room {
   }
   listen() {
     this.peer.on('connection', (c) => {
+      if (this.state === 'closed') { c.close(); return; }
       // one guest per room. A second one is told so politely.
       if (this.conn) { c.on('open', () => { try { c.send({ k: 'full' }); } catch (e) {} setTimeout(() => c.close(), 400); }); return; }
       this.conn = c;
-      c.on('open', () => { c.send({ k: 'hello', v: 1, slug: this.slug }); this.attach(c); });
+      const cleanup = () => {
+        clearTimeout(timer);
+        c.off('open', opened); c.off('close', abandon); c.off('error', abandon);
+        this.cancelPending = null;
+      };
+      const abandon = () => {
+        cleanup();
+        if (this.conn === c) this.conn = null;
+        try { c.close(); } catch (e) {}
+      };
+      const opened = () => {
+        cleanup();
+        try { c.send({ k: 'hello', v: 1, slug: this.slug }); }
+        catch (e) { abandon(); return; }
+        this.attach(c);
+      };
+      const timer = setTimeout(abandon, DIAL_TIMEOUT);
+      this.cancelPending = abandon;
+      c.on('open', opened); c.on('close', abandon); c.on('error', abandon);
     });
     this.peer.on('error', (e) => { if (this.state === 'waiting' && e.type !== 'peer-unavailable') this.set('error', { msg: 'The room closed: ' + (e.type || 'network error') }); });
     // the broker dropping us does not end a match (the data goes direct),
@@ -108,27 +132,33 @@ export class Room {
   }
 
   // ---- guest: dial a room ---------------------------------------------
-  // resolves 'ok' | 'none' (nobody has that code) | 'full' | 'timeout'
+  // resolves 'ok' | 'none' (nobody has that code) | 'full' | 'timeout' | 'cancelled'
   dial(id) {
     return new Promise((resolve) => {
+      const peer = this.peer;
       let over = false;
-      const c = this.peer.connect(id, { reliable: true, serialization: 'json' });
+      const c = peer.connect(id, { reliable: true, serialization: 'json' });
       const finish = (r) => {
         if (over) return; over = true;
-        clearTimeout(t); this.peer.off('error', onErr);
+        clearTimeout(t); peer.off('error', onErr);
+        c.off('data', onData); c.off('close', onClose); c.off('error', onClose);
+        this.cancelDial = null;
         if (r !== 'ok') { try { c.close(); } catch (e) {} }
         resolve(r);
       };
       const onErr = (e) => { if (e && e.type === 'peer-unavailable') finish('none'); };
+      const onClose = () => finish('timeout');
+      const onData = (d) => {
+        if (!d) return;
+        if (d.k === 'hello' && d.v === 1 && d.slug === this.slug) { this.conn = c; finish('ok'); this.attach(c); }
+        else if (d.k === 'full') finish('full');
+      };
       // THE TIMEOUT MATTERS: a code that exists but never answers would
       // otherwise sit on "connecting" for ever, which looks broken.
-      const t = setTimeout(() => finish('timeout'), 9000);
-      this.peer.on('error', onErr);
-      c.on('data', (d) => {
-        if (over || !d) return;
-        if (d.k === 'hello') { this.conn = c; finish('ok'); this.attach(c); }
-        else if (d.k === 'full') finish('full');
-      });
+      const t = setTimeout(onClose, DIAL_TIMEOUT);
+      this.cancelDial = () => finish('cancelled');
+      peer.on('error', onErr);
+      c.on('data', onData); c.on('close', onClose); c.on('error', onClose);
     });
   }
   async join(code) {
@@ -157,9 +187,10 @@ export class Room {
     this.role = 'guest';
     for (let n = 1, retried = false; n <= QUICK_SLOTS; n++) {
       const slot = 'Q' + n, id = this.id(slot);
+      this.code = slot;
       const r = await this.dial(id);
       if (this.state === 'closed') return null;
-      if (r === 'ok') { this.code = slot; return 'guest'; }
+      if (r === 'ok') return 'guest';
       if (r === 'full' || r === 'timeout') continue;
       // nobody waiting in this slot: wait in it ourselves
       try {
@@ -212,6 +243,8 @@ export class Room {
   }
   destroy() {
     clearInterval(this.timer);
+    this.cancelDial?.();
+    this.cancelPending?.();
     try { if (this.conn && this.conn.open) this.conn.send({ k: 'bye' }); } catch (e) {}
     const p = this.peer, c = this.conn;
     this.conn = null; this.peer = null;
@@ -247,7 +280,7 @@ export function mountOnline(o) {
   let room = null, ready = false, queue = [], opened = false;
 
   const linkFor = (code) => location.origin + location.pathname + '?room=' + code;
-  const toGame = (m) => { try { o.frame.contentWindow.postMessage(m, '*'); } catch (e) {} };
+  const toGame = (m) => { try { o.frame.contentWindow.postMessage(m, location.origin); } catch (e) {} };
   const status = (s) => toGame({ pp: 'net', t: 'status', s, ping: room ? room.ping : 0 });
 
   function setPill(kind, text) {
@@ -259,10 +292,11 @@ export function mountOnline(o) {
 
   // the game asks for its role when it boots, and sends its messages
   addEventListener('message', (e) => {
-    if (!room || e.source !== o.frame.contentWindow) return;
+    if (!room || e.origin !== location.origin || e.source !== o.frame.contentWindow) return;
     const m = e.data;
     if (!m || m.pp !== 'net') return;
     if (m.t === 'ready') {
+      if (m.role !== room.role) return;
       ready = true;
       status(room.state === 'live' ? 'live' : 'lost');
       for (const d of queue) toGame({ pp: 'net', t: 'msg', d });
@@ -288,7 +322,11 @@ export function mountOnline(o) {
         setPill('live', 'Online · ' + inf.role + ' · …');
         // a link only works once: take ?room off the address so Restart
         // or a reload does not try to join a room that has finished
-        if (location.search.includes('room=')) history.replaceState(null, '', location.pathname + location.hash);
+        const url = new URL(location.href);
+        if (url.searchParams.has('room')) {
+          url.searchParams.delete('room');
+          history.replaceState(history.state, '', url);
+        }
         o.launch(inf.role);
       } else if (s === 'lost') {
         status('lost');
@@ -303,7 +341,19 @@ export function mountOnline(o) {
     },
   };
 
-  function fresh() { if (room) room.close(); room = new Room(o.g.slug, cb); return room; }
+  function begin(method, ...args) {
+    if (room) room.close();
+    const next = new Room(o.g.slug);
+    for (const [name, handler] of Object.entries(cb)) {
+      next.cb[name] = (...values) => { if (room === next) handler(...values); };
+    }
+    room = next;
+    next[method](...args).catch(error => {
+      if (room !== next) return;
+      next.close();
+      cb.status('error', { msg: brokerMsg(error) });
+    });
+  }
 
   // ---- the panel's screens --------------------------------------------
   function show(view, arg, err) {
@@ -352,8 +402,8 @@ export function mountOnline(o) {
   box.addEventListener('click', async (e) => {
     const b = e.target.closest('[data-a]'); if (!b) return;
     const a = b.dataset.a;
-    if (a === 'quick') { const r = fresh(); r.quick().catch((x) => cb.status('error', { msg: brokerMsg(x) })); }
-    else if (a === 'create') { const r = fresh(); r.create().catch((x) => cb.status('error', { msg: brokerMsg(x) })); }
+    if (a === 'quick') begin('quick');
+    else if (a === 'create') begin('create');
     else if (a === 'copy') {
       const inp = box.querySelector('.ollink input');
       try { await navigator.clipboard.writeText(inp.value); } catch (x) { inp.select(); try { document.execCommand('copy'); } catch (y) {} }
@@ -376,7 +426,7 @@ export function mountOnline(o) {
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && !box.hidden && box.dataset.view !== 'lost') box.querySelector('[data-a="close"]')?.click(); });
   addEventListener('pagehide', () => { if (room) room.close(); });
 
-  function joinCode(code) { const r = fresh(); r.join(code).catch((x) => cb.status('error', { msg: brokerMsg(x) })); }
+  function joinCode(code) { begin('join', code); }
   const brokerMsg = (x) => (x && (x.type === 'network' || x.type === 'server-error' || x.type === 'timeout' || x.type === 'socket-error'))
     ? 'Could not reach the online service. Check your connection and try again.'
     : 'Could not connect' + (x && x.type ? ' (' + x.type + ')' : '') + '. Try again.';

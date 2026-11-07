@@ -36,7 +36,7 @@ let PeerLib = null;
 async function peerLib() {
   if (PeerLib) return PeerLib;
   // peerjs ships as a UMD bundle: it defines window.Peer when loaded
-  await import(BROKER_LIB);
+  if (!window.Peer) await import(BROKER_LIB);
   PeerLib = window.Peer;
   if (!PeerLib) throw new Error('the networking library did not load');
   return PeerLib;
@@ -58,6 +58,7 @@ export class Net {
     this.code = '';
     this.peer = null;
     this.conns = [];           // host: one per guest
+    this.slots = new Map();    // reserved as soon as a guest starts connecting
     this.conn = null;          // guest: the one to the host
     this.slot = 0;             // guest: which player you are
     this.live = false;
@@ -85,21 +86,36 @@ export class Net {
         resolve(this.code);
       });
       peer.on('connection', (c) => {
-        if (this.conns.length >= this.max) { c.close(); return; }
-        const slot = this.conns.length + 1;
+        let slot = 1;
+        while (this.slots.has(slot)) slot++;
+        if (slot > this.max) {
+          c.once('open', () => { c.send({ full: true }); setTimeout(() => c.close(), 250); });
+          return;
+        }
+        this.slots.set(slot, c);
+        const timer = setTimeout(() => { if (!c.open) { this.slots.delete(slot); c.close(); } }, 9000);
+        const remove = () => {
+          clearTimeout(timer);
+          if (this.slots.get(slot) !== c) return;
+          this.slots.delete(slot);
+          const wasPlaying = this.conns.includes(c);
+          this.conns = this.conns.filter((q) => q !== c);
+          this.live = this.conns.length > 0;
+          if (wasPlaying) this.onLeave?.(slot);
+          this.status(this.live ? this.conns.length + ' playing' : 'waiting for players', this.live ? 'live' : 'waiting');
+        };
         c.on('open', () => {
+          if (this.slots.get(slot) !== c) { c.close(); return; }
+          clearTimeout(timer);
           this.conns.push(c);
           c.send({ hello: true, slot });
           this.live = true;
           this.status(this.conns.length + ' joined', 'live');
           this.onJoin && this.onJoin(slot, this.conns.length);
         });
-        c.on('data', (d) => { if (d && d.i) this.onInput && this.onInput(slot, d); });
-        c.on('close', () => {
-          this.conns = this.conns.filter((q) => q !== c);
-          this.onLeave && this.onLeave(slot);
-          this.status(this.conns.length ? this.conns.length + ' playing' : 'they left', this.conns.length ? 'live' : 'waiting');
-        });
+        c.on('data', (d) => { if (d?.i && this.slots.get(slot) === c && c.open) this.onInput?.(slot, d); });
+        c.on('close', remove);
+        c.on('error', () => { remove(); c.close(); });
       });
     });
   }
@@ -113,9 +129,12 @@ export class Net {
       const peer = new Peer(undefined, { debug: 0 });
       this.peer = peer;
       let settled = false;
+      const timer = setTimeout(() => bail('no answer from that room'), 9000);
       const bail = (msg) => {
         if (settled) return;
         settled = true;
+        clearTimeout(timer);
+        peer.destroy();
         this.status(msg, 'error');
         reject(new Error(msg));
       };
@@ -126,20 +145,24 @@ export class Net {
         // THE TIMEOUT MATTERS. A wrong code with a broker that is up simply
         // never answers, and a game that sits on "connecting..." for ever
         // is indistinguishable from a broken one.
-        const t = setTimeout(() => bail('no answer from that room'), 9000);
-        c.on('open', () => { this.status('connected', 'live'); });
         c.on('data', (d) => {
+          if (d?.full) { bail('that room is full'); return; }
           if (d && d.hello) {
-            clearTimeout(t);
+            if (settled) return;
+            clearTimeout(timer);
             this.slot = d.slot;
             this.live = true;
             settled = true;
+            this.status('connected', 'live');
             resolve(d.slot);
             return;
           }
           if (d && d.ps) this.onState && this.onState(d);
         });
-        c.on('close', () => { this.live = false; this.status('the host left', 'error'); });
+        c.on('close', () => {
+          if (!settled) { bail('the room closed before the match started'); return; }
+          if (this.live) { this.live = false; this.status('the host left', 'error'); }
+        });
       });
     });
   }
@@ -154,13 +177,15 @@ export class Net {
     if (this.conn && this.conn.open) this.conn.send(input);
   }
 
+  hasSlot(slot) { return !!this.slots.get(slot)?.open; }
+
   status(text, kind) { this.onStatus && this.onStatus(text, kind); }
 
   close() {
-    try { for (const c of this.conns) c.close(); } catch (e) { /* going away anyway */ }
+    try { for (const c of this.slots.values()) c.close(); } catch (e) { /* going away anyway */ }
     try { if (this.conn) this.conn.close(); } catch (e) { /* ditto */ }
     try { if (this.peer) this.peer.destroy(); } catch (e) { /* ditto */ }
-    this.conns = []; this.conn = null; this.peer = null; this.live = false; this.role = null;
+    this.slots.clear(); this.conns = []; this.conn = null; this.peer = null; this.live = false; this.role = null;
   }
 }
 

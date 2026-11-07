@@ -1,30 +1,79 @@
-// All sound is synthesised with WebAudio. Wakes on first input.
+// Ski sounds and a repeating downhill score, synthesized with Web Audio.
+import { createMusicSequencer } from '../../_shared/music-sequencer.js';
+
 let ctx = null, master = null, sfx = null, NB = null, muted = false;
+let music = null, riding = false;
 const loops = {};
+const melody = [
+  [77, null, 74, 69, 72, null, 74, null],
+  [76, null, 72, null, 69, 72, 76, null],
+  [77, 81, null, 77, 74, null, 72, null],
+  [79, null, 76, 72, null, 74, 76, null],
+  [81, null, 77, 74, 72, 74, null, 77],
+  [76, 79, null, 76, 72, null, 69, null],
+  [77, null, 74, null, 72, 69, 72, null],
+  [79, null, 76, 74, 72, null, 69, null],
+];
+const bass = [50, 45, 46, 48, 50, 45, 46, 48];
+function score(step) {
+  const bar = step >> 3, beat = step & 7;
+  const pitch = melody[bar][beat];
+  const notes = pitch === null ? [] : [[pitch, 'sine', 0.12, 1.7]];
+  if (pitch !== null && beat % 2 === 0) notes.push([pitch + 12, 'triangle', 0.035, 0.55]);
+  if (beat === 0 || beat === 3 || beat === 6) notes.push([bass[bar] + (beat === 6 ? 7 : 0), 'triangle', 0.075, 2.4]);
+  return notes;
+}
+
+const ready = () => ctx?.state === 'running' && !document.hidden;
+const audible = () => ready() && !muted;
+function audioStateChanged() {
+  if (!audible()) music?.stop();
+  window.dispatchEvent(new Event('ski-audio-state'));
+}
+function setOutput() {
+  if (master) master.gain.setTargetAtTime(muted || document.hidden ? 0 : 0.85, ctx.currentTime, 0.025);
+  audioStateChanged();
+}
+document.addEventListener('visibilitychange', setOutput);
+
 export const Audio = {
   init() {
-    if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
-    try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
-    master = ctx.createGain(); master.gain.value = muted ? 0 : 0.85; master.connect(ctx.destination);
-    const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -12; comp.ratio.value = 4; comp.connect(master);
-    sfx = ctx.createGain(); sfx.connect(comp);
-    const b = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; NB = b;
-    const loop = (name, type, f, q) => { const s = ctx.createBufferSource(); s.buffer = NB; s.loop = true; const fl = ctx.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q; const g = ctx.createGain(); g.gain.value = 0; s.connect(fl).connect(g).connect(sfx); s.start(); loops[name] = { fl, g }; };
-    loop('wind', 'lowpass', 500, 0.7); loop('carve', 'bandpass', 2600, 0.9); loop('grind', 'bandpass', 3800, 6); loop('aval', 'lowpass', 140, 1); loop('whistle', 'bandpass', 1600, 7);
-    const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = 190; const og = ctx.createGain(); og.gain.value = 0; const of = ctx.createBiquadFilter(); of.type = 'bandpass'; of.frequency.value = 1400; of.Q.value = 3; o.connect(of).connect(og).connect(sfx); o.start(); loops.ring = { g: og, o };
+    if (document.hidden || muted) return;
+    if (!ctx) {
+      try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch { return; }
+      master = ctx.createGain(); master.gain.value = 0.85; master.connect(ctx.destination);
+      const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -12; comp.ratio.value = 4; comp.connect(master);
+      sfx = ctx.createGain(); sfx.connect(comp);
+      music = createMusicSequencer(ctx, comp, { bpm: 108, steps: 64, notesAt: score });
+      const b = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; NB = b;
+      const loop = (name, type, f, q) => { const s = ctx.createBufferSource(); s.buffer = NB; s.loop = true; const fl = ctx.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q; const g = ctx.createGain(); g.gain.value = 0; s.connect(fl).connect(g).connect(sfx); s.start(); loops[name] = { fl, g }; };
+      loop('wind', 'lowpass', 500, 0.7); loop('carve', 'bandpass', 2600, 0.9); loop('grind', 'bandpass', 3800, 6); loop('aval', 'lowpass', 140, 1); loop('whistle', 'bandpass', 1600, 7);
+      const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = 190; const og = ctx.createGain(); og.gain.value = 0; const of = ctx.createBiquadFilter(); of.type = 'bandpass'; of.frequency.value = 1400; of.Q.value = 3; o.connect(of).connect(og).connect(sfx); o.start(); loops.ring = { g: og, o };
+      ctx.addEventListener('statechange', audioStateChanged);
+      audioStateChanged();
+    }
+    if (ctx.state !== 'running' && ctx.state !== 'closed') {
+      try { ctx.resume().catch(() => {}); } catch { /* Retry on the next gesture. */ }
+    }
   },
   get muted() { return muted; },
-  setMuted(m) { muted = m; if (master) master.gain.setTargetAtTime(m ? 0 : 0.85, ctx.currentTime, 0.05); },
+  get ready() { return ready(); },
+  setMuted(m) { muted = !!m; setOutput(); },
+  updateRun(on) {
+    if (riding && !on) for (const name of Object.keys(loops)) this.set(name, 0);
+    riding = on;
+    music?.update(on && audible() ? 0.78 : 0);
+  },
   set(name, gain, freq) { const l = loops[name]; if (!l) return; l.g.gain.setTargetAtTime(gain, ctx.currentTime, 0.06); if (freq && l.fl) l.fl.frequency.setTargetAtTime(freq, ctx.currentTime, 0.1); },
   noise(dur, { f = 1000, q = 1, type = 'bandpass', g = 0.5, a = 0.002, f2 = null, when = 0 } = {}) {
-    if (!ctx) return; const t = ctx.currentTime + when;
+    if (!audible()) return; const t = ctx.currentTime + when;
     const s = ctx.createBufferSource(); s.buffer = NB; const fl = ctx.createBiquadFilter(); fl.type = type; fl.frequency.setValueAtTime(f, t); fl.Q.value = q;
     if (f2) fl.frequency.exponentialRampToValueAtTime(f2, t + dur);
     const gn = ctx.createGain(); gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(g, t + a); gn.gain.exponentialRampToValueAtTime(0.0008, t + dur);
     s.connect(fl).connect(gn).connect(sfx); s.start(t, Math.random()); s.stop(t + dur + 0.05);
   },
   tone(freq, dur, { type = 'sine', g = 0.3, a = 0.005, f2 = null, when = 0 } = {}) {
-    if (!ctx) return; const t = ctx.currentTime + when;
+    if (!audible()) return; const t = ctx.currentTime + when;
     const o = ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(freq, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
     const gn = ctx.createGain(); gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(g, t + a); gn.gain.exponentialRampToValueAtTime(0.0008, t + dur);
     o.connect(gn).connect(sfx); o.start(t); o.stop(t + dur + 0.05);

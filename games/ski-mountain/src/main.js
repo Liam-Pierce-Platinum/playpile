@@ -68,12 +68,48 @@ const P = {
 // ---------------- input ----------------
 const K = {};
 const I = { turn: 0, tuck: false, brake: false, jump: false, grab: false, mdx: 0, mdy: 0, mSteer: 0, touchSteer: 0, touchTuck: 0, touchJump: false, touchGrab: false, lmb: false, rmb: false };
-let prevJump = false, prevGrab = false, rawDX = 0, rawDY = 0, inputSeen = false;
-const wake = () => { Audio.init(); if (!inputSeen) { inputSeen = true; } };
+let prevJump = false, prevGrab = false, rawDX = 0, rawDY = 0;
+const sound = $('soundToggle');
+const shouldMute = () => !Audio.muted && Audio.ready;
+let soundIntent;
+// Preserve the press's intent if shared recovery unlocks audio on release.
+sound.addEventListener('pointerdown', () => { soundIntent = shouldMute(); });
+sound.addEventListener('pointercancel', () => { soundIntent = undefined; });
+sound.addEventListener('blur', () => { soundIntent = undefined; });
+sound.addEventListener('keydown', (e) => {
+  if (!e.repeat && (e.key === 'Enter' || e.key === ' ')) soundIntent = shouldMute();
+});
+function updateSoundButton() {
+  const pending = !Audio.muted && !Audio.ready;
+  const label = pending ? 'Enable sound' : Audio.muted ? 'Unmute sound' : 'Mute sound';
+  sound.classList.toggle('pending', pending);
+  sound.classList.toggle('off', Audio.muted);
+  sound.title = label;
+  sound.setAttribute('aria-label', label);
+}
+function toggleSound(mute = shouldMute()) {
+  soundIntent = undefined;
+  save.mute = mute;
+  persist();
+  Audio.setMuted(save.mute);
+  if (!save.mute) Audio.init();
+  if (Audio.muted || Audio.ready) toast(Audio.muted ? 'SOUND OFF' : 'SOUND ON');
+}
+sound.addEventListener('click', () => toggleSound(soundIntent));
+addEventListener('ski-audio-state', updateSoundButton);
+Audio.setMuted(!!save.mute || qs.has('mute'));
+function wakeSound(e) {
+  if (!e.isTrusted || sound.contains(e.target) || e.code === 'KeyM') return;
+  if (e.type === 'pointerdown' && e.pointerType !== 'mouse') return;
+  Audio.init();
+}
+for (const type of ['pointerdown', 'pointerup', 'touchend', 'keydown', 'click']) {
+  addEventListener(type, wakeSound, { capture: true, passive: true });
+}
 addEventListener('keydown', (e) => {
-  wake(); K[e.code] = true;
+  K[e.code] = true;
   if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
-  if (e.code === 'KeyM') { Audio.setMuted(!Audio.muted); toast(Audio.muted ? 'SOUND OFF' : 'SOUND ON'); }
+  if (e.code === 'KeyM' && !e.repeat) toggleSound();
   if (e.code === 'Escape') { if (G.state === 'play' || G.state === 'result') { openMenu(); $('card').classList.add('hidden'); } else if (G.state === 'menu') closeMenu(); }
   if (e.code === 'KeyR' && (G.state === 'play' || G.state === 'result')) start();
   if ((G.state === 'result' || G.state === 'menu') && e.code === 'Enter') start();
@@ -81,7 +117,6 @@ addEventListener('keydown', (e) => {
 addEventListener('keyup', (e) => { K[e.code] = false; });
 addEventListener('blur', () => { for (const k in K) K[k] = false; I.lmb = I.rmb = false; });
 canvas.addEventListener('mousedown', (e) => {
-  wake();
   if (e.button === 0) I.lmb = true; if (e.button === 2) I.rmb = true;
   if (!document.pointerLockElement && !isTouch && G.state === 'play') { try { const r = canvas.requestPointerLock(); if (r && r.catch) r.catch(() => {}); } catch (err) {} }
 });
@@ -94,7 +129,7 @@ const isTouch = matchMedia('(pointer: coarse)').matches || qs.has('touch');
 const touches = new Map();
 if (isTouch) document.body.classList.add('touch');
 canvas.addEventListener('touchstart', (e) => {
-  wake(); e.preventDefault();
+  e.preventDefault();
   for (const t of e.changedTouches) { const left = t.clientX < innerWidth * 0.45; touches.set(t.identifier, { left, x0: t.clientX, y0: t.clientY, x: t.clientX, y: t.clientY }); if (!left) I.touchJump = true; }
 }, { passive: false });
 canvas.addEventListener('touchmove', (e) => {
@@ -103,7 +138,7 @@ canvas.addEventListener('touchmove', (e) => {
 }, { passive: false });
 const tend = (e) => { for (const t of e.changedTouches) { const s = touches.get(t.identifier); if (s && !s.left) I.touchJump = [...touches.values()].some((o) => o !== s && !o.left); touches.delete(t.identifier); } };
 canvas.addEventListener('touchend', tend); canvas.addEventListener('touchcancel', tend);
-$('tgrab').addEventListener('touchstart', (e) => { e.preventDefault(); wake(); I.touchGrab = true; }, { passive: false });
+$('tgrab').addEventListener('touchstart', (e) => { e.preventDefault(); I.touchGrab = true; }, { passive: false });
 $('tgrab').addEventListener('touchend', (e) => { e.preventDefault(); I.touchGrab = false; }, { passive: false });
 $('tgrab').addEventListener('touchcancel', () => { I.touchGrab = false; });
 addEventListener('blur', () => { touches.clear(); I.touchGrab = I.touchJump = false; rawDX = rawDY = 0; });
@@ -454,9 +489,9 @@ function showResult() {
     <p class="tip">best ${fmt(B.score)} · furthest ${(B.dist / 1000).toFixed(2)} km · top speed ${top} km/h<br>3 wipeouts end the run. Every kilometre is faster, tighter and worth more per metre.</p>
     <div class="btns"><button id="bAgain" class="primary">GO AGAIN <small>Enter</small></button><button id="bGear">SWITCH TO ${rider.gear === 'board' ? 'SKIS' : 'SNOWBOARD'}</button><button id="bMenu">MENU</button></div>`;
   card.classList.remove('hidden'); $('hud').classList.add('hidden');
-  $('bAgain').onclick = () => { wake(); start(); };
-  $('bMenu').onclick = () => { wake(); openMenu(); $('card').classList.add('hidden'); };
-  $('bGear').onclick = () => { wake(); setGear(rider.gear === 'board' ? 'ski' : 'board'); start(); };
+  $('bAgain').onclick = start;
+  $('bMenu').onclick = () => { openMenu(); $('card').classList.add('hidden'); };
+  $('bGear').onclick = () => { setGear(rider.gear === 'board' ? 'ski' : 'board'); start(); };
 }
 function setGear(g) { save.gear = g; rider.setGear(g); persist(); updGearChip(); }
 function updGearChip() { const c = $('gearchip'); if (c) c.innerHTML = (rider.gear === 'board' ? 'SNOWBOARD' : 'SKIS') + '<small>' + (isTouch ? 'tap' : 'scroll') + ' ⇅</small>'; }
@@ -472,19 +507,19 @@ function swapGear() {
 let lastWheel = 0;
 addEventListener('wheel', (e) => {
   if (G.state === 'menu') return; // the home screen scrolls normally; swap with the gear cards there
-  e.preventDefault(); wake();
+  e.preventDefault();
   const now = performance.now(), fresh = now - lastWheel > 200; lastWheel = now; // one swap per flick (trackpad inertia = one gesture)
   if (fresh && (Math.abs(e.deltaY) > 0 || Math.abs(e.deltaX) > 0)) swapGear();
 }, { passive: false });
-$('gearchip').addEventListener('click', (e) => { e.stopPropagation(); wake(); swapGear(); });
-$('gearchip').addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); wake(); swapGear(); }, { passive: false });
+$('gearchip').addEventListener('click', (e) => { e.stopPropagation(); swapGear(); });
+$('gearchip').addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); swapGear(); }, { passive: false });
 const GEARS = {
   ski: { name: 'SKIS', blurb: 'Tight turns, hard grip, strong snowplough brake.', stats: [['TURN', 0.9], ['GRIP', 0.9], ['POP', 0.6], ['SPIN', 0.6]] },
   board: { name: 'SNOWBOARD', blurb: 'Slides more, pops 8% higher, spins 12% faster.', stats: [['TURN', 0.72], ['GRIP', 0.6], ['POP', 0.8], ['SPIN', 0.85]] },
 };
 function renderMenu() {
   $('mgear').innerHTML = ['ski', 'board'].map((g) => { const d = GEARS[g]; return `<button data-g="${g}" class="gc ${rider.gear === g ? 'on' : ''}"><b>${d.name}</b><small>${d.blurb}</small><span class="bars">${d.stats.map(([k, v]) => `<span><i>${k}</i><u><s style="width:${v * 100}%"></s></u></span>`).join('')}</span></button>`; }).join('');
-  $('mgear').querySelectorAll('button').forEach((b) => (b.onclick = () => { wake(); if (b.dataset.g !== rider.gear) swapGear(); else Audio.click(); }));
+  $('mgear').querySelectorAll('button').forEach((b) => (b.onclick = () => { if (b.dataset.g !== rider.gear) swapGear(); else Audio.click(); }));
   const done = chDone(), avail = OUTFITS.filter((o) => o.unlock <= done);
   $('moutfit').innerHTML = OUTFITS.map((o, i) => `<button data-i="${i}" class="sw ${save.outfit === i ? 'on' : ''} ${o.unlock > done ? 'locked' : ''}" style="background:#${o.jacket.toString(16).padStart(6, '0')}" title="${o.name}${o.unlock > done ? ' - ' + o.unlock + ' challenges' : ''}">${o.unlock > done ? o.unlock : ''}</button>`).join('');
   $('moutfit').querySelectorAll('button').forEach((b) => (b.onclick = () => { const i = +b.dataset.i; if (OUTFITS[i].unlock > done) return; save.outfit = i; rider.setOutfit(i); persist(); Audio.click(); renderMenu(); }));
@@ -499,8 +534,8 @@ function renderMenu() {
   document.querySelector('#menu h3 .tag').textContent = isTouch ? 'tap the gear chip in a run to swap' : 'scroll wheel swaps any time';
   void avail;
 }
-$('mresume').onclick = () => { wake(); closeMenu(); };
-$('mplay').onclick = () => { wake(); start(); };
+$('mresume').onclick = closeMenu;
+$('mplay').onclick = start;
 
 // ---------------- camera + visuals ----------------
 const qA = new THREE.Quaternion(), qY = new THREE.Quaternion(), qF = new THREE.Quaternion(), qL = new THREE.Quaternion(), XA = new V3(1, 0, 0), ZA = new V3(0, 0, 1);
@@ -614,14 +649,13 @@ function tick(dt) {
 let last = performance.now();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  tick(dt); renderer.render(scene, camera);
+  tick(dt); Audio.updateRun(G.state === 'play'); renderer.render(scene, camera);
   requestAnimationFrame(frame);
 }
 // boot: land straight in gameplay; ?title shows the menu
 start();
 if (qs.has('title')) openMenu();
 if (save.runs <= 1 && !qs.has('nohint')) { G.hintT = 9; $('hint').classList.remove('hidden'); }
-if (qs.has('mute')) Audio.setMuted(true);
 $('lockhint').classList.toggle('hidden', isTouch);
 requestAnimationFrame(frame);
 

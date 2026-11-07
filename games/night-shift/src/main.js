@@ -25,6 +25,9 @@ import { Garage } from './garage.js';
 import { Pedestrian } from './onfoot.js';
 import { buildSpec, money, CAR_BY_ID, CARS } from './catalog.js';
 import * as SaveIO from './save.js';
+import { createFeedback } from '../../_shared/feedback-sfx.js';
+
+const sound = createFeedback('night-shift', {left:'calc(50% - 22px)'});
 
 class Game {
   constructor() {
@@ -394,6 +397,9 @@ class Game {
   // ---------------- loop ----------------
   frame(now) {
     requestAnimationFrame(t => this.frame(t));
+    const driving = this.state === 'play' && this.mode === 'drive' && this.myCar && !this.myCar.wrecked;
+    if (driving) sound.motor(true, 43 + Math.min(110, this.myCar.speed * 2.1), 0.14 + this.input.throttle * 0.63, 'triangle');
+    else sound.motor(false);
     let dt = (now - this.last) / 1000;
     this.last = now;
     if (dt > 0.05) dt = 0.05;
@@ -730,6 +736,7 @@ class Game {
     const fromCar = this.mode === 'drive';
     const shot = K.tryFire(dt, inp.fire, inp.hit('r'), here.x, here.y, aim, fromCar);
     if (shot) {
+      sound.shot(this.combat.gun.pellets > 1 ? 'boom' : this.combat.gun.rate < 0.13 ? 'crack' : 'pop');
       this.muzzle(shot.x, shot.y, shot.a);
       this.renderer.cam.shake = Math.min(0.5, this.renderer.cam.shake + 0.10);
       // gunfire is the loudest thing you can do in a quiet street

@@ -22,18 +22,53 @@ export class UI {
     this.radar = $('#radar').getContext('2d');
     this.isTouch = app.input.isTouch;
     if (this.isTouch) { document.body.classList.add('touch'); app.input.bindTouch($('#touch')); }
-    $('#mute').classList.toggle('off', !!save.settings.mute);
-    $('#mute').onclick = (e) => { e.stopPropagation(); save.settings.mute = !save.settings.mute; persist(); A.setMuted(save.settings.mute); $('#mute').classList.toggle('off', save.settings.mute); };
+    const sound = $('#mute');
+    const shouldMute = () => !A.isMuted() && A.audioReady();
+    let soundIntent;
+    // The shared release handler may unlock audio before click arrives. Keep
+    // the action the button advertised when the player pressed it.
+    sound.addEventListener('pointerdown', () => { soundIntent = shouldMute(); });
+    sound.addEventListener('pointercancel', () => { soundIntent = undefined; });
+    sound.addEventListener('blur', () => { soundIntent = undefined; });
+    sound.addEventListener('keydown', (e) => {
+      if (!e.repeat && (e.key === 'Enter' || e.key === ' ')) soundIntent = shouldMute();
+    });
+    const updateSound = () => {
+      const muted = A.isMuted();
+      const pending = !muted && !A.audioReady();
+      sound.classList.toggle('off', muted);
+      sound.classList.toggle('pending', pending);
+      const label = pending ? 'Enable sound' : muted ? 'Unmute sound' : 'Mute sound';
+      sound.title = label;
+      sound.setAttribute('aria-label', label);
+    };
+    this.toggleSound = (mute = shouldMute()) => {
+      soundIntent = undefined;
+      save.settings.mute = mute;
+      persist();
+      A.setMuted(save.settings.mute);
+      if (!save.settings.mute) A.initAudio();
+    };
+    sound.onclick = (e) => { e.stopPropagation(); this.toggleSound(soundIntent); };
+    addEventListener('sky-audio-state', updateSound);
+    updateSound();
+    const wakeSound = (e) => {
+      if (!e.isTrusted || sound.contains(e.target) || e.code === 'KeyM') return;
+      if (e.type === 'pointerdown' && e.pointerType !== 'mouse') return;
+      A.initAudio();
+    };
+    // On phones the release, rather than the press, can unlock Web Audio.
+    for (const type of ['pointerdown', 'pointerup', 'touchend', 'keydown', 'click']) {
+      addEventListener(type, wakeSound, { capture: true, passive: true });
+    }
     $('#pauseBtn').onclick = () => { if (this.app.state === 'play') this.app.pause(true); };
     addEventListener('keydown', (e) => this.key(e));
     addEventListener('keyup', (e) => { if (e.code === 'Tab') $('#board').classList.add('hide'); });
-    // first click anywhere wakes the audio
-    addEventListener('pointerdown', () => A.initAudio(), { once: false });
   }
 
   key(e) {
     const st = this.app.state;
-    if (e.code === 'KeyM') { $('#mute').click(); return; }
+    if (e.code === 'KeyM') { if (!e.repeat) this.toggleSound(); return; }
     if (st === 'play') {
       if (e.code === 'Escape' || e.code === 'KeyP') { if (this.panel === 'pause') this.app.pause(false); else this.app.pause(true); }
       if (e.code === 'Tab') { e.preventDefault(); this.board(); }
@@ -44,7 +79,7 @@ export class UI {
     if (st === 'menu' && this.panel === 'title' && (e.code === 'Enter' || e.code === 'Space')) { e.preventDefault(); this.play(); }
     if (st === 'menu' && e.code === 'Escape' && this.panel !== 'title' && this.panel !== 'lobby') this.title();
   }
-  click() { A.initAudio(); A.sJingle('click'); }
+  click() { A.sJingle('click'); }
   show(html, name) {
     this.panel = name;
     this.root.innerHTML = html;

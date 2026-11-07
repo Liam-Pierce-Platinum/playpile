@@ -1,28 +1,70 @@
-// Every sound is synthesized with WebAudio: no files. One engine drone (two detuned saws through
-// a lowpass, plus filtered noise for wind), and short one-shots built from noise + oscillators.
+// Synthesized engine, effects and flight score. No audio downloads.
+import { createMusicSequencer } from '../../_shared/music-sequencer.js';
+
 let ctx = null, master = null, noiseBuf = null, muted = false;
 let eng = null;
+let music = null;
 const last = {};
+const melody = [
+  [69, 72, 76, null, 74, 72, 71, null],
+  [67, null, 71, 74, 76, null, 74, 71],
+  [69, 72, 77, null, 76, 72, 74, null],
+  [71, 74, 76, 74, 71, 68, 71, null],
+  [69, null, 72, 76, 81, 79, 76, null],
+  [74, 71, 67, null, 71, 74, 79, null],
+  [77, null, 76, 72, 74, 72, 69, null],
+  [71, 74, 76, null, 72, 71, 68, null],
+];
+const bass = [45, 43, 41, 40, 45, 43, 41, 40];
+function score(step) {
+  const bar = step >> 3, beat = step & 7;
+  const pitch = melody[bar][beat];
+  const notes = pitch === null ? [] : [[pitch, 'triangle', 0.085, 1.45]];
+  if (beat % 2 === 0) notes.push([bass[bar] + (beat === 6 ? 7 : 0), 'sine', 0.095, 1.55]);
+  if (beat === 0 || beat === 4) notes.push([bass[bar] + 19, 'triangle', 0.028, 2.3]);
+  return notes;
+}
 
 export function initAudio() {
-  if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
-  try {
-    ctx = new (window.AudioContext || window.webkitAudioContext)();
-  } catch (e) { return; }
-  master = ctx.createGain();
-  master.gain.value = muted ? 0 : 0.55;
-  const comp = ctx.createDynamicsCompressor();
-  comp.threshold.value = -14; comp.ratio.value = 4;
-  master.connect(comp); comp.connect(ctx.destination);
-  noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
-  const d = noiseBuf.getChannelData(0);
-  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  if (document.hidden || muted) return;
+  if (!ctx) {
+    try { ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch { return; }
+    master = ctx.createGain();
+    master.gain.value = 0.55;
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -14; comp.ratio.value = 4;
+    master.connect(comp); comp.connect(ctx.destination);
+    noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    music = createMusicSequencer(ctx, master, { bpm: 132, steps: 64, notesAt: score });
+    ctx.addEventListener('statechange', audioStateChanged);
+    audioStateChanged();
+  }
+  if (ctx.state !== 'running' && ctx.state !== 'closed') {
+    // Safari can interrupt a previously unlocked context. Retry on a real
+    // gesture, and leave the enable-sound button available if it is denied.
+    try { ctx.resume().catch(() => {}); } catch { /* Retry on the next gesture. */ }
+  }
 }
-export const audioReady = () => !!ctx;
+export const audioReady = () => ctx?.state === 'running' && !document.hidden;
+const audible = () => audioReady() && !muted;
+
+function audioStateChanged() {
+  if (!audible()) music?.stop();
+  window.dispatchEvent(new Event('sky-audio-state'));
+}
+function setOutput() {
+  if (master) master.gain.setTargetAtTime(muted || document.hidden ? 0 : 0.55, ctx.currentTime, 0.025);
+  audioStateChanged();
+}
+document.addEventListener('visibilitychange', setOutput);
+export const updateMusic = (volume) => music?.update(audible() ? volume : 0);
 
 export function setMuted(m) {
-  muted = m;
-  if (master) master.gain.setTargetAtTime(m ? 0 : 0.55, ctx.currentTime, 0.05);
+  muted = !!m;
+  setOutput();
 }
 export const isMuted = () => muted;
 
@@ -45,7 +87,7 @@ function throttle(name, ms) {
 
 // ---------------------------------------------------------------- engine
 export function engineStart() {
-  if (!ctx || eng) return;
+  if (!audible() || eng) return;
   const out = ctx.createGain(); out.gain.value = 0; out.connect(master);
   const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 600; lp.Q.value = 2;
   lp.connect(out);
@@ -66,6 +108,7 @@ export function engineStart() {
   eng = { out, lp, o1, o2, o3, chop, wg, wf, nodes: [o1, o2, o3, chop, w] };
 }
 export function engineSet(on, speed01, boost, jet) {
+  if (on && !eng) engineStart();
   if (!eng) return;
   const t = ctx.currentTime;
   const f = (jet ? 90 : 55) + speed01 * (jet ? 120 : 70) + (boost ? 35 : 0);
@@ -87,7 +130,7 @@ export function engineStop() {
 
 // ---------------------------------------------------------------- one-shots
 export function sGun(vol = 1) {
-  if (!ctx || !throttle('gun' + (vol < 1 ? 'f' : ''), 55)) return;
+  if (!audible() || !throttle('gun' + (vol < 1 ? 'f' : ''), 55)) return;
   const t = ctx.currentTime;
   const n = noise(); const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1400 + Math.random() * 500; f.Q.value = 1.2;
   const g = ctx.createGain(); env(g, t, 0.002, 0.35 * vol, 0.06);
@@ -97,14 +140,14 @@ export function sGun(vol = 1) {
   o.connect(og); og.connect(master); o.start(t); o.stop(t + 0.08);
 }
 export function sHit() {
-  if (!ctx || !throttle('hit', 45)) return;
+  if (!audible() || !throttle('hit', 45)) return;
   const t = ctx.currentTime;
   const o = ctx.createOscillator(); o.type = 'triangle'; o.frequency.setValueAtTime(1800, t); o.frequency.exponentialRampToValueAtTime(900, t + 0.05);
   const g = ctx.createGain(); env(g, t, 0.001, 0.22, 0.06);
   o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.1);
 }
 export function sHurt() {
-  if (!ctx || !throttle('hurt', 70)) return;
+  if (!audible() || !throttle('hurt', 70)) return;
   const t = ctx.currentTime;
   const n = noise(); const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 900;
   const g = ctx.createGain(); env(g, t, 0.002, 0.5, 0.12);
@@ -114,7 +157,7 @@ export function sHurt() {
   o.connect(og); og.connect(master); o.start(t); o.stop(t + 0.08);
 }
 export function sBoom(size = 1, dist = 0) {
-  if (!ctx) return;
+  if (!audible()) return;
   const t = ctx.currentTime;
   const vol = Math.max(0.05, 1 - dist / 1800) * Math.min(1.4, size);
   const n = noise(); const f = ctx.createBiquadFilter(); f.type = 'lowpass';
@@ -126,7 +169,7 @@ export function sBoom(size = 1, dist = 0) {
   o.connect(og); og.connect(master); o.start(t); o.stop(t + 0.8);
 }
 export function sMissile() {
-  if (!ctx) return;
+  if (!audible()) return;
   const t = ctx.currentTime;
   const n = noise(); const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 2;
   f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(2400, t + 0.5);
@@ -135,7 +178,7 @@ export function sMissile() {
 }
 let lockOsc = null;
 export function sLockTone(state) { // 0 none, 1 locking, 2 locked
-  if (!ctx) return;
+  if (!audible() && (state !== 0 || !lockOsc)) return;
   if (!lockOsc) {
     const o = ctx.createOscillator(); o.type = 'square'; o.frequency.value = 900;
     const g = ctx.createGain(); g.gain.value = 0;
@@ -152,14 +195,14 @@ export function sLockTone(state) { // 0 none, 1 locking, 2 locked
 }
 let warnT = 0;
 export function sWarn() { // incoming missile beeps
-  if (!ctx || !throttle('warn', 260)) return;
+  if (!audible() || !throttle('warn', 260)) return;
   const t = ctx.currentTime;
   const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = 520 + (warnT++ % 2) * 180;
   const g = ctx.createGain(); env(g, t, 0.005, 0.12, 0.12);
   o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.15);
 }
 export function sWhoosh() {
-  if (!ctx || !throttle('whoosh', 300)) return;
+  if (!audible() || !throttle('whoosh', 300)) return;
   const t = ctx.currentTime;
   const n = noise(); const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 1;
   f.frequency.setValueAtTime(400, t); f.frequency.exponentialRampToValueAtTime(1600, t + 0.25); f.frequency.exponentialRampToValueAtTime(300, t + 0.6);
@@ -167,7 +210,7 @@ export function sWhoosh() {
   n.connect(f); f.connect(g); g.connect(master); n.start(t); n.stop(t + 0.7);
 }
 export function sJingle(kind) { // 'kill' | 'streak' | 'win' | 'lose' | 'buy' | 'click' | 'wave'
-  if (!ctx) return;
+  if (!audible()) return;
   const seqs = {
     kill: [[784, 0], [1046, 0.07]], streak: [[659, 0], [880, 0.08], [1175, 0.16], [1568, 0.24]],
     win: [[523, 0], [659, 0.12], [784, 0.24], [1046, 0.36], [1318, 0.52]], lose: [[392, 0], [330, 0.18], [262, 0.36], [196, 0.6]],

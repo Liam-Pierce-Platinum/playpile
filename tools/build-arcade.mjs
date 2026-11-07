@@ -54,7 +54,7 @@ await write('category/index.html',page('Game categories','Find games by category
 for(const world of WORLDS){
  const games=members(world);
  let info='';
- if(world.id==='friends') info='<p class="category-note">Look for <b>Play online</b> to join from different devices. Car Soccer, Tank Duel and Getaway Flop share one screen. The controls below each game show you how</p>';
+ if(world.id==='friends') info='<p class="category-note">Look for <b>Play online</b> to join from different devices. Same-screen games may use touch, a keyboard or controllers. Check the controls below each game.</p>';
  await write(world.href.slice(1)+'index.html',page(world.name+' games',world.intro,world.href,worldHeroHTML(world,games.length)+info+`<div class="game-grid">${games.map(gameCardHTML).join('')}</div>`,'categories'));
 }
 

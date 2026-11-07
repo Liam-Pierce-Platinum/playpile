@@ -21,6 +21,9 @@ import { buildSheets, startSheets, stopSheets, setSheetLook } from './ui/tricksh
 import { installTouch, isTouch } from './ui/touch.js';
 import * as portal from './crazygames.js';
 import './ui/fit.js';             // every menu shrinks to fit a small window (PLAYPILE's player)
+import { createFeedback } from '../../_shared/feedback-sfx.js';
+
+const sound = createFeedback('grind-city', {left:'calc(50% - 22px)'});
 
 const canvas = document.getElementById('screen');
 const v = createView(canvas);
@@ -574,6 +577,7 @@ document.getElementById('results-again').onclick = () => {
 // ----------------------------------------------------------------------- loop
 let last = performance.now();
 let msWork = 0;
+let grindSoundAt = 0;
 function frame(now) {
   const t0 = performance.now();
   // the pad belongs to a RUN, not to the game: it would sit over the shop
@@ -595,7 +599,15 @@ function frame(now) {
     if (sk.state === 'walk' && !sk.input) {
       sk.input = (arrows.right ? 1 : 0) + (arrows.left ? -1 : 0);
     }
+    const previous = sk.state;
     sk.update(dt);
+    if (sk.state === 'air' && previous === 'ride') sound.burst(1900, 0.06, 0.3);
+    if (sk.state === 'ride' && previous === 'air') sound.shot('thump', 0.43);
+    if (sk.state === 'bail' && previous !== 'bail') sound.shot('thud', 0.68);
+    if (sk.state === 'grind' && clock >= grindSoundAt) {
+      sound.burst(2800, 0.16, 0.1);
+      grindSoundAt = clock + 0.13;
+    }
     collect();
     collectCoins();
     if (sk.grabPaid) {
@@ -758,6 +770,7 @@ function collectCoins() {
     const dx = sk.x - c.x, dy = (sk.y - 14) - c.y;
     if (dx * dx + dy * dy > 26 * 26) continue;
     c.taken = true;
+    sound.tone(560, 880, 0.12, 0.12);
     const got = earn(save, COIN);
     score.add('PICKED UP ' + money(got), 0);
     showCash();

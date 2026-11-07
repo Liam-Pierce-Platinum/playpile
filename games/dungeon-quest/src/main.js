@@ -35,6 +35,9 @@ import { buildGoldenKey } from './ui/shotsDark.js';
 import { PEACE } from './world/levels.js';
 import { CUTSCENE_CLASS } from './ui/cutsceneStage.js';
 import * as crazygames from './crazygames.js';
+import { createFeedback } from '../../_shared/feedback-sfx.js';
+
+const sound = createFeedback('dungeon-quest', {left:'calc(50% - 22px)'});
 
 /* ================= boot ================= */
 
@@ -190,6 +193,7 @@ combat.onArrowLost = (pos) => {
 function hitEnemy(enemy, damage, source = 'melee') {
   if (enemy.dead) return;
   const dealt = enemy.takeDamage(damage, controller.position, source);
+  if (dealt > 0 && source === 'melee') sound.burst(460, 0.09, 0.15);
   // No colour tint on hit: the health bar, the damage number and the spark
   // carry the feedback, and repainting a model orange looked terrible.
   combat.hitSpark(enemy.position, '#ffd98a', 3);
@@ -219,6 +223,7 @@ function damagePlayer(amount, from, type) {
     follow.shake(0.2, 0.35);
   }
   if (!taken) return;
+  sound.tone(165, 74, 0.16, 0.26);
   _v.copy(controller.position);
   _v.y += 1.7;
   combat.popup(_v, `-${taken}`, 'hurt');
@@ -457,6 +462,8 @@ function fireArrow(from, dir, damage, opts = {}) {
 function onStrike(kind, def) {
   const s = controller.stats;
   const classId = controller.classId;
+  if (classId === 'wizard' && !def.desperate) sound.tone(350, 740, 0.17, 0.2, 'sine');
+  else sound.burst(classId === 'archer' && !def.desperate ? 2300 : 950, 0.11, 0.22);
   aimDir(_dir);
 
   // Out of mana or out of arrows: the staff and the bow are both just wood.
@@ -1566,6 +1573,7 @@ function castBoundSpell() {
 
   controller.mana -= sp.mana;
   spellCooldown = sp.cooldown;
+  sound.tone(420, 920, 0.27, 0.2, 'sine');
   hud.announce(sp.name);
   follow.shake(0.12, 0.25);
 
@@ -2523,6 +2531,7 @@ resize();
 
 loot.onCoin = (v) => {
   progress.addCoin(v);
+  sound.tone(740, 1047, 0.11, 0.12);
   if (Math.random() < 0.28) {
     _v.copy(controller.position); _v.y += 1.5;
     combat.popup(_v, '+' + v, 'coin');

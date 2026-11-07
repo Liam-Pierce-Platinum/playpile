@@ -11,6 +11,7 @@
 //         'mounted' - a project of Liam's with its own server on its own
 //                     port. The page frames http://localhost:<port>.
 //         'unity'   - a Unity WebGL build under games/<slug>/build.
+import { GAME_COPY } from './arcade-copy.js';
 export const GAMES = [
   {
     slug: "lukes-diner", title: "Luke's Diner", how: 'local',
@@ -1442,4 +1443,8 @@ The tent becomes a shack, a cabin, then a two-floor cottage that you paint and f
   },
 ];
 
+for (const game of GAMES) Object.assign(game, GAME_COPY[game.slug] || {});
+// The wrapper and the game's own key map must agree.
+const diner = GAMES.find(g=>g.slug==='lukes-diner');
+if (diner) diner.controls = diner.controls.map(([key,label])=>[key,key==='Q W E'?'tables A, B and C':key==='A S D'?'counter stools 1, 2 and 3':label]);
 export const bySlug = (s) => GAMES.find((g) => g.slug === s);

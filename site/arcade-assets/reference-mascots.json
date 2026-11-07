@@ -1,0 +1,72 @@
+{
+  "arcade": {
+    "source": "kai",
+    "frames": 6,
+    "cellWidth": 128,
+    "cellHeight": 128,
+    "fps": 7
+  },
+  "action": {
+    "source": "brick",
+    "frames": 6,
+    "cellWidth": 128,
+    "cellHeight": 128,
+    "fps": 7
+  },
+  "adventure": {
+    "source": "mae",
+    "frames": 6,
+    "cellWidth": 128,
+    "cellHeight": 128,
+    "fps": 7
+  },
+  "puzzle": {
+    "source": "axiom",
+    "frames": 6,
+    "cellWidth": 128,
+    "cellHeight": 128,
+    "fps": 7
+  },
+  "strategy": {
+    "source": "ren",
+    "frames": 6,
+    "cellWidth": 128,
+    "cellHeight": 128,
+    "fps": 7
+  },
+  "horror": {
+    "source": "marrow",
+    "frames": 6,
+    "cellWidth": 128,
+    "cellHeight": 128,
+    "fps": 7
+  },
+  "new": {
+    "source": "cluck",
+    "frames": 6,
+    "cellWidth": 128,
+    "cellHeight": 128,
+    "fps": 7
+  },
+  "popular": {
+    "source": "riff",
+    "frames": 6,
+    "cellWidth": 128,
+    "cellHeight": 128,
+    "fps": 7
+  },
+  "friend-left": {
+    "source": "vale",
+    "frames": 6,
+    "cellWidth": 128,
+    "cellHeight": 128,
+    "fps": 7
+  },
+  "friend-right": {
+    "source": "rook",
+    "frames": 6,
+    "cellWidth": 128,
+    "cellHeight": 128,
+    "fps": 7
+  }
+}

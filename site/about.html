@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="/site/style.css">
 <!-- the account button is somebody else's file; this page only holds the hole for it -->
 <link rel="stylesheet" href="/site/account.css">
-<script type="module" src="/site/account.js"></script>
+<script type="module" src="/site/account.js?v=82f109c9"></script>
 <link rel="icon" href="/site/icon.svg" type="image/svg+xml">
 <link rel="icon" href="/site/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/site/icon-180.png">
@@ -21,109 +21,29 @@
      here and does not add a second copy. -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3389918233377914"
      crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/site/arcade-characters.css?v=82f109c9">
+<link rel="stylesheet" href="/site/arcade.css?v=82f109c9">
 </head>
-<body>
+<body class="arcade-site">
 <a class="skip" href="#main">Skip to the content</a>
 
-<header class="top"><div class="bar">
-  <button class="burger" id="burger" type="button" aria-label="Categories">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
-  </button>
-  <a class="logo" href="/">PLAY<b>PILE</b></a>
-  <form class="search" id="searchForm" role="search" autocomplete="off">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>
-    <input id="q" type="search" placeholder="Search games" aria-label="Search games">
-  </form>
-  <div class="topright">
-    <!-- RESERVED. site/account.js fills this; nothing here touches it. -->
-    <div id="accountSlot"></div>
-  </div>
-</div></header>
+<header class="top arcade-top"><div class="bar"><a class="logo" href="/" aria-label="PlayPile start screen">PLAY<b>PILE</b><span class="logo-pixel" aria-hidden="true"></span></a><nav class="arcade-nav" aria-label="Main menu"><a href="/browse/" >Browse games</a><a href="/me/" >Profile</a><a href="/settings/" aria-current="page">Settings</a></nav><div id="accountSlot"></div></div></header>
 
 <div class="shell">
-  <aside class="sidenav" id="sidenav"></aside>
-  <div class="scrim" id="scrim"></div>
+
+
 
   <main id="main">
-    <div class="prose">
-      <section class="hero">
-        <h1>About PLAYPILE</h1>
-        <p id="lede">Browser games in one place, every one of them made for this site. Nothing
-           to install, no account needed, and every game keeps your progress in your own
-           browser.</p>
-      </section>
-      <h2>Who makes it</h2>
-      <p>PLAYPILE is made by Liam, an independent game developer in Seattle. For years I wanted to play games that did not exist yet, so I started building them myself, and this site is where I get to share them with you. Every game on it was designed and built here
-         &mdash; there are no embeds from other portals, no reskinned templates and no copies of
-         games hosted elsewhere. The site went up in September 2026 with sixteen games and has
-         grown since; the <a href="/site/updates.html" style="color:var(--accent)">updates
-         page</a> lists what has been added and changed, with dates.</p>
-      <h2>The big ones</h2>
-      <p>Some of the games are full projects, built and rebuilt over weeks. APEX is a
-         Formula&nbsp;1 simulation on thirty-three circuits built from survey data of the real
-         tracks, with tyre wear, rain, damage and pit stops. NASCAR does the same for twenty
-         ovals, where the banking and the draft decide the race. HIGHRISE is a first-person
-         shooter up all thirty-one floors of a single tower. DUNGEON QUEST is an N64-style
-         crawler with four levels, three classes and a dragon at the end of it. SOUTHPAW is
-         arcade boxing against ten opponents who each have a weakness to find. PENGUIN DASH is a
-         penguin fishing a two-kilometre sea full of things that eat penguins. NIGHT SHIFT is a
-         getaway driver in a city that remembers your car. INKVALE is a tower defence in
-         watercolour where the colours of your towers mix on the enemy, playable by two.</p>
-      <h2>The quick ones</h2>
-      <p>The rest are written to be finished in a sitting: a stacker, an asteroids
-         where the gun and the engine share one tank, an endless road-and-river crossing, a
-         horror game lit only by your own muzzle flash, a merge puzzle with a
-         thousand stages, a pipe puzzle, a minesweeper on the clock, a western duel, two
-         basketball modes and a jelly volleyball. They run on one small shared
-         engine, so they behave the same way on a phone as on a desktop.</p>
-      <h2>How the games are checked</h2>
-      <p>Each game is tested by machine as well as by hand: scripts play every game on the site
-         through the same page you use, and fail if one does not start, throws an error or draws
-         a blank screen. The bigger games have their own checks too &mdash; the basketball game
-         counts shots by distance to keep the computer players honest, and the boxing game
-         proves that mashing one button loses to mixing your punches.</p>
-      <h2>Every game has a guide</h2>
-      <p>Under every game is a written guide: how it plays, tips taken from how the game
-         actually works rather than guessed at, what is in it, and answers to the usual
-         questions. If something in a guide is wrong, it is a bug, and it gets fixed.</p>
-      <h2>Adverts</h2>
-      <p>There are advertising slots on this site, and there are rules about them: none over a
-         game that is being played, none that move, none that make a noise, and none inside the
-         game itself.</p>
-      <h2>Contact</h2>
-      <p>Questions, bug reports and anything else: <a href="mailto:support@playpile.net"
-         style="color:var(--accent)">support@playpile.net</a>.</p>
-      <div id="picks"></div>
+    <a class="arcade-info-back" href="/settings/">← Settings & info</a>
+<div class="prose">
+      <section class="hero"><h1>Hey, welcome to PlayPile</h1><p>A home for games you can open in a browser and get straight into</p></section><h2>A pile of ideas that became games</h2><p>PlayPile is Liam’s collection of browser games. Some are quick little score chasers. Others have whole worlds to explore. The fun is finding something you didn’t know you wanted to play.</p><p>Start with a category, follow a character or just <a class="text-link" href="/browse/all/">look through the whole pile</a>. You don’t need an account to play.</p><h2>Your progress stays with you</h2><p>Scores and profiles are saved in this browser. If you move to another device, use a save code from your profile menu. Clearing the browser’s saved data can clear your progress too.</p><h2>Stuck on something?</h2><p>Each game has controls and a guide underneath it. There’s a report link there too. If a game gets stuck or an instruction makes no sense, let us know which game and what happened.</p><h2>Still growing</h2><p>The <a class="text-link" href="/site/updates.html">updates page</a> keeps track of additions and fixes. The <a class="text-link" href="/devlog/">dev log</a> looks at how parts of the games work.</p><h2>Say hello</h2><p>Ideas, bug reports and the occasional very good score are welcome at <a class="text-link" href="mailto:support@playpile.net">support@playpile.net</a></p>
     </div>
     <!-- THE FOOTER IS REAL HTML, not something a script draws.
          An AdSense reviewer and a search engine both read the page
          before any module runs, and "privacy and cookies are linked
          from the home page" is a thing tools/ready.mjs checks in the
          SOURCE. Injecting it was invisible to all three. -->
-    <footer class="foot">
-      <div class="cols2">
-        <div>
-          <div class="brand">PLAY<b>PILE</b></div>
-          <p class="blurb">100 browser games, all of them written for this site. No sign-up,
-             no download, and your best scores stay in your own browser.</p>
-        </div>
-        <div class="fl"><b>Site</b>
-          <a href="/">All games</a><a href="/site/about.html">About</a>
-          <a href="/site/updates.html">Updates</a><a href="/devlog/">Dev log</a><a href="/articles/">Articles</a><a href="/site/contact.html">Contact</a>
-          <a href="/site/parents.html">For parents</a><a href="/site/advertise.html">Advertise</a></div>
-        <div class="fl"><b>Legal</b>
-          <a href="/site/privacy.html">Privacy</a><a href="/site/cookies.html">Cookies</a>
-          <a href="/site/settings.html">Privacy settings</a><a href="/site/terms.html">Terms of use</a>
-          <a href="/site/accessibility.html">Accessibility</a><a href="/site/credits.html">Credits</a>
-          <a href="/site/settings.html">Do not sell or share my info</a></div>
-        <div class="fl"><b>Play</b>
-          <a href="/category/arcade/">Arcade</a>
-          <a href="/category/puzzle/">Puzzle</a><a href="/category/sport/">Sport</a><a href="/category/strategy/">Strategy</a>
-          <a href="/category/driving/">Driving</a><a href="/category/action/">Action</a></div>
-      </div>
-      <div class="row"><span>&copy; 2026 PLAYPILE</span><span class="sp"></span>
-        <span>Made by Liam in Seattle.</span></div>
-    </footer>
+    <footer class="arcade-footer"><a class="footer-brand" href="/">PLAYPILE</a><span>A little escape, one game at a time</span><nav aria-label="Site information"><a href="/settings/">Settings & info</a><a href="/site/contact.html">Contact</a><a href="/site/privacy.html">Privacy</a><a href="/site/terms.html">Terms</a><a href="/site/credits.html">Credits</a></nav><small>© 2026 PLAYPILE</small></footer>
   </main>
 </div>
 
@@ -131,11 +51,11 @@
 import { GAMES, mountShell, row } from '/site/shell.js';
 import { loadAds } from '/ads/ads.js';
 mountShell({ active: 'about' });
-document.getElementById('picks').innerHTML =
-  row('Start with one of these', GAMES.filter((g) => g.big).slice(0, 6), { seeAll: '/' });
+// Optional recommendations removed: the page already has its own content.
 // no ad slots on this page, but it does load the ad script, so it owes
 // the visitor the same cookie notice as everywhere else
 loadAds();
 </script>
+<script type="module" src="/site/arcade-client.js?v=82f109c9"></script>
 </body>
 </html>

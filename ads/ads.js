@@ -190,13 +190,8 @@ export function slot(el, name) {
     return;
   }
 
-  if (cfg.houseAds && cfg.houseAds.enabled) { house(el, sz); return; }
-
-  el.innerHTML = '<div class="ad-ph">'
-    + '<b>AD SLOT</b>'
-    + '<span>' + sz.label + ' &middot; ' + sz.w + '&times;' + sz.h + '</span>'
-    + '<i>ads/ads.json &rarr; slots.' + name + '</i>'
-    + '</div>';
+  // Empty slots stay empty. No striped placeholders or repeated house promotions.
+  el.hidden = true;
 }
 
 /**
@@ -209,15 +204,10 @@ export function slot(el, name) {
  * same place. The ins stays in the page, untouched, as Google asks.
  */
 function whenUnfilled(el, ins, sz, cfg) {
-  if (!(cfg.houseAds && cfg.houseAds.enabled)) return;
   const check = () => {
     if (ins.getAttribute('data-ad-status') !== 'unfilled') return false;
-    ins.style.display = 'none';
-    const box = document.createElement('div');
-    box.className = 'ad-house';
-    el.appendChild(box);
-    house(box, sz);
     el.classList.add('ad-unfilled');
+    el.hidden = true;
     return true;
   };
   if (check()) return;

@@ -372,14 +372,13 @@ const myAvatar = () => getAvatar() || avatarFor(state.name || 'guest');
 function render() {
   if (!ui.button) return;
   const signed = state.mode !== 'guest';
-  ui.button.innerHTML = signed ? avatarSvg(myAvatar(), 26) : '';
-  if (!signed) ui.button.append($('span', 'acc-dot'));
+  ui.button.innerHTML = avatarSvg(myAvatar(), 26);
   const dot = signed ? $('span', 'acc-mode ' + state.mode) : null;
   if (dot) ui.button.append(dot);
-  ui.button.append($('span', 'acc-name', signed ? state.name : 'Sign in'));
+  ui.button.append($('span', 'acc-name', signed ? state.name : 'Player one'));
   ui.button.title = state.mode === 'cloud' ? 'signed in as ' + state.email + ' - saved to your account'
     : state.mode === 'local' ? 'playing as ' + state.name + ' - saved on this device'
-    : 'sign in to keep your progress';
+    : 'Choose your name and picture - progress is saved on this device';
   ui.button.setAttribute('aria-label', ui.button.title);
 }
 

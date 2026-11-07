@@ -5,6 +5,7 @@
 // upload, no image host and nothing to moderate. A player's choice is a
 // short id kept in `pd.site.avatar`, which means it travels with their
 // progress (profiles, save codes and cloud accounts all carry pd.* keys).
+import { pixelPortrait } from './pixel-ui.js';
 const BG = ['#22d37a', '#2f7df6', '#ffb15e', '#ff6b8b', '#9b7bff', '#18b6c9'];
 const FACES = {
   // each one is drawn on a 40x40 tile, in near-black on the colour
@@ -29,12 +30,7 @@ export function avatarFor(name) {
 }
 
 export function avatarSvg(id, size = 40) {
-  const i = Math.max(0, AVATARS.indexOf(id));
-  const bg = BG[i % BG.length];
-  const face = FACES[KEYS[(i + Math.floor(i / 6) * 3) % KEYS.length]];
-  return '<svg class="pp-av" viewBox="0 0 40 40" width="' + size + '" height="' + size + '" aria-hidden="true">'
-    + '<rect width="40" height="40" rx="12" fill="' + bg + '"/>'
-    + '<g fill="#061325">' + face + '</g></svg>';
+  return pixelPortrait(AVATARS.includes(id) ? id : 'g0',size);
 }
 
 export function getAvatar() {

@@ -16,6 +16,8 @@
 
 import { playUrl, catUrl, kwOf, CAT_TITLE } from './seo.js';
 import { isOnline } from './multiplayer.js';
+import { gameCardHTML, worldHeroHTML } from './arcade-ui.js';
+import { worldFor } from './arcade-data.js';
 export { playUrl, catUrl, kwOf, CAT_TITLE };
 export const SITE = 'https://playpile.net';
 
@@ -37,10 +39,10 @@ export const keysHtml = (g) => (g.controls || [])
   .map(([k, w]) => '<li><kbd>' + esc(k) + '</kbd><span>' + esc(w) + '</span></li>').join('');
 
 export const tagsHtml = (g) => [catOf(g), ...(g.tags || [])].map((t, i) => i
-  ? '<a class="chip" href="/#q=' + encodeURIComponent(t) + '">' + esc(t) + '</a>'
+  ? '<a class="chip" href="/browse/?q=' + encodeURIComponent(t) + '">' + esc(t) + '</a>'
   : '<a class="chip on" href="' + catUrl(t) + '">' + esc(t) + '</a>').join('');
 
-export const crumbsHtml = (g) => '<a href="/">Games</a><i>&rsaquo;</i>'
+export const crumbsHtml = (g) => '<a href="/browse/">Games</a><i>&rsaquo;</i>'
   + '<a href="' + catUrl(catOf(g)) + '">' + esc(catOf(g)) + '</a>'
   + '<i>&rsaquo;</i><b>' + esc(g.title) + '</b>';
 
@@ -51,14 +53,7 @@ export const pageTitle = (g) => g.title + ' — Free ' + cap(kwOf(g)) + ' Online
 // the card, identical to shell.js's so a pre-rendered row is the same row
 const shot = (g) => '<img src="/shots/t/' + g.slug + '.webp" alt="' + esc(g.title + ' - ' + kwOf(g)) + '" width="640" height="360" loading="lazy" decoding="async" onerror="this.remove()"'
   + ' onload="if(this.naturalHeight>this.naturalWidth)this.classList.add(\'tall\')">';
-export const cardHtml = (g) => '<a class="card" href="' + playUrl(g) + '" title="' + esc(g.title) + '" data-slug="' + g.slug + '">'
-  + '<span class="thumb"><span class="ph">' + esc(g.title.slice(0, 2)) + '</span>' + shot(g)
-  + '<span class="badge">' + esc(catOf(g)) + '</span>'
-  + (g.big ? '<span class="big-flag">Big</span>' : '')
-  + (isOnline(g.slug) ? '<span class="online-flag">Online</span>' : '')
-  + '<span class="hover"><span>PLAY</span></span></span>'
-  + '<span class="cname">' + esc(g.title) + '</span>'
-  + '<span class="cmeta">' + (g.tags || []).filter((t) => t !== 'new').slice(0, 2).map(esc).join(' &middot; ') + '</span></a>';
+export const cardHtml = gameCardHTML;
 
 // ---------------------------------------------------------------------
 // a game page: <head> extras and the body text
@@ -126,26 +121,9 @@ export function categoryHead(cat, intro) {
     + '<meta property="og:description" content="' + esc(desc) + '">\n'
     + '<meta property="og:url" content="' + url + '">';
 }
-// the pick of the category: the newest big game, shown large with its full intro
-function featHtml(list) {
-  const g = list.find((x) => x.big) || list[0];
-  return '<a class="catfeat" href="' + playUrl(g) + '"><img src="/shots/' + g.slug + '.png" alt="' + esc(g.title) + '" loading="lazy">'
-    + '<div><small>Liam&rsquo;s pick in this category</small><h2>' + esc(g.title) + '</h2><p>' + esc(clean(g.blurb)) + '</p>'
-    + '<p>' + esc(clean(String(g.about).split(/\n\s*\n/)[0])) + '</p><b>Play now &rarr;</b></div></a>';
-}
-
 export function categoryBody(cat, list, intro) {
-  return '<section class="cathero"><h1>' + esc(CAT_TITLE[cat] || cat + ' games') + '</h1>'
-    + '<p>' + esc(clean(intro)) + '</p></section>'
-    + featHtml(list)
-    + '<h2 class="cath2">All ' + esc(CAT_TITLE[cat] || cat + ' games') + '</h2>'
-    + '<div class="strip wide catbig">' + list.map(cardHtml).join('') + '</div>'
-    + '<div class="catlist">' + list.map((g) =>
-      '<article><a href="' + playUrl(g) + '"><img src="/shots/t/' + g.slug + '.webp" alt="' + esc(g.title) + '" loading="lazy"></a><h2><a href="' + playUrl(g) + '">' + esc(g.title) + '</a></h2>'
-      + '<p class="lede">' + esc(clean(g.blurb)) + '</p>'
-      + '<p>' + esc(clean(String(g.about).split(/\n\s*\n/)[0])) + '</p>'
-      + '<p class="more"><a href="' + playUrl(g) + '">Play ' + esc(g.title) + ', the free ' + esc(kwOf(g))
-      + ', and read the guide &rarr;</a></p></article>').join('') + '</div>';
+  return worldHeroHTML(worldFor(cat),list.length)
+    + '<div class="game-grid">' + list.map(cardHtml).join('') + '</div>';
 }
 
 // ---------------------------------------------------------------------

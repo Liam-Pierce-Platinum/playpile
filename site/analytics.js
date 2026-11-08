@@ -10,6 +10,9 @@
   // Preview builds and embedded games must not inflate production traffic.
   if (location.hostname !== 'playpile.net' && location.hostname !== 'www.playpile.net') return;
   if (window.self !== window.top) return;
+  import('/site/engagement.js').then(({ startEngagement }) => {
+    startEngagement('https://playpile-engagement.liamlikescows.workers.dev/collect');
+  }).catch(() => {});
   if (document.querySelector('script[data-cf-beacon], script[src^="https://static.cloudflareinsights.com/beacon.min.js"]')) return;
 
   var beacon = document.createElement('script');

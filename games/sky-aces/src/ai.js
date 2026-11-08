@@ -7,7 +7,7 @@
 //   SAFETY  ground / sea / boundary / ceiling always win
 import * as THREE from '../vendor/three.module.js';
 import { clamp, rand } from './util.js';
-import { safetyDir, BULLET_SPEED } from './entities.js';
+import { safetyDir, BULLET_SPEED } from './entities.js?v=red-fleet-1';
 import { HARBOR } from './world.js';
 
 const _d = new THREE.Vector3(), _t = new THREE.Vector3(), _s = new THREE.Vector3(), _o = new THREE.Vector3();

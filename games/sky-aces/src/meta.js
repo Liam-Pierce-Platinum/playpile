@@ -2,26 +2,26 @@
 const KEY = 'pd.sky-aces';
 
 export const PLANES = [
-  { id: 'sparrow', name: 'SPARROW', kind: 'Biplane', price: 0, costMul: 1,
-    desc: 'Canvas-and-wire biplane. Slow, fragile, turns on a dime.',
+  { id: 'sparrow', name: 'SPARROW', kind: 'Flying boat', price: 0, costMul: 1,
+    desc: 'Crimson flying boat with a high wing. Slow, fragile, turns on a dime.',
     speed: 92, turn: 2.15, roll: 3.4, hp: 100, barrels: 2, maxBarrels: 4, dmg: 6, rof: 11, missiles: 2, radius: 6,
-    colors: { body: 0xe8433a, wing: 0xf2e2b6, trim: 0x2b3a67 } },
-  { id: 'kestrel', name: 'KESTREL', kind: 'Fighter', price: 2500, costMul: 1.6,
-    desc: 'All-rounder monoplane. Good speed, good guns, good turn.',
+    colors: { body: 0xbe292b, wing: 0xcb3634, trim: 0xe9d7ac } },
+  { id: 'kestrel', name: 'KESTREL', kind: 'Float fighter', price: 2500, costMul: 1.6,
+    desc: 'Blue racing biplane on twin floats. Good speed, good guns, good turn.',
     speed: 118, turn: 1.85, roll: 3.6, hp: 135, barrels: 4, maxBarrels: 6, dmg: 7, rof: 13, missiles: 4, radius: 6.5,
-    colors: { body: 0x3b8fd9, wing: 0xe8eef5, trim: 0xf5c33b } },
+    colors: { body: 0x315e92, wing: 0x3b6c9e, trim: 0xe2b65c } },
   { id: 'bulldog', name: 'BULLDOG', kind: 'Heavy', price: 6000, costMul: 2.3,
-    desc: 'Armoured brawler with six guns. Lumbers, but shrugs off fire.',
+    desc: 'Heavy twin-engine flying boat with six guns. Takes a beating.',
     speed: 108, turn: 1.45, roll: 2.6, hp: 250, barrels: 6, maxBarrels: 8, dmg: 8, rof: 11, missiles: 6, radius: 7.5,
-    colors: { body: 0x6b7f3a, wing: 0x8a9b55, trim: 0xd9a441 } },
+    colors: { body: 0x6c7860, wing: 0x838e72, trim: 0x9b4638 } },
   { id: 'hornet', name: 'HORNET', kind: 'Interceptor', price: 11000, costMul: 3.1,
-    desc: 'Twin-boom interceptor. Fast in, fast out, heavy nose guns.',
+    desc: 'Twin-boom float racer. Fast in, fast out, heavy nose guns.',
     speed: 138, turn: 1.75, roll: 3.9, hp: 160, barrels: 4, maxBarrels: 6, dmg: 9.5, rof: 14, missiles: 4, radius: 7,
-    colors: { body: 0xf5b62b, wing: 0x2f2f38, trim: 0xe8433a } },
+    colors: { body: 0xd79533, wing: 0xe0ac52, trim: 0x8e302b } },
   { id: 'comet', name: 'COMET', kind: 'Jet', price: 19000, costMul: 4.2,
-    desc: 'Rocket-age jet with an open cockpit. Brutal speed, wide turns.',
+    desc: 'Experimental racing floatplane with a jet engine. Brutal speed, wide turns.',
     speed: 172, turn: 1.6, roll: 4.3, hp: 175, barrels: 4, maxBarrels: 6, dmg: 10, rof: 16, missiles: 8, radius: 7,
-    colors: { body: 0xdfe4ea, wing: 0x9aa6b5, trim: 0x7a3fd9 } },
+    colors: { body: 0xd5cec0, wing: 0xc8c7b6, trim: 0x9d3534 } },
 ];
 export const planeById = (id) => PLANES.find((p) => p.id === id) || PLANES[0];
 

@@ -3,12 +3,12 @@
 // guest does not resolve damage or run AI - it flies its own plane and draws the host's world.
 import * as THREE from '../vendor/three.module.js';
 import { clamp, rand, pick } from './util.js';
-import { Plane, Bullet, Missile, segSphere, safetyDir, BULLET_SPEED, resetIds } from './entities.js';
-import { Brain, gunnerUpdate } from './ai.js';
-import { makePlane, makeBomber, makeAirship, makeMissile, RAIDER, ACE, TEAM_COLORS } from './models.js';
-import { statsFor, planeById, save, upOf, MISSIONS, endlessWave, REWARD } from './meta.js';
+import { Plane, Bullet, Missile, segSphere, safetyDir, BULLET_SPEED, resetIds } from './entities.js?v=red-fleet-1';
+import { Brain, gunnerUpdate } from './ai.js?v=red-fleet-1';
+import { makePlane, makeBomber, makeAirship, makeMissile, RAIDER, ACE, TEAM_COLORS } from './models.js?v=red-fleet-1';
+import { statsFor, planeById, save, upOf, MISSIONS, endlessWave, REWARD } from './meta.js?v=red-fleet-1';
 import { groundAt, heightAt, HARBOR, ARENA } from './world.js';
-import * as A from './audio.js?v=ios-audio-2';
+import * as A from './audio.js?v=red-fleet-1';
 
 const _v = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3(), _q = new THREE.Quaternion();
 const RAIDER_NAMES = ['Grub', 'Slick', 'Mange', 'Rook', 'Tusk', 'Vex', 'Cinder', 'Moth', 'Brick', 'Snipe', 'Dregs', 'Scab', 'Hex', 'Jolt', 'Knave', 'Rust'];
@@ -90,7 +90,7 @@ export class Game {
   spawnAlly(i) {
     const st = statsFor('kestrel', { dmg: 1, armor: 2 });
     st.hp = Math.round(st.hp * 1.2);
-    const a = new Plane({ model: makePlane('kestrel', { body: 0x3b8fd9, wing: 0xe8eef5, trim: 0xffffff }, 0xffffff), stats: st, team: 0, name: pick(BOT_NAMES), skill: 0.55, planeId: 'kestrel' });
+    const a = new Plane({ model: makePlane('kestrel', { body: 0x3b8fd9, wing: 0xe8eef5, trim: 0xffffff }, 0xffffff, 0, false), stats: st, team: 0, name: pick(BOT_NAMES), skill: 0.55, planeId: 'kestrel' });
     a.brain = new Brain(a, this);
     a.brain.leader = this.player;
     a.brain.slot.set(i % 2 ? 50 : -50, 8, 40 + Math.floor(i / 2) * 40);
@@ -119,7 +119,7 @@ export class Game {
       st.rof = ace ? 9 : 7 + sk * 4;
       st.missiles = ace ? 3 : sk > 0.45 ? 1 : 0;
       st.lock = 1.4 - sk * 0.5;
-      p = new Plane({ model: makePlane(model, ace ? ACE : RAIDER, ace ? 0x111111 : 0x8c2f2f, st.barrels), stats: st, team: 1, name: def.name || pick(RAIDER_NAMES), skill: sk, cls: ace ? 'ace' : 'fighter', planeId: model });
+      p = new Plane({ model: makePlane(model, ace ? ACE : RAIDER, ace ? 0x111111 : 0x8c2f2f, st.barrels, false), stats: st, team: 1, name: def.name || pick(RAIDER_NAMES), skill: sk, cls: ace ? 'ace' : 'fighter', planeId: model });
       p.brain = new Brain(p, this);
     } else if (def.type === 'bomber') {
       const st = { speed: 56, turn: 0.55, roll: 0.9, hp: 380 + sk * 120, armor: 1, barrels: 0, dmg: 0, rof: 1, missiles: 0, radius: 15, boost: 1, lock: 9 };

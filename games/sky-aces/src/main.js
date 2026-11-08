@@ -2,16 +2,16 @@
 import * as THREE from '../vendor/three.module.js';
 import { makeRenderer, buildWorld, ARENA, groundAt } from './world.js';
 import { FX } from './fx.js';
-import { Game } from './game.js?v=ios-audio-2';
+import { Game } from './game.js?v=red-fleet-1';
 import { Input } from './input.js';
-import { UI } from './ui.js?v=ios-audio-2';
-import { Online } from './online.js';
-import { Brain } from './ai.js';
-import { makePlane, animatePilot } from './models.js';
-import { planeById, statsFor, upOf } from './meta.js';
+import { UI } from './ui.js?v=red-fleet-1';
+import { Online } from './online.js?v=red-fleet-1';
+import { Brain } from './ai.js?v=red-fleet-1';
+import { makePlane, animatePilot } from './models.js?v=red-fleet-1';
+import { planeById, statsFor, upOf } from './meta.js?v=red-fleet-1';
 import { clamp, damp, QS, rand } from './util.js';
-import { save, persist, addMoney, MISSIONS } from './meta.js';
-import * as A from './audio.js?v=ios-audio-2';
+import { save, persist, addMoney, MISSIONS } from './meta.js?v=red-fleet-1';
+import * as A from './audio.js?v=red-fleet-1';
 
 const canvas = document.getElementById('c');
 const lowq = QS.has('lq') || (matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) < 500);

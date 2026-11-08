@@ -3,7 +3,7 @@
 import * as THREE from '../vendor/three.module.js';
 import { clamp, rand } from './util.js';
 import { groundAt, ARENA, CEILING } from './world.js';
-import { animatePilot } from './models.js';
+import { animatePilot } from './models.js?v=red-fleet-1';
 
 const _r = new THREE.Vector3(), _b1 = new THREE.Vector3(), _b2 = new THREE.Vector3(), _v = new THREE.Vector3(), _v2 = new THREE.Vector3(), _q = new THREE.Quaternion(), _qi = new THREE.Quaternion(), _e = new THREE.Euler();
 export const FWD = new THREE.Vector3(0, 0, -1), UP = new THREE.Vector3(0, 1, 0), RIGHT = new THREE.Vector3(1, 0, 0);

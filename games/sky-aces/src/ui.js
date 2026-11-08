@@ -1,10 +1,10 @@
 // Menus (title, campaign, hangar, settings, online lobby, results, pause) and the in-flight HUD.
 import * as THREE from '../vendor/three.module.js';
-import { PLANES, TRACKS, MISSIONS, planeById, save, persist, upOf, statsFor, upgradeCost, trackMax, resetSave } from './meta.js';
+import { PLANES, TRACKS, MISSIONS, planeById, save, persist, upOf, statsFor, upgradeCost, trackMax, resetSave } from './meta.js?v=red-fleet-1';
 import { fmtMoney, clamp } from './util.js';
 import { ARENA } from './world.js';
-import * as A from './audio.js?v=ios-audio-2';
-import { makePlane, animatePilot } from './models.js';
+import * as A from './audio.js?v=red-fleet-1';
+import { makePlane, animatePilot } from './models.js?v=red-fleet-1';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));

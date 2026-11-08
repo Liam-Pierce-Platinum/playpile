@@ -9,10 +9,10 @@
 //   host  -> guest {k:'lobby', players, cfg}  {k:'start', roster, cfg, you}  {k:'s', ...snapshot}  {k:'ev', e:[...]}
 import * as THREE from '../vendor/three.module.js';
 import { makeNet, NET_ERRORS, cleanCode } from './net.js';
-import { Plane } from './entities.js';
-import { Brain } from './ai.js';
-import { makePlane, TEAM_COLORS } from './models.js';
-import { statsFor, planeById, save, upOf } from './meta.js';
+import { Plane } from './entities.js?v=red-fleet-1';
+import { Brain } from './ai.js?v=red-fleet-1';
+import { makePlane, TEAM_COLORS } from './models.js?v=red-fleet-1';
+import { statsFor, planeById, save, upOf } from './meta.js?v=red-fleet-1';
 import { QS, pick, rand } from './util.js';
 
 const MAX = 8;
@@ -176,7 +176,7 @@ export class Online {
     if (!this.cfg.teams) return;
     const G = this.app.game;
     G.scene.remove(p.model);
-    p.model = makePlane(p.planeId, TEAM_COLORS[p.team], p.team ? 0x222222 : 0xffffff, p.st.barrels);
+    p.model = makePlane(p.planeId, TEAM_COLORS[p.team], p.team ? 0x222222 : 0xffffff, p.st.barrels, p.human);
     G.scene.add(p.model);
     p.gunsCache = null;
   }
@@ -185,7 +185,7 @@ export class Online {
     const st = statsFor(r.planeId, r.up || {});
     const colors = this.cfg.teams ? TEAM_COLORS[r.team] : planeById(r.planeId).colors;
     const isMe = this.role === 'host' ? r.conn === 0 : r.id === this.myId;
-    const p = new Plane({ id: r.id, model: makePlane(r.planeId, colors, this.cfg.teams ? (r.team ? 0x222222 : 0xffffff) : 0xe8433a, st.barrels), stats: st, team: r.team, name: r.name, isPlayer: isMe, human: r.human, skill: 0.5, planeId: r.planeId });
+    const p = new Plane({ id: r.id, model: makePlane(r.planeId, colors, this.cfg.teams ? (r.team ? 0x222222 : 0xffffff) : 0xe8433a, st.barrels, r.human), stats: st, team: r.team, name: r.name, isPlayer: isMe, human: r.human, skill: 0.5, planeId: r.planeId });
     p.upg = r.up || {}; p.conn = r.conn; p.human = r.human;
     p.netPos = new THREE.Vector3(); p.netQuat = new THREE.Quaternion(); p.netSpeed = 0; p.netT = 0; p.netFiring = false;
     if (this.role === 'host') {

@@ -24,3 +24,35 @@ test('translated search labels find catalogue games without changing game names'
   assert.ok(search(localizedGameQuery('Carreras 3D', 'es')).length > 0);
   assert.deepEqual(search(localizedGameQuery('فن البكسل', 'ar')), search('pixel art'));
 });
+
+test('supported ad landing languages are saved and unsupported values keep the preference', async (t) => {
+  const location = { search: '?utm_source=meta&lang=es' };
+  const preferences = new Map([['pd.ui.language', 'id']]);
+  for (const [name, value] of Object.entries({
+    location,
+    localStorage: {
+      getItem: key => preferences.get(key),
+      setItem: (key, value) => preferences.set(key, value),
+    },
+  })) {
+    const original = Object.getOwnPropertyDescriptor(globalThis, name);
+    Object.defineProperty(globalThis, name, { value, configurable: true });
+    t.after(() => {
+      if (original) Object.defineProperty(globalThis, name, original);
+      else delete globalThis[name];
+    });
+  }
+
+  const landing = await import('../site/arcade-locale.js?campaign-landing');
+  assert.equal(landing.getLocale(), 'es');
+  assert.equal(preferences.get('pd.ui.language'), 'es');
+
+  location.search = '';
+  const nextPage = await import('../site/arcade-locale.js?campaign-next-page');
+  assert.equal(nextPage.getLocale(), 'es');
+
+  location.search = '?lang=unsupported';
+  const invalid = await import('../site/arcade-locale.js?campaign-invalid');
+  assert.equal(invalid.getLocale(), 'es');
+  assert.equal(preferences.get('pd.ui.language'), 'es');
+});

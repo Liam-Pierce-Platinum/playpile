@@ -20,7 +20,18 @@ function readLocale() {
   return 'en';
 }
 
-let locale = readLocale();
+function saveLocale(code) {
+  try { globalThis.localStorage?.setItem(STORAGE_KEY, code); } catch { /* still works on this page */ }
+}
+
+function initialLocale() {
+  const requested = new URLSearchParams(globalThis.location?.search).get('lang');
+  if (!Object.hasOwn(MESSAGES, requested)) return readLocale();
+  saveLocale(requested);
+  return requested;
+}
+
+let locale = initialLocale();
 export const getLocale = () => locale;
 
 export function translate(key, values = {}, code = locale) {
@@ -186,7 +197,7 @@ function mount() {
 
   select.addEventListener('change', () => {
     locale = select.value;
-    try { localStorage.setItem(STORAGE_KEY, locale); } catch { /* still works on this page */ }
+    saveLocale(locale);
     applyLocale();
   });
   addEventListener('storage', event => {

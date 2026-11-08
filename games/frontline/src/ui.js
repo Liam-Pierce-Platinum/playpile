@@ -74,6 +74,9 @@ export class UI {
     const equipped = d.loadout[slot].id === sel;
     const curAtt = equipped ? d.loadout[slot].att : (d.equippedAtt?.[sel] || []);
     const st = statsFor(sel, curAtt);
+    const previewCanvas = this.pr?.cv;
+    const scrollers = ['.armory', '.alist', '.adetail'];
+    const scrollOffsets = scrollers.map((selector) => this.el.querySelector(selector)?.scrollTop || 0);
     const row = (id) => {
       const W = WEAPONS[id], o = M.owns(id), eq = d.loadout.primary.id === id || d.loadout.secondary.id === id;
       return `<button class="wrow ${id === sel ? 'sel' : ''} ${o ? '' : 'locked'}" data-w="${id}"><b>${W.name}</b><small>${W.cls}</small>${eq ? '<i class="eq">EQUIPPED</i>' : o ? '' : `<i class="price">${W.price}</i>`}</button>`;
@@ -108,6 +111,10 @@ export class UI {
           }).join('')}</div>` : '<p class="noatt">No attachments for this weapon.</p>'}
         </div>
       </div>`, 'scr-armory');
+    // The controls are rebuilt after each selection. Keep their preview's
+    // canvas so it does not allocate a new WebGL context for every click.
+    if (previewCanvas) $('prev').replaceWith(previewCanvas);
+    scrollers.forEach((selector, i) => { this.el.querySelector(selector).scrollTop = scrollOffsets[i]; });
     this.bind('[data-back]', () => this.title());
     this.bind('[data-w]', (b) => { this.armSel = b.dataset.w; this.armory(); });
     this.bind('[data-buy]', () => { if (M.buyWeapon(sel)) { this.G.audio.buy(); M.equip(slot, sel); } this.armory(); });
@@ -135,7 +142,6 @@ export class UI {
       this.pr = { r, scene, cam, cv };
     }
     const P = this.pr;
-    if (P.cv !== cv) { P.r.dispose(); this.pr = null; this.preview(id, att); return; }
     if (P.gun) P.scene.remove(P.gun);
     const g = buildGun(id, att);
     const box = new THREE.Box3().setFromObject(g);
@@ -156,7 +162,15 @@ export class UI {
     };
     loop();
   }
-  stopPreview(keep) { if (this.prRaf) cancelAnimationFrame(this.prRaf); this.prRaf = 0; if (!keep && this.pr) { this.pr.r.dispose(); this.pr = null; } }
+  stopPreview(keep) {
+    if (this.prRaf) cancelAnimationFrame(this.prRaf);
+    this.prRaf = 0;
+    if (!keep && this.pr) {
+      this.pr.r.dispose();
+      this.pr.r.forceContextLoss();
+      this.pr = null;
+    }
+  }
   // ------------------------------------------------------------------ pause
   pause() {
     this.panel = 'pause';

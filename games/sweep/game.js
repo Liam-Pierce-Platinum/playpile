@@ -52,9 +52,14 @@ const LEVELS = [
 ];
 
 let sizeI = 1, levelI = 1;
+function readChoice(key, choices) {
+  const value = localStorage.getItem(key);
+  const index = value ? Number(value) : NaN;
+  return Number.isInteger(index) && index >= 0 && index < choices.length ? index : 1;
+}
 try {
-  sizeI = clamp(+localStorage.getItem('pd.sweep.size') || 1, 0, 3);
-  levelI = clamp(+localStorage.getItem('pd.sweep.level') || 1, 0, 3);
+  sizeI = readChoice('pd.sweep.size', SIZES);
+  levelI = readChoice('pd.sweep.level', LEVELS);
 } catch (e) {}
 
 let cols, rows, mines, cell, ox, oy, board, first, boardNo, score, left, time, over, started, menu, boom;
@@ -260,13 +265,13 @@ D.cv.addEventListener('touchstart', (e) => {
   touchT = performance.now();
 }, { passive: true });
 D.cv.addEventListener('touchend', e => {
-  if (!touchCell || menu || over || !started) return;
+  if (!touchCell) return;
   const t = Array.from(e.changedTouches).find(point => point.identifier === touchCell.id);
   if (!t) return;
   const moved = Math.hypot(t.clientX-touchCell.x,t.clientY-touchCell.y) > 10;
   const { mx, my } = touchCell;
   touchCell = null;
-  if (moved || mx < 0 || my < 0 || mx >= cols || my >= rows) return;
+  if (menu || over || !started || moved || mx < 0 || my < 0 || mx >= cols || my >= rows) return;
   const c = board[my][mx];
   if (performance.now() - touchT > 360) {
     if (!c.open) { c.flag = !c.flag; left += c.flag ? -1 : 1; D.beep(640, .05, 'sine', .04); }

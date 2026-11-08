@@ -213,6 +213,7 @@ body.touch #pauseBtn { left: max(10px, env(safe-area-inset-left)); }
 body.touch #top { width: min(420px, calc(100% - 128px)); }
 body.touch #obj { font-size: 12px; padding: 4px 10px; white-space: normal; }
 .bar.hp.rep i { animation: rep 0.8s infinite alternate; } @keyframes rep { to { filter: brightness(1.5); } }
-#pvwrap { margin: 6px 0; background: linear-gradient(#cfe6f7, #f4ead2); border-radius: 14px; overflow: hidden; } #pvwrap canvas { display: block; }
+#pvwrap { position: relative; width: 100%; aspect-ratio: 50 / 21; max-height: 220px; margin: 6px 0; background: linear-gradient(#cfe6f7, #f4ead2); border-radius: 14px; overflow: hidden; }
+#pvwrap canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
 @media (max-width: 600px) { #ui { padding-top: 58px; align-items: flex-start; } }
 body.touch .kh { display: none; }

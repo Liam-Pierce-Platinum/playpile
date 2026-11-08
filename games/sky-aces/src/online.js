@@ -9,10 +9,10 @@
 //   host  -> guest {k:'lobby', players, cfg}  {k:'start', roster, cfg, you}  {k:'s', ...snapshot}  {k:'ev', e:[...]}
 import * as THREE from '../vendor/three.module.js';
 import { makeNet, NET_ERRORS, cleanCode } from './net.js';
-import { Plane } from './entities.js?v=red-fleet-1';
-import { Brain } from './ai.js?v=red-fleet-1';
-import { makePlane, TEAM_COLORS } from './models.js?v=red-fleet-1';
-import { statsFor, planeById, save, upOf } from './meta.js?v=red-fleet-1';
+import { Plane } from './entities.js?v=hangar-2';
+import { Brain } from './ai.js?v=hangar-2';
+import { makePlane, TEAM_COLORS } from './models.js?v=hangar-2';
+import { statsFor, planeById, save, upOf } from './meta.js?v=hangar-2';
 import { QS, pick, rand } from './util.js';
 
 const MAX = 8;

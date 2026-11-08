@@ -3,12 +3,12 @@
 // guest does not resolve damage or run AI - it flies its own plane and draws the host's world.
 import * as THREE from '../vendor/three.module.js';
 import { clamp, rand, pick } from './util.js';
-import { Plane, Bullet, Missile, segSphere, safetyDir, BULLET_SPEED, resetIds } from './entities.js?v=red-fleet-1';
-import { Brain, gunnerUpdate } from './ai.js?v=red-fleet-1';
-import { makePlane, makeBomber, makeAirship, makeMissile, RAIDER, ACE, TEAM_COLORS } from './models.js?v=red-fleet-1';
-import { statsFor, planeById, save, upOf, MISSIONS, endlessWave, REWARD } from './meta.js?v=red-fleet-1';
+import { Plane, Bullet, Missile, segSphere, safetyDir, BULLET_SPEED, resetIds } from './entities.js?v=hangar-2';
+import { Brain, gunnerUpdate } from './ai.js?v=hangar-2';
+import { makePlane, makeBomber, makeAirship, makeMissile, RAIDER, ACE, TEAM_COLORS } from './models.js?v=hangar-2';
+import { statsFor, planeById, save, upOf, MISSIONS, endlessWave, REWARD } from './meta.js?v=hangar-2';
 import { groundAt, heightAt, HARBOR, ARENA } from './world.js';
-import * as A from './audio.js?v=red-fleet-1';
+import * as A from './audio.js?v=hangar-2';
 
 const _v = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3(), _q = new THREE.Quaternion();
 const RAIDER_NAMES = ['Grub', 'Slick', 'Mange', 'Rook', 'Tusk', 'Vex', 'Cinder', 'Moth', 'Brick', 'Snipe', 'Dregs', 'Scab', 'Hex', 'Jolt', 'Knave', 'Rust'];

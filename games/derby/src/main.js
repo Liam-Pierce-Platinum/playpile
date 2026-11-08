@@ -91,7 +91,7 @@ class Game {
       if (e.code === 'Escape' || e.code === 'KeyP') {
         if (this.ui.open && ['pause', 'howto'].includes(this.ui.panel)) { this.ui.back(); return; }
         if (this.mode === 'play' && !this.ui.open) { this.ui.show('pause'); return; }
-        if (this.ui.panel === 'garage' || this.ui.panel === 'howto') { this.ui.show('title'); return; }
+        if (this.ui.panel === 'garage') { this.toTitle(); return; }
       }
       if (this.ui.open) { if (['Enter', 'Space', 'KeyR'].includes(e.code)) this.ui.primary(e.code); return; }
       if (this.mode === 'play' && e.code === 'KeyR') this.startRound(this.arenaIdx);

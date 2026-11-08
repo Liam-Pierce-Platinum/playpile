@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>SKI MOUNTAIN</title>
 <meta name="description" content="An endless, ever-faster downhill: weave the trees, hit kicker after kicker, grind rails, spin and flip with the mouse.">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=touch-pause-1">
 </head>
 <body>
 <canvas id="c"></canvas>
@@ -19,6 +19,7 @@
   <div id="pops"></div>
   <div id="bal"><div id="needle"></div></div>
   <div id="lockhint">click to lock the mouse for spins</div>
+  <button type="button" id="pauseGame" aria-label="Pause game" title="Pause game">&#x23F8;&#xFE0E;</button>
 </div>
 <div id="toast"></div>
 <div id="hint" class="hidden">
@@ -52,6 +53,6 @@
 </div>
 <div id="fade"></div>
 <button type="button" id="soundToggle" aria-label="Enable sound"><span aria-hidden="true">&#9835;</span><small aria-hidden="true">SOUND</small></button>
-<script type="module" src="src/main.js"></script>
+<script type="module" src="src/main.js?v=touch-pause-1"></script>
 </body>
 </html>

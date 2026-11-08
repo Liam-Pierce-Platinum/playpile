@@ -209,7 +209,10 @@ button { font-family: var(--font); cursor: pointer; }
   .logo, .menu, .setup, .profile, .foot { grid-column: 1; grid-row: auto; }
   .logo h1 { font-size: 48px; } .profile { justify-self: stretch; text-align: left; }
   .foot { display: none; }
-  .armory { grid-template-columns: 1fr; overflow-y: auto; padding: 16px; } .ahead { grid-column: 1; }
+  .armory { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto; align-content: start; overflow-y: auto; padding: 16px; }
+  .ahead { grid-column: 1; }
+  .alist { height: clamp(140px, 34vh, 300px); min-width: 0; }
+  .adetail { min-width: 0; overflow: visible; }
   .atts { grid-template-columns: 1fr; }
   #board { min-width: 0; width: calc(100vw - 32px); } #board .cols { flex-direction: column; }
   #radio { width: 60vw; top: auto; bottom: 200px; font-size: 12px; }
@@ -269,10 +272,15 @@ body.watching #touch .tbtn:not(#t-pause), body.watching #stick { display: none; 
 .earnhelp { flex: 1; margin: 0; font-size: 12px; color: var(--dim); line-height: 1.4; max-width: 560px; }
 .earnhelp b { color: #ffd23a; font-weight: 600; }
 .acts .need { margin-left: 12px; color: var(--dim); font-size: 13px; }
+@media (max-width: 600px) and (orientation: portrait) {
+  .ahead { flex-wrap: wrap; gap: 8px 12px; }
+  .ahead h2 { font-size: 30px; letter-spacing: 4px; }
+  .earnhelp { order: 1; flex-basis: 100%; }
+}
 @media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
   .armory { grid-template-columns: 220px 1fr; grid-template-rows: auto 1fr; padding: 10px 14px; gap: 8px 12px; overflow: hidden; }
   .ahead { grid-column: 1 / 3; gap: 12px; } .ahead h2 { font-size: 24px; letter-spacing: 4px; } .earnhelp { font-size: 10px; }
-  .alist { grid-column: 1; overflow-y: auto; } .adetail { grid-column: 2; overflow-y: auto; }
+  .alist { grid-column: 1; height: auto; overflow-y: auto; } .adetail { grid-column: 2; overflow-y: auto; }
   .wrow { padding: 5px 8px; } .wrow b { font-size: 13px; } .wrow small { font-size: 10px; }
   #prev { max-height: 90px; width: auto; max-width: 100%; }
   .adetail h3 { font-size: 20px; margin: 2px 0 6px; } .atts { grid-template-columns: 1fr 1fr; }

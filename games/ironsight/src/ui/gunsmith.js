@@ -35,6 +35,7 @@ export class Gunsmith {
     this.game = game;
     this.scene = new THREE.Scene();
     this.cam = new THREE.PerspectiveCamera(30, 1, 0.01, 50);
+    this.preview = $('gunsmith').querySelector('.gs-preview') ?? $('gunsmith');
     this.yaw = -0.6; this.pitch = 0.18; this.dist = 1.95;
     this.loadouts = loadLoadouts();
     this.slot = 'primary';
@@ -164,15 +165,15 @@ export class Gunsmith {
     }).join('') + `<div class="st" style="margin-top:12px">${st.optic.zoom > 1.2 ? st.optic.zoom.toFixed(1) + 'x optic · ' : ''}${st.suppressed ? 'suppressed · ' : ''}zero ${st.zero} m</div>`;
   }
   save() { saveLoadouts(this.loadouts); }
-  render(renderer, dt) {
-    const t = performance.now() * 0.001;
-    if (this.weapon) this.pivot.rotation.y += dt * 0.0;
+  render(renderer) {
+    const { left, top, width, height } = this.preview.getBoundingClientRect();
+    if (width < 1 || height < 1) return;
     const c = this.cam;
-    c.aspect = innerWidth / innerHeight; c.updateProjectionMatrix();
-    // keep the gun right of the panel
-    c.position.set(Math.sin(this.yaw) * Math.cos(this.pitch) * this.dist, Math.sin(this.pitch) * this.dist, Math.cos(this.yaw) * Math.cos(this.pitch) * this.dist);
+    const dist = this.dist / Math.min(1, width / height);
+    c.position.set(Math.sin(this.yaw) * Math.cos(this.pitch) * dist, Math.sin(this.pitch) * dist, Math.cos(this.yaw) * Math.cos(this.pitch) * dist);
     c.lookAt(0, -0.05, 0);
-    c.setViewOffset(innerWidth, innerHeight, -innerWidth * 0.015, -innerHeight * 0.06, innerWidth, innerHeight);   // between the option panel and the stats
+    // Frame the bench in the visible gap while continuing to use the full-screen canvas.
+    c.setViewOffset(width, height, -left, -top, innerWidth, innerHeight);
     renderer.setRenderTarget(null);
     renderer.render(this.scene, c);
   }

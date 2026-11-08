@@ -37,7 +37,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #cfe6fb; fon
 #hint b { color: var(--gold); }
 #hint span { opacity: .75; font-size: 12px; }
 #touchui { display: none; }
-body.touch #touchui { display: block; }
+body.touch #hud:not(.hidden) ~ #touchui { display: block; }
 body.touch #hint, body.touch #lockhint { display: none; }
 #tgrab { position: fixed; right: 18px; bottom: 26px; width: 84px; height: 84px; border-radius: 50%; border: 3px solid #fff; background: #ff4f2acc; color: #fff; font: 900 15px var(--font); }
 #tl2, #tr2 { position: fixed; bottom: 10px; font: 700 11px var(--font); color: #fff; text-shadow: 0 1px 2px #0008; pointer-events: none; }
@@ -56,7 +56,10 @@ button { font: 800 14px var(--font); letter-spacing: 1px; border: none; border-r
 button:hover { filter: brightness(1.05); }
 button.primary { background: var(--hot); color: #fff; box-shadow: 0 4px 0 #b9301a; }
 button small { opacity: .7; font-size: 10px; margin-left: 4px; }
-#soundToggle { position: fixed; top: max(8px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right)); z-index: 3; width: 44px; height: 44px; padding: 3px; background: #10151fde; color: #fff; border: 2px solid #ffffffa8; font-size: 20px; line-height: 1; }
+#soundToggle, #pauseGame { right: max(8px, env(safe-area-inset-right)); width: 44px; height: 44px; padding: 3px; background: #10151fde; color: #fff; border: 2px solid #ffffffa8; font-size: 20px; line-height: 1; }
+#soundToggle { position: fixed; top: max(8px, env(safe-area-inset-top)); z-index: 3; }
+#pauseGame { display: none; position: absolute; top: calc(max(8px, env(safe-area-inset-top)) + 52px); pointer-events: auto; }
+body.touch #pauseGame { display: block; }
 #soundToggle small { display: none; margin: 0; opacity: 1; font-size: 8px; }
 #soundToggle.pending { background: #ffdf84; color: #10151f; border-color: #10151f; }
 #soundToggle.pending small { display: block; }

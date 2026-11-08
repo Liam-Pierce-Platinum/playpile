@@ -322,19 +322,50 @@ function garage() {
   const row = (label, lvl, cost, fn) => { const d = document.createElement('div'); d.className = 'gi'; d.innerHTML = `<span>${label} <b>${lvl}</b></span>`; const b = document.createElement('button'); b.className = 'btn'; b.textContent = cost == null ? 'MAX' : '$' + cost; b.disabled = cost == null || S.cash < cost; b.style.opacity = b.disabled ? 0.4 : 1; b.onclick = () => { if (S.cash >= cost) { S.cash -= cost; fn(); save(); sfx.buy(); garage(); } }; d.appendChild(b); el.appendChild(d); };
   row('ENGINE', 'LV ' + S.eng + '/5', S.eng < 5 ? 300 * (S.eng + 1) : null, () => S.eng++);
   row('NITRO TANK', 'LV ' + S.nos + '/5', S.nos < 5 ? 250 * (S.nos + 1) : null, () => S.nos++);
-  const d = document.createElement('div'); d.className = 'gi'; d.innerHTML = '<span>PAINT</span>'; const sw = document.createElement('span');
-  PAINTS.forEach(([n, col], i) => { const s = document.createElement('i'); s.className = 'sw' + (S.paint === i ? ' on' : ''); s.style.background = '#' + col.toString(16).padStart(6, '0'); s.title = n + (S.paints.includes(i) ? '' : ' $200'); s.onclick = () => { if (!S.paints.includes(i)) { if (S.cash < 200) return; S.cash -= 200; S.paints.push(i); sfx.buy(); } S.paint = i; CAR.paint.color.set(col); save(); garage(); }; sw.appendChild(s); });
+  const d = document.createElement('div'); d.className = 'gi paint'; d.innerHTML = '<span>PAINT</span>';
+  const sw = document.createElement('span'); sw.className = 'swatches';
+  PAINTS.forEach(([n, col], i) => {
+    const s = document.createElement('button');
+    const owned = S.paints.includes(i);
+    s.type = 'button';
+    s.className = 'sw' + (S.paint === i ? ' on' : '');
+    s.style.background = '#' + col.toString(16).padStart(6, '0');
+    s.title = n + (owned ? '' : ' $200');
+    s.setAttribute('aria-label', s.title);
+    s.setAttribute('aria-pressed', String(S.paint === i));
+    s.disabled = !owned && S.cash < 200;
+    s.onclick = () => {
+      if (!owned) {
+        if (S.cash < 200) return;
+        S.cash -= 200; S.paints.push(i); sfx.buy();
+      }
+      const focused = document.activeElement === s;
+      S.paint = i; CAR.paint.color.set(col); save(); garage();
+      if (focused) el.querySelector('.sw.on').focus({ preventScroll: true });
+    };
+    sw.appendChild(s);
+  });
   d.appendChild(sw); el.appendChild(d);
 }
-$('garBtn').onclick = (e) => { e.target.blur(); garage(); }; $('garClose').onclick = () => hide('garage');
+function openGarage() {
+  garage();
+  document.querySelector('#garage:not(.hide) .sw.on')?.focus({ preventScroll: true });
+}
+$('garBtn').onclick = openGarage; $('garClose').onclick = () => hide('garage');
 
 // ---------- input ----------
 const KEY = { KeyW: 'up', ArrowUp: 'up', KeyS: 'down', ArrowDown: 'down', KeyA: 'left', ArrowLeft: 'left', KeyD: 'right', ArrowRight: 'right', ShiftLeft: 'nitro', ShiftRight: 'nitro', Space: 'hand', KeyQ: 'rollL', KeyE: 'rollR' };
 addEventListener('keydown', (e) => {
-  initAudio(); const k = KEY[e.code]; if (k) { input[k] = 1; e.preventDefault(); }
+  initAudio();
+  if (!$('garage').classList.contains('hide')) {
+    if (e.code === 'KeyG' || e.code === 'Escape') { e.preventDefault(); hide('garage'); }
+    return;
+  }
+  if (e.target === $('garBtn') && (e.code === 'Enter' || e.code === 'Space')) return;
+  const k = KEY[e.code]; if (k) { input[k] = 1; e.preventDefault(); }
   if (e.code === 'KeyR' && car.mode !== 'crash') respawn();
   if (e.code === 'KeyM') toggleMute();
-  if (e.code === 'KeyG') { if ($('garage').classList.contains('hide')) garage(); else hide('garage'); }
+  if (e.code === 'KeyG') openGarage();
   if (e.code === 'Enter') { if (!$('card').classList.contains('hide')) cardA && cardA(); else if (G.state === 'roam') { const n = nextIdx(); if (n >= 0) startChallenge(n); } }
   if (e.code === 'Escape' && ch) toRoam();
   if (!$('title').classList.contains('hide') && (e.code === 'Enter' || e.code === 'Space')) hide('title');

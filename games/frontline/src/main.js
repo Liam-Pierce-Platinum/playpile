@@ -8,7 +8,7 @@ import { Audio } from './audio.js';
 import { Meta } from './meta.js';
 import { Input } from './input.js';
 import { HUD } from './hud.js';
-import { UI } from './ui.js';
+import { UI } from './ui.js?v=armory-fix-1';
 import { ViewModel } from './viewmodel.js';
 import { AIDebug } from './debug.js';
 import { Match } from './match.js';

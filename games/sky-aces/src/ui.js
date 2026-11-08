@@ -1,10 +1,10 @@
 // Menus (title, campaign, hangar, settings, online lobby, results, pause) and the in-flight HUD.
 import * as THREE from '../vendor/three.module.js';
-import { PLANES, TRACKS, MISSIONS, planeById, save, persist, upOf, statsFor, upgradeCost, trackMax, resetSave } from './meta.js?v=red-fleet-1';
+import { PLANES, TRACKS, MISSIONS, planeById, save, persist, upOf, statsFor, upgradeCost, trackMax, resetSave } from './meta.js?v=hangar-2';
 import { fmtMoney, clamp } from './util.js';
 import { ARENA } from './world.js';
-import * as A from './audio.js?v=red-fleet-1';
-import { makePlane, animatePilot } from './models.js?v=red-fleet-1';
+import * as A from './audio.js?v=hangar-2';
+import { makePlane, animatePilot } from './models.js?v=hangar-2';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -83,6 +83,7 @@ export class UI {
   }
   click() { A.sJingle('click'); }
   show(html, name) {
+    this.pv?.observer.disconnect();
     this.panel = name;
     this.root.innerHTML = html;
     this.root.classList.remove('hide');
@@ -97,6 +98,7 @@ export class UI {
   act(a, v, el) {
     const app = this.app;
     if (a === 'play') this.play();
+    else if (app.state === 'results' && (a === 'title' || a === 'hangar')) app.quit(a);
     else if (a === 'title') this.title();
     else if (a === 'campaign') this.campaign();
     else if (a === 'mission') app.startMission(+v);
@@ -165,6 +167,8 @@ export class UI {
       <div class="menu-row"><button class="b" data-a="endless">ENDLESS WAVES (best: wave ${save.bestWave})</button></div></div>`, 'campaign');
   }
   hangar() {
+    const scrollTop = this.panel === 'hangar' ? this.root.querySelector('.card').scrollTop : 0;
+    const scrollLeft = this.panel === 'hangar' ? this.root.querySelector('.planes').scrollLeft : 0;
     const sel = planeById(this.hangarSel || save.sel);
     const owned = save.owned.includes(sel.id);
     const st = statsFor(sel.id, upOf(sel.id));
@@ -192,6 +196,8 @@ export class UI {
       ${owned ? `<div class="ups">${ups}</div>` : '<div style="font-weight:800">Buy this plane to upgrade it.</div>'}
       </div>`, 'hangar');
     this.mountPreview(sel.id, st.barrels);
+    this.root.querySelector('.card').scrollTop = scrollTop;
+    this.root.querySelector('.planes').scrollLeft = scrollLeft;
   }
   /** a little turntable of the selected plane inside the hangar card (its own small renderer) */
   mountPreview(id, barrels) {
@@ -208,24 +214,42 @@ export class UI {
       const d = new THREE.DirectionalLight(0xfff1d8, 2.2); d.position.set(-4, 6, 5); sc.add(d);
       const cam = new THREE.PerspectiveCamera(30, 2, 1, 200);
       cam.position.set(0, 6.5, 25); cam.lookAt(0, 0.6, 0);
-      this.pv = { c, r, sc, cam, model: null, key: '' };
+      const observer = new ResizeObserver(([entry]) => this.resizePreview(entry.target));
+      this.pv = { c, r, sc, cam, observer, model: null, key: '' };
     }
     const pv = this.pv;
     wrap.appendChild(pv.c);
     const key = id + ':' + barrels;
     if (pv.key !== key) {
-      if (pv.model) pv.sc.remove(pv.model);
+      if (pv.model) {
+        pv.sc.remove(pv.model);
+        const geometries = new Set();
+        pv.model.traverse((part) => { if (part.isMesh) geometries.add(part.geometry); });
+        for (const geometry of geometries) geometry.dispose();
+        // These materials belong to the model. The paint materials are shared.
+        for (const prop of pv.model.userData.props) prop.userData.disc.material.dispose();
+        pv.model.userData.flame?.material.dispose();
+      }
       pv.model = makePlane(id, planeById(id).colors, 0xe8433a, barrels);
+      if (pv.model.userData.flame) pv.model.userData.flame.visible = false;
+      pv.model.rotation.y = 2.4;
       pv.sc.add(pv.model); pv.key = key;
     }
-    const w = wrap.clientWidth || 300, h = Math.round(Math.min(220, w * 0.42));
-    pv.r.setSize(w, h, false); pv.c.style.width = '100%'; pv.c.style.height = h + 'px';
+    this.resizePreview(wrap);
+    pv.observer.observe(wrap);
+  }
+  resizePreview(wrap) {
+    const pv = this.pv;
+    const w = wrap.clientWidth, h = wrap.clientHeight;
+    if (!w || !h || (pv.width === w && pv.height === h)) return;
+    pv.width = w; pv.height = h;
+    pv.r.setSize(w, h, false);
     pv.cam.aspect = w / h; pv.cam.updateProjectionMatrix();
   }
   tickPreview(dt, t) {
     const pv = this.pv;
     if (!pv || this.panel !== 'hangar' || !pv.model) return;
-    pv.model.rotation.y = t * 0.5; pv.model.rotation.z = Math.sin(t * 0.8) * 0.08;
+    pv.model.rotation.y += dt * 0.5; pv.model.rotation.z = Math.sin(t * 0.8) * 0.08;
     for (const p of pv.model.userData.props) p.rotation.z += dt * 30;
     if (pv.model.userData.pilot) animatePilot(pv.model.userData.pilot, t, 0.5, Math.sin(t * 0.7) * 0.9, 0.1, 0);
     pv.r.render(pv.sc, pv.cam);

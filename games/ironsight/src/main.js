@@ -30,7 +30,7 @@ import { HUD } from './ui/hud.js';
 import { Grenades, THROWABLES } from './game/grenades.js';
 import { Match, MODES, BOT_NAMES, PROTECT, TEAM_NAME, esc } from './game/match.js';
 import { Net } from './game/net.js';
-import { Gunsmith, loadLoadouts } from './ui/gunsmith.js';
+import { Gunsmith, loadLoadouts } from './ui/gunsmith.js?v=gunsmith-layout-1';
 import city from './maps/city.js';
 import desert from './maps/desert.js';
 import docks from './maps/docks.js';

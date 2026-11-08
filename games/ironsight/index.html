@@ -6,7 +6,7 @@
 <title>IRONSIGHT</title>
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="src/ui/ui.css">
+<link rel="stylesheet" href="src/ui/ui.css?v=gunsmith-layout-1">
 <link rel="stylesheet" href="../_shared/touch-combat.css">
 <script type="importmap">
 { "imports": {
@@ -147,6 +147,7 @@
     <div class="gs-sec gs-pre"><span>Save as</span><input id="gsPresetName" maxlength="24" placeholder="Preset name"><button id="gsPresetSave">Save preset</button></div>
     <div class="row-btn"><button data-act="gsBack">Back</button><button data-act="gsRange">Test in range</button><button data-act="gsSave" class="primary">Save loadout</button></div>
   </div>
+  <div class="gs-preview" aria-hidden="true"></div>
   <div class="gs-right">
     <div id="gsName"></div>
     <div id="gsStats"></div>
@@ -213,6 +214,6 @@
 <script>try { if (parent !== window && parent.__PLAYPILE_WEB) window.__PLAYPILE_WEB = 1; } catch (e) {}
 if (location.hostname === "playpile.net" || location.hostname === "www.playpile.net") window.__PLAYPILE_WEB = 1;
 if (window.__PLAYPILE_WEB) addEventListener("DOMContentLoaded", () => { const b = document.querySelector("[data-act=online]"); if (b) { b.disabled = true; b.style.opacity = 0.45; b.querySelector("small").textContent = "Online play: run the game locally (needs its server)"; } });</script>
-<script type="module" src="src/main.js"></script>
+<script type="module" src="src/main.js?v=gunsmith-layout-1"></script>
 </body>
 </html>

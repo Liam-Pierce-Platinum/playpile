@@ -597,8 +597,9 @@ export function drawPreview(canvas, style, team = 0) {
   ctx = g;
   const w = canvas.width, h = canvas.height;
   g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h);
-  const s = Math.min(w / 220, h / 120);
-  g.setTransform(s, 0, 0, -s, w / 2, h * 0.62);
+  // Frame the complete silhouette, including the longest boost flame.
+  const s = Math.min(w / 300, h / 165);
+  g.setTransform(s, 0, 0, -s, w / 2 + 28 * s, h * 0.62);
   g.fillStyle = 'rgba(0,0,0,0.35)'; g.beginPath(); g.ellipse(0, -38, 80, 8, 0, 0, Math.PI * 2); g.fill();
   const t = performance.now() / 1000;
   drawCar({ x: 0, y: 0, a: 0, dir: 1, team, boosting: true, supersonic: false, wheel: t * 6, demo: 0, turnT: 0, landT: 0 }, style, t);

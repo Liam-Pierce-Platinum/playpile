@@ -5,7 +5,7 @@ import { makeBot, botInput } from './bot.js';
 import { initInput, readInput, initTouch, touch, anyPressed, clearPressed } from './input.js';
 import { initAudio, sfxs, engine, crowdLevel, setMuted, setMusic, setMusicMode } from './audio.js';
 import { fx, resetFx, updateFx, sparks, dust, boostPuff, goalExplosion, demoBlast, ring, shake, popup, part } from './fx.js';
-import { initRender, resize, draw, updateCamera, TEAM, drawPreview, cam } from './render.js';
+import { initRender, resize, draw, updateCamera, TEAM, drawPreview, cam } from './render.js?v=garage-preview-1';
 import { save, persist } from './save.js';
 import { PAINTS, BODIES, TRAILS, GOALFX, UNLOCKS, LISTS, unlockLevel, XP_PER_LEVEL, levelFromXp, itemName } from './unlocks.js';
 

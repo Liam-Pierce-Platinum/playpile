@@ -38,7 +38,7 @@ export const GAMES = [
   {
     slug: "ironsight", title: "IRONSIGHT", how: 'mounted', port: 8430, url: "/",
     content: "A realistic military shooter against computer-controlled soldiers. Guns, grenades and headshots; no gore beyond a small hit effect. No accounts, no chat and no purchases. Online play only works when the game is run on your own computer.",
-    web: "ironsight/",
+    web: "ironsight/?v=gunsmith-layout-1",
     tag: "Realistic tactical FPS", big: true, added: '2026-10-18',
     cat: "Shooter", tags: ["new","shooter","fps","realistic","gunsmith","3d", "mobile"],
     blurb: "A realistic first-person shooter. Build your gun in the gunsmith, then fight nine bots in free-for-all or a 5v5 team match across four maps. Headshots kill instantly. Desktop only: needs a mouse and keyboard. Big download.",
@@ -193,7 +193,7 @@ Collect golden drops along the way and spend them in the Garage on Engine, Soft 
   {
     slug: "stunt-city", title: "STUNT CITY", how: 'mounted', port: 8413, url: "/",
     content: "A chrome car in a free-roam neon stunt park with ramps and loops. Wipe-outs just reset the car; no people. Neon colours but no flashing.",
-    web: "stunt-city/",
+    web: "stunt-city/?v=garage-controls-1",
     tag: "Vaporwave stunt park", big: true, added: '2026-10-18',
     cat: "Driving", tags: ["new","driving","stunts","free roam","loops","vaporwave","3d","mobile"],
     blurb: "Drive a chrome car around a vaporwave stunt park. Flip, spin and barrel-roll off ramps and loops, clear eight challenges and upgrade your ride.",
@@ -455,7 +455,7 @@ Play Team KO, King of the Hill or a one-on-one Duel across four maps: the rug, a
   {
     slug: "ski-mountain", title: "SKI MOUNTAIN", how: 'mounted', port: 8397, url: "/",
     content: "Skiing and snowboarding with cartoon wipeouts and no injuries shown. The screen shakes on crashes and there are fast-moving speed lines at high speed, but no flashing lights.",
-    web: "ski-mountain/",
+    web: "ski-mountain/?v=touch-pause-1",
     tag: "Endless ski", big: true, added: '2026-10-14',
     cat: "Sport", tags: ["ski","snowboard","tricks","endless","winter","3d","mobile"],
     blurb: "One endless, ever-faster downhill. Weave the trees, hit the kickers, spin and flip with the mouse, and see how far you get on three lives.",
@@ -534,7 +534,7 @@ There are 24 missions across fishing boats, ferries, cargo ships, cruise liners,
   {
     slug: "sky-aces", title: "SKY ACES", how: 'mounted', port: 8380, url: "/",
     content: "Cartoon plane dogfights: planes are shot down in fireballs with smoke and falling wreckage, no people are shown hurt. Bright explosion and muzzle flashes, a red flash at the screen edges when you are hit, screen shake, and the screen briefly turns white when you fly through a cloud.",
-    web: "sky-aces/?v=red-fleet-1",
+    web: "sky-aces/?v=hangar-2",
     tag: "Dogfight", big: true, added: '2026-10-13',
     cat: "Shooter", tags: ["planes","dogfight","airships","3d","upgrades","online","mobile"],
     blurb: "Arcade dogfights in a bright cartoon sky. Shoot down raiders, aces, bombers and armoured airships, then spend the money on faster planes.",
@@ -613,7 +613,7 @@ There are fifteen spells to learn from spellbooks, from Fireball and Chain Light
   {
     slug: "frontline", title: "FRONTLINE", how: 'mounted', port: 8377, url: "/",
     content: "A war shooter with guns, grenades and explosions against simple low-poly soldiers. Hits show a small red puff and soldiers tumble when they fall; no gore. Muzzle flashes and explosion flashes.",
-    web: "frontline/",
+    web: "frontline/?v=armory-fix-1",
     tag: "FPS", big: true, added: '2026-10-12',
     cat: "Shooter", tags: ["fps","squad","ai","low poly","3d","armory","war", "mobile"],
     blurb: "A low-poly squad shooter against soldiers who take cover, flank, suppress, throw grenades and call out your position.",
@@ -666,7 +666,7 @@ Every fifth stage is a boss log with a carved angry face: Old Gnarl, Iron Bark, 
   {
     slug: "car-soccer", title: "TURBO GOAL", how: 'mounted', port: 8363, url: "/",
     content: "Cartoon cars play football with a giant ball. Cars can be rammed and blown up (demolished) and come straight back; nobody is shown hurt. Every goal sets off a big explosion with a bright coloured flash.",
-    web: "car-soccer/",
+    web: "car-soccer/?v=garage-preview-1",
     tag: "Sport", big: false, added: '2026-10-11',
     cat: "Sport", tags: ["football","cars","boost","2 players","bots","versus","mobile"],
     blurb: "Rocket-car football from the side: boost, double jump and flip into a giant ball to smash it into the net.",
@@ -1017,7 +1017,7 @@ Walk one tile behind a guard and he never knows. Duck into a potted fern or a lo
   {
     slug: "derby", title: "DEMOLITION DERBY", how: 'mounted', port: 8302, url: "/",
     content: "Cartoon top-down cars ram each other, lose panels, smoke and catch fire. There are no people shown and nobody is hurt.",
-    web: "derby/",
+    web: "derby/?v=garage-return-1",
     tag: "Driving", big: false, added: '2026-10-09',
     cat: "Driving", tags: ["demolition derby","cars","crashing","top down","arena","destruction","physics", "mobile"],
     blurb: "Eight cars, one dirt bowl, and the last one still running wins.",
@@ -1043,7 +1043,7 @@ Race puts you on a grid with three rivals, Kenta, Shin and Mika, for an eighty-s
   {
     slug: "blade-dash", title: "BLADE DASH", how: 'mounted', port: 8296, url: "/",
     content: "Stylised ink stick-figure samurai fights: enemies split in two when cut, barrels explode, and hits leave red ink splats on the paper. No realistic blood or gore.",
-    web: "blade-dash/",
+    web: "blade-dash/?v=local-fonts-1",
     tag: "Action", big: false, added: '2026-10-09',
     cat: "Action", tags: ["samurai","ink","slash","combo","one touch","endless","mobile"],
     blurb: "Tap to dash-slash. Every kill refills your dash, so the whole room can be one unbroken chain.",

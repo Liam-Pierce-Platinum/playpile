@@ -33,11 +33,12 @@ h2 { font-weight: 300; letter-spacing: .4em; text-transform: uppercase; margin: 
 .row-btn button { min-width: 150px; }
 
 #gunsmith { background: none; flex-direction: row; justify-content: space-between; align-items: stretch; padding: 0; pointer-events: none; }
-.gs-left { pointer-events: auto; width: 380px; padding: 28px 30px; background: var(--panel); overflow-y: auto; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+.gs-left { pointer-events: auto; box-sizing: border-box; width: min(38%, 380px); padding: 28px 30px; background: var(--panel); overflow-y: auto; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+.gs-preview { flex: 1; min-width: 0; }
 .gs-sec { display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: var(--mute); text-transform: uppercase; letter-spacing: .1em; }
 .gs-sec em { font-style: normal; color: var(--fg); font-size: 11px; }
 .gs-sec .tog { display: inline-flex; }
-.gs-right { pointer-events: none; width: 340px; padding: 28px; display: flex; flex-direction: column; justify-content: flex-end; ; background: linear-gradient(90deg, rgba(10,13,16,0), rgba(10,13,16,.82) 18%); padding-left: 48px; }
+.gs-right { pointer-events: none; box-sizing: border-box; width: min(31%, 340px); padding: 28px; display: flex; flex-direction: column; justify-content: flex-end; background: linear-gradient(90deg, rgba(10,13,16,0), rgba(10,13,16,.82) 18%); padding-left: 48px; }
 #gsName { font-size: 28px; font-weight: 300; letter-spacing: .3em; text-transform: uppercase; margin-bottom: 14px; }
 #gsStats .st { margin: 7px 0; font-size: 11px; letter-spacing: .12em; color: var(--mute); text-transform: uppercase; }
 #gsStats .st div { height: 4px; background: #1c2227; margin-top: 4px; position: relative; }
@@ -247,8 +248,14 @@ h2 { font-weight: 300; letter-spacing: .4em; text-transform: uppercase; margin: 
 .touch-combat .ol-cols { flex-wrap: wrap; }
 .touch-combat .ol-box { box-sizing: border-box; min-width: 0; max-width: 100%; }
 .touch-combat #gunsmith { display: flex; overflow: hidden; }
-.touch-combat #gunsmith .gs-left { box-sizing: border-box; width: min(100%,355px); max-height: 100%; padding: 12px 14px; touch-action: pan-y; }
+.touch-combat #gunsmith .gs-left { width: min(44%, 355px); max-height: 100%; padding: 12px 14px; touch-action: pan-y; }
 .touch-combat #gunsmith .gs-right { display: none; }
+@media (orientation: portrait) {
+  #gunsmith { flex-direction: column; }
+  #gunsmith .gs-left, .touch-combat #gunsmith .gs-left { width: 100%; flex: 1; min-height: 0; }
+  #gunsmith .gs-preview { order: -1; flex: 0 0 38%; }
+  #gunsmith .gs-right { display: none; }
+}
 .touch-combat .ld-hdr { padding: 8px 12px; letter-spacing: .1em; }
 .touch-combat .ld-mid h1 { font-size: clamp(31px,9vw,64px); letter-spacing: .12em; }
 .touch-combat .ld-foot { grid-template-columns: minmax(0,1fr); gap: 6px; padding: 0 12px 15px; }

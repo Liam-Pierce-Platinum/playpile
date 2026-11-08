@@ -2,16 +2,16 @@
 import * as THREE from '../vendor/three.module.js';
 import { makeRenderer, buildWorld, ARENA, groundAt } from './world.js';
 import { FX } from './fx.js';
-import { Game } from './game.js?v=red-fleet-1';
+import { Game } from './game.js?v=hangar-2';
 import { Input } from './input.js';
-import { UI } from './ui.js?v=red-fleet-1';
-import { Online } from './online.js?v=red-fleet-1';
-import { Brain } from './ai.js?v=red-fleet-1';
-import { makePlane, animatePilot } from './models.js?v=red-fleet-1';
-import { planeById, statsFor, upOf } from './meta.js?v=red-fleet-1';
+import { UI } from './ui.js?v=hangar-2';
+import { Online } from './online.js?v=hangar-2';
+import { Brain } from './ai.js?v=hangar-2';
+import { makePlane, animatePilot } from './models.js?v=hangar-2';
+import { planeById, statsFor, upOf } from './meta.js?v=hangar-2';
 import { clamp, damp, QS, rand } from './util.js';
-import { save, persist, addMoney, MISSIONS } from './meta.js?v=red-fleet-1';
-import * as A from './audio.js?v=red-fleet-1';
+import { save, persist, addMoney, MISSIONS } from './meta.js?v=hangar-2';
+import * as A from './audio.js?v=hangar-2';
 
 const canvas = document.getElementById('c');
 const lowq = QS.has('lq') || (matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) < 500);
@@ -53,6 +53,7 @@ app.shake = (n) => { trauma = Math.min(1, trauma + n); };
 function begin(cfg) {
   game.start(cfg);
   app.state = 'play';
+  app.paused = false;
   input.enabled = true;
   input.lock();
   if (game.player) { anglesFromDir(game.player.fwd); camOff.set(0, 6, 24).applyQuaternion(game.player.quat); }
@@ -76,11 +77,13 @@ app.onlineEnd = (res) => {
   save.kills += game.kills; persist();
   setTimeout(() => ui.onlineResults(res, { place, bonus, earned: game.earned, total }), 1200);
 };
-app.quit = () => {
+app.quit = (panel = 'title') => {
   if (game.mode === 'online') { online.leave(); app.endOnline(); return; }
   game.running = false; game.clear(); app.state = 'menu'; input.enabled = false; input.unlock();
+  app.paused = false;
   A.engineSet(false, 0, false); A.sLockTone(0);
-  ui.title();
+  if (panel === 'hangar') ui.hangar();
+  else ui.title();
 };
 app.pause = (on) => {
   if (game.mode === 'online') { if (on) ui.pauseMenu(); else ui.hud(); app.paused = false; return; }
@@ -223,9 +226,10 @@ app.setShowcase = (id, panel) => {
   if (show) show.visible = !!id && panel === 'title';
 };
 function updateShowcase(dt, t) {
-  if (!show || !show.visible) return;
+  if (!show || ui.panel !== 'title') return;
   const asp = innerWidth / innerHeight;
-  if (asp < 0.9) { show.visible = false; return; }
+  show.visible = asp >= 0.9;
+  if (!show.visible) return;
   const dist = 44;
   const halfH = Math.tan(camera.fov * Math.PI / 360) * dist, halfW = halfH * asp;
   const right = tmp.set(1, 0, 0).applyQuaternion(camera.quaternion), upv = tmp2.set(0, 1, 0).applyQuaternion(camera.quaternion);

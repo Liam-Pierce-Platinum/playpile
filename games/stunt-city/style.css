@@ -31,12 +31,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#12031f;color:#fff;f
 #title{background:none;border:none;box-shadow:none}
 #title h1{font-size:min(19vw,120px);line-height:.9;font-style:italic;font-weight:900;background:linear-gradient(#fff 10%,#ffd1f1 40%,#ff3fa4 52%,#5b0c8a 54%,#7ff6ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(4px 4px 0 #2a0a45)}
 #title p{margin:10px 0 22px;color:#ffd6f4;letter-spacing:2px}
-#garList{display:grid;gap:8px;margin:10px 0 16px;min-width:min(380px,80vw)}
+#garage{width:min(444px,calc(100vw - 32px))}
+#garList{display:grid;gap:8px;margin:10px 0 16px}
 .gi{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 10px;border:1px solid #ff9ee055;text-align:left}
 .gi b{color:#7ff6ff}
 .gi .btn{font-size:13px;padding:5px 12px}
-.sw{display:inline-block;width:18px;height:18px;border-radius:50%;border:2px solid #fff;margin-right:4px;cursor:pointer;pointer-events:auto;vertical-align:middle}
+.gi.paint,.swatches{display:flex;flex-wrap:wrap}
+.swatches{gap:6px}
+.sw{width:24px;height:24px;border-radius:50%;border:2px solid #fff;cursor:pointer}
 .sw.on{box-shadow:0 0 0 2px #fff36b}
+.sw:focus-visible{outline:2px solid #7ff6ff;outline-offset:2px}
+.sw:disabled{opacity:.45;cursor:not-allowed}
 #touch{display:none}
 body.touch #touch{display:block}
 body.touch #hint{display:none}
@@ -51,7 +56,9 @@ body.touch #spd b{font-size:30px}
   html,body { touch-action: manipulation; }
   .tb { touch-action: none; }
   #garage,#card { max-height: calc(100dvh - 24px); overflow: auto; overscroll-behavior: contain; touch-action: pan-y; }
+  #garage { padding-inline: 16px; }
   #garBtn,#garage button,#card button { min-height: 44px; }
+  #garage .sw { width: 44px; height: 44px; }
   #hint { display: none; }
   .tb { width: clamp(46px,16vmin,66px); height: clamp(46px,16vmin,66px); padding: 0; font-size: 14px; }
   #tL { left: max(10px,env(safe-area-inset-left)); bottom: 12px; }

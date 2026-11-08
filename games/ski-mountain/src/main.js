@@ -203,7 +203,13 @@ function start() {
   popup('GO!', 'it only gets faster', 'big'); updPill(); updGearChip();
   save.runs++; persist();
 }
-function openMenu() { G.menuFromRun = G.state === 'play' && P.time > 1 && P.state !== 'dead'; G.state = 'menu'; G.orbitT = 0; $('card').classList.add('hidden'); $('hint').classList.add('hidden'); G.hintT = 0; renderMenu(); $('menu').classList.remove('hidden'); $('hud').classList.add('hidden'); if (document.pointerLockElement) document.exitPointerLock(); }
+function openMenu(fromRun = G.state === 'play' && P.state !== 'dead') {
+  G.menuFromRun = fromRun; G.state = 'menu'; G.orbitT = 0;
+  touches.clear(); I.touchGrab = I.touchJump = false;
+  $('card').classList.add('hidden'); $('hint').classList.add('hidden'); G.hintT = 0;
+  renderMenu(); $('menu').classList.remove('hidden'); $('hud').classList.add('hidden');
+  if (document.pointerLockElement) document.exitPointerLock();
+}
 function closeMenu() { $('menu').classList.add('hidden'); G.state = G.result ? 'result' : 'play'; if (G.state === 'play') $('hud').classList.remove('hidden'); if (G.state === 'result') $('card').classList.remove('hidden'); }
 
 function crash(why) {
@@ -526,7 +532,7 @@ function renderMenu() {
   const B = save.best.endless;
   $('mbest').innerHTML = [['BEST SCORE', B ? fmt(B.score) : '-'], ['FURTHEST', B ? (B.dist / 1000).toFixed(2) + ' km' : '-'], ['TOP SPEED', B && B.kmh ? B.kmh + ' km/h' : '-']].map(([k, v]) => `<div><small>${k}</small><b>${v}</b></div>`).join('');
   const K2 = isTouch
-    ? [['left drag', 'steer · up tuck · down brake'], ['right hold + release', 'jump'], ['right drag in air', 'spin / flip'], ['GRAB', 'grab'], ['gear chip', 'swap skis / board']]
+    ? [['left drag', 'steer · up tuck · down brake'], ['right hold + release', 'jump'], ['right drag in air', 'spin / flip'], ['GRAB', 'grab'], ['gear chip', 'swap skis / board'], ['pause button', 'open this menu']]
     : [['A / D or mouse', 'steer'], ['W / S', 'tuck (faster) / brake'], ['SPACE or click', 'hold + release = jump'], ['mouse in the air', 'spin + flip'], ['SHIFT / right-click', 'grab'], ['SCROLL WHEEL', 'swap skis / snowboard'], ['R · M · ESC', 'restart · mute · this screen']];
   $('mkeys').innerHTML = K2.map(([k, v]) => `<span class="k">${k}</span><span>${v}</span>`).join('');
   $('mch').innerHTML = `<div class="chh">CHALLENGES ${done}/${CH.length}</div>` + CH.map(([id, t]) => `<div class="ch ${save.ch[id] ? 'done' : ''}">${save.ch[id] ? '✓' : '○'} ${t}</div>`).join('');
@@ -536,6 +542,7 @@ function renderMenu() {
 }
 $('mresume').onclick = closeMenu;
 $('mplay').onclick = start;
+$('pauseGame').onclick = () => { if (G.state === 'play') openMenu(); };
 
 // ---------------- camera + visuals ----------------
 const qA = new THREE.Quaternion(), qY = new THREE.Quaternion(), qF = new THREE.Quaternion(), qL = new THREE.Quaternion(), XA = new V3(1, 0, 0), ZA = new V3(0, 0, 1);
@@ -654,7 +661,7 @@ function frame(now) {
 }
 // boot: land straight in gameplay; ?title shows the menu
 start();
-if (qs.has('title')) openMenu();
+if (qs.has('title')) openMenu(false);
 if (save.runs <= 1 && !qs.has('nohint')) { G.hintT = 9; $('hint').classList.remove('hidden'); }
 $('lockhint').classList.toggle('hidden', isTouch);
 requestAnimationFrame(frame);

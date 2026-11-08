@@ -23,7 +23,7 @@ function database() {
   };
 }
 
-test('engagement worker accepts both production origins and binds only cumulative page time', async () => {
+test('engagement worker accepts both production origins and preserves missing play time', async () => {
   const { writes, env } = database();
   for (const origin of [ORIGIN, 'https://www.playpile.net']) {
     const response = await worker.fetch(collect(JSON.stringify({ ...payload, visit: VISIT.toUpperCase() }), { origin }), env);
@@ -34,10 +34,21 @@ test('engagement worker accepts both production origins and binds only cumulativ
   }
   assert.equal(writes.length, 2);
   for (const { sql, params } of writes) {
-    assert.deepEqual(params, [VISIT, PAGE, 12345]);
+    assert.deepEqual(params, [VISIT, PAGE, 12345, null]);
     assert.match(sql, /ON CONFLICT \(visit_id, page_id\) DO UPDATE/);
     assert.match(sql, /MAX\(engagement_pages\.active_ms, excluded\.active_ms\)/);
   }
+});
+
+test('engagement worker accepts only cumulative play time within dwell time', async () => {
+  const { writes, env } = database();
+  for (const playMs of [0, 5_000, payload.ms]) {
+    assert.equal((await worker.fetch(collect(JSON.stringify({ ...payload, playMs })), env)).status, 204);
+  }
+  for (const playMs of [-1, 1.5, '5000', null, payload.ms + 1]) {
+    assert.equal((await worker.fetch(collect(JSON.stringify({ ...payload, playMs })), env)).status, 400);
+  }
+  assert.deepEqual(writes.map(write => write.params[3]), [0, 5_000, payload.ms]);
 });
 
 test('engagement worker rejects invalid and oversized beacons without writing to D1', async () => {

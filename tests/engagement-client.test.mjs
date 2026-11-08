@@ -32,6 +32,7 @@ async function withBrowser(options, run) {
   const stored = options.stored ?? new Map();
   const reports = [];
   const timers = new Map();
+  let onFrameVisibilityChange;
   const sessionStorage = {
     getItem: key => stored.get(key) ?? null,
     setItem: (key, value) => stored.set(key, String(value)),
@@ -40,8 +41,9 @@ async function withBrowser(options, run) {
   const send = (url, body) => {
     assert.equal(url, endpoint);
     const record = JSON.parse(body);
-    assert.deepEqual(Object.keys(record).sort(), ['ms', 'page', 'visit']);
+    assert.deepEqual(Object.keys(record).sort(), ['ms', 'page', 'playMs', 'visit']);
     assert.ok(Number.isInteger(record.ms) && record.ms >= 0);
+    assert.ok(Number.isInteger(record.playMs) && record.playMs >= 0 && record.playMs <= record.ms);
     reports.push(record);
   };
   const navigator = {
@@ -53,6 +55,7 @@ async function withBrowser(options, run) {
     },
   };
   const frame = options.frame ? Object.assign(new BrowserEvents(), {
+    hidden: true,
     contentWindow: new BrowserEvents(),
     contentDocument: new BrowserEvents(),
   }) : null;
@@ -67,7 +70,7 @@ async function withBrowser(options, run) {
   const crypto = {
     randomUUID: () => '00000000-0000-4000-8000-' + String(++uuidCounter).padStart(12, '0'),
   };
-  const location = { hostname: 'playpile.net', origin: 'https://playpile.net' };
+  const location = { hostname: 'playpile.net', origin: 'https://playpile.net', pathname: options.path ?? '/' };
   Object.assign(window, { self: window, top: window, crypto, location });
   class ClockDate extends Date {
     static now() { return baseTime + elapsed; }
@@ -75,6 +78,10 @@ async function withBrowser(options, run) {
   const globals = {
     window, document, navigator, sessionStorage, crypto, location, Date: ClockDate,
     performance: { now: () => elapsed },
+    MutationObserver: class {
+      constructor(callback) { this.callback = callback; }
+      observe() { onFrameVisibilityChange = this.callback; }
+    },
     fetch(url, { body }) {
       send(url, body);
       return Promise.resolve({ ok: true });
@@ -115,6 +122,16 @@ async function withBrowser(options, run) {
     async frameInput() {
       frame.contentDocument.dispatch('pointerdown');
       frame.contentWindow.dispatch('pointerdown');
+      await settle();
+    },
+    async frameVisible(visible) {
+      frame.hidden = !visible;
+      onFrameVisibilityChange();
+      await settle();
+    },
+    async frameFocus(hasFocus) {
+      document.activeElement = hasFocus ? frame : null;
+      frame.contentWindow.dispatch(hasFocus ? 'focus' : 'blur');
       await settle();
     },
     async visible(visible) {
@@ -178,10 +195,52 @@ test('idle time is capped and trusted gameplay input restarts the clock', async 
     await browser.active(false);
     await browser.advance(30_000);
     assert.equal(browser.reports.at(-1)?.ms, 90_000, 'untrusted input cannot resume the timer');
+    await browser.frameVisible(true);
+    await browser.frameFocus(true);
     await browser.frameInput();
     await browser.advance(12_000);
     await browser.pagehide();
     assert.equal(browser.reports.at(-1)?.ms, 102_000, 'input in the game frame resumes the same page');
+    assert.equal(browser.reports.at(-1)?.playMs, 12_000);
+  });
+});
+
+test('cabinet play time requires a visible, focused game and ignores activity outside it', async () => {
+  await withBrowser({ frame: true }, async browser => {
+    await browser.advance(10_000);
+    await browser.frameVisible(true);
+    await browser.advance(5_000);
+    await browser.frameFocus(true);
+    await browser.frameInput();
+    await browser.advance(60_000);
+    await browser.active();
+    await browser.advance(40_000);
+    assert.equal(browser.reports.at(-1).playMs, 75_000);
+    await browser.frameInput();
+    await browser.advance(10_000);
+    await browser.frameFocus(false);
+    await browser.advance(5_000);
+    await browser.frameFocus(true);
+    await browser.advance(3_000);
+    await browser.frameVisible(false);
+    await browser.advance(2_000);
+    await browser.pagehide();
+    assert.equal(browser.reports.at(-1).ms, 135_000);
+    assert.equal(browser.reports.at(-1).playMs, 103_000);
+  });
+});
+
+test('a standalone game counts active dwell as play time', async () => {
+  await withBrowser({ path: '/games/sky-aces/' }, async browser => {
+    await browser.advance(10_000);
+    await browser.visible(false);
+    await browser.advance(5_000);
+    await browser.visible(true);
+    await browser.active();
+    await browser.advance(5_000);
+    await browser.pagehide();
+    assert.equal(browser.reports.at(-1).ms, 15_000);
+    assert.equal(browser.reports.at(-1).playMs, 15_000);
   });
 });
 

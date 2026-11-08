@@ -14,6 +14,9 @@ export function startEngagement(endpoint) {
 
   const visible = () => document.visibilityState === 'visible';
   const focused = () => visible() && document.hasFocus();
+  const standalone = location.pathname?.startsWith('/games/');
+  const frame = document.getElementById('frame');
+  const gameFocused = () => standalone || (frame && !frame.hidden && document.activeElement === frame);
   const freshVisit = () => ({ id: crypto.randomUUID(), last: Date.now() });
   function readVisit() {
     try {
@@ -27,27 +30,51 @@ export function startEngagement(endpoint) {
   let visit = readVisit();
   let page = crypto.randomUUID();
   let activeMs = 0, delivered = -1, sending;
+  let gameMs = 0, deliveredPlay = -1;
   let lastSample = performance.now();
   let idleAt = lastSample + IDLE_MS;
+  let gameIdleAt = idleAt;
   let running = focused();
+  let playing = running && gameFocused();
 
   function saveVisit() {
     try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(visit)); } catch {}
   }
 
   function sample(now = performance.now()) {
-    if (running) activeMs += Math.max(0, Math.min(now, idleAt) - lastSample);
+    if (running) {
+      const end = Math.min(now, idleAt);
+      activeMs += Math.max(0, end - lastSample);
+      if (playing) gameMs += Math.max(0, Math.min(end, gameIdleAt) - lastSample);
+    }
     lastSample = now;
   }
 
+  function updatePlay(now, gameInput = false) {
+    const next = running && focused() && gameFocused();
+    if (next && (!playing || gameInput)) gameIdleAt = now + IDLE_MS;
+    playing = next;
+  }
+
+  function syncPlay() {
+    const now = performance.now();
+    sample(now);
+    updatePlay(now);
+  }
+
   function report(final = false) {
-    sample();
+    syncPlay();
     saveVisit();
     const ms = Math.min(MAX_PAGE_MS, Math.floor(activeMs));
-    if (ms <= delivered || (!final && sending === page)) return;
+    const playMs = Math.min(ms, Math.floor(gameMs));
+    if ((ms <= delivered && playMs <= deliveredPlay) || (!final && sending === page)) return;
     const reportPage = page;
-    const body = JSON.stringify({ visit: visit.id, page: reportPage, ms });
-    const acknowledge = () => { if (page === reportPage) delivered = Math.max(delivered, ms); };
+    const body = JSON.stringify({ visit: visit.id, page: reportPage, ms, playMs });
+    const acknowledge = () => {
+      if (page !== reportPage) return;
+      delivered = Math.max(delivered, ms);
+      deliveredPlay = Math.max(deliveredPlay, playMs);
+    };
     if (final && navigator.sendBeacon?.(endpoint, body)) { acknowledge(); return; }
     sending = reportPage;
     fetch(endpoint, { method: 'POST', body, credentials: 'omit', keepalive: true })
@@ -61,9 +88,11 @@ export function startEngagement(endpoint) {
     page = crypto.randomUUID();
     activeMs = 0;
     delivered = -1;
+    gameMs = 0;
+    deliveredPlay = -1;
   }
 
-  function activity(event) {
+  function activity(event, gameInput = false) {
     if ((event && !event.isTrusted) || !visible()) return;
     const now = performance.now();
     sample(now);
@@ -75,11 +104,13 @@ export function startEngagement(endpoint) {
     visit.last = Date.now();
     idleAt = now + IDLE_MS;
     running = true;
+    updatePlay(now, gameInput || Boolean(standalone && event));
   }
 
   function pause() {
     sample();
     running = false;
+    playing = false;
     if (activeMs > 0 || delivered >= 0) report(true);
   }
 
@@ -103,17 +134,24 @@ export function startEngagement(endpoint) {
 
   // The portal and its game are same-origin, but game input does not bubble
   // to the cabinet page. Capture activity in both and count the time once.
-  const frame = document.getElementById('frame');
   const watched = new WeakSet();
+  const gameActivity = event => activity(event, true);
+  const gameFocusChanged = () => queueMicrotask(syncPlay);
   function watchGame() {
+    syncPlay();
     try {
       const game = frame.contentDocument;
       if (!game || watched.has(game)) return;
       watched.add(game);
-      for (const type of ACTIVITY) game.addEventListener(type, activity, CAPTURE);
+      for (const type of ACTIVITY) game.addEventListener(type, gameActivity, CAPTURE);
+      frame.contentWindow.addEventListener('focus', gameFocusChanged);
+      frame.contentWindow.addEventListener('blur', gameFocusChanged);
     } catch { /* An inaccessible iframe does not affect the cabinet. */ }
   }
   if (frame) {
+    document.addEventListener('focusin', gameFocusChanged);
+    frame.addEventListener('focus', gameFocusChanged);
+    new MutationObserver(syncPlay).observe(frame, { attributes: true, attributeFilter: ['hidden'] });
     frame.addEventListener('load', watchGame);
     watchGame();
   }

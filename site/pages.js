@@ -38,9 +38,12 @@ export const aboutHtml = (g) => String(g.about || '').split(/\n\s*\n/).map(clean
 export const keysHtml = (g) => (g.controls || [])
   .map(([k, w]) => '<li><kbd>' + esc(k) + '</kbd><span>' + esc(w) + '</span></li>').join('');
 
-export const tagsHtml = (g) => [catOf(g), ...(g.tags || [])].map((t, i) => i
-  ? '<a class="chip" href="/browse/?q=' + encodeURIComponent(t) + '">' + esc(t) + '</a>'
-  : '<a class="chip on" href="' + catUrl(t) + '">' + esc(t) + '</a>').join('');
+export const tagsHtml = (g) => [catOf(g), ...(g.tags || [])].map((t, i) => {
+  const label = esc(t.replace(/\p{L}/u, (letter) => letter.toUpperCase()));
+  return i
+    ? '<a class="chip" href="/browse/?q=' + encodeURIComponent(t) + '">' + label + '</a>'
+    : '<a class="chip on" href="' + catUrl(t) + '">' + label + '</a>';
+}).join('');
 
 export const crumbsHtml = (g) => '<a href="/browse/">Games</a><i>&rsaquo;</i>'
   + '<a href="' + catUrl(catOf(g)) + '">' + esc(catOf(g)) + '</a>'

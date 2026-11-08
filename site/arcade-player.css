@@ -169,6 +169,42 @@
 .stage-controls .stage-music[aria-pressed="false"] { color: #a2acb5; text-decoration: line-through; }
 .stage-controls button:focus-visible { outline-offset: -4px; }
 
+.arcade-site .about h4:has(+ .keys) {
+  color: var(--text);
+  font-size: 1rem;
+  letter-spacing: .08em;
+}
+
+.arcade-site .about .keys {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr));
+  gap: 10px;
+}
+
+.arcade-site .about .keys > li {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 6px;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 2px;
+  font: 1rem/1.35 var(--sans);
+  overflow-wrap: anywhere;
+}
+
+.arcade-site .about .keys kbd {
+  max-width: 100%;
+  padding: 4px 7px;
+  border-radius: 2px;
+  background: var(--ink);
+  color: var(--text);
+  font: 700 .875rem/1.2 var(--sans);
+  letter-spacing: normal;
+  white-space: normal;
+}
+
+.arcade-site .about .keys span { font: inherit; }
+
 @media (max-width: 560px) {
   body:has(.player-computer) .shell > main { padding-inline: 9px; }
   .arcade-site .stagebar button, .arcade-site .stagebar .lnk { min-height: 44px; }

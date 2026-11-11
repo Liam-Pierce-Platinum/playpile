@@ -45,6 +45,22 @@ test('card text is escaped rather than being treated as markup',()=>{
 test('information pages do not access the absent recommendations element',async()=>{
  for(const p of ['articles/index.html','devlog/index.html','articles/games-that-play-well-on-a-phone/index.html'])assert.ok(!(await read(p)).includes("document.getElementById('picks').innerHTML"),p);
 });
+test('sitemap pages declare their canonical URL and link directly to games and categories',async()=>{
+ const sitemap=await read('sitemap.xml');
+ const urls=[...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match=>new URL(match[1]));
+ assert.ok(urls.length>0);
+ const paths=new Set(urls.map(url=>url.pathname));
+ for(const game of GAMES)assert.ok(paths.has(playUrl(game)),game.slug+' is missing from the sitemap');
+ for(const url of urls){
+  const file=url.pathname.slice(1)+(url.pathname.endsWith('/')?'index.html':'');
+  const html=await read(file);
+  const canonicals=[...html.matchAll(/<link rel="canonical" href="([^"]+)">/g)].map(match=>match[1]);
+  assert.deepEqual(canonicals,[url.href],file);
+  for(const [,target] of html.matchAll(/<a\b[^>]*?\s+href\s*=\s*["'](\/(?:play|category)\/[a-z0-9-]+\/)(?=["'?#])/gi)){
+   assert.ok(paths.has(target),`${file} links to ${target} instead of its canonical URL`);
+  }
+ }
+});
 test('local save keys and avatar ids survive the redesign',async()=>{
  const avatar=await read('site/avatar.js'),progress=await read('site/progress.js'),shell=await read('site/arcade-shell.js');assert.ok(avatar.includes("localStorage.getItem('pd.site.avatar')"));assert.ok(avatar.includes("'g' + i"));for(const key of ['pd.site.stats','pd.site.badges','pd.site.daily','pd.site.favs'])assert.ok(progress.includes(key));assert.ok(shell.includes("localStorage.getItem('pd.recent')"));
 });

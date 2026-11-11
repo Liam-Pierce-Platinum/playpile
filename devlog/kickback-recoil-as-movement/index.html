@@ -43,7 +43,7 @@
       <article>
       <section class="hero"><h1>KICKBACK: when the gun is how you move</h1>
         <p id="lede"><time datetime="2026-09-22">22 September 2026</time> &middot; 5 min read</p></section>
-<p><a href="/play/kickback/">KICKBACK</a> is a small pixel-art shooter set on six floors of an unfinished tower over the harbour, with downtown across the water. You carry a sawed-off shotgun with two shells in it, and the shells are your legs. This post is about how that idea works in numbers, and about three bugs that made the fights feel wrong for reasons nobody could see.</p>
+<p><a href="/play/kickback-recoil-shooter-platformer/">KICKBACK</a> is a small pixel-art shooter set on six floors of an unfinished tower over the harbour, with downtown across the water. You carry a sawed-off shotgun with two shells in it, and the shells are your legs. This post is about how that idea works in numbers, and about three bugs that made the fights feel wrong for reasons nobody could see.</p>
 
 <h2>The gun is the movement system</h2>
 <p>Fire the gun and you get pushed the opposite way from where you aimed. In the code the kick is a single impulse of 10.8 against gravity of 27, applied directly against the aim. Shoot at the floor and you go up, about half a storey for one barrel. Fire both barrels quickly and you reach 27 metres a second, which clears a whole floor through the stairwell. Fire into a wall beside you and a muzzle-to-wall check adds up to 5 more, so a diagonal shot into concrete is a real wall jump rather than a nudge.</p>

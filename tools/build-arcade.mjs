@@ -8,6 +8,7 @@ import { WORLDS, newest, featured } from '../site/arcade-data.js';
 import { headerHTML, footerHTML, searchHTML, worldCardHTML, worldHeroHTML, gameCardHTML, escapeHTML as esc } from '../site/arcade-ui.js';
 import { friendsList } from '../site/multiplayer.js';
 import { gameHead, aboutHtml, keysHtml, tagsHtml, crumbsHtml, related, miniHtml, playUrl } from '../site/pages.js';
+import { CAT_SEO, OLD_SEO, catUrl } from '../site/seo.js';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const siteFiles=await fs.readdir(path.join(root,'site'));
 const modulePaths=siteFiles.filter(file=>file.endsWith('.js')).sort().map(file=>'/site/'+file).concat('/ads/ads.js');
@@ -19,7 +20,24 @@ const release=releaseHash.digest('hex').slice(0,8);
 // cached portal shell/avatar/catalogue with the new arcade entry points.
 const importMap='<script type="importmap">'+JSON.stringify({imports:Object.fromEntries(modulePaths.map(url=>[url,url+'?v='+release]))})+'</script>';
 const read=p=>fs.readFile(path.join(root,p),'utf8');
-const write=async(p,s)=>{if(p.endsWith('.html'))s=s.replace(/<script type="importmap">[\s\S]*?<\/script>\s*/g,'').replace('<head>','<head>'+importMap).replace(/(href|src)="(\/site\/(?:arcade[^"?]*\.(?:js|css)|account\.js))(?:\?[^\"]*)?"/g,(_,attr,url)=>`${attr}="${url}?v=${release}"`).replace(/\r\n?/g,'\n').replace(/[\t ]+$/gm,'');await fs.mkdir(path.dirname(path.join(root,p)),{recursive:true});await fs.writeFile(path.join(root,p),s);};
+const canonicalLinks=new Map(Object.keys(CAT_SEO).map(category=>[`/category/${category.toLowerCase()}/`,catUrl(category)]));
+for(const game of GAMES){
+ const canonical=playUrl(game);
+ canonicalLinks.set(`/play/${game.slug}/`,canonical);
+ const oldSlug=OLD_SEO[game.slug];
+ if(oldSlug)canonicalLinks.set(`/play/${oldSlug}/`,canonical);
+}
+const write=async(p,s)=>{
+ if(p.endsWith('.html')){
+  s=s.replace(/(<a\b[^>]*?\s+href\s*=\s*["'])(\/(?:play|category)\/[a-z0-9-]+\/)(?=["'?#])/gi,
+    (_,start,url)=>start+(canonicalLinks.get(url)??url));
+  s=s.replace(/<script type="importmap">[\s\S]*?<\/script>\s*/g,'').replace('<head>','<head>'+importMap)
+    .replace(/(href|src)="(\/site\/(?:arcade[^"?]*\.(?:js|css)|account\.js))(?:\?[^\"]*)?"/g,(_,attr,url)=>`${attr}="${url}?v=${release}"`)
+    .replace(/\r\n?/g,'\n').replace(/[\t ]+$/gm,'');
+ }
+ await fs.mkdir(path.dirname(path.join(root,p)),{recursive:true});
+ await fs.writeFile(path.join(root,p),s);
+};
 const extraStyles='<link rel="stylesheet" href="/site/arcade-return.css">\n<link rel="stylesheet" href="/site/arcade-locale.css">';
 const styles='<link rel="stylesheet" href="/site/arcade-characters.css">\n<link rel="stylesheet" href="/site/arcade.css">\n'+extraStyles;
 const client='<script type="module" src="/site/arcade-client.js"></script>';

@@ -236,9 +236,15 @@ test('the shipped iframe and each audio importer load the same versioned Sky Ace
   const read = path => readFileSync(new URL(`../games/sky-aces/${path}`, import.meta.url), 'utf8');
   const html = read('index.html');
   const entry = html.match(/<script type="module" src="([^"]+)"/)?.[1];
-  assert.equal(entry, `src/main.js?v=${version}`);
+  const entryUrl = new URL(entry, gameUrl);
+  assert.equal(entryUrl.pathname, '/games/sky-aces/src/main.js');
+  assert.ok(entryUrl.searchParams.get('v'), 'the game entry must bypass cached scripts');
   const main = read('src/main.js');
-  for (const module of ['game', 'ui']) assert.ok(main.includes(`'./${module}.js?v=${version}'`));
+  for (const module of ['game', 'ui']) {
+    const source = main.match(new RegExp(`from\\s+['"](\\./${module}\\.js[^'"]*)['"]`))?.[1];
+    const moduleVersion = new URL(source, entryUrl).searchParams.get('v');
+    assert.equal(moduleVersion, module === 'game' ? entryUrl.searchParams.get('v') : version);
+  }
   for (const module of ['main', 'game', 'ui']) {
     const audio = read(`src/${module}.js`).match(/\bfrom\s+['"](\.\/audio\.js[^'"]*)['"]/)?.[1];
     assert.equal(audio, `./audio.js?v=${version}`, `${module} must share the same audio instance`);

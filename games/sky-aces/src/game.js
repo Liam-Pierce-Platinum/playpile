@@ -283,7 +283,11 @@ export class Game {
     if (q.isPlayer && this.mode !== 'online') dmg *= 0.55; // arcade: the hero is tougher than the raiders
     const died = q.damage(dmg, owner, this);
     if (Math.random() < 0.3) this.fx.spark(at, 4, q.kind === 'fighter' ? 0.6 : 1);
-    if (Math.random() < (q.kind === 'fighter' ? 0.12 : 0.05)) this.fx.debrisBurst(at, q.vel, q.model.children[0] && q.model.children[0].material ? q.model.children[0].material.color.getHex() : 0x777777, 1);
+    if (Math.random() < (q.kind === 'fighter' ? 0.12 : 0.05)) {
+      const hullMaterial = q.model.children[0]?.material;
+      const paint = Array.isArray(hullMaterial) ? hullMaterial.find(material => material?.color) : hullMaterial;
+      this.fx.debrisBurst(at, q.vel, paint?.color?.getHex?.() ?? 0x777777, 1);
+    }
     if (owner && owner.isPlayer) this.emit('hit', { target: q, dmg });
     else if (owner && owner.human) this.emit('relayhit', { by: owner, target: q, dmg });
     if (q.isPlayer) { this.emit('hurt', { by: owner, dmg }); A.sHurt(); }

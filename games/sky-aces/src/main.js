@@ -2,7 +2,7 @@
 import * as THREE from '../vendor/three.module.js';
 import { makeRenderer, buildWorld, ARENA, groundAt } from './world.js';
 import { FX } from './fx.js';
-import { Game } from './game.js?v=hangar-2';
+import { Game } from './game.js?v=debris-1';
 import { Input } from './input.js';
 import { UI } from './ui.js?v=hangar-2';
 import { Online } from './online.js?v=hangar-2';

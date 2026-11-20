@@ -18,6 +18,7 @@ function setup(migrated = false) {
       PRIMARY KEY(visit_id,page_id));`);
     db.prepare('INSERT INTO engagement_pages VALUES (?,?,?,CURRENT_TIMESTAMP,?)').run(uuid(999), uuid(999), 180000, 120000);
     db.exec(read('migrate-game-metrics.sql'));
+    db.exec(read('migrate-returning-visitors.sql'));
   } else db.exec(read('schema.sql'));
   const env = { DB: { prepare: sql => ({ bind: (...params) => ({ run: async () => db.prepare(sql).run(...params) }) }) } };
   async function send(visit, page, ms, playMs, game) {

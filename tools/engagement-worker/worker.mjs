@@ -23,15 +23,20 @@ const GAMES = new Set([
 ]);
 
 const UPSERT = `
-  INSERT INTO engagement_pages (visit_id, page_id, active_ms, play_ms, game_id)
-  VALUES (?, ?, ?, ?, ?)
+  INSERT INTO engagement_pages (visit_id, page_id, active_ms, play_ms, game_id, visitor_id, last_seen_at)
+  VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
   ON CONFLICT (visit_id, page_id) DO UPDATE SET
     active_ms = MAX(engagement_pages.active_ms, excluded.active_ms),
     play_ms = COALESCE(MAX(engagement_pages.play_ms, excluded.play_ms),
                        engagement_pages.play_ms, excluded.play_ms),
-    game_id = COALESCE(engagement_pages.game_id, excluded.game_id)
+    game_id = COALESCE(engagement_pages.game_id, excluded.game_id),
+    last_seen_at = CASE
+      WHEN excluded.active_ms > engagement_pages.active_ms
+        OR excluded.play_ms > COALESCE(engagement_pages.play_ms, 0)
+      THEN CURRENT_TIMESTAMP ELSE engagement_pages.last_seen_at END
   WHERE (engagement_pages.game_id IS NULL OR excluded.game_id IS NULL
          OR engagement_pages.game_id = excluded.game_id)
+    AND engagement_pages.visitor_id IS excluded.visitor_id
     AND (excluded.active_ms > engagement_pages.active_ms
      OR (excluded.play_ms IS NOT NULL AND
          (engagement_pages.play_ms IS NULL OR excluded.play_ms > engagement_pages.play_ms))
@@ -74,9 +79,11 @@ function validPayload(payload) {
   if (!payload || typeof payload !== 'object') return false;
   const hasPlay = Object.hasOwn(payload, 'playMs');
   const hasGame = Object.hasOwn(payload, 'game');
-  const allowed = new Set(['visit', 'page', 'ms', 'playMs', 'game']);
+  const allowed = new Set(['visit', 'page', 'ms', 'playMs', 'game', 'visitor']);
   if (Object.keys(payload).some(key => !allowed.has(key))) return false;
   if (hasGame && (!hasPlay || !GAMES.has(payload.game))) return false;
+  if (Object.hasOwn(payload, 'visitor') &&
+      (typeof payload.visitor !== 'string' || !UUID.test(payload.visitor))) return false;
   const { visit, page, ms, playMs } = payload;
   return typeof visit === 'string' && UUID.test(visit) && typeof page === 'string' && UUID.test(page) &&
     Number.isInteger(ms) && ms >= 0 && ms <= MAX_PAGE_MS &&
@@ -106,9 +113,10 @@ export default {
     }
     if (!validPayload(payload)) return respond(400, origin);
 
-    const { visit, page, ms, playMs, game } = payload;
+    const { visit, page, ms, playMs, game, visitor } = payload;
     try {
-      await env.DB.prepare(UPSERT).bind(visit.toLowerCase(), page.toLowerCase(), ms, playMs ?? null, game ?? null).run();
+      await env.DB.prepare(UPSERT).bind(visit.toLowerCase(), page.toLowerCase(), ms, playMs ?? null,
+        game ?? null, visitor?.toLowerCase() ?? null).run();
       return respond(204, origin);
     } catch {
       return respond(503, origin);

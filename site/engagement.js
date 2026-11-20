@@ -1,4 +1,5 @@
 import { gameForPath } from './engagement-games.js';
+import { visitorCode, analyticsChoice, privacyBlocked, isAudienceStorageKey, showAnalyticsChoice } from './audience.js';
 
 const STORAGE_KEY = 'pp.engagement.visit';
 const IDLE_MS = 90_000;
@@ -12,7 +13,9 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{1
 let started = false;
 
 export function startEngagement(endpoint) {
-  if (started || window.self !== window.top || navigator.globalPrivacyControl || navigator.doNotTrack === '1' || !globalThis.crypto?.randomUUID) return;
+  if (started || window.self !== window.top) return;
+  analyticsChoice(); // Remove an existing browser code if privacy signals forbid it.
+  if (privacyBlocked() || !globalThis.crypto?.randomUUID) return;
   started = true;
 
   const visible = () => document.visibilityState === 'visible';
@@ -21,12 +24,15 @@ export function startEngagement(endpoint) {
   const standalone = Boolean(gameId && location.pathname?.startsWith('/games/'));
   const frame = document.getElementById('frame');
   const gameFocused = () => Boolean(gameId && (standalone || (frame && !frame.hidden && document.activeElement === frame)));
-  const freshVisit = () => ({ id: crypto.randomUUID(), last: Date.now() });
+  // This identity is immutable for a page record. A changed choice starts a new
+  // record, so previous anonymous time can never become linked retroactively.
+  let pageVisitor = visitorCode();
+  const freshVisit = () => ({ id: crypto.randomUUID(), last: Date.now(), visitor: pageVisitor });
   function readVisit() {
     try {
       const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY));
       const age = Date.now() - saved?.last;
-      if (UUID.test(saved?.id || '') && age >= 0 && age < VISIT_GAP_MS) return saved;
+      if (UUID.test(saved?.id || '') && age >= 0 && age < VISIT_GAP_MS && (saved.visitor ?? null) === pageVisitor) return saved;
     } catch { /* Tracking still works for the current page. */ }
     return freshVisit();
   }
@@ -66,6 +72,7 @@ export function startEngagement(endpoint) {
   }
 
   function syncPlay() {
+    if (!ensureIdentity()) return;
     const now = performance.now();
     sample(now);
     updatePlay(now);
@@ -78,13 +85,14 @@ export function startEngagement(endpoint) {
   }
 
   function report(final = false) {
+    if (!ensureIdentity()) return;
     syncPlay();
     saveVisit();
     const ms = Math.min(MAX_PAGE_MS, Math.floor(activeMs));
     const playMs = Math.min(ms, Math.floor(gameMs));
     if ((ms <= delivered && playMs <= deliveredPlay) || (!final && sending === page)) return;
     const reportPage = page;
-    const body = JSON.stringify({ visit: visit.id, page: reportPage, ms, playMs, ...(gameId ? { game: gameId } : {}) });
+    const body = JSON.stringify({ visit: visit.id, page: reportPage, ms, playMs, ...(gameId ? { game: gameId } : {}), ...(pageVisitor ? { visitor: pageVisitor } : {}) });
     const acknowledge = () => {
       if (page !== reportPage) return;
       delivered = Math.max(delivered, ms);
@@ -105,11 +113,26 @@ export function startEngagement(endpoint) {
     delivered = -1;
     gameMs = 0;
     deliveredPlay = -1;
+    lastSample = performance.now();
     resetGameInput();
   }
 
+  function ensureIdentity() {
+    const next = visitorCode();
+    if (next !== pageVisitor) {
+      // Storage events arrive after another tab changes consent. Never send an
+      // old ID after revocation or attach pending time to the replacement ID.
+      // The unreported remainder (normally <=30 seconds) is discarded here.
+      pageVisitor = next;
+      newPage(freshVisit());
+      saveVisit();
+    }
+    if (privacyBlocked()) { running = false; playing = false; return false; }
+    return true;
+  }
+
   function activity(event, gameInput = false) {
-    if ((event && !event.isTrusted) || !visible()) return;
+    if ((event && !event.isTrusted) || !visible() || !ensureIdentity()) return;
     const now = performance.now();
     sample(now);
     if (Date.now() - visit.last >= VISIT_GAP_MS) {
@@ -124,6 +147,7 @@ export function startEngagement(endpoint) {
   }
 
   function pause() {
+    if (!ensureIdentity()) return;
     sample();
     running = false;
     playing = false;
@@ -140,8 +164,21 @@ export function startEngagement(endpoint) {
   window.addEventListener('focus', updateFocus);
   window.addEventListener('blur', updateFocus);
   window.addEventListener('pagehide', pause);
+  window.addEventListener('pp-analytics-choice-changing', () => report(true));
+  window.addEventListener('pp-analytics-choice-changed', () => {
+    if (ensureIdentity() && running) report();
+  });
+  window.addEventListener('storage', event => {
+    if (!isAudienceStorageKey(event.key)) return;
+    ensureIdentity();
+    try {
+      document.getElementById('pp-analytics-choice')?.remove();
+      showAnalyticsChoice();
+    } catch { /* Optional UI must never interrupt a game. */ }
+  });
   window.addEventListener('pageshow', event => {
     if (!event.persisted) return;
+    if (!ensureIdentity()) return;
     const saved = readVisit();
     if (saved.id !== visit.id) newPage(saved);
     else visit = saved;
@@ -195,6 +232,7 @@ export function startEngagement(endpoint) {
   }
 
   saveVisit();
+  try { showAnalyticsChoice(); } catch { /* Optional UI must never interrupt a game. */ }
   if (running) report();
   setInterval(() => { if (running) report(); }, REPORT_INTERVAL);
 }

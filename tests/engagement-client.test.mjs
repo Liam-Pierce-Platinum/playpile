@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { setImmediate as settle } from 'node:timers/promises';
 import test from 'node:test';
+import { setAnalyticsChoice } from '../site/audience.js';
 
 const endpoint = 'https://engagement.example.workers.dev/collect';
 let uuidCounter = 0;
@@ -23,6 +24,8 @@ class BrowserEvents {
       listener({ type, isTrusted: true, target: this, ...properties });
     }
   }
+
+  dispatchEvent(event) { this.dispatch(event.type, { detail: event.detail }); return true; }
 }
 
 async function withBrowser(options, run) {
@@ -30,6 +33,7 @@ async function withBrowser(options, run) {
   let focused = true;
   const baseTime = options.time ?? 2_000_000_000_000;
   const stored = options.stored ?? new Map();
+  const persistent = options.persistent ?? new Map();
   const reports = [];
   const timers = new Map();
   let gamepads = options.gamepads;
@@ -40,10 +44,15 @@ async function withBrowser(options, run) {
     setItem: (key, value) => stored.set(key, String(value)),
     removeItem: key => stored.delete(key),
   };
+  const localStorage = {
+    getItem: key => persistent.get(key) ?? null,
+    setItem: (key, value) => persistent.set(key, String(value)),
+    removeItem: key => persistent.delete(key),
+  };
   const send = (url, body) => {
     assert.equal(url, endpoint);
     const record = JSON.parse(body);
-    assert.deepEqual(Object.keys(record).sort(), record.game ? ['game', 'ms', 'page', 'playMs', 'visit'] : ['ms', 'page', 'playMs', 'visit']);
+    assert.deepEqual(Object.keys(record).sort(), ['ms', 'page', 'playMs', 'visit', ...(record.game ? ['game'] : []), ...(record.visitor ? ['visitor'] : [])].sort());
     assert.ok(Number.isInteger(record.ms) && record.ms >= 0);
     assert.ok(Number.isInteger(record.playMs) && record.playMs >= 0 && record.playMs <= record.ms);
     reports.push(record);
@@ -79,7 +88,7 @@ async function withBrowser(options, run) {
     static now() { return baseTime + elapsed; }
   }
   const globals = {
-    window, document, navigator, sessionStorage, crypto, location, Date: ClockDate,
+    window, document, navigator, sessionStorage, localStorage, crypto, location, Date: ClockDate,
     performance: { now: () => elapsed },
     MutationObserver: class {
       constructor(callback) { this.callback = callback; }
@@ -104,6 +113,22 @@ async function withBrowser(options, run) {
 
   const browser = {
     reports,
+    persistent,
+    choose(allowed) { setAnalyticsChoice(allowed); },
+    externalChoice(allowed) {
+      persistent.set('pp.analytics.choice', JSON.stringify({ allowed, at: Date.now() }));
+      persistent.delete('pp.analytics.visitor');
+      window.dispatch('storage', { key: 'pp.analytics.choice' });
+    },
+    externalVisitor(id) {
+      persistent.set('pp.analytics.visitor', JSON.stringify({ id, expires: Date.now() + 86400000 }));
+      window.dispatch('storage', { key: 'pp.analytics.visitor' });
+    },
+    privacySignal() { navigator.globalPrivacyControl = true; },
+    jumpClock(milliseconds) {
+      elapsed += milliseconds;
+      for (const timer of timers.values()) timer.next = elapsed + timer.delay;
+    },
     setGamepads(value) { gamepads = value; },
     get gamepadReads() { return gamepadReads; },
     async advance(milliseconds) {
@@ -167,6 +192,13 @@ async function withBrowser(options, run) {
     startEngagement(endpoint);
     await settle();
     await run(browser);
+    const identities = new Map();
+    for (const record of reports) {
+      const key = record.visit + '/' + record.page;
+      const identity = record.visitor ?? null;
+      if (identities.has(key)) assert.equal(identity, identities.get(key), 'identity is immutable for each page record');
+      identities.set(key, identity);
+    }
   } finally {
     for (const key of Object.keys(globals)) {
       if (previous[key]) Object.defineProperty(globalThis, key, previous[key]);
@@ -433,5 +465,153 @@ test('controllers are not polled for hidden or unfocused games', async () => {
     await browser.focus(false);
     await browser.advance(10_000);
     assert.equal(browser.gamepadReads, reads, 'an unfocused tab does not poll a held button');
+  });
+});
+
+test('allowing flushes anonymous time before starting a fresh identified page', async () => {
+  await withBrowser({ path: '/games/sky-aces/' }, async browser => {
+    await browser.active();
+    await browser.advance(12_000);
+    browser.choose(true);
+    const before = browser.reports.at(-2), after = browser.reports.at(-1);
+    assert.equal(before.visitor, undefined);
+    assert.equal(before.ms, 12_000);
+    assert.ok(after.visitor);
+    assert.equal(after.ms, 0);
+    assert.notEqual(before.page, after.page);
+    assert.notEqual(before.visit, after.visit);
+    await browser.active();
+    await browser.advance(3_000);
+    await browser.pagehide();
+    assert.equal(browser.reports.at(-1).playMs, 3_000);
+  });
+});
+
+test('repeat visits share the allowed browser ID but use different visit IDs', async () => {
+  const persistent = new Map();
+  let first, second;
+  await withBrowser({ persistent }, async browser => {
+    browser.choose(true);
+    await browser.active();
+    await browser.advance(5_000);
+    await browser.pagehide();
+    first = browser.reports.at(-1);
+  });
+  await withBrowser({ persistent, time: 2_000_086_400_000 }, async browser => {
+    await browser.active();
+    await browser.advance(7_000);
+    await browser.pagehide();
+    second = browser.reports.at(-1);
+  });
+  assert.equal(first.visitor, second.visitor);
+  assert.notEqual(first.visit, second.visit);
+  assert.notEqual(first.page, second.page);
+  assert.equal(second.ms, 7_000);
+});
+
+test('local opt-out flushes the old snapshot and never links later time', async () => {
+  await withBrowser({}, async browser => {
+    browser.choose(true);
+    const identified = browser.reports.at(-1);
+    await browser.active();
+    await browser.advance(8_000);
+    browser.choose(false);
+    const finalIdentified = browser.reports.at(-2), anonymous = browser.reports.at(-1);
+    assert.equal(finalIdentified.visitor, identified.visitor);
+    assert.equal(finalIdentified.ms, 8_000);
+    assert.equal(anonymous.visitor, undefined);
+    assert.notEqual(anonymous.page, finalIdentified.page);
+    await browser.advance(5_000);
+    await browser.pagehide();
+    assert.equal(browser.reports.at(-1).visitor, undefined);
+    assert.equal(browser.reports.at(-1).ms, 5_000);
+    assert.equal(browser.persistent.has('pp.analytics.visitor'), false);
+  });
+});
+
+test('cross-tab opt-out discards pending identified time before the next report', async () => {
+  await withBrowser({}, async browser => {
+    browser.choose(true);
+    await browser.active();
+    await browser.advance(5_000);
+    const previous = browser.reports.at(-1);
+    const count = browser.reports.length;
+    browser.externalChoice(false);
+    assert.equal(browser.reports.length, count, 'no final linked report is sent after another tab revokes consent');
+    await browser.active();
+    await browser.advance(3_000);
+    await browser.pagehide();
+    const next = browser.reports.at(-1);
+    assert.equal(next.visitor, undefined);
+    assert.equal(next.ms, 3_000);
+    assert.notEqual(next.page, previous.page);
+  });
+});
+
+test('cross-tab allowance and ID replacement start fresh records without retroactive attribution', async () => {
+  await withBrowser({}, async browser => {
+    await browser.active();
+    await browser.advance(5_000);
+    browser.externalChoice(true);
+    await browser.active();
+    await browser.advance(3_000);
+    await browser.pagehide();
+    const first = browser.reports.at(-1);
+    assert.ok(first.visitor);
+    assert.equal(first.ms, 3_000);
+    const replacement = '11111111-1111-4111-8111-111111111111';
+    browser.externalVisitor(replacement);
+    await browser.active();
+    await browser.advance(4_000);
+    await browser.pagehide();
+    const next = browser.reports.at(-1);
+    assert.equal(next.visitor, replacement);
+    assert.equal(next.ms, 4_000);
+    assert.notEqual(next.page, first.page);
+    assert.notEqual(next.visit, first.visit);
+  });
+});
+
+test('expiry in an open tab stops linking and a later Allow cannot inherit old time', async () => {
+  await withBrowser({}, async browser => {
+    browser.choose(true);
+    const original = browser.reports.at(-1);
+    await browser.active();
+    await browser.advance(5_000);
+    browser.jumpClock(90 * 86400000);
+    await browser.active();
+    await browser.advance(3_000);
+    await browser.pagehide();
+    const expired = browser.reports.at(-1);
+    assert.equal(expired.visitor, undefined);
+    assert.equal(expired.ms, 3_000);
+    assert.notEqual(expired.page, original.page);
+    browser.choose(true);
+    await browser.active();
+    await browser.advance(2_000);
+    await browser.pagehide();
+    const renewed = browser.reports.at(-1);
+    assert.notEqual(renewed.visitor, original.visitor);
+    assert.equal(renewed.ms, 2_000);
+  });
+});
+
+test('same Allow keeps the visit and privacy signals stop all collection', async () => {
+  await withBrowser({}, async browser => {
+    browser.choose(true);
+    const first = browser.reports.at(-1);
+    browser.choose(true);
+    await browser.active();
+    await browser.advance(5_000);
+    await browser.pagehide();
+    assert.equal(browser.reports.at(-1).page, first.page);
+    assert.equal(browser.reports.at(-1).visitor, first.visitor);
+    browser.privacySignal();
+    const count = browser.reports.length;
+    await browser.active();
+    await browser.advance(40_000);
+    await browser.pagehide();
+    assert.equal(browser.reports.length, count);
+    assert.equal(browser.persistent.has('pp.analytics.visitor'), false);
   });
 });

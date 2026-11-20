@@ -35,10 +35,28 @@ test('engagement worker accepts both production origins and preserves missing pl
   }
   assert.equal(writes.length, 2);
   for (const { sql, params } of writes) {
-    assert.deepEqual(params, [VISIT, PAGE, 12345, null, null]);
+    assert.deepEqual(params, [VISIT, PAGE, 12345, null, null, null]);
     assert.match(sql, /ON CONFLICT \(visit_id, page_id\) DO UPDATE/);
     assert.match(sql, /MAX\(engagement_pages\.active_ms, excluded\.active_ms\)/);
   }
+});
+
+test('visitor UUID is optional, canonicalized, and fits alongside every game at maximum totals', async () => {
+  const { writes, env } = database();
+  for (const { slug } of GAMES) {
+    const body = JSON.stringify({ ...payload, ms: 28800000, playMs: 28800000, game: slug, visitor: VISIT.toUpperCase() });
+    assert.ok(Buffer.byteLength(body) <= 256, slug);
+    assert.equal((await worker.fetch(collect(body), env)).status, 204);
+    assert.equal(writes.at(-1).params[5], VISIT);
+  }
+  const count = writes.length;
+  for (const visitor of ['', null, 12, [], {}, 'person@example.com', 'not-a-uuid']) {
+    assert.equal((await worker.fetch(collect(JSON.stringify({ ...payload, visitor })), env)).status, 400);
+  }
+  for (const key of ['last_seen_at', 'created_at', 'timestamp']) {
+    assert.equal((await worker.fetch(collect(JSON.stringify({ ...payload, [key]: '2099-01-01' })), env)).status, 400);
+  }
+  assert.equal(writes.length, count);
 });
 
 test('per-game beacons accept every canonical catalogue ID and reject arbitrary attribution', async () => {

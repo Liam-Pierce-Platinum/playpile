@@ -102,3 +102,26 @@ test('date cohort keeps a visit/game together across the boundary and excludes l
     assert.deepEqual({ ...cohort }, { plays: 1, play_ms: 180000 });
   } finally { db.close(); }
 });
+
+test('public popularity ranks recent engaged visits, deduplicates reloads and exposes only game slugs', async () => {
+  const { db, send } = setup();
+  const env = { DB: { prepare: sql => ({ all: async () => ({ results: db.prepare(sql).all() }) }) } };
+  const readFeed = () => worker.fetch(new Request('https://worker.example/popular'), env);
+  try {
+    assert.deepEqual(await (await readFeed()).json(), { games: [] });
+    await send(1, 1, 1500, 1500, 'apex');
+    await send(1, 2, 1500, 1500, 'apex');
+    await send(2, 3, 1250, 1250, 'curveball');
+    await send(3, 4, 1250, 1250, 'curveball');
+    await send(4, 5, 5000, 5000, 'drifter');
+    await send(5, 6, 3000, 3000, 'grind-city');
+    await send(6, 7, 5000, 0, 'inkvale');
+    await send(7, 8, 10000, 10000, 'stack');
+    db.prepare("UPDATE engagement_pages SET created_at=datetime('now','-8 days') WHERE page_id=?").run(uuid(8));
+    const response = await readFeed();
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('access-control-allow-origin'), '*');
+    assert.equal(response.headers.get('cache-control'), 'public, max-age=900');
+    assert.deepEqual(await response.json(), { games: ['curveball', 'drifter', 'apex', 'grind-city'] });
+  } finally { db.close(); }
+});

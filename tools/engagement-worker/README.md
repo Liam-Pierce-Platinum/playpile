@@ -1,9 +1,14 @@
 # Private engagement reports
 
-The public Worker only accepts small telemetry beacons and serves `/health`.
-Read reports in the authenticated Cloudflare D1 Studio for `playpile-engagement`.
-There is no public report endpoint. Returning-browser reports use an optional
-random browser identifier only after the visitor chooses to allow it.
+The Worker accepts small telemetry beacons, serves `/health`, and supplies the
+catalogue's public popularity order at `GET /popular`. This feed returns an
+array of game slugs in the `games` field. It orders games by distinct engaged
+visits first recorded in the past seven days, then active play time, then slug.
+Browsers and the edge can reuse the response for 15 minutes.
+
+Read detailed reports in the authenticated Cloudflare D1 Studio for
+`playpile-engagement`. Returning-browser reports use an optional random browser
+identifier only after the visitor chooses to allow it.
 
 ## Per-game metrics
 

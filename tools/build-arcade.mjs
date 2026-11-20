@@ -73,7 +73,8 @@ for(const world of WORLDS){
  const games=members(world);
  let info='';
  if(world.id==='friends') info='<p class="category-note">Look for <b>Play online</b> to join from different devices. Same-screen games may use touch, a keyboard or controllers. Check the controls below each game.</p>';
- await write(world.href.slice(1)+'index.html',page(world.name+' games',world.intro,world.href,worldHeroHTML(world,games.length)+info+`<div class="game-grid">${games.map(gameCardHTML).join('')}</div>`,'categories'));
+ const order=world.id==='new'?'newest':world.id==='popular'?'popular':'recommended';
+ await write(world.href.slice(1)+'index.html',page(world.name+' games',world.intro,world.href,worldHeroHTML(world,games.length)+info+`<div class="game-grid" data-game-order="${order}">${games.map(gameCardHTML).join('')}</div>`,'categories'));
 }
 
 const infoPages=[['01','About','The person and the idea behind the pile','/site/about.html'],['02','Updates','What’s new, what’s fixed and what changed','/site/updates.html'],['03','Dev log','A peek under the hood','/devlog/'],['04','My picks','A few good places to start','/articles/'],['05','Contact','Found a bug? Got an idea? Say hello','/site/contact.html'],['06','Privacy & saves','Your saved games and your choices','/site/settings.html']];
@@ -98,9 +99,7 @@ function theme(html,active='browse'){
 // Shared game wrapper. Existing route aliases and game files are untouched.
 let template=await read('site/play.html');
 template=theme(template);
-template=template.replaceAll("row('More ' + catOf(g) + ' games', same,", "row('More ' + catOf(g) + ' games', same.slice(0, 4),")
- .replaceAll("rest.slice(0, 12)","rest.slice(0, 4)")
- .replaceAll("note = 'runs here';","note = '';");
+template=template.replaceAll("note = 'runs here';","note = '';");
 template=template.replace("const ro = new ResizeObserver(adSpacing);\nro.observe(document.querySelector('.stage')); ro.observe(document.querySelector('.side .panel'));","const ro = new ResizeObserver(adSpacing);\nro.observe(document.querySelector('.stage'));\nconst sidePanel=document.querySelector('.side .panel'); if(sidePanel) ro.observe(sidePanel);");
 if(!template.includes('window.__PLAYPILE_WEB=1'))template=template.replace('<head>','<head>\n<script>window.__PLAYPILE_WEB=1;</script>');
 await write('site/play.html',template);

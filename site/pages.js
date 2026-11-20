@@ -107,7 +107,7 @@ export function related(g, GAMES, n = 5) {
   const same = others.filter((x) => catOf(x) === catOf(g));
   return [...same, ...others.filter((x) => catOf(x) !== catOf(g))].slice(0, n);
 }
-export const miniHtml = (x) => '<a class="mini" href="' + playUrl(x) + '">'
+export const miniHtml = (x) => '<a class="mini" data-slug="' + esc(x.slug) + '" href="' + playUrl(x) + '">'
   + '<span class="th" style="background-image:url(\'/shots/t/' + x.slug + '.webp\')"></span>'
   + '<span><b>' + esc(x.title) + '</b><small>' + esc(catOf(x)) + '</small></span></a>';
 

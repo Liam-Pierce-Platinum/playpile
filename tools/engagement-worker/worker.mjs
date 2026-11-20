@@ -91,10 +91,39 @@ function validPayload(payload) {
     (!hasPlay || (Number.isInteger(playMs) && playMs >= 0 && playMs <= ms));
 }
 
+// This public feed contains only the order of known games, shared by all players.
+async function popularGames(request, env, ctx) {
+  const key = new URL('/popular', request.url).href;
+  const cache = globalThis.caches?.default;
+  const cached = await cache?.match(key).catch(() => undefined);
+  if (cached) return cached;
+
+  try {
+    const { results } = await env.DB.prepare(`
+      SELECT game_id FROM engagement_game_plays
+      WHERE first_recorded_at >= datetime('now', '-7 days')
+      GROUP BY game_id
+      ORDER BY COUNT(*) DESC, SUM(play_ms) DESC, game_id
+    `).all();
+    const games = results.map(row => row.game_id).filter(game => GAMES.has(game));
+    const response = Response.json({ games }, { headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Cache-Control': 'public, max-age=900',
+    } });
+    if (cache && ctx) ctx.waitUntil(cache.put(key, response.clone()).catch(() => {}));
+    return response;
+  } catch {
+    return respond(503, '*');
+  }
+}
+
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const { pathname } = new URL(request.url);
     if (request.method === 'GET' && pathname === '/health') return respond(200, null, 'OK');
+    if (pathname === '/popular') {
+      return request.method === 'GET' ? popularGames(request, env, ctx) : respond(405, '*');
+    }
     if (pathname !== '/collect') return respond(404);
 
     const origin = request.headers.get('Origin');

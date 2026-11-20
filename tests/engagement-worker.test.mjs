@@ -126,3 +126,27 @@ test('engagement worker serves a plain health check and exposes no reports or fa
   assert.equal(failure.status, 503);
   assert.equal(await failure.text(), '');
 });
+
+test('public popularity shares one cache key and leaves private reports closed on errors', async t => {
+  const entries = new Map();
+  const pending = [];
+  const ctx = { waitUntil: work => pending.push(work) };
+  const original = Object.getOwnPropertyDescriptor(globalThis, 'caches');
+  t.after(() => original ? Object.defineProperty(globalThis, 'caches', original) : delete globalThis.caches);
+  Object.defineProperty(globalThis, 'caches', { configurable: true, value: { default: {
+    match: async key => entries.get(key)?.clone(),
+    put: async (key, value) => entries.set(key, value),
+  } } });
+  const url = 'https://worker.example/popular';
+  const noData = await worker.fetch(new Request(url), {}, ctx);
+  assert.equal(noData.status, 503);
+  assert.equal(noData.headers.get('Cache-Control'), 'no-store');
+  const env = { DB: { prepare: () => ({ all: async () => ({ results: [{ game_id: 'apex' }, { game_id: 'unknown' }] }) }) } };
+  const live = await worker.fetch(new Request(url+'?irrelevant=1'), env, ctx);
+  assert.deepEqual(await live.json(), { games: ['apex'] });
+  await Promise.all(pending);
+  assert.deepEqual([...entries.keys()], [url]);
+  const cached = await worker.fetch(new Request(url+'?other=2'), {}, ctx);
+  assert.deepEqual(await cached.json(), { games: ['apex'] });
+  assert.equal((await worker.fetch(new Request(url, { method: 'POST' }), {}, ctx)).status, 405);
+});

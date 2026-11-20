@@ -10,7 +10,7 @@ export const WORLDS = [
   {id:'strategy',name:'Strategy',cat:'Strategy',href:'/free-strategy-games/',hook:'A plan would help',intro:'Build a team, guard your turf and try to look like this was the plan all along',color:'#c5ba73'},
   {id:'horror',name:'Horror',cat:'Horror',href:'/free-horror-games/',hook:'Did that just move?',intro:'Dark corners and very bad company. Maybe leave a light on',color:'#b6a1d5'},
   {id:'new',name:'New',href:'/browse/new/',hook:'Fresh out of the workshop',intro:'The latest additions to the pile. Pick one up and see what it does',color:'#90c996'},
-  {id:'popular',name:'Popular picks',href:'/browse/popular/',hook:'Can’t pick? Start here',intro:'A starting lineup of quick fixes and bigger adventures. Something here should grab you',note:'Featured selection',color:'#ebbd67'},
+  {id:'popular',name:'Popular picks',href:'/browse/popular/',hook:'Can’t pick? Start here',intro:'See what people are playing across PlayPile.',color:'#ebbd67'},
   {id:'friends',name:'Play with friends',cat:'Multiplayer',href:'/free-multiplayer-games/',hook:'Settle it with a rematch',intro:'Bring a friend. Share a screen or meet online, depending on the game',color:'#96b8ef'}
 ];
 export const worldFor = value => WORLDS.find(w=>w.id===String(value).toLowerCase()||w.cat===value) || WORLDS[0];

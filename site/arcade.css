@@ -222,3 +222,6 @@ html.arcade-still .arcade-boot{display:none}
 }
 @media(max-width:360px){.game-feed{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-height:490px){.arcade-site[data-arcade-page="browse"] .arcade-top{position:relative}}
+
+/* Reranking a gallery should keep the viewport at the player's scroll position. */
+#gameFeed,[data-game-order],#more,#alsorows{overflow-anchor:none}

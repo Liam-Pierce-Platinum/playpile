@@ -1,7 +1,10 @@
-import { mountShell, search } from './shell.js';
+import { GAMES, mountShell, search } from './shell.js';
 import { catUrl } from './seo.js';
 import { translate, localizedGameQuery } from './arcade-locale.js';
 import { mountReturnShelf } from './arcade-return.js';
+import { bindCards, mountCategoryGames, watchRanking } from './arcade-ranked-grids.js';
+import { gameCardHTML } from './arcade-ui.js';
+import { rankGames } from './game-ranking.js';
 
 function reduceMotion() {
   try { return localStorage.getItem('pd.ui.motion') === 'reduced'; }
@@ -28,16 +31,17 @@ function mountCatalogue(feed) {
   const empty = document.getElementById('searchEmpty');
   const shelf = document.getElementById('returnShelf');
   if (shelf) mountReturnShelf(shelf);
-  const cards = new Map(Array.from(feed.children, card => [card.dataset.slug, card]));
-  let currentTerm = '';
+  const show = bindCards(feed, game => gameCardHTML(game, { compact: true }));
+  let currentTerm;
 
   function filter(value, force = false) {
     const term = value.trim();
     if (term === currentTerm && !force) return;
     currentTerm = term;
-    const visible = term ? search(localizedGameQuery(term)).map(game => cards.get(game.slug)).filter(Boolean) : [...cards.values()];
-    feed.replaceChildren(...visible);
-    count.textContent = term ? translate('resultCount',{count:visible.length,query:term}) : translate('gameCount',{count:cards.size});
+    const visible = term ? search(localizedGameQuery(term), rankGames) : rankGames(GAMES);
+    show(visible);
+    const label = term ? translate('resultCount',{count:visible.length,query:term}) : translate('gameCount',{count:visible.length});
+    if (count.textContent !== label) count.textContent = label;
     if (shelf) shelf.hidden = Boolean(term);
     clear.hidden = !term;
     empty.hidden = visible.length !== 0;
@@ -49,6 +53,7 @@ function mountCatalogue(feed) {
 
   input.value = new URLSearchParams(location.search).get('q') || '';
   filter(input.value);
+  watchRanking([feed], () => filter(input.value, true));
   input.addEventListener('input', () => filter(input.value));
   addEventListener('pp-locale', () => filter(input.value, true));
   clear.addEventListener('click', () => {
@@ -64,6 +69,8 @@ const destination = (location.pathname === '/' || location.pathname === '/index.
 if (destination) location.replace(destination);
 else if (page) {
   const feed = document.getElementById('gameFeed');
+  const category = document.querySelector('[data-game-order]');
+  if (category) mountCategoryGames(category);
   mountShell({ active: page === 'profile' ? 'me' : page, onSearch: feed ? mountCatalogue(feed) : null });
 }
 

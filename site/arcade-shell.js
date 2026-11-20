@@ -63,10 +63,10 @@ function indexGame(game) {
 }
 
 let searchIndex;
-export function search(query) {
+export function search(query, rank = games => games) {
   const term = normalizeSearch(query);
   const words = searchWords(term).filter(word => !fillerWords.has(word));
-  if (!words.length) return GAMES.slice();
+  if (!words.length) return rank(GAMES.slice());
 
   const exact = [];
   const titles = [];
@@ -77,7 +77,7 @@ export function search(query) {
     else if (words.every(word => entry.titleWords.some(token => token.startsWith(word)))) titles.push(entry.game);
     else if (words.every(word => entry.words.some(token => token.startsWith(word)))) keywords.push(entry.game);
   }
-  return [...exact, ...titles, ...keywords];
+  return [...rank(exact), ...rank(titles), ...rank(keywords)];
 }
 export function recent(){try{return JSON.parse(localStorage.getItem('pd.recent')||'[]').map(s=>GAMES.find(g=>g.slug===s)).filter(Boolean);}catch{return [];}}
 export function remember(slug){try{const saved=JSON.parse(localStorage.getItem('pd.recent')||'[]').filter(s=>s!==slug);localStorage.setItem('pd.recent',JSON.stringify([slug,...saved].slice(0,12)));}catch{}}

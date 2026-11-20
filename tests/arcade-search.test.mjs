@@ -26,6 +26,15 @@ test('genre and visual style aliases work together without confusing similar sty
   assert.deepEqual(slugs('PlayStation 1 style'), ['highrise']);
 });
 
+test('personal order applies inside each search relevance tier', () => {
+  const reverse = games => games.slice().reverse();
+  assert.equal(search('merge', reverse)[0].slug, 'merge');
+  assert.deepEqual(search('drift', reverse).map(game => game.slug), [
+    'drifter', 'touge-drift', 'drift-tower', 'rush-hour',
+  ]);
+  assert.deepEqual(search('games', reverse), GAMES.slice().reverse());
+});
+
 test('search uses shared multiplayer metadata for online and same-device games', () => {
   assert.ok(slugs('play with friends').includes('air-hockey'));
   assert.ok(slugs('multiplayer').includes('car-soccer'));

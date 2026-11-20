@@ -675,6 +675,7 @@ $("start").onclick = () => {
   canvas.focus();
   toast(s, "HOLD W / ↑ · FOLLOW THE MINT ARROWS");
 };
+$("start").disabled = false;
 $("pause").onclick = () => {
   if (running) setPause(!paused);
 };

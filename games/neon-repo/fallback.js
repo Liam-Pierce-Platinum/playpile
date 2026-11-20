@@ -21,11 +21,13 @@ export function createFallback(canvas) {
   const cam = { x: 760, y: 760 };
   const reduced = matchMedia("(prefers-reduced-motion:reduce)").matches;
   const coarse = matchMedia("(pointer:coarse)").matches;
+  let vignette, vignetteBitmap;
   function rr(x, y, width, height, r = 4) {
     ctx.beginPath();
     ctx.roundRect(x, y, width, height, r);
   }
   function road() {
+    const halfWidth = w / (2 * zoom) + 120, halfHeight = h / (2 * zoom) + 120;
     ctx.fillStyle = "#10272d";
     ctx.fillRect(0, 0, WORLD.w, WORLD.h);
     ctx.fillStyle = "#263c43";
@@ -50,8 +52,10 @@ export function createFallback(canvas) {
       ctx.stroke();
     }
     ctx.setLineDash([]);
-    for (const x of GRID_X)
+    for (const x of GRID_X) {
+      if (Math.abs(x - cam.x) > halfWidth) continue;
       for (const y of GRID_Y) {
+        if (Math.abs(y - cam.y) > halfHeight) continue;
         ctx.fillStyle = "#172c35";
         ctx.fillRect(x - 77, y - 77, 154, 154);
         ctx.fillStyle = "#b1c7be38";
@@ -71,6 +75,7 @@ export function createFallback(canvas) {
           ctx.fill();
         }
       }
+    }
     for (const b of BLOCKS) {
       if (
         b.x + b.w < cam.x - w / (2 * zoom) - 120 ||
@@ -379,29 +384,19 @@ export function createFallback(canvas) {
     drawTarget();
     car(s.car, true);
     ctx.restore();
-    const vig = ctx.createRadialGradient(
-      w * 0.5,
-      h * 0.52,
-      Math.min(w, h) * 0.15,
-      w * 0.5,
-      h * 0.52,
-      Math.max(w, h) * 0.7,
-    );
-    vig.addColorStop(0, "transparent");
-    vig.addColorStop(1, "#02131bc9");
-    ctx.fillStyle = vig;
-    ctx.fillRect(0, 0, w, h);
+    if (vignetteBitmap) ctx.drawImage(vignetteBitmap, 0, 0, w, h);
+    else { ctx.fillStyle = vignette; ctx.fillRect(0, 0, w, h); }
     if (!reduced) {
       ctx.strokeStyle = "#acdedb17";
       ctx.lineWidth = 0.6;
+      ctx.beginPath();
       for (let n = 0; n < 65; n++) {
         const x = (n * 173 + now * 48) % w,
           y = (n * 137 + now * 270) % h;
-        ctx.beginPath();
         ctx.moveTo(x, y);
         ctx.lineTo(x - 4, y + 12);
-        ctx.stroke();
       }
+      ctx.stroke();
     }
     minimap();
   }
@@ -414,6 +409,27 @@ export function createFallback(canvas) {
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       zoom = w < 720 ? 0.73 : Math.min(1.02, w / 1350 + 0.12);
+      // The screen-space fade changes on resize only. Limit its cached raster to 16 MiB.
+      if (canvas.width * canvas.height <= 4194304 && canvas.ownerDocument) {
+        vignetteBitmap ??= canvas.ownerDocument.createElement("canvas");
+        vignetteBitmap.width = canvas.width;
+        vignetteBitmap.height = canvas.height;
+      } else if (vignetteBitmap) {
+        vignetteBitmap.width = vignetteBitmap.height = 0;
+        vignetteBitmap = null;
+      }
+      const cachedPaint = vignetteBitmap?.getContext("2d");
+      if (!cachedPaint && vignetteBitmap) {
+        vignetteBitmap.width = vignetteBitmap.height = 0;
+        vignetteBitmap = null;
+      }
+      const paint = cachedPaint || ctx;
+      paint.setTransform(dpr, 0, 0, dpr, 0, 0);
+      vignette = paint.createRadialGradient(w / 2, h * 0.52, Math.min(w, h) * 0.15,
+        w / 2, h * 0.52, Math.max(w, h) * 0.7);
+      vignette.addColorStop(0, "transparent");
+      vignette.addColorStop(1, "#02131bc9");
+      if (cachedPaint) { paint.fillStyle = vignette; paint.fillRect(0, 0, w, h); }
     },
     render(state, time, dt, controls = {}) {
       s = state;

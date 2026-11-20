@@ -376,6 +376,10 @@ function input() {
   } catch {}
   return { throttle, steer, brake, boost };
 }
+function setHudText(id, text) {
+  const element = $(id);
+  if (element.textContent !== text) element.textContent = text;
+}
 function updateHUD() {
   $("touch").hidden = !((coarse || w < 900 || h < 500) && s.mode === "play");
   if (!s.job) return;
@@ -383,37 +387,36 @@ function updateHUD() {
     r = route(s);
   let d = 0;
   for (let i = 1; i < r.length; i++) d += dist(r[i - 1], r[i]);
-  $("stage").textContent =
-    s.stage === "pickup" ? "01 / FIND THE VEHICLE" : "02 / BRING IT HOME";
-  $("mission").textContent = s.job.name;
+  setHudText("stage", s.stage === "pickup" ? "01 / FIND THE VEHICLE" : "02 / BRING IT HOME");
+  setHudText("mission", s.job.name);
   const actionHint = usingPad ? "press X" : coarse ? "tap the prompt" : "press E";
-  $("objective").textContent =
+  setHudText("objective",
     s.stage === "pickup"
       ? `Collect the ${VEHICLES[s.job.vehicle].name}. Slow down and ${actionHint}.`
-      : `Return to ${s.job.drop.name}. Slow down and ${actionHint}.`;
-  $("distance").textContent = `${Math.round(d * METRES_PER_UNIT)}m VIA GPS`;
-  $("clock").textContent =
+      : `Return to ${s.job.drop.name}. Slow down and ${actionHint}.`);
+  setHudText("distance", `${Math.round(d * METRES_PER_UNIT)}m VIA GPS`);
+  setHudText("clock",
     s.clock > 0
       ? `${Math.ceil(s.clock)}s BONUS WINDOW`
-      : "OVERTIME · KEEP DRIVING";
+      : "OVERTIME · KEEP DRIVING");
   $("clock").style.color = s.clock < 20 ? "#ffbc78" : "#67f0cf";
-  $("condition").textContent = Math.round(s.car.health) + "%";
+  setHudText("condition", Math.round(s.car.health) + "%");
   $("healthbar").style.width = s.car.health + "%";
   $("boostbar").style.width = s.car.boost + "%";
-  $("speed").textContent = String(
+  setHudText("speed", String(
     Math.round(Math.abs(s.car.speed) * METRES_PER_UNIT * 3.6),
-  ).padStart(3, "0");
-  $("carname").textContent = VEHICLES[s.car.kind].name;
+  ).padStart(3, "0"));
+  setHudText("carname", VEHICLES[s.car.kind].name);
   const near = dist(s.car, t) < HANDOVER_RADIUS;
   $("interaction").hidden = !(s.mode === "play" && near);
   const ready = canInteract(s);
   const prefix = usingPad ? "X / " : coarse ? "" : "E / ";
-  $("interaction").textContent =
+  setHudText("interaction",
     !ready
       ? "SLOW DOWN"
       : s.stage === "pickup"
         ? prefix + "COLLECT VEHICLE"
-        : prefix + "COMPLETE RECOVERY";
+        : prefix + "COMPLETE RECOVERY");
   $("interaction").disabled = !ready;
 }
 function frame(ts) {
@@ -451,7 +454,7 @@ function frame(ts) {
   view.render(s, now, dt, controls);
   updateHUD();
   $("toast").hidden = s.mode !== "play" || !s.toast || s.toast.ttl <= 0;
-  if (s.toast) $("toast").textContent = s.toast.text;
+  if (s.toast) setHudText("toast", s.toast.text);
   if (engineGain) {
     const volume =
       sound && s.mode === "play" ? 0.009 + Math.abs(s.car.speed) * 0.000025 : 0;

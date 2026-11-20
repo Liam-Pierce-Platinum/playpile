@@ -11,20 +11,19 @@
       name="description"
       content="Drive the midnight city, recover stranded cars and build your own vehicle recovery business."
     />
-    <link rel="stylesheet" href="style.css?v=20261120-controls" />
+    <link rel="stylesheet" href="style.css?v=20261120-canvas" />
     <script type="importmap">
       {"imports":{
         "../apex/vendor/three.module.js":"../_deck/three.module.js",
         "./engine.js":"./engine.js?v=20261120-controls",
         "./renderer.js":"./renderer.js?v=20261120-controls",
-        "./fallback.js":"./fallback.js?v=20261120-controls"
+        "./fallback.js":"./fallback.js?v=20261120-canvas"
       }}
     </script>
     <script src="../_shared/mobile.js"></script>
   </head>
   <body>
     <canvas id="city" tabindex="-1" aria-label="Neon Repo driving game"></canvas>
-    <div class="grain" aria-hidden="true"></div>
     <header>
       <a class="brand" href="#" id="brand"
         ><span class="brand-mark">NR</span
@@ -135,6 +134,6 @@
         ><button data-key="boost" aria-label="Boost">⚡</button>
       </div>
     </div>
-    <script type="module" src="app.js?v=20261120-controls"></script>
+    <script type="module" src="app.js?v=20261120-canvas"></script>
   </body>
 </html>

@@ -66,14 +66,6 @@ button.primary {
   display: block;
   touch-action: none;
 }
-.grain {
-  pointer-events: none;
-  position: fixed;
-  inset: 0;
-  opacity: 0.12;
-  background: repeating-linear-gradient(0deg, transparent 0 3px, #0004 3px 4px);
-  z-index: 1;
-}
 header {
   position: fixed;
   left: 28px;
@@ -1076,9 +1068,6 @@ button.graphics-choice {
 }
 
 /* Chase-view HUD: keep the road and vehicle silhouette clear. */
-.grain {
-  opacity: 0.035;
-}
 #radar {
   position: fixed;
   left: 28px;

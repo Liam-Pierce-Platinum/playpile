@@ -63,7 +63,10 @@ function auditDriving(touch) {
       if (!el.contains(document.elementFromPoint(rect.left+rect.width*x,rect.top+rect.height*y))) issues.push(label(el)+' blocked');
     }
   }
-  return { frame: [innerWidth,innerHeight], issues };
+  const centers = nodes.filter(el => el.matches('button,select')).map(el => {
+    const r=el.getBoundingClientRect();return { x:r.x+r.width/2, y:r.y+r.height/2, label:label(el) };
+  });
+  return { frame: [innerWidth,innerHeight], issues, centers };
 }
 
 async function check(browser, base, game) {
@@ -100,6 +103,16 @@ async function check(browser, base, game) {
       await inner.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
       const audit = await inner.evaluate(auditDriving, !desktop);
       assert.deepEqual(audit.issues, [], game.slug+' at '+audit.frame.join('×')+': '+audit.issues.join(', '));
+      if (!standalone) {
+        const blocked=await slot.evaluate((el,points) => {
+          const frame=el.getBoundingClientRect();
+          return points.filter(p=>{
+            const x=frame.left+p.x,y=frame.top+p.y;
+            return x>=0 && y>=0 && x<innerWidth && y<innerHeight && document.elementFromPoint(x,y)!==el;
+          }).map(p=>p.label);
+        },audit.centers);
+        assert.deepEqual(blocked,[],game.slug+' buttons covered by storefront after rotation: '+blocked.join(', '));
+      }
       if (i===0 && process.env.HUD_CAPTURES) {
         await fs.mkdir(process.env.HUD_CAPTURES,{recursive:true});
         await slot.screenshot({path:path.join(process.env.HUD_CAPTURES,game.slug+'.jpg'),type:'jpeg',quality:87});

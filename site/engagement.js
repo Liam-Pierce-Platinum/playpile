@@ -1,7 +1,10 @@
+import { gameForPath } from './engagement-games.js';
+
 const STORAGE_KEY = 'pp.engagement.visit';
 const IDLE_MS = 90_000;
 const VISIT_GAP_MS = 30 * 60_000;
 const REPORT_INTERVAL = 30_000;
+const GAMEPAD_INTERVAL = 1_000;
 const MAX_PAGE_MS = 8 * 60 * 60_000;
 const ACTIVITY = ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart', 'touchmove'];
 const CAPTURE = { capture: true, passive: true };
@@ -9,14 +12,15 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{1
 let started = false;
 
 export function startEngagement(endpoint) {
-  if (started || navigator.globalPrivacyControl || navigator.doNotTrack === '1' || !globalThis.crypto?.randomUUID) return;
+  if (started || window.self !== window.top || navigator.globalPrivacyControl || navigator.doNotTrack === '1' || !globalThis.crypto?.randomUUID) return;
   started = true;
 
   const visible = () => document.visibilityState === 'visible';
   const focused = () => visible() && document.hasFocus();
-  const standalone = location.pathname?.startsWith('/games/');
+  const gameId = gameForPath(location.pathname);
+  const standalone = Boolean(gameId && location.pathname?.startsWith('/games/'));
   const frame = document.getElementById('frame');
-  const gameFocused = () => standalone || (frame && !frame.hidden && document.activeElement === frame);
+  const gameFocused = () => Boolean(gameId && (standalone || (frame && !frame.hidden && document.activeElement === frame)));
   const freshVisit = () => ({ id: crypto.randomUUID(), last: Date.now() });
   function readVisit() {
     try {
@@ -33,9 +37,10 @@ export function startEngagement(endpoint) {
   let gameMs = 0, deliveredPlay = -1;
   let lastSample = performance.now();
   let idleAt = lastSample + IDLE_MS;
-  let gameIdleAt = idleAt;
+  let gameIdleAt = 0;
+  let hasGameInput = false;
   let running = focused();
-  let playing = running && gameFocused();
+  let playing = false;
 
   function saveVisit() {
     try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(visit)); } catch {}
@@ -52,14 +57,24 @@ export function startEngagement(endpoint) {
 
   function updatePlay(now, gameInput = false) {
     const next = running && focused() && gameFocused();
-    if (next && (!playing || gameInput)) gameIdleAt = now + IDLE_MS;
-    playing = next;
+    if (next && gameInput) {
+      hasGameInput = true;
+      gameIdleAt = now + IDLE_MS;
+    }
+    // Focus changes alone never start a play or extend the input idle window.
+    playing = next && hasGameInput && now < gameIdleAt;
   }
 
   function syncPlay() {
     const now = performance.now();
     sample(now);
     updatePlay(now);
+  }
+
+  function resetGameInput() {
+    hasGameInput = false;
+    gameIdleAt = 0;
+    playing = false;
   }
 
   function report(final = false) {
@@ -69,7 +84,7 @@ export function startEngagement(endpoint) {
     const playMs = Math.min(ms, Math.floor(gameMs));
     if ((ms <= delivered && playMs <= deliveredPlay) || (!final && sending === page)) return;
     const reportPage = page;
-    const body = JSON.stringify({ visit: visit.id, page: reportPage, ms, playMs });
+    const body = JSON.stringify({ visit: visit.id, page: reportPage, ms, playMs, ...(gameId ? { game: gameId } : {}) });
     const acknowledge = () => {
       if (page !== reportPage) return;
       delivered = Math.max(delivered, ms);
@@ -90,6 +105,7 @@ export function startEngagement(endpoint) {
     delivered = -1;
     gameMs = 0;
     deliveredPlay = -1;
+    resetGameInput();
   }
 
   function activity(event, gameInput = false) {
@@ -142,6 +158,9 @@ export function startEngagement(endpoint) {
     try {
       const game = frame.contentDocument;
       if (!game || watched.has(game)) return;
+      // A reloaded game must receive input again before its loading/menu time
+      // contributes to the existing page's cumulative play timer.
+      resetGameInput();
       watched.add(game);
       for (const type of ACTIVITY) game.addEventListener(type, gameActivity, CAPTURE);
       frame.contentWindow.addEventListener('focus', gameFocusChanged);
@@ -151,9 +170,28 @@ export function startEngagement(endpoint) {
   if (frame) {
     document.addEventListener('focusin', gameFocusChanged);
     frame.addEventListener('focus', gameFocusChanged);
-    new MutationObserver(syncPlay).observe(frame, { attributes: true, attributeFilter: ['hidden'] });
+    new MutationObserver((changes = []) => {
+      syncPlay();
+      if (changes.some(change => change.attributeName === 'src')) resetGameInput();
+    }).observe(frame, { attributes: true, attributeFilter: ['hidden', 'src'] });
     frame.addEventListener('load', watchGame);
     watchGame();
+  }
+
+  // Controller input does not dispatch DOM events. Sample it at most once a
+  // second, only while the actual game is visible and focused. A connected
+  // controller at rest (including small axis drift) must not keep a visit alive.
+  if (gameId && typeof navigator.getGamepads === 'function') {
+    setInterval(() => {
+      if (!focused() || !gameFocused()) return;
+      try {
+        const active = Array.from(navigator.getGamepads() || []).some(pad => pad && pad.connected && (
+          pad.buttons.some(button => button.pressed || button.value > 0.2) ||
+          pad.axes.some(axis => Math.abs(axis) > 0.2)
+        ));
+        if (active) activity(undefined, true);
+      } catch { /* Gamepad access can be disabled by browser permissions policy. */ }
+    }, GAMEPAD_INTERVAL);
   }
 
   saveVisit();

@@ -2,17 +2,40 @@ const ORIGINS = new Set(['https://playpile.net', 'https://www.playpile.net']);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MAX_BODY_BYTES = 256;
 const MAX_PAGE_MS = 8 * 60 * 60 * 1000;
+// Canonical IDs from site/catalogue.js. Keep this self-contained for dashboard deploys.
+const GAMES = new Set([
+  'lukes-diner', 'bladeborn', 'ironsight', 'blade-dash-story', 'egg-wars', 'kart-clash',
+  'slope-rush', 'tunnel-dive', 'bridge-race', 'hole-feast', 'stick-swing', 'moto-stunt',
+  'drift-tower', 'eggy-road', 'stunt-city', 'crazy-cattle', 'freeze-run', 'archer-duel',
+  'rooftop-duel', 'snake-arena', 'paper-land', 'cube-merge', 'getaway-flop', 'block-world',
+  'sky-climb', 'golf-orbit', 'time-shooter', 'subway-run', 'marble-roll', 'rush-hour',
+  'mirror-duel', 'bubble-trouble', 'pizza-panic', 'toy-soldier-blitz', 'ski-mountain',
+  'dodgeball-dash', 'roof-run', 'firework-frenzy', 'pursued', 'deep-dive', 'sky-aces',
+  'auto-arena', 'tiny-knight', 'the-mark', 'chibi-clash', 'spelldelve', 'frontline',
+  'curveball', 'helix-drop', 'axe-throw', 'car-soccer', 'tank-duel', 'sumo-slam', 'prism',
+  'home-run', 'air-hockey', 'strike', 'word-blitz', 'beat-dash', 'neon-swarm', 'pinball',
+  'mini-golf', 'graze', 'lanternfall', 'bailout', 'twister-io', 'block-royale', 'bannerfall',
+  'stack-attack', 'snowball-royale', 'wrecking-ball', 'mower-madness', 'sushi-conveyor',
+  'bomb-squad', 'grapple-goblin', 'parry', 'one-tile', 'derby', 'touge-drift', 'blade-dash',
+  'tiny-harbor', 'highrise', 'kickback', 'exposure', 'dungeon-quest', 'apex', 'nascar',
+  'night-shift', 'grind-city', 'southpaw', 'inkvale', 'penguin-dash', 'stack', 'drifter',
+  'merge', 'pipeworks', 'sweep', 'quickdraw', 'hoops', 'spike', 'crossing',
+]);
 
 const UPSERT = `
-  INSERT INTO engagement_pages (visit_id, page_id, active_ms, play_ms)
-  VALUES (?, ?, ?, ?)
+  INSERT INTO engagement_pages (visit_id, page_id, active_ms, play_ms, game_id)
+  VALUES (?, ?, ?, ?, ?)
   ON CONFLICT (visit_id, page_id) DO UPDATE SET
     active_ms = MAX(engagement_pages.active_ms, excluded.active_ms),
     play_ms = COALESCE(MAX(engagement_pages.play_ms, excluded.play_ms),
-                       engagement_pages.play_ms, excluded.play_ms)
-  WHERE excluded.active_ms > engagement_pages.active_ms
+                       engagement_pages.play_ms, excluded.play_ms),
+    game_id = COALESCE(engagement_pages.game_id, excluded.game_id)
+  WHERE (engagement_pages.game_id IS NULL OR excluded.game_id IS NULL
+         OR engagement_pages.game_id = excluded.game_id)
+    AND (excluded.active_ms > engagement_pages.active_ms
      OR (excluded.play_ms IS NOT NULL AND
          (engagement_pages.play_ms IS NULL OR excluded.play_ms > engagement_pages.play_ms))
+     OR (engagement_pages.game_id IS NULL AND excluded.game_id IS NOT NULL))
 `;
 
 function respond(status, origin, body = null) {
@@ -50,7 +73,10 @@ async function readSmallBody(request) {
 function validPayload(payload) {
   if (!payload || typeof payload !== 'object') return false;
   const hasPlay = Object.hasOwn(payload, 'playMs');
-  if (Object.keys(payload).length !== (hasPlay ? 4 : 3)) return false;
+  const hasGame = Object.hasOwn(payload, 'game');
+  const allowed = new Set(['visit', 'page', 'ms', 'playMs', 'game']);
+  if (Object.keys(payload).some(key => !allowed.has(key))) return false;
+  if (hasGame && (!hasPlay || !GAMES.has(payload.game))) return false;
   const { visit, page, ms, playMs } = payload;
   return typeof visit === 'string' && UUID.test(visit) && typeof page === 'string' && UUID.test(page) &&
     Number.isInteger(ms) && ms >= 0 && ms <= MAX_PAGE_MS &&
@@ -80,9 +106,9 @@ export default {
     }
     if (!validPayload(payload)) return respond(400, origin);
 
-    const { visit, page, ms, playMs } = payload;
+    const { visit, page, ms, playMs, game } = payload;
     try {
-      await env.DB.prepare(UPSERT).bind(visit.toLowerCase(), page.toLowerCase(), ms, playMs ?? null).run();
+      await env.DB.prepare(UPSERT).bind(visit.toLowerCase(), page.toLowerCase(), ms, playMs ?? null, game ?? null).run();
       return respond(204, origin);
     } catch {
       return respond(503, origin);

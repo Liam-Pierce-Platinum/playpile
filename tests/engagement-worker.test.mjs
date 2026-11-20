@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import worker from '../tools/engagement-worker/worker.mjs';
+import { GAMES } from '../site/catalogue.js';
 
 const ORIGIN = 'https://playpile.net';
 const VISIT = '0d3f536c-c428-4a77-a4db-d71cb0c59ea1';
@@ -34,10 +35,26 @@ test('engagement worker accepts both production origins and preserves missing pl
   }
   assert.equal(writes.length, 2);
   for (const { sql, params } of writes) {
-    assert.deepEqual(params, [VISIT, PAGE, 12345, null]);
+    assert.deepEqual(params, [VISIT, PAGE, 12345, null, null]);
     assert.match(sql, /ON CONFLICT \(visit_id, page_id\) DO UPDATE/);
     assert.match(sql, /MAX\(engagement_pages\.active_ms, excluded\.active_ms\)/);
   }
+});
+
+test('per-game beacons accept every canonical catalogue ID and reject arbitrary attribution', async () => {
+  const { writes, env } = database();
+  for (const { slug } of GAMES) {
+    const body = JSON.stringify({ ...payload, playMs: 5000, game: slug });
+    assert.ok(Buffer.byteLength(body) <= 256);
+    assert.equal((await worker.fetch(collect(body), env)).status, 204, slug);
+    assert.equal(writes.at(-1).params[4], slug);
+  }
+  const count = writes.length;
+  for (const game of ['', null, 12, [], {}, 'nonexistent', '/games/apex/', 'APEX', 'apex?user=123']) {
+    assert.equal((await worker.fetch(collect(JSON.stringify({ ...payload, playMs: 5000, game })), env)).status, 400);
+  }
+  assert.equal((await worker.fetch(collect(JSON.stringify({ ...payload, game: 'apex' })), env)).status, 400);
+  assert.equal(writes.length, count);
 });
 
 test('engagement worker accepts only cumulative play time within dwell time', async () => {

@@ -32,6 +32,8 @@ async function withBrowser(options, run) {
   const stored = options.stored ?? new Map();
   const reports = [];
   const timers = new Map();
+  let gamepads = options.gamepads;
+  let gamepadReads = 0;
   let onFrameVisibilityChange;
   const sessionStorage = {
     getItem: key => stored.get(key) ?? null,
@@ -41,7 +43,7 @@ async function withBrowser(options, run) {
   const send = (url, body) => {
     assert.equal(url, endpoint);
     const record = JSON.parse(body);
-    assert.deepEqual(Object.keys(record).sort(), ['ms', 'page', 'playMs', 'visit']);
+    assert.deepEqual(Object.keys(record).sort(), record.game ? ['game', 'ms', 'page', 'playMs', 'visit'] : ['ms', 'page', 'playMs', 'visit']);
     assert.ok(Number.isInteger(record.ms) && record.ms >= 0);
     assert.ok(Number.isInteger(record.playMs) && record.playMs >= 0 && record.playMs <= record.ms);
     reports.push(record);
@@ -54,6 +56,7 @@ async function withBrowser(options, run) {
       return true;
     },
   };
+  if (gamepads) navigator.getGamepads = () => { gamepadReads++; return gamepads; };
   const frame = options.frame ? Object.assign(new BrowserEvents(), {
     hidden: true,
     contentWindow: new BrowserEvents(),
@@ -70,8 +73,8 @@ async function withBrowser(options, run) {
   const crypto = {
     randomUUID: () => '00000000-0000-4000-8000-' + String(++uuidCounter).padStart(12, '0'),
   };
-  const location = { hostname: 'playpile.net', origin: 'https://playpile.net', pathname: options.path ?? '/' };
-  Object.assign(window, { self: window, top: window, crypto, location });
+  const location = { hostname: 'playpile.net', origin: 'https://playpile.net', pathname: options.path ?? (options.frame ? '/play/sky-aces-plane-dogfight-game/' : '/') };
+  Object.assign(window, { self: window, top: options.embedded ? {} : window, crypto, location });
   class ClockDate extends Date {
     static now() { return baseTime + elapsed; }
   }
@@ -101,6 +104,8 @@ async function withBrowser(options, run) {
 
   const browser = {
     reports,
+    setGamepads(value) { gamepads = value; },
+    get gamepadReads() { return gamepadReads; },
     async advance(milliseconds) {
       const end = elapsed + milliseconds;
       for (;;) {
@@ -119,9 +124,15 @@ async function withBrowser(options, run) {
       window.dispatch('pointerdown', { isTrusted });
       await settle();
     },
-    async frameInput() {
-      frame.contentDocument.dispatch('pointerdown');
-      frame.contentWindow.dispatch('pointerdown');
+    async frameInput(isTrusted = true) {
+      frame.contentDocument.dispatch('pointerdown', { isTrusted });
+      frame.contentWindow.dispatch('pointerdown', { isTrusted });
+      await settle();
+    },
+    async frameReload() {
+      onFrameVisibilityChange([{ attributeName: 'src' }]);
+      frame.contentDocument = new BrowserEvents();
+      frame.dispatch('load');
       await settle();
     },
     async frameVisible(visible) {
@@ -230,7 +241,7 @@ test('cabinet play time requires a visible, focused game and ignores activity ou
   });
 });
 
-test('a standalone game counts active dwell as play time', async () => {
+test('a standalone game starts play time only after trusted input', async () => {
   await withBrowser({ path: '/games/sky-aces/' }, async browser => {
     await browser.advance(10_000);
     await browser.visible(false);
@@ -240,7 +251,8 @@ test('a standalone game counts active dwell as play time', async () => {
     await browser.advance(5_000);
     await browser.pagehide();
     assert.equal(browser.reports.at(-1).ms, 15_000);
-    assert.equal(browser.reports.at(-1).playMs, 15_000);
+    assert.equal(browser.reports.at(-1).playMs, 5_000);
+    assert.equal(browser.reports.at(-1).game, 'sky-aces');
   });
 });
 
@@ -276,4 +288,150 @@ test('GPC and Do Not Track suppress duration reports', async () => {
       assert.deepEqual(browser.reports, []);
     });
   }
+});
+
+test('opening and focusing a game is not a play; untrusted input is ignored', async () => {
+  await withBrowser({ frame: true }, async browser => {
+    await browser.frameVisible(true);
+    await browser.frameFocus(true);
+    await browser.advance(30_000);
+    await browser.frameInput(false);
+    await browser.advance(30_000);
+    assert.equal(browser.reports.at(-1).playMs, 0);
+    assert.equal(browser.reports.at(-1).game, 'sky-aces');
+    await browser.frameInput();
+    await browser.advance(4_000);
+    await browser.pagehide();
+    assert.equal(browser.reports.at(-1).playMs, 4_000);
+  });
+});
+
+test('repeated focus changes cannot extend the last genuine game input', async () => {
+  await withBrowser({ frame: true }, async browser => {
+    await browser.frameVisible(true);
+    await browser.frameFocus(true);
+    await browser.frameInput();
+    await browser.advance(30_000);
+    await browser.focus(false);
+    await browser.advance(120_000);
+    await browser.focus(true);
+    await browser.advance(30_000);
+    await browser.frameFocus(false);
+    await browser.frameFocus(true);
+    await browser.active();
+    await browser.advance(30_000);
+    await browser.pagehide();
+    assert.equal(browser.reports.at(-1).playMs, 30_000);
+    await browser.frameInput();
+    await browser.advance(3_000);
+    await browser.pagehide();
+    assert.equal(browser.reports.at(-1).playMs, 33_000);
+  });
+});
+
+test('game reload keeps the visit but requires fresh game input', async () => {
+  await withBrowser({ frame: true }, async browser => {
+    await browser.frameVisible(true);
+    await browser.frameFocus(true);
+    await browser.frameInput();
+    await browser.advance(10_000);
+    await browser.frameReload();
+    await browser.advance(30_000);
+    assert.equal(browser.reports.at(-1).playMs, 10_000);
+    await browser.frameInput();
+    await browser.advance(5_000);
+    await browser.pagehide();
+    assert.equal(browser.reports.at(-1).playMs, 15_000);
+    assert.equal(new Set(browser.reports.map(record => record.visit)).size, 1);
+  });
+});
+
+test('a new visit clears the previous game input latch', async () => {
+  await withBrowser({ frame: true }, async browser => {
+    await browser.frameVisible(true);
+    await browser.frameFocus(true);
+    await browser.frameInput();
+    await browser.advance(10_000);
+    await browser.focus(false);
+    const previousVisit = browser.reports.at(-1).visit;
+    await browser.advance(31 * 60_000);
+    await browser.focus(true);
+    await browser.advance(30_000);
+    assert.notEqual(browser.reports.at(-1).visit, previousVisit);
+    assert.equal(browser.reports.at(-1).playMs, 0);
+    await browser.frameInput();
+    await browser.advance(5_000);
+    await browser.pagehide();
+    assert.equal(browser.reports.at(-1).playMs, 5_000);
+  });
+});
+
+test('unknown game paths cannot create attributed play and child frames do not report', async () => {
+  await withBrowser({ frame: true, path: '/play/not-a-game/' }, async browser => {
+    await browser.frameVisible(true);
+    await browser.frameFocus(true);
+    await browser.frameInput();
+    await browser.advance(5_000);
+    await browser.pagehide();
+    assert.equal(browser.reports.at(-1).playMs, 0);
+    assert.equal(browser.reports.at(-1).game, undefined);
+  });
+  await withBrowser({ embedded: true, path: '/games/sky-aces/' }, async browser => {
+    await browser.active();
+    await browser.advance(30_000);
+    await browser.pagehide();
+    assert.deepEqual(browser.reports, []);
+  });
+});
+
+test('controller buttons and axes keep active play running beyond 90 seconds', async () => {
+  for (const pad of [
+    { connected: true, buttons: [{ pressed: true, value: 1 }], axes: [0, 0] },
+    { connected: true, buttons: [{ pressed: false, value: 0.5 }], axes: [0, 0] },
+    { connected: true, buttons: [], axes: [0, -0.5] },
+  ]) {
+    await withBrowser({ path: '/games/sky-aces/', gamepads: [null, pad] }, async browser => {
+      await browser.advance(120_000);
+      await browser.pagehide();
+      assert.equal(browser.reports.at(-1).playMs, 119_000, 'play starts at the first one-second controller sample');
+      assert.equal(browser.gamepadReads, 120, 'polling is bounded to once per second');
+    });
+  }
+});
+
+test('neutral controllers and small axis drift do not start or indefinitely extend play', async () => {
+  const neutral = { connected: true, buttons: [{ pressed: false, value: 0.1 }], axes: [0.1, -0.2] };
+  await withBrowser({ path: '/games/sky-aces/', gamepads: [neutral] }, async browser => {
+    await browser.advance(120_000);
+    assert.equal(browser.reports.at(-1).playMs, 0);
+    browser.setGamepads([{ connected: true, buttons: [{ pressed: true, value: 1 }], axes: [] }]);
+    await browser.advance(10_000);
+    browser.setGamepads([neutral]);
+    await browser.advance(120_000);
+    await browser.pagehide();
+    assert.equal(browser.reports.at(-1).playMs, 99_000, 'idle grace ends 90 seconds after the last controller input');
+  });
+});
+
+test('controllers are not polled for hidden or unfocused games', async () => {
+  const pad = { connected: true, buttons: [{ pressed: true, value: 1 }], axes: [] };
+  await withBrowser({ frame: true, gamepads: [pad] }, async browser => {
+    await browser.advance(10_000);
+    assert.equal(browser.gamepadReads, 0, 'unopened games ignore controllers');
+    await browser.frameVisible(true);
+    await browser.advance(10_000);
+    assert.equal(browser.gamepadReads, 0, 'a visible iframe without focus ignores controllers');
+    await browser.frameFocus(true);
+    await browser.advance(10_000);
+    await browser.visible(false);
+    const before = browser.reports.at(-1).playMs;
+    const reads = browser.gamepadReads;
+    await browser.advance(120_000);
+    assert.equal(browser.gamepadReads, reads);
+    assert.equal(browser.reports.at(-1).playMs, before);
+    await browser.visible(true);
+    await browser.focus(false);
+    await browser.advance(10_000);
+    assert.equal(browser.gamepadReads, reads, 'an unfocused tab does not poll a held button');
+  });
 });

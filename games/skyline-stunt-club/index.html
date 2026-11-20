@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <title>Skyline Stunt Club</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="../_shared/mobile.js"></script>
+  </head>
+  <body>
+    <canvas
+      id="world"
+      tabindex="0"
+      aria-label="Rooftop driving playground"
+    ></canvas>
+    <header>
+      <div class="brand">
+        <span class="club-mark">SSC</span>
+        <div>
+          SKYLINE <b>STUNT CLUB</b><small>A LITTLE CLOSER TO THE SKY</small>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button id="sound" aria-label="Toggle sound effects">FX OFF</button
+        ><button id="recover" aria-label="Reset car to rooftop">RESET</button
+        ><button id="mobileGarage">GARAGE</button
+        ><button id="pause">PAUSE</button>
+      </div>
+    </header>
+    <section class="scoreboard" aria-label="Session progress">
+      <div><small>CLUB REP</small><strong id="rep">0</strong></div>
+      <div><small>BEST COMBO</small><strong id="best">0</strong></div>
+      <div><small>LANDINGS</small><strong id="landings">0</strong></div>
+    </section>
+    <section class="challenge" aria-live="polite">
+      <span id="routeLabel">FREE ROAM / NO CLOCK</span>
+      <h2 id="objective">Find a ramp. Make an entrance.</h2>
+      <p id="routeInfo">Follow the mint arrows for your first rooftop jump.</p>
+      <select id="course" aria-label="Choose stunt course">
+        <option value="0">FIRST FLIGHT · 30s</option>
+        <option value="1">ROOFTOP TOUR · 100s</option>
+        <option value="2">CLUB CIRCUIT · 150s</option></select
+      ><button id="challenge">START FIRST FLIGHT</button
+      ><small id="record">PERSONAL BEST —</small>
+    </section>
+    <div id="toast" role="status"></div>
+    <div id="combo" aria-live="polite"></div>
+    <div class="dashboard">
+      <div class="speed"><strong id="speed">0</strong><small>KM/H</small></div>
+      <div class="boost">
+        <span>BOOST</span>
+        <div><i id="boostFill"></i></div>
+      </div>
+      <p id="location">CLUBHOUSE · ON DECK</p>
+    </div>
+    <aside class="controls">
+      <span><kbd>W</kbd><kbd>S</kbd> drive</span
+      ><span><kbd>A</kbd><kbd>D</kbd> steer / air spin</span
+      ><span><kbd>SHIFT</kbd> boost</span><span><kbd>SPACE</kbd> brake</span
+      ><span><kbd>R</kbd> reset</span><button id="garage">GARAGE</button>
+    </aside>
+    <div class="mobile">
+      <div>
+        <button data-key="s" aria-label="Reverse">REV</button
+        ><button data-key="a" aria-label="Steer left">◀</button
+        ><button data-key="d" aria-label="Steer right">▶</button>
+      </div>
+      <div>
+        <button data-key=" " aria-label="Brake">BRAKE</button
+        ><button data-key="shift" aria-label="Boost">BOOST</button
+        ><button data-key="w" aria-label="Accelerate">GO</button>
+      </div>
+    </div>
+    <section id="menu" class="veil">
+      <div class="welcome">
+        <div class="eyebrow">THE ROOFTOPS ARE YOURS</div>
+        <h1>TAKE THE<br /><em>HIGH ROAD.</em></h1>
+        <p>
+          Five rooftops. No traffic. Just you, a tiny car,<br />and a very good
+          reason to leave the ground.
+        </p>
+        <div class="pills">
+          <span>FREE ROAM</span><span>STUNT COMBOS</span
+          ><span>TIME TRIALS</span>
+        </div>
+        <button id="start" class="primary">JOIN THE CLUB</button
+        ><small
+          >WASD / arrows to drive · touch controls on mobile<br />Progress stays
+          in this browser. No sign-in.</small
+        >
+      </div>
+    </section>
+    <section
+      id="garagePanel"
+      class="veil"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Club garage"
+      hidden
+    >
+      <div class="garage-card">
+        <div class="eyebrow">MAKE IT YOURS</div>
+        <h2>THE CLUB GARAGE</h2>
+        <p>Earn reputation from landings, beacons, and challenges.</p>
+        <div id="cars"></div>
+        <button id="garageClose" class="primary">BACK TO THE ROOFTOPS</button
+        ><small>Cosmetic unlocks. Every car handles the same.</small>
+      </div>
+    </section>
+    <script type="module" src="game.js"></script>
+  </body>
+</html>

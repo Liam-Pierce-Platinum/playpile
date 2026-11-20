@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"
+    />
+    <title>NEON REPO · Night recovery service</title>
+    <meta
+      name="description"
+      content="Drive the midnight city, recover stranded cars and build your own vehicle recovery business."
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="../_shared/mobile.js"></script>
+  </head>
+  <body>
+    <canvas id="city" aria-label="Neon Repo driving game"></canvas>
+    <div class="grain" aria-hidden="true"></div>
+    <header>
+      <a class="brand" href="#" id="brand"
+        ><span class="brand-mark">NR</span
+        ><span>NEON REPO<small>NIGHT RECOVERY SERVICE</small></span></a
+      >
+      <div class="top-actions">
+        <button id="sound" aria-label="Toggle sound effects">FX ON</button
+        ><button id="pause" aria-label="Pause game">Ⅱ</button>
+      </div>
+    </header>
+    <div id="hud" hidden>
+      <div class="dispatch">
+        <span class="eyebrow" id="stage">01 / FIND THE VEHICLE</span>
+        <h2 id="mission"></h2>
+        <div class="objective" id="objective"></div>
+        <div class="job-meta">
+          <span id="distance"></span><span id="clock"></span>
+        </div>
+      </div>
+      <div class="condition">
+        <div><span>BODYWORK</span><strong id="condition">100%</strong></div>
+        <div class="meter"><i id="healthbar"></i></div>
+        <div><span>BOOST</span><span>SHIFT</span></div>
+        <div class="meter boost"><i id="boostbar"></i></div>
+      </div>
+      <div class="speed">
+        <strong id="speed">000</strong><span>KM/H <em id="carname"></em></span>
+      </div>
+      <div class="map-label">N ↑ <span>ASHPORT / AFTER HOURS</span></div>
+      <div class="controls-hint">
+        WASD / ARROWS <b>DRIVE</b> · SPACE <b>HANDBRAKE</b> · SHIFT
+        <b>BOOST</b> · R <b>UNSTICK</b>
+      </div>
+      <button id="interaction" hidden></button>
+    </div>
+    <div class="toast" id="toast" hidden></div>
+    <main id="board" class="overlay">
+      <section class="board-panel">
+        <div class="intro">
+          <div>
+            <span class="eyebrow"
+              ><i class="status-dot"></i> ASHPORT · 02:17 AM</span
+            >
+            <h1>THE CITY SLEEPS.<br /><em>YOU DON'T.</em></h1>
+            <p>
+              Find it. Drive it. Bring it back clean.<br />Someone's stranded
+              ride is your next payday.
+            </p>
+          </div>
+          <div class="career">
+            <span id="rank">ROOKIE OPERATOR</span><strong id="cash">$0</strong
+            ><small id="careerline">0 RECOVERIES · 0 REP</small>
+          </div>
+        </div>
+        <div class="board-heading">
+          <h3>TONIGHT'S DISPATCH</h3>
+          <span>CHOOSE A CONTRACT</span>
+        </div>
+        <div id="jobs" class="job-grid"></div>
+        <div class="board-footer">
+          <span
+            ><b>HOW IT WORKS</b> Follow the amber GPS. Slow down and press E to
+            switch cars. Return to the mint handover bay.</span
+          ><button id="garage">GARAGE / UPGRADES ↗</button>
+        </div>
+        <p class="save-note" id="savenote">
+          Your career saves on this device. No account needed.
+        </p>
+      </section>
+    </main>
+    <section id="result" class="overlay" hidden>
+      <div class="result-panel">
+        <span class="eyebrow">RECOVERY COMPLETE / PAID IN FULL</span>
+        <h2>ANOTHER ONE<br /><em>HOME SAFE.</em></h2>
+        <div id="receipt"></div>
+        <button class="primary" id="next">BACK TO DISPATCH →</button>
+      </div>
+    </section>
+    <section id="garagepanel" class="overlay" hidden>
+      <div class="garage-panel">
+        <span class="eyebrow">SMALL IMPROVEMENTS. LONG NIGHTS.</span>
+        <h2>YOUR GARAGE</h2>
+        <p>Upgrades apply to every recovered vehicle.</p>
+        <div id="upgrades"></div>
+        <button class="primary" id="closegarage">BACK TO DISPATCH →</button>
+      </div>
+    </section>
+    <section id="pausepanel" class="overlay" hidden>
+      <div class="pause-panel">
+        <span class="eyebrow">TAKE A BREATHER</span>
+        <h2>SHIFT PAUSED</h2>
+        <p>Your contract clock is paused too.</p>
+        <button class="primary" id="resume">KEEP DRIVING →</button
+        ><button id="abandon">ABANDON THIS CONTRACT</button>
+      </div>
+    </section>
+    <div id="touch" hidden>
+      <div class="steering">
+        <button data-key="left" aria-label="Steer left">◀</button
+        ><button data-key="right" aria-label="Steer right">▶</button>
+      </div>
+      <div class="pedals">
+        <button data-key="brake" aria-label="Handbrake">DRIFT</button
+        ><button data-key="reverse" aria-label="Reverse">REV</button
+        ><button data-key="forward" aria-label="Accelerate">GO</button
+        ><button data-key="boost" aria-label="Boost">⚡</button>
+      </div>
+    </div>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

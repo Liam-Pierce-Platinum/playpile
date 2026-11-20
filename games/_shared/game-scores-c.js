@@ -1,5 +1,8 @@
 // Track title, palette, tempo, tonic MIDI, mode, eight melodic degrees, four roots.
 export const SCORES_C = {
+  'harbor-rush': ['Dock Lights','surf',118,53,'dorian',[2,4,null,6,5,2,1,4],[0,3,1,4]],
+  'neon-repo': ['After the Last Train','noir',96,50,'minor',[4,null,5,3,null,1,2,0],[0,5,3,4]],
+  'skyline-stunt-club': ['Air Above the Avenue','flight',132,56,'pentatonic',[3,1,4,null,6,5,2,null],[0,4,3,1]],
   derby: ['Scrap Heat','drift',148,43,'minor',[0,3,null,5,4,null,1,0],[0,5,6,0]],
   highrise: ['Thirty-First Landing','noir',82,48,'phrygian',[0,null,1,4,null,3,1,null],[0,1,5,0]],
   kickback: ['Two Shell Stairwell','workshop',132,50,'minor',[0,2,3,null,6,5,3,2],[0,3,5,6]],

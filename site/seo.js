@@ -14,6 +14,9 @@
 // /category/driving/.
 
 export const KW = {
+  'harbor-rush': 'courier driving game',
+  'neon-repo': 'vehicle recovery game',
+  'skyline-stunt-club': 'rooftop driving game',
   'lukes-diner': 'restaurant game',
   'bladeborn': 'claw brawler game', 'ironsight': 'realistic fps shooter game', 'blade-dash-story': 'samurai story game',
   'egg-wars': 'egg shooter game', 'kart-clash': 'kart racing game', 'slope-rush': 'slope runner game',

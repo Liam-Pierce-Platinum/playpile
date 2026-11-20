@@ -14,6 +14,27 @@
 import { GAME_COPY } from './arcade-copy.js';
 export const GAMES = [
   {
+    slug: 'harbor-rush', title: 'Harbor Rush', how: 'local',
+    tag: 'Open-city courier', cat: 'Driving', added: '2026-11-19',
+    tags: ['courier', 'open world', 'driving', 'upgrades', 'mobile'],
+    content: 'Arcade driving, traffic and vehicle collisions.',
+    controls: [['WASD / arrows', 'accelerate, steer, brake and reverse'], ['Space', 'handbrake'], ['Shift', 'boost'], ['B / G', 'jobs / garage'], ['P', 'pause'], ['Touch', 'use the steering buttons and pedals']],
+  },
+  {
+    slug: 'neon-repo', title: 'Neon Repo', how: 'local',
+    tag: 'Vehicle recovery', cat: 'Driving', added: '2026-11-19',
+    tags: ['driving', 'open world', 'vehicle recovery', 'career', 'mobile'],
+    content: 'Arcade driving and vehicle collisions.',
+    controls: [['WASD / arrows', 'accelerate, steer, brake and reverse'], ['E', 'collect or return a stopped car'], ['Space', 'handbrake'], ['Shift', 'boost'], ['R', 'return to the road'], ['Touch', 'use the pedals and tap the recovery prompt at the target']],
+  },
+  {
+    slug: 'skyline-stunt-club', title: 'Skyline Stunt Club', how: 'local',
+    tag: 'Rooftop stunt driving', cat: 'Driving', added: '2026-11-19',
+    tags: ['driving', 'stunts', 'jumps', 'free roam', 'mobile'],
+    content: 'Arcade car stunts and falls from rooftops.',
+    controls: [['WASD / arrows', 'drive, steer or spin in midair'], ['Space', 'brake'], ['Shift', 'boost'], ['R', 'return to a checkpoint'], ['Touch', 'use the steering buttons, pedals and boost']],
+  },
+  {
     slug: "lukes-diner", title: "Luke's Diner", how: 'local',
     content: "A cartoon diner game with timed orders, impatient customers and light bickering. No violence.",
     tag: "Diner time management", big: false, added: '2026-11-05',

@@ -1,0 +1,647 @@
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #fff7e4;
+  background: #172641;
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  overflow: hidden;
+  touch-action: none;
+}
+button {
+  font: 700 11px Arial;
+  letter-spacing: 1.2px;
+  border: 1px solid #ffffff35;
+  border-radius: 6px;
+  background: #203348db;
+  color: #fff7e4;
+  padding: 12px 16px;
+  cursor: pointer;
+  touch-action: none;
+}
+button:hover {
+  background: #35556a;
+}
+button:focus-visible {
+  outline: 3px solid #a8f5ca;
+  outline-offset: 3px;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+canvas {
+  display: block;
+  width: 100vw;
+  height: 100dvh;
+  outline: none;
+}
+header {
+  position: fixed;
+  inset: 22px 28px auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+.brand b {
+  display: block;
+}
+.brand small {
+  font-size: 7px;
+  letter-spacing: 2.1px;
+  display: block;
+  margin-top: 5px;
+  color: #e4b8a1;
+}
+.club-mark {
+  display: grid;
+  place-items: center;
+  width: 49px;
+  height: 49px;
+  border: 2px solid #a8f5ca;
+  color: #a8f5ca;
+  border-radius: 50%;
+  font-size: 14px;
+  transform: rotate(-12deg);
+}
+.top-actions {
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+}
+.scoreboard {
+  position: fixed;
+  left: 29px;
+  top: 105px;
+  display: flex;
+  gap: 30px;
+  text-shadow: 0 2px 9px #142338;
+}
+.scoreboard small {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #e0bbaf;
+}
+.scoreboard strong {
+  font-size: 27px;
+  font-weight: 900;
+}
+.challenge {
+  position: fixed;
+  top: 107px;
+  right: 28px;
+  width: 260px;
+  text-align: right;
+  text-shadow: 0 2px 8px #142338;
+}
+.challenge > span {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #a8f5ca;
+}
+.challenge h2 {
+  font-size: 17px;
+  margin: 8px 0;
+  line-height: 1.15;
+}
+.challenge p {
+  font-size: 11px;
+  line-height: 1.5;
+  color: #e2c8be;
+  margin: 8px 0 13px;
+}
+.challenge button {
+  font-size: 9px;
+  padding: 10px 12px;
+  border-color: #a8f5ca66;
+}
+.dashboard {
+  position: fixed;
+  left: 28px;
+  bottom: 62px;
+  width: 190px;
+}
+.speed {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+.speed strong {
+  font-size: 53px;
+  line-height: 1;
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: -3px;
+}
+.speed small {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #d4c1bd;
+}
+.boost {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 10px;
+}
+.boost span {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #a8f5ca;
+}
+.boost > div {
+  height: 4px;
+  background: #ffffff30;
+  flex: 1;
+  overflow: hidden;
+}
+.boost i {
+  display: block;
+  background: #a8f5ca;
+  height: 100%;
+  width: 100%;
+}
+.dashboard p {
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  color: #e0bbaf;
+  margin-top: 12px;
+}
+.controls {
+  position: fixed;
+  bottom: 15px;
+  left: 28px;
+  right: 28px;
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  font-size: 10px;
+  color: #e0c9bf;
+}
+.controls span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+kbd {
+  border: 1px solid #ffffff30;
+  border-radius: 3px;
+  padding: 5px;
+  font: 9px Arial;
+  color: #fff7e4;
+}
+.controls button {
+  margin-left: auto;
+  font-size: 9px;
+  padding: 8px 13px;
+}
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 115px;
+  transform: translateX(-50%);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-align: center;
+  text-shadow: 0 2px 8px #142338;
+  pointer-events: none;
+}
+#combo {
+  position: fixed;
+  left: 50%;
+  top: 24%;
+  transform: translateX(-50%);
+  font-style: italic;
+  font-size: 36px;
+  font-weight: 900;
+  color: #c8fce0;
+  text-shadow: 0 3px 0 #203348;
+  pointer-events: none;
+  text-align: center;
+}
+.veil {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(90deg, #12243ced, #12243c90 55%, #12243c15);
+  display: flex;
+  align-items: center;
+  padding: 8vw;
+}
+.veil[hidden] {
+  display: none;
+}
+.welcome {
+  max-width: 560px;
+}
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: #a8f5ca;
+  font-weight: 700;
+}
+h1 {
+  font-size: clamp(50px, 7.2vw, 105px);
+  font-weight: 950;
+  letter-spacing: -5px;
+  line-height: 0.91;
+  margin: 26px 0;
+}
+h1 em {
+  font-style: italic;
+  color: #ffc19d;
+}
+.welcome p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #dbc5be;
+}
+.pills {
+  display: flex;
+  gap: 18px;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  color: #a8f5ca;
+  margin: 22px 0;
+}
+.primary {
+  display: block;
+  background: #a8f5ca;
+  color: #19364a;
+  font-size: 13px;
+  padding: 17px 30px;
+  border: none;
+  margin: 25px 0 15px;
+  min-width: 210px;
+}
+.primary:hover {
+  background: #d1ffe4;
+}
+.welcome > small,
+.garage-card > small {
+  font-size: 10px;
+  line-height: 1.8;
+  color: #b7c1c7;
+}
+.garage-card {
+  background: #183149f5;
+  border: 1px solid #ffffff35;
+  padding: 32px;
+  border-radius: 14px;
+  width: min(570px, 100%);
+  margin: auto;
+}
+.garage-card h2 {
+  font-size: 28px;
+  font-style: italic;
+  letter-spacing: -1px;
+}
+.garage-card p {
+  font-size: 13px;
+  color: #c1c9cf;
+}
+#cars {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 22px 0;
+}
+#cars button {
+  text-align: left;
+  font-size: 12px;
+  line-height: 1.5;
+  border-left: 6px solid var(--car);
+}
+#cars button small {
+  font-size: 9px;
+  display: block;
+  font-weight: 400;
+}
+.mobile {
+  display: none;
+  position: fixed;
+  bottom: 22px;
+  left: 14px;
+  right: 14px;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.mobile > div {
+  display: flex;
+  gap: 6px;
+  pointer-events: auto;
+}
+.mobile button {
+  height: 58px;
+  min-width: 58px;
+  padding: 8px;
+  font-size: 11px;
+  background: #182b43cc;
+}
+.mobile button.held {
+  background: #a8f5ca;
+  color: #173044;
+}
+@media (max-width: 800px), (pointer: coarse) {
+  header {
+    inset: 12px 15px auto;
+  }
+  .brand {
+    font-size: 10px;
+    gap: 8px;
+  }
+  .club-mark {
+    width: 35px;
+    height: 35px;
+    font-size: 10px;
+  }
+  .brand small {
+    display: none;
+  }
+  .top-actions button {
+    font-size: 8px;
+    padding: 9px;
+  }
+  .scoreboard {
+    top: 65px;
+    left: 15px;
+    gap: 17px;
+  }
+  .scoreboard strong {
+    font-size: 21px;
+  }
+  .scoreboard small {
+    font-size: 7px;
+  }
+  .challenge {
+    top: 65px;
+    right: 15px;
+    width: 170px;
+  }
+  .challenge h2 {
+    font-size: 13px;
+  }
+  .challenge p {
+    font-size: 10px;
+  }
+  .challenge > span {
+    font-size: 7px;
+  }
+  .challenge button {
+    font-size: 8px;
+    padding: 8px;
+  }
+  .dashboard {
+    left: 16px;
+    bottom: 100px;
+    width: 140px;
+  }
+  .speed strong {
+    font-size: 40px;
+  }
+  .controls {
+    display: none;
+  }
+  .mobile {
+    display: flex;
+  }
+  #toast {
+    bottom: 170px;
+    width: 70%;
+    font-size: 12px;
+  }
+  #combo {
+    font-size: 25px;
+    top: 31%;
+  }
+  .veil {
+    padding: 30px;
+  }
+  .welcome p {
+    font-size: 13px;
+  }
+  .welcome h1 {
+    letter-spacing: -3px;
+  }
+  .garage-card {
+    padding: 20px;
+  }
+  .pills {
+    gap: 10px;
+    font-size: 7px;
+  }
+}
+@media (max-height: 510px) {
+  .welcome h1 {
+    font-size: 51px;
+    margin: 17px 0;
+  }
+  .welcome p {
+    font-size: 12px;
+  }
+  .welcome .pills {
+    margin: 10px 0;
+  }
+  .primary {
+    margin: 15px 0 10px;
+    padding: 13px;
+  }
+  .challenge {
+    top: 62px;
+  }
+  .scoreboard {
+    top: 62px;
+  }
+  .dashboard {
+    bottom: 88px;
+  }
+  .controls {
+    bottom: 8px;
+  }
+  .garage-card {
+    max-height: 94vh;
+    overflow: auto;
+  }
+}
+
+.challenge select {
+  display: block;
+  margin: 8px 0 8px auto;
+  max-width: 100%;
+  padding: 8px;
+  border-radius: 5px;
+  color: #fff2db;
+  background: #203348ed;
+  border: 1px solid #b6f5cc60;
+  font: 700 10px Arial;
+}
+.challenge > small {
+  display: block;
+  color: #e8d2b9;
+  font-size: 8px;
+  letter-spacing: 1px;
+  margin-top: 8px;
+}
+#mobileGarage {
+  display: none;
+}
+.car-option.selected {
+  outline: 2px solid #a8f5ca;
+}
+.car-swatch {
+  font-size: 22px;
+  color: var(--car);
+  display: block;
+}
+@media (max-width: 800px), (pointer: coarse) {
+  #mobileGarage {
+    display: block;
+  }
+  .top-actions {
+    gap: 4px;
+  }
+  .top-actions button {
+    letter-spacing: 0.3px;
+    padding: 9px 7px;
+  }
+  .mobile {
+    bottom: 14px;
+    left: 8px;
+    right: 8px;
+  }
+  .mobile > div {
+    gap: 4px;
+  }
+  .mobile button {
+    min-width: 45px;
+    width: 45px;
+    height: 54px;
+    font-size: 9px;
+  }
+  .challenge select {
+    font-size: 9px;
+    padding: 6px;
+  }
+  .challenge p {
+    display: none;
+  }
+  .brand {
+    font-size: 9px;
+    letter-spacing: 1px;
+  }
+  .club-mark {
+    width: 30px;
+    height: 30px;
+  }
+  .challenge {
+    width: 155px;
+  }
+  .scoreboard {
+    gap: 13px;
+  }
+  .dashboard {
+    bottom: 88px;
+  }
+}
+@media (max-height: 380px) {
+  .welcome h1 {
+    font-size: 40px;
+    margin: 12px 0;
+  }
+  .welcome .eyebrow,
+  .welcome .pills,
+  .welcome > small {
+    display: none;
+  }
+  .welcome p {
+    font-size: 11px;
+    margin: 10px 0;
+  }
+  .veil {
+    padding: 22px 35px;
+  }
+  .primary {
+    min-width: 180px;
+    font-size: 11px;
+    padding: 12px;
+    margin: 12px 0 0;
+  }
+  .challenge {
+    top: 57px;
+  }
+  .challenge h2 {
+    font-size: 11px;
+    margin: 4px 0;
+  }
+  .challenge > small {
+    display: none;
+  }
+  .challenge select {
+    margin: 5px 0 5px auto;
+  }
+  .scoreboard {
+    top: 56px;
+  }
+  .dashboard {
+    bottom: 77px;
+  }
+  .speed strong {
+    font-size: 30px;
+  }
+  .dashboard p {
+    margin: 5px 0;
+  }
+  .mobile button {
+    height: 44px;
+  }
+  #toast {
+    bottom: 75px;
+    font-size: 10px;
+  }
+  .garage-card h2 {
+    font-size: 22px;
+    margin: 10px 0;
+  }
+  .garage-card #cars {
+    margin: 10px 0;
+    gap: 6px;
+  }
+  .garage-card .eyebrow,
+  .garage-card > small,
+  .garage-card p {
+    display: none;
+  }
+  .garage-card button {
+    padding: 7px;
+  }
+  .car-swatch {
+    display: none;
+  }
+}
+.challenge > small {
+  display: table;
+  margin-left: auto;
+  background: #203348c9;
+  padding: 4px 6px;
+  border-radius: 4px;
+  color: #fff0d6;
+}
+@media (max-height: 380px) {
+  .challenge > small {
+    display: none;
+  }
+}

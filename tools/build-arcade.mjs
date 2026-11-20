@@ -129,6 +129,6 @@ await write('site/about.html',about);
 // Keep the newer destinations discoverable without duplicating every game on Home.
 let sitemap=await read('sitemap.xml');
 for(const url of ['/browse/','/browse/all/'])sitemap=sitemap.replace(`<url><loc>https://playpile.net${url}</loc></url>\n`,'');
-for(const url of ['/category/','/browse/new/','/browse/popular/','/settings/'])if(!sitemap.includes('https://playpile.net'+url+'<'))sitemap=sitemap.replace('</urlset>',`<url><loc>https://playpile.net${url}</loc></url>\n</urlset>`);
+for(const url of ['/category/','/browse/new/','/browse/popular/','/settings/', ...GAMES.map(playUrl)])if(!sitemap.includes('https://playpile.net'+url+'<'))sitemap=sitemap.replace('</urlset>',`<url><loc>https://playpile.net${url}</loc></url>\n</urlset>`);
 await write('sitemap.xml',sitemap);
 console.log(`Built the catalogue and boot intro, 12 category screens, profile, settings, ${GAMES.length} game pages and shared information layouts`);

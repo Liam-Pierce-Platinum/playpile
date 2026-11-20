@@ -4,6 +4,7 @@ const MAX_BODY_BYTES = 256;
 const MAX_PAGE_MS = 8 * 60 * 60 * 1000;
 // Canonical IDs from site/catalogue.js. Keep this self-contained for dashboard deploys.
 const GAMES = new Set([
+  'harbor-rush', 'neon-repo', 'skyline-stunt-club',
   'lukes-diner', 'bladeborn', 'ironsight', 'blade-dash-story', 'egg-wars', 'kart-clash',
   'slope-rush', 'tunnel-dive', 'bridge-race', 'hole-feast', 'stick-swing', 'moto-stunt',
   'drift-tower', 'eggy-road', 'stunt-city', 'crazy-cattle', 'freeze-run', 'archer-duel',

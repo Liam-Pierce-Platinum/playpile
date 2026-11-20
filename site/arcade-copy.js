@@ -1,6 +1,21 @@
 // Short, game-specific copy for the arcade. Mechanics come from catalogue.js.
 // Content warnings, controls and saved-progress rules stay in the catalogue.
 export const GAME_COPY = {
+  'harbor-rush': {
+    blurb: 'Pick up a parcel and thread your way through harbor traffic.',
+    about: 'Choose a standard delivery, carry fragile cargo or take on a rival courier. The route line leaves you free to cut through the parks. Between jobs, find twelve landmarks or put your earnings into the engine, tires and cargo protection.',
+    tips: 'Brake before a turn. A clean exit is faster than bouncing off traffic.',
+  },
+  'neon-repo': {
+    blurb: 'Find a stranded car and drive it back through the night shift.',
+    about: 'Drive a scout coupe to one of six recovery calls, then take the wheel of a microcar, delivery van, GT or V8. Bring it to the marked handover bay. Your browser saves payouts, garage upgrades and personal records for each route.',
+    tips: 'Get a feel for the recovered car before taking the first corner at speed.',
+  },
+  'skyline-stunt-club': {
+    blurb: 'Link rooftop jumps and land a clean spin above the city.',
+    about: 'Five rooftops are connected by narrow bridges and paired ramps. Practice a jump in free roam, try First Flight for a single timed crossing, or take on the eleven-checkpoint Club Circuit. Landings earn reputation and each course keeps its own best time.',
+    tips: 'Look past the ramp to the landing roof before committing to a jump.',
+  },
   'lukes-diner': {
     blurb: "Coffee's on and the regulars are getting hungry. Your shift starts here",
     about: "The coffee pot needs you. So does the kitchen. And someone at the counter has been waiting a while. Learn each station, keep the orders moving and work your way through a year of Stars Hollow shifts. Relaxed mode gives you a little breathing room. This is an unofficial Gilmore Girls fan game.",

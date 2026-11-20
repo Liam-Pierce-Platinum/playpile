@@ -12,13 +12,13 @@
       name="description"
       content="An original open-city arcade courier driving game. Find your route, drift the harbor, and build your fleet."
     />
-    <link rel="stylesheet" href="style.css?v=20261120-controls" />
+    <link rel="stylesheet" href="style.css?v=20261120-hud" />
     <script type="importmap">
       {"imports":{
         "../apex/vendor/three.module.js":"../_deck/three.module.js",
         "./model.js":"./model.js?v=20261120-controls",
-        "./render3d.js":"./render3d.js?v=20261120-controls",
-        "./fallback.js":"./fallback.js?v=20261120-controls"
+        "./render3d.js":"./render3d.js?v=20261120-hud",
+        "./fallback.js":"./fallback.js?v=20261120-hud"
       }}
     </script>
     <script src="../_shared/mobile.js"></script>
@@ -27,40 +27,21 @@
     <canvas id="city" tabindex="0" aria-label="Harbor Rush city driving game"></canvas>
     <div id="hud" hidden>
       <header>
-        <div class="brand">
-          HARBOR<span>RUSH</span><small id="district">SOUTH DOCKS</small>
+        <section id="dispatch" data-drive-readout aria-label="Current route">
+          <div class="route-line"><strong id="objective">Free drive</strong><span id="distance" hidden></span></div>
+          <div id="routeNote" hidden></div>
+          <div id="toast" role="status" hidden></div>
+        </section>
+        <div id="speed" data-drive-readout aria-label="Speed and boost">
+          <strong id="speedValue">0</strong><span>km/h</span>
+          <div class="boost" title="Boost charge"><i id="boostFill"></i></div>
         </div>
-        <div class="readout">
-          <small>SHIFT EARNINGS</small><strong id="bank">$0</strong>
-        </div>
-        <button id="pauseButton" aria-label="Pause game">Ⅱ</button>
+        <button id="pauseButton" aria-haspopup="dialog" aria-label="Pause game and open menu">Menu</button>
       </header>
-      <section id="dispatch">
-        <small id="phase">DISPATCH / 01</small>
-        <h2 id="objective">Follow the cyan route</h2>
-        <p id="instructions">Slow down in the marked bay.</p>
-        <div class="meter"><i id="cargo"></i></div>
-        <div class="dispatchStats">
-          <span id="condition">PACKAGE 100%</span><b id="distance">0 m</b>
-        </div>
-      </section>
-      <div id="toast" role="status"></div>
-      <section id="speed">
-        <strong id="speedValue">0</strong><span>KM/H</span>
-        <div class="boost"><i id="boostFill"></i></div>
-        <small>BOOST <b>SHIFT</b></small>
-      </section>
-      <nav id="actions">
-        <button id="jobsButton">Jobs <kbd>B</kbd></button
-        ><button id="garageButton">Garage <kbd>G</kbd></button
-        ><button id="soundButton" aria-label="Toggle sound effects">
-          FX off
-        </button>
-      </nav>
       <div id="touch">
         <div>
-          <button data-input="left" aria-label="Steer left">◀</button
-          ><button data-input="right" aria-label="Steer right">▶</button>
+          <button data-input="left" aria-label="Steer left"><span class="arrow" aria-hidden="true"></span></button
+          ><button data-input="right" aria-label="Steer right"><span class="arrow right" aria-hidden="true"></span></button>
         </div>
         <div>
           <button data-input="drift">DRIFT</button
@@ -69,13 +50,11 @@
           ><button data-input="boost" class="nitro">BOOST</button>
         </div>
       </div>
-      <div id="help">
-        WASD / ARROWS drive · SPACE drift · SHIFT boost · B jobs · G garage · P
-        pause
-      </div>
     </div>
-    <div id="overlay" role="dialog" aria-modal="true" aria-label="Harbor Rush"><section class="panel" id="menu"></section></div>
-    <script type="module" src="game.js?v=20261120-controls"></script>
+    <div id="overlay" role="dialog" aria-modal="true" aria-label="Harbor Rush">
+      <section class="panel"><div id="menu"></div><div data-playpile-notices></div></section>
+    </div>
+    <script type="module" src="game.js?v=20261120-hud"></script>
     <noscript>Turn on JavaScript to play Harbor Rush.</noscript>
   </body>
 </html>

@@ -1,7 +1,6 @@
 import {
   roofs,
   bridges,
-  ramps,
   beacons,
   liveries,
   courses,
@@ -10,7 +9,6 @@ import {
   reset,
   startRoute,
   surface,
-  toast,
 } from "./engine.js";
 import { graphicsChoice, mountDrivingView } from "../_shared/city-art/driving-view.js";
 import { createFallback } from "./fallback.js";
@@ -85,45 +83,74 @@ function events() {
   }
   s.events = [];
 }
+const bearings = ["Ahead", "Ahead right", "Right", "Back right", "Behind", "Back left", "Left", "Ahead left"];
 function ui() {
+  $("speed").textContent = Math.round(Math.abs(s.car.speed) * 3.6);
+  $("boostFill").style.width = s.boost * 100 + "%";
+  const active = s.route && !s.route.done;
+  $("courseStatus").hidden = !active;
+  if (active) {
+    const course = courses[s.route.course];
+    const target = beacons[course.path[s.route.index]];
+    const dx = target.x - s.car.x, dz = target.z - s.car.z;
+    const heading = Math.atan2(dx, -dz) - s.car.a;
+    const octant = (Math.round(heading / (Math.PI / 4)) % 8 + 8) % 8;
+    $("objective").textContent = "Checkpoint " + (s.route.index + 1) + " / " + course.path.length;
+    $("routeLabel").textContent = bearings[octant] + " · " + Math.round(Math.hypot(dx, dz)) + " m · " + Math.ceil(s.route.remaining) + "s";
+  }
+  const message = s.toastTime > 0 ? s.toast : s.combo > 1 ? "×" + Math.min(s.combo, 5) + " combo" : "";
+  $("toast").hidden = !!active || !message;
+  if ($("toast").textContent !== message) $("toast").textContent = message;
+}
+function menuInfo() {
+  const pick = Number($("course").value);
+  $("routeInfo").textContent = courses[pick].description;
+  $("record").textContent = "Personal best " + (s.records[pick] ? s.records[pick].toFixed(2) + "s" : "—");
+  $("challenge").textContent = s.route?.course === pick ? "Retry course" : "Start course";
   $("rep").textContent = s.rep.toLocaleString();
   $("best").textContent = s.best.toLocaleString();
   $("landings").textContent = s.landings;
-  $("speed").textContent = Math.round(Math.abs(s.car.speed) * 3.6);
-  $("boostFill").style.width = s.boost * 100 + "%";
-  $("location").textContent = s.car.air
-    ? "AIR TIME / " + s.car.airTime.toFixed(1) + "s"
-    : surface(s.car.x, s.car.z)?.name || "OVER THE EDGE";
-  const message = s.toastTime > 0 ? s.toast : "";
-  if ($("toast").textContent !== message) $("toast").textContent = message;
-  $("combo").textContent =
-    s.combo > 1
-      ? "×" + Math.min(s.combo, 5) + " COMBO · " + s.comboTime.toFixed(1) + "s"
-      : "";
-  const pick = +$("course").value,
-    def = courses[pick];
-  $("record").textContent =
-    "PERSONAL BEST " +
-    (s.records[pick] ? s.records[pick].toFixed(2) + "s" : "—");
-  $("challenge").textContent =
-    (s.route?.course === pick ? "RETRY " : "START ") + def.name;
-  if (s.route) {
-    const active = courses[s.route.course];
-    $("routeLabel").textContent = s.route.done
-      ? "RUN ENDED / FREE ROAM"
-      : active.name + " / " + Math.ceil(s.route.remaining) + "s";
-    $("objective").textContent = s.route.done
-      ? s.route.success
-        ? "COURSE COMPLETE"
-        : "One more run?"
-      : "CHECKPOINT " + (s.route.index + 1) + " OF " + active.path.length;
-    $("routeInfo").textContent = s.route.done
-      ? "Pick a course or keep exploring."
-      : "Follow the gold beacon. Bridges are the safe line.";
-  } else {
-    $("routeInfo").textContent = def.description;
-  }
+  $("location").textContent = s.car.air ? "Airborne" : surface(s.car.x, s.car.z)?.name || "Over the edge";
 }
+function drawMap() {
+  const mc = $("miniMap").getContext("2d");
+  if (!mc) return;
+  mc.clearRect(0, 0, 240, 240);
+  mc.fillStyle = "rgba(9,17,24,.68)";
+  mc.fillRect(0, 0, 240, 240);
+  mc.save();
+  mc.translate(120, 120);
+  const f = 1.85;
+  for (const r of [...roofs, ...bridges]) {
+    mc.fillStyle = "#6d7d82";
+    mc.fillRect((r.x - r.w / 2) * f, (r.z - r.d / 2) * f, r.w * f, r.d * f);
+  }
+  beacons.forEach((b, i) => {
+    const active =
+      s.route &&
+      !s.route.done &&
+      courses[s.route.course].path[s.route.index] === i;
+    mc.fillStyle = active
+      ? "#ffcf5a"
+      : s.collected.has(i)
+        ? "#758f82"
+        : "#c4d4be";
+    mc.beginPath();
+    mc.arc(b.x * f, b.z * f, active ? 6 : 3, 0, Math.PI * 2);
+    mc.fill();
+  });
+  mc.translate(s.car.x * f, s.car.z * f);
+  mc.rotate(s.car.a);
+  mc.fillStyle = "#fff4d1";
+  mc.beginPath();
+  mc.moveTo(0, -8);
+  mc.lineTo(5, 6);
+  mc.lineTo(0, 3);
+  mc.lineTo(-5, 6);
+  mc.fill();
+  mc.restore();
+}
+
 function frame(now) {
   const elapsed = Math.max(0, (now - last) / 1000);
   last = Math.max(last, now);
@@ -165,37 +192,36 @@ function setPause(value) {
   last = performance.now();
   s.pendingSeconds = 0;
   releaseControls();
-  $("pause").textContent = paused ? "RESUME" : "PAUSE";
-  if (paused) toast(s, "PAUSED · PRESS P OR RESUME");
-  else {
+  $("cockpit").inert = value;
+  if (value) {
+    menuInfo();
+    drawMap();
+    if (!$("pausePanel").open) $("pausePanel").showModal();
+    $("resume").focus({ preventScroll: true });
+  } else {
+    if ($("pausePanel").open) $("pausePanel").close();
     canvas.focus({ preventScroll: true });
-    toast(s, "BACK IN THE DRIVER’S SEAT");
   }
   ui();
 }
-$("start").onclick = () => {
+function start(chooseCourse) {
   running = true;
-  last = performance.now();
   $("menu").hidden = true;
-  $("cockpit").inert = false;
-  canvas.focus({ preventScroll: true });
-  toast(s, matchMedia("(pointer: coarse)").matches
-    ? "HOLD GO · FOLLOW THE MINT ARROWS"
-    : "HOLD W / ↑ · FOLLOW THE MINT ARROWS");
-};
-$("start").disabled = false;
-$("pause").onclick = () => {
-  if (running) setPause(!paused);
+  setPause(chooseCourse);
+  if (chooseCourse) $("course").focus({ preventScroll: true });
+}
+$("start").onclick = () => start(false);
+$("chooseCourse").onclick = () => start(true);
+$("start").disabled = $("chooseCourse").disabled = false;
+$("pause").onclick = () => setPause(true);
+$("resume").onclick = () => setPause(false);
+$("pausePanel").oncancel = e => {
+  e.preventDefault();
+  if (!document.hidden) setPause(false);
 };
 $("challenge").onclick = () => {
-  running = true;
-  paused = false;
-  last = performance.now();
-  releaseControls();
-  $("pause").textContent = "PAUSE";
-  $("menu").hidden = true;
-  startRoute(s, +$("course").value);
-  canvas.focus({ preventScroll: true });
+  startRoute(s, Number($("course").value));
+  setPause(false);
 };
 function showLiveries() {
   $("cars").replaceChildren(
@@ -224,24 +250,19 @@ function showLiveries() {
     }),
   );
 }
-let pausedBeforeGarage = false;
-function garage() {
-  pausedBeforeGarage = paused;
-  setPause(true);
+$("garage").onclick = () => {
   showLiveries();
   $("garagePanel").showModal();
   $("cars").querySelector(".selected")?.focus();
-}
-$("garage").onclick = garage;
-$("mobileGarage").onclick = garage;
-$("recover").onclick = () => {
-  if (running && !paused) reset(s);
-  canvas.focus({ preventScroll: true });
 };
-$("course").onchange = ui;
+$("recover").onclick = () => {
+  reset(s);
+  setPause(false);
+};
+$("course").onchange = menuInfo;
 $("garageClose").onclick = () => $("garagePanel").close();
 $("garagePanel").onclose = () => {
-  setPause(pausedBeforeGarage || document.hidden);
+  if ($("pausePanel").open) $("garage").focus({ preventScroll: true });
 };
 $("sound").onclick = () => {
   try {
@@ -259,19 +280,33 @@ $("sound").onclick = () => {
     sound = !sound;
     if (sound) audio.resume().catch(() => {
       sound = false;
-      $("sound").textContent = "FX OFF";
+      $("sound").textContent = "Sound off";
+      $("sound").setAttribute("aria-pressed", "false");
     });
-    $("sound").textContent = sound ? "FX ON" : "FX OFF";
+    $("sound").textContent = sound ? "Sound on" : "Sound off";
+    $("sound").setAttribute("aria-pressed", String(sound));
   } catch {
     sound = false;
     $("sound").disabled = true;
-    $("sound").textContent = "FX UNAVAILABLE";
+    $("sound").setAttribute("aria-pressed", "false");
+    $("sound").textContent = "Sound unavailable";
   }
 };
 addEventListener("keydown", (e) => {
   const k = e.key.toLowerCase();
   if (!running || $("garagePanel").open || e.target instanceof HTMLSelectElement ||
       e.ctrlKey || e.metaKey || e.altKey) return;
+  if (k === "p" && !e.repeat) {
+    e.preventDefault();
+    setPause(!paused);
+    return;
+  }
+  if (paused) return;
+  if (k === "escape" && !e.repeat) {
+    e.preventDefault();
+    setPause(true);
+    return;
+  }
   if (
     [
       "w",
@@ -285,15 +320,13 @@ addEventListener("keydown", (e) => {
       " ",
       "shift",
       "r",
-      "p",
     ].includes(k)
   ) {
     if (e.target instanceof HTMLButtonElement && [" ", "enter"].includes(k))
       return;
     e.preventDefault();
-    if (k === "p" && !e.repeat && running) setPause(!paused);
-    if (k === "r" && !e.repeat && running && !paused) reset(s);
-    if (!paused && !["p","r"].includes(k)) {
+    if (k === "r" && !e.repeat) reset(s);
+    if (k !== "r") {
       keyboardHeld.add(k);
       keys.add(k);
     }
@@ -305,7 +338,6 @@ addEventListener("keyup", (e) => {
   if (![...touchPointers.values()].includes(key)) keys.delete(key);
 });
 function pauseInactiveGame() {
-  if ($("garagePanel").open) pausedBeforeGarage = true;
   if (running && !paused) setPause(true);
   else releaseControls();
 }

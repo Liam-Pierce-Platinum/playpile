@@ -20,7 +20,6 @@ export function createFallback(canvas) {
     currentInput = {};
   const cam = { x: 760, y: 760 };
   const reduced = matchMedia("(prefers-reduced-motion:reduce)").matches;
-  const coarse = matchMedia("(pointer:coarse)").matches;
   let vignette, vignetteBitmap;
   function rr(x, y, width, height, r = 4) {
     ctx.beginPath();
@@ -278,62 +277,6 @@ export function createFallback(canvas) {
     ctx.stroke();
     ctx.setLineDash([]);
   }
-  function minimap() {
-    if (!["play", "pause"].includes(s.mode)) return;
-    const small = w < 720,
-      mw = small ? 128 : 200,
-      mh = (mw * WORLD.h) / WORLD.w,
-      mx = small ? 16 : 28,
-      my = h - (coarse || w < 900 || h < 570 ? 145 : 39) - mh,
-      sc = mw / WORLD.w;
-    ctx.save();
-    ctx.translate(mx, my);
-    ctx.fillStyle = "#071923e8";
-    rr(-5, -5, mw + 10, mh + 10, 4);
-    ctx.fill();
-    ctx.strokeStyle = "#45626c";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    ctx.scale(sc, sc);
-    ctx.strokeStyle = "#42606a";
-    ctx.lineWidth = 24;
-    for (const x of GRID_X) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, WORLD.h);
-      ctx.stroke();
-    }
-    for (const y of GRID_Y) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(WORLD.w, y);
-      ctx.stroke();
-    }
-    const points = route(s);
-    ctx.strokeStyle = s.stage === "pickup" ? "#ffbc78" : "#67f0cf";
-    ctx.lineWidth = 36;
-    ctx.beginPath();
-    points.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
-    ctx.stroke();
-    const t = target(s);
-    ctx.fillStyle = s.stage === "pickup" ? "#ffbc78" : "#67f0cf";
-    ctx.beginPath();
-    ctx.arc(t.x, t.y, 60, 0, 7);
-    ctx.fill();
-    ctx.fillStyle = "#67f0cf";
-    ctx.fillRect(DEPOT.x - 45, DEPOT.y - 45, 90, 90);
-    ctx.translate(s.car.x, s.car.y);
-    ctx.rotate(s.car.angle);
-    ctx.fillStyle = "#fff";
-    ctx.beginPath();
-    ctx.moveTo(85, 0);
-    ctx.lineTo(-50, -48);
-    ctx.lineTo(-25, 0);
-    ctx.lineTo(-50, 48);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-  }
   function draw() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = "#061820";
@@ -398,7 +341,6 @@ export function createFallback(canvas) {
       }
       ctx.stroke();
     }
-    minimap();
   }
 
   return {

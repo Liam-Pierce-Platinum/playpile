@@ -641,12 +641,6 @@ export function createHarborRenderer(canvas, game) {
   routeGeo.setAttribute("lineDistance", routeDistances);
   routeLine.frustumCulled = false;
   scene.add(routeLine);
-  const mini = document.createElement("canvas");
-  mini.id = "map3d";
-  mini.width = 220;
-  mini.height = 220;
-  document.body.appendChild(mini);
-  const mx = mini.getContext("2d");
   let angle = game.car.a,
     initialized = false,
     lastTime = 0,
@@ -657,48 +651,6 @@ export function createHarborRenderer(canvas, game) {
     camera.fov = w < 650 ? 70 : 62;
     cameraSide = w < 650 ? 0 : 1.15;
     camera.updateProjectionMatrix();
-  }
-  function drawMini(g, mode) {
-    mini.hidden = mode !== "drive";
-    mx.clearRect(0, 0, 220, 220);
-    mx.fillStyle = "#101d26dd";
-    mx.fillRect(0, 0, 220, 220);
-    mx.strokeStyle = "#697c82";
-    mx.lineWidth = 5;
-    for (const n of GRID) {
-      mx.beginPath();
-      mx.moveTo(n * 0.09, 12);
-      mx.lineTo(n * 0.09, 199);
-      mx.stroke();
-    }
-    for (const n of YGRID) {
-      mx.beginPath();
-      mx.moveTo(14, n * 0.09);
-      mx.lineTo(199, n * 0.09);
-      mx.stroke();
-    }
-    mx.fillStyle = "#2c6b80";
-    mx.fillRect(199, 0, 21, 220);
-    mx.fillRect(0, 199, 220, 21);
-    if (g.mission) {
-      const p = g.mission.stage === "pickup" ? g.mission.from : g.mission.to;
-      mx.fillStyle = "#f7d181";
-      mx.beginPath();
-      mx.arc(p.x * 0.09, p.y * 0.09, 5, 0, Math.PI * 2);
-      mx.fill();
-    }
-    mx.save();
-    mx.translate(g.car.x * 0.09, g.car.y * 0.09);
-    mx.rotate(g.car.a);
-    mx.fillStyle = "#c4fff0";
-    mx.beginPath();
-    mx.moveTo(7, 0);
-    mx.lineTo(-4, -4);
-    mx.lineTo(-2, 0);
-    mx.lineTo(-4, 4);
-    mx.closePath();
-    mx.fill();
-    mx.restore();
   }
   function render(g, input, mode) {
     const now = performance.now(),
@@ -787,12 +739,10 @@ export function createHarborRenderer(canvas, game) {
       routePositions.needsUpdate = true;
       routeDistances.needsUpdate = true;
     }
-    drawMini(g, mode);
     adjustFrameBudget();
     renderer.render(scene, camera);
   }
   function dispose() {
-    mini.remove();
     renderer.dispose();
   }
   return { resize, render, dispose };

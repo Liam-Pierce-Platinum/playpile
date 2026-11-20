@@ -57,7 +57,8 @@ export function showAnalyticsChoice() {
   const panel = document.createElement('section');
   panel.id = 'pp-analytics-choice';
   panel.setAttribute('aria-label', 'Repeat-visit analytics choice');
-  const layout = settings ? 'position:relative;margin:24px auto;' : 'position:fixed;bottom:12px;left:12px;right:12px;margin:auto;';
+  const slot = document.querySelector('[data-playpile-notices]');
+  const layout = settings || slot ? 'position:relative;margin:16px auto;' : 'position:fixed;bottom:12px;left:12px;right:12px;margin:auto;';
   panel.style.cssText = layout + 'box-sizing:border-box;max-width:640px;z-index:10000;background:#152b2c;color:#fff;border:2px solid #dfbe75;border-radius:12px;padding:14px;box-shadow:0 8px 32px #0005;font:16px/1.4 system-ui';
   panel.innerHTML = '<strong>Help improve PlayPile?</strong><p style="margin:8px 0">Allow a random browser code to measure return visits and time spent across visits? No names or game saves. The code expires after 90 days. Games work either way.</p><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button type="button" data-choice="no">No thanks</button><button type="button" data-choice="yes">Allow</button><a href="/site/privacy.html#analytics" style="color:#f5d99b">Privacy details</a></div><small style="display:block;margin-top:8px;font-size:14px">Change your choice in Settings &amp; info.</small>';
   const updateStatus = () => {
@@ -76,6 +77,6 @@ export function showAnalyticsChoice() {
     });
   }
   if (settings) updateStatus();
-  const host = settings ? document.querySelector('main') || document.body : document.body;
+  const host = slot || (settings && document.querySelector('main')) || document.body;
   host.appendChild(panel);
 }

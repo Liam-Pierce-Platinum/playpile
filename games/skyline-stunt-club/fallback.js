@@ -395,65 +395,6 @@ export function createFallback(canvas) {
       }
     }
   }
-  function miniMap() {
-    const size = H < 450 ? 72 : W < 650 ? 104 : 136,
-      x = W - size - 18,
-      y = H - size - 76;
-    ctx.fillStyle = "rgba(25,47,57,.72)";
-    ctx.fillRect(x, y, size, size);
-    ctx.strokeStyle = "rgba(218,235,220,.24)";
-    ctx.strokeRect(x, y, size, size);
-    const f = size / 122,
-      q = (xx, zz) => ({ x: x + size / 2 + xx * f, y: y + size / 2 + zz * f });
-    for (const r of [...roofs, ...bridges]) {
-      ctx.fillStyle = "#67877f";
-      ctx.fillRect(
-        q(r.x - r.w / 2, r.z - r.d / 2).x,
-        q(r.x - r.w / 2, r.z - r.d / 2).y,
-        r.w * f,
-        r.d * f,
-      );
-    }
-    beacons.forEach((b, i) => {
-      ctx.fillStyle =
-        s.route &&
-        !s.route.done &&
-        courses[s.route.course].path[s.route.index] === i
-          ? "#ffe38f"
-          : "#bdd7b9";
-      ctx.beginPath();
-      ctx.arc(
-        q(b.x, b.z).x,
-        q(b.x, b.z).y,
-        s.route &&
-          !s.route.done &&
-          courses[s.route.course].path[s.route.index] === i
-          ? 4
-          : 2,
-        0,
-        7,
-      );
-      ctx.fill();
-    });
-    const c = q(s.car.x, s.car.z);
-    ctx.save();
-    ctx.translate(c.x, c.y);
-    ctx.rotate(s.car.a);
-    poly(
-      [
-        { x: 0, y: -6 },
-        { x: 4, y: 4 },
-        { x: 0, y: 2 },
-        { x: -4, y: 4 },
-      ],
-      "#fff3dd",
-    );
-    ctx.restore();
-    ctx.fillStyle = "#e4edda";
-    ctx.font = "9px Arial";
-    ctx.textAlign = "left";
-    ctx.fillText("THE FIVE ROOFTOPS", x + 6, y + size + 13);
-  }
   function render(dt) {
     background();
     ctx.save();
@@ -499,7 +440,6 @@ export function createFallback(canvas) {
     }
     ctx.globalAlpha = 1;
     ctx.restore();
-    miniMap();
   }
 
   return {

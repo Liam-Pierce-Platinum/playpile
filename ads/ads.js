@@ -137,7 +137,11 @@ function notice() {
     try { localStorage.setItem('pd.notice', '1'); } catch (e) {}
     bar.remove();
   });
-  const put = () => document.body && document.body.appendChild(bar);
+  const put = () => {
+    const slot = document.querySelector('[data-playpile-notices]');
+    if (slot) bar.style.position = 'static';
+    (slot || document.body).appendChild(bar);
+  };
   if (document.body) put(); else addEventListener('DOMContentLoaded', put);
 }
 

@@ -795,52 +795,7 @@ export function createRenderer(canvas) {
   );
   contactShadow.rotation.x = -Math.PI / 2;
   contactShadow.castShadow = false;
-  const mapCanvas = document.createElement("canvas");
-  mapCanvas.id = "miniMap";
-  mapCanvas.width = 240;
-  mapCanvas.height = 240;
-  mapCanvas.setAttribute("aria-label", "Rooftop route map");
-  document.body.append(mapCanvas);
-  const mc = mapCanvas.getContext("2d");
-  function map(s) {
-    mc.clearRect(0, 0, 240, 240);
-    mc.fillStyle = "rgba(9,17,24,.68)";
-    mc.fillRect(0, 0, 240, 240);
-    mc.save();
-    mc.translate(120, 120);
-    const f = 1.85;
-    for (const r of [...roofs, ...bridges]) {
-      mc.fillStyle = "#6d7d82";
-      mc.fillRect((r.x - r.w / 2) * f, (r.z - r.d / 2) * f, r.w * f, r.d * f);
-    }
-    beacons.forEach((b, i) => {
-      const active =
-        s.route &&
-        !s.route.done &&
-        courses[s.route.course].path[s.route.index] === i;
-      mc.fillStyle = active
-        ? "#ffcf5a"
-        : s.collected.has(i)
-          ? "#758f82"
-          : "#c4d4be";
-      mc.beginPath();
-      mc.arc(b.x * f, b.z * f, active ? 6 : 3, 0, Math.PI * 2);
-      mc.fill();
-    });
-    mc.translate(s.car.x * f, s.car.z * f);
-    mc.rotate(s.car.a);
-    mc.fillStyle = "#fff4d1";
-    mc.beginPath();
-    mc.moveTo(0, -8);
-    mc.lineTo(5, 6);
-    mc.lineTo(0, 3);
-    mc.lineTo(-5, 6);
-    mc.fill();
-    mc.restore();
-  }
-  let camYaw = 0,
-    lastLivery = -1,
-    frameCount = 0;
+  let camYaw = 0, lastLivery = -1;
   function resize() {
     const width = Math.max(1, canvas.clientWidth);
     const height = Math.max(1, canvas.clientHeight);
@@ -917,13 +872,11 @@ export function createRenderer(canvas) {
       v.tor.material = active ? amber : mint;
       v.diamond.material = active ? amber : mint;
     });
-    if (++frameCount % 5 === 0) map(s);
     adjustFrameBudget();
     renderer.render(scene, camera);
   }
   function dispose() {
     removeEventListener("resize", resize);
-    mapCanvas.remove();
     renderer.dispose();
   }
   return { render, renderer, scene, camera, dispose };

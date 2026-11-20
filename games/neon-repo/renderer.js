@@ -827,13 +827,6 @@ export function createCityRenderer(canvas) {
   });
   let routeKey = "",
     routeClock = 0;
-  const minimap = document.createElement("canvas");
-  minimap.id = "radar";
-  minimap.width = 360;
-  minimap.height = 280;
-  minimap.setAttribute("aria-label", "Street map and route");
-  document.body.appendChild(minimap);
-  const mapctx = minimap.getContext("2d");
   const desired = new THREE.Vector3(),
     look = new THREE.Vector3(),
     follow = new THREE.Vector3();
@@ -1008,51 +1001,8 @@ export function createCityRenderer(canvas) {
     lastMode = s.mode;
     adjustFrameBudget();
     renderer.render(scene, camera);
-    minimap.hidden = !active;
-    mapctx.fillStyle = "#101f2be8";
-    mapctx.fillRect(0, 0, 360, 280);
-    mapctx.save();
-    mapctx.translate(180, 140);
-    const sc = 0.075;
-    mapctx.scale(sc, sc);
-    mapctx.translate(-c.x, -c.y);
-    mapctx.lineWidth = 65;
-    mapctx.strokeStyle = "#42505b";
-    mapctx.beginPath();
-    for (const x of GRID_X) {
-      mapctx.moveTo(x, 0);
-      mapctx.lineTo(x, WORLD.h);
-    }
-    for (const z of GRID_Y) {
-      mapctx.moveTo(0, z);
-      mapctx.lineTo(WORLD.w, z);
-    }
-    mapctx.stroke();
-    mapctx.strokeStyle = color;
-    mapctx.lineWidth = 21;
-    mapctx.beginPath();
-    route(s).forEach((p, i) =>
-      i ? mapctx.lineTo(p.x, p.y) : mapctx.moveTo(p.x, p.y),
-    );
-    mapctx.stroke();
-    mapctx.fillStyle = color;
-    mapctx.beginPath();
-    mapctx.arc(t.x, t.y, 50, 0, Math.PI * 2);
-    mapctx.fill();
-    mapctx.translate(c.x, c.y);
-    mapctx.rotate(c.angle);
-    mapctx.fillStyle = "#fff";
-    mapctx.beginPath();
-    mapctx.moveTo(70, 0);
-    mapctx.lineTo(-50, -42);
-    mapctx.lineTo(-25, 0);
-    mapctx.lineTo(-50, 42);
-    mapctx.closePath();
-    mapctx.fill();
-    mapctx.restore();
   }
   function dispose() {
-    minimap.remove();
     renderer.dispose();
   }
   return { resize, render, dispose };

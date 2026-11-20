@@ -2,121 +2,110 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width,initial-scale=1,viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
     <title>Skyline Stunt Club</title>
-    <link rel="stylesheet" href="style.css?v=20261120-controls" />
+    <link rel="stylesheet" href="style.css?v=20261120-drive-menu" />
     <script type="importmap">
       {"imports":{
         "../apex/vendor/three.module.js":"../_deck/three.module.js",
         "./engine.js":"./engine.js?v=20261120-controls",
-        "./renderer.js":"./renderer.js?v=20261120-controls",
-        "./fallback.js":"./fallback.js?v=20261120-controls"
+        "./renderer.js":"./renderer.js?v=20261120-drive-menu",
+        "./fallback.js":"./fallback.js?v=20261120-drive-menu"
       }}
     </script>
     <script src="../_shared/mobile.js"></script>
   </head>
   <body>
     <main id="cockpit" inert>
-    <canvas
-      id="world"
-      tabindex="0"
-      aria-label="Rooftop driving playground"
-    ></canvas>
-    <header>
-      <div class="brand">
-        <span class="club-mark">SSC</span>
+      <canvas id="world" tabindex="0" aria-label="Rooftop driving playground"></canvas>
+      <header class="drivebar">
+        <div class="driving-info">
+          <div class="instruments" data-drive-readout>
+            <div class="speed"><strong id="speed">0</strong> <small>km/h</small></div>
+            <div class="boost" title="Boost remaining" aria-label="Boost remaining"><i id="boostFill"></i></div>
+          </div>
+          <div id="courseStatus" class="status" data-drive-readout hidden>
+            <strong id="objective"></strong><span id="routeLabel"></span>
+          </div>
+          <div id="toast" class="status notice" data-drive-readout role="status" hidden></div>
+        </div>
+        <button id="pause" aria-haspopup="dialog" aria-controls="pausePanel">Menu</button>
+      </header>
+      <div class="mobile" aria-label="Driving controls">
         <div>
-          SKYLINE <b>STUNT CLUB</b><small>A LITTLE CLOSER TO THE SKY</small>
+          <button data-key="a" aria-label="Steer left">◀</button>
+          <button data-key="d" aria-label="Steer right">▶</button>
+        </div>
+        <div>
+          <button data-key=" " aria-label="Brake">BRAKE</button>
+          <button data-key="s" aria-label="Reverse">REV</button>
+          <button data-key="w" aria-label="Accelerate">GO</button>
+          <button data-key="shift" aria-label="Boost">BOOST</button>
         </div>
       </div>
-      <div class="top-actions">
-        <button id="sound" aria-label="Toggle sound effects">FX OFF</button
-        ><button id="recover" aria-label="Reset car to rooftop">RESET</button
-        ><button id="mobileGarage">GARAGE</button
-        ><button id="pause">PAUSE</button>
-      </div>
-    </header>
-    <section class="scoreboard" aria-label="Session progress">
-      <div><small>CLUB REP</small><strong id="rep">0</strong></div>
-      <div><small>BEST COMBO</small><strong id="best">0</strong></div>
-      <div><small>LANDINGS</small><strong id="landings">0</strong></div>
-    </section>
-    <section class="challenge" aria-label="Stunt courses">
-      <span id="routeLabel">FREE ROAM / NO CLOCK</span>
-      <h2 id="objective">Find a ramp. Make an entrance.</h2>
-      <p id="routeInfo">Follow the mint arrows for your first rooftop jump.</p>
-      <select id="course" aria-label="Choose stunt course">
-        <option value="0">FIRST FLIGHT · 30s</option>
-        <option value="1">ROOFTOP TOUR · 100s</option>
-        <option value="2">CLUB CIRCUIT · 150s</option></select
-      ><button id="challenge">START FIRST FLIGHT</button
-      ><small id="record">PERSONAL BEST —</small>
-    </section>
-    <div id="toast" role="status"></div>
-    <div id="combo"></div>
-    <div class="dashboard">
-      <div class="speed"><strong id="speed">0</strong><small>KM/H</small></div>
-      <div class="boost">
-        <span>BOOST</span>
-        <div><i id="boostFill"></i></div>
-      </div>
-      <p id="location">CLUBHOUSE · ON DECK</p>
-    </div>
-    <aside class="controls">
-      <span><kbd>W</kbd><kbd>S</kbd> drive</span
-      ><span><kbd>A</kbd><kbd>D</kbd> steer / air spin</span
-      ><span><kbd>SHIFT</kbd> boost</span><span><kbd>SPACE</kbd> brake</span
-      ><span><kbd>R</kbd> reset</span><button id="garage">GARAGE</button>
-    </aside>
-    <div class="mobile">
-      <div>
-        <button data-key="s" aria-label="Reverse">REV</button
-        ><button data-key="a" aria-label="Steer left">◀</button
-        ><button data-key="d" aria-label="Steer right">▶</button>
-      </div>
-      <div>
-        <button data-key=" " aria-label="Brake">BRAKE</button
-        ><button data-key="shift" aria-label="Boost">BOOST</button
-        ><button data-key="w" aria-label="Accelerate">GO</button>
-      </div>
-    </div>
     </main>
-    <section id="menu" class="veil">
+    <section id="menu" class="welcome-screen" aria-labelledby="title">
       <div class="welcome">
-        <div class="eyebrow">THE ROOFTOPS ARE YOURS</div>
-        <h1>TAKE THE<br /><em>HIGH ROAD.</em></h1>
-        <p>
-          A city below. A new line ahead.<br />Take your place on the skyline.
-        </p>
-        <div class="pills">
-          <span>FREE ROAM</span><span>STUNT COMBOS</span
-          ><span>TIME TRIALS</span>
+        <h1 id="title">Skyline<br /><em>Stunt Club</em></h1>
+        <p>Jump between rooftops in free drive or race through a timed course.</p>
+        <div class="launch-actions">
+          <button id="start" class="primary" disabled>Free drive</button>
+          <button id="chooseCourse" disabled>Choose a course</button>
         </div>
-        <button id="start" class="primary" disabled>JOIN THE CLUB</button
-        ><small
-          >WASD / arrows to drive · touch controls on mobile<br />Progress stays
-          in this browser. No sign-in.</small
-        >
+        <p class="input-tip">WASD or arrows to drive · Space to brake · Shift to boost</p>
         <div id="graphicsChoice"></div>
+        <div data-playpile-notices></div>
       </div>
     </section>
-    <dialog
-      id="garagePanel"
-      class="veil"
-      aria-label="Club garage"
-    >
-      <div class="garage-card">
-        <div class="eyebrow">MAKE IT YOURS</div>
-        <h2>THE CLUB GARAGE</h2>
-        <p>Earn reputation from landings, beacons, and challenges.</p>
-        <div id="cars"></div>
-        <button id="garageClose" class="primary">BACK TO THE ROOFTOPS</button
-        ><small>Cosmetic unlocks. Every car handles the same.</small>
+    <dialog id="pausePanel" aria-labelledby="pauseTitle">
+      <div class="menu-head">
+        <h2 id="pauseTitle">Drive menu</h2>
+        <button id="resume" class="primary" autofocus>Resume</button>
       </div>
+      <section class="courses" aria-label="Timed courses">
+        <label for="course">Timed course</label>
+        <div class="course-actions">
+          <select id="course">
+            <option value="0">First Flight · 30s</option>
+            <option value="1">Rooftop Tour · 100s</option>
+            <option value="2">Club Circuit · 150s</option>
+          </select>
+          <button id="challenge">Start course</button>
+        </div>
+        <p id="routeInfo"></p><p id="record"></p>
+      </section>
+      <div class="menu-actions">
+        <button id="garage" aria-haspopup="dialog" aria-controls="garagePanel">Garage</button>
+        <button id="recover">Reset car</button>
+        <button id="sound" aria-pressed="false">Sound off</button>
+      </div>
+      <details id="driveDetails">
+        <summary>Map, stats &amp; controls</summary>
+        <div class="details-layout">
+          <div>
+            <canvas id="miniMap" width="240" height="240" role="img" aria-label="Rooftop route map"></canvas>
+            <p id="location"></p>
+          </div>
+          <div>
+            <dl class="stats">
+              <div><dt>Club rep</dt><dd id="rep">0</dd></div>
+              <div><dt>Best combo</dt><dd id="best">0</dd></div>
+              <div><dt>Landings</dt><dd id="landings">0</dd></div>
+            </dl>
+            <p>Arrows or WASD drive and steer. Hold Shift to boost and Space to brake. R resets the car. P opens the menu.</p>
+            <p>Follow the gold beacon on a timed course. The bridges connect all five rooftops.</p>
+          </div>
+        </div>
+      </details>
     </dialog>
-    <script type="module" src="game.js?v=20261120-controls"></script>
+    <dialog id="garagePanel" aria-labelledby="garageTitle">
+      <div class="menu-head">
+        <h2 id="garageTitle">Club garage</h2>
+        <button id="garageClose">Back</button>
+      </div>
+      <p>Earn reputation from landings, beacons and courses to unlock paint colors.</p>
+      <div id="cars"></div>
+    </dialog>
+    <script type="module" src="game.js?v=20261120-drive-menu"></script>
   </body>
 </html>

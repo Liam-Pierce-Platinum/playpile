@@ -103,9 +103,11 @@ template=template.replaceAll("note = 'runs here';","note = '';");
 template=template.replace("const ro = new ResizeObserver(adSpacing);\nro.observe(document.querySelector('.stage')); ro.observe(document.querySelector('.side .panel'));","const ro = new ResizeObserver(adSpacing);\nro.observe(document.querySelector('.stage'));\nconst sidePanel=document.querySelector('.side .panel'); if(sidePanel) ro.observe(sidePanel);");
 if(!template.includes('window.__PLAYPILE_WEB=1'))template=template.replace('<head>','<head>\n<script>window.__PLAYPILE_WEB=1;</script>');
 await write('site/play.html',template);
+const drivingNoticeSlots = new Set(['harbor-rush','neon-repo','skyline-stunt-club']);
 for(const game of GAMES){
  const guide=await read('site/guides/'+game.slug+'.html').catch(()=> '');
  const fields={head:gameHead(game),title:esc(game.title),blurb:esc(game.blurb),about:aboutHtml(game),keys:keysHtml(game),tip:esc(game.tips),tags:tagsHtml(game),crumbs:crumbsHtml(game),guide,more:related(game,GAMES).map(miniHtml).join('')};
+ fields.notices=drivingNoticeSlots.has(game.slug)?'<div data-playpile-notices></div>':'';
  let html=template.replace(/<!--PRE:(\w+)-->[\s\S]*?<!--\/PRE:\1-->/g,(_,key)=>fields[key]||'');
  await write(playUrl(game).slice(1)+'index.html',html);
 }

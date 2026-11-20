@@ -62,8 +62,7 @@ let w = innerWidth,
   previousCollision = 0,
   previousMode = "board",
   idleFor = 0;
-const coarse = matchMedia("(pointer:coarse)").matches,
-  reduced = matchMedia("(prefers-reduced-motion:reduce)").matches;
+const touchDevice = matchMedia("(any-pointer: coarse)").matches || navigator.maxTouchPoints > 0;
 let padButtons = [], usingPad = false;
 function resize() {
   w = innerWidth;
@@ -152,7 +151,7 @@ function begin(index) {
   tone(510);
   acceptJob(s, index);
   showMode();
-  notify("Dispatch: " + s.job.brief, 5);
+  s.toast = null;
   cam.x = s.car.x;
   cam.y = s.car.y;
   previousCollision = 0;
@@ -160,13 +159,14 @@ function begin(index) {
 }
 function showMode() {
   $("board").hidden = s.mode !== "board";
-  $("hud").hidden = !["play", "pause"].includes(s.mode);
+  $("hud").hidden = s.mode !== "play";
   $("hud").inert = s.mode !== "play";
   $("result").hidden = s.mode !== "result";
   $("pausepanel").hidden = s.mode !== "pause";
   $("garagepanel").hidden = s.mode !== "garage";
-  $("touch").hidden = !((coarse || w < 900 || h < 500) && s.mode === "play");
-  $("pause").textContent = s.mode === "pause" ? "▶" : "Ⅱ";
+  $("touch").hidden = !((touchDevice || w < 900 || h < 500) && s.mode === "play");
+  $("routeDetails").hidden = true;
+  $("mapToggle").setAttribute("aria-expanded", "false");
   if (s.mode === "board") renderBoard();
   if (s.mode === "result") {
     const r = s.completed;
@@ -213,14 +213,7 @@ function action() {
   const result = interact(s);
   if (result === "collected") {
     tone(640, 0.2);
-    notify(
-      "Keys secured. " +
-        VEHICLES[s.car.kind].name +
-        " — return to " +
-        s.job.drop.name +
-        ".",
-      4,
-    );
+    notify("Vehicle collected", 2);
   }
   if (result === "delivered") {
     tone(880, 0.35);
@@ -238,6 +231,45 @@ function pause() {
 }
 $("pause").onclick = pause;
 $("resume").onclick = pause;
+function drawRouteMap() {
+  const map = $("radar"), ctx = map.getContext("2d");
+  if (!ctx) return;
+  const padding = 9;
+  const scale = Math.min((map.width - padding * 2) / WORLD.w, (map.height - padding * 2) / WORLD.h);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = "#0b1e26";
+  ctx.fillRect(0, 0, map.width, map.height);
+  ctx.translate((map.width - WORLD.w * scale) / 2, (map.height - WORLD.h * scale) / 2);
+  ctx.scale(scale, scale);
+  ctx.beginPath();
+  for (const x of GRID_X) { ctx.moveTo(x, 0); ctx.lineTo(x, WORLD.h); }
+  for (const y of GRID_Y) { ctx.moveTo(0, y); ctx.lineTo(WORLD.w, y); }
+  ctx.strokeStyle = "#476068";
+  ctx.lineWidth = 38;
+  ctx.stroke();
+  const color = s.stage === "pickup" ? "#ffbc78" : "#67f0cf";
+  ctx.beginPath();
+  route(s).forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
+  ctx.strokeStyle = color;
+  ctx.stroke();
+  const end = target(s);
+  ctx.beginPath();
+  ctx.arc(end.x, end.y, 63, 0, 2 * Math.PI);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.translate(s.car.x, s.car.y);
+  ctx.rotate(s.car.angle);
+  ctx.beginPath();
+  ctx.moveTo(85, 0); ctx.lineTo(-52, -54); ctx.lineTo(-28, 0); ctx.lineTo(-52, 54); ctx.closePath();
+  ctx.fillStyle = "#fff";
+  ctx.fill();
+}
+$("mapToggle").onclick = () => {
+  const open = $("routeDetails").hidden;
+  $("routeDetails").hidden = !open;
+  $("mapToggle").setAttribute("aria-expanded", String(open));
+  if (open) drawRouteMap();
+};
 function returnToRoad() {
   if (s.mode === "pause") pause();
   recover(s);
@@ -261,18 +293,22 @@ $("closegarage").onclick = () => {
   showMode();
 };
 $("interaction").onclick = action;
-$("brand").onclick = (e) => {
-  e.preventDefault();
-  if (s.mode === "play") pause();
-};
 $("sound").onclick = () => {
   sound = !sound;
-  $("sound").textContent = sound ? "FX ON" : "FX OFF";
+  $("sound").textContent = sound ? "Sound on" : "Sound off";
+  $("sound").setAttribute("aria-pressed", String(sound));
   if (sound) audio();
   if (engineGain) engineGain.gain.value = 0;
 };
 addEventListener("keydown", (e) => {
   usingPad = false;
+  if (s.mode === "pause" && e.key === "Tab") {
+    const first = $("resume"), last = $("abandon");
+    if (e.shiftKey ? document.activeElement === first : document.activeElement === last) {
+      e.preventDefault();
+      (e.shiftKey ? last : first).focus();
+    }
+  }
   if (e.code === "Space" && e.target instanceof HTMLButtonElement) return;
   if (s.mode === "play" && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key))
     e.preventDefault();
@@ -381,36 +417,32 @@ function setHudText(id, text) {
   if (element.textContent !== text) element.textContent = text;
 }
 function updateHUD() {
-  $("touch").hidden = !((coarse || w < 900 || h < 500) && s.mode === "play");
+  $("touch").hidden = !((touchDevice || w < 900 || h < 500) && s.mode === "play");
   if (!s.job) return;
   const t = target(s),
     r = route(s);
   let d = 0;
   for (let i = 1; i < r.length; i++) d += dist(r[i - 1], r[i]);
-  setHudText("stage", s.stage === "pickup" ? "01 / FIND THE VEHICLE" : "02 / BRING IT HOME");
-  setHudText("mission", s.job.name);
-  const actionHint = usingPad ? "press X" : coarse ? "tap the prompt" : "press E";
-  setHudText("objective",
-    s.stage === "pickup"
-      ? `Collect the ${VEHICLES[s.job.vehicle].name}. Slow down and ${actionHint}.`
-      : `Return to ${s.job.drop.name}. Slow down and ${actionHint}.`);
-  setHudText("distance", `${Math.round(d * METRES_PER_UNIT)}m VIA GPS`);
-  setHudText("clock",
-    s.clock > 0
-      ? `${Math.ceil(s.clock)}s BONUS WINDOW`
-      : "OVERTIME · KEEP DRIVING");
-  $("clock").style.color = s.clock < 20 ? "#ffbc78" : "#67f0cf";
-  setHudText("condition", Math.round(s.car.health) + "%");
-  $("healthbar").style.width = s.car.health + "%";
-  $("boostbar").style.width = s.car.boost + "%";
-  setHudText("speed", String(
-    Math.round(Math.abs(s.car.speed) * METRES_PER_UNIT * 3.6),
-  ).padStart(3, "0"));
-  setHudText("carname", VEHICLES[s.car.kind].name);
+  const instruction = s.stage === "pickup" ? `Pick up ${VEHICLES[s.job.vehicle].name}` : `Deliver to ${s.job.drop.name}`;
+  if ($("hud").dataset.stage !== s.stage) $("hud").dataset.stage = s.stage;
+  setHudText("objective", instruction);
+  setHudText("distance", `${Math.round(d * METRES_PER_UNIT)} m`);
+  setHudText("speed", String(Math.round(Math.abs(s.car.speed) * METRES_PER_UNIT * 3.6)));
+  if (s.mode === "pause") {
+    setHudText("mission", s.job.name);
+    setHudText("clock", s.clock > 0 ? `${Math.ceil(s.clock)}s bonus remaining` : "Overtime");
+    setHudText("mapObjective", instruction);
+    setHudText("condition", Math.round(s.car.health) + "%");
+    setHudText("boostLevel", Math.round(s.car.boost) + "%");
+    setHudText("carname", VEHICLES[s.car.kind].name);
+    setHudText("controlsHint", usingPad ? "Steer with the left stick. RT drives, LT reverses, A brakes, B boosts and X collects or delivers."
+      : touchDevice ? "Steer with the arrows. Hold GO to drive, REV to reverse and DRIFT to brake. Slow at the marker, then tap to collect or deliver."
+      : "Drive with WASD or the arrow keys. Space brakes, Shift boosts and E collects or delivers at the marker.");
+  }
   const near = dist(s.car, t) < HANDOVER_RADIUS;
   $("interaction").hidden = !(s.mode === "play" && near);
   const ready = canInteract(s);
-  const prefix = usingPad ? "X / " : coarse ? "" : "E / ";
+  const prefix = usingPad ? "X / " : touchDevice ? "" : "E / ";
   setHudText("interaction",
     !ready
       ? "SLOW DOWN"

@@ -6,9 +6,6 @@ import {
   YGRID,
   WIDTH,
   HEIGHT,
-  buildings,
-  stops,
-  clamp,
   distance,
   createGame,
   makeContract,
@@ -43,6 +40,7 @@ await mountDrivingView(
   },
 );
 let mode = "title",
+  submenuFromPause = false,
   width = innerWidth,
   height = innerHeight,
   dpr = 1,
@@ -90,7 +88,11 @@ function beep(freq = 440, duration = 0.1) {
 function soundToggle() {
   sound = !sound;
   beep(660);
-  $("soundButton").textContent = sound ? "FX on" : "FX off";
+  const button = $("soundButton");
+  if (button) {
+    button.textContent = sound ? "Sound on" : "Sound off";
+    button.setAttribute("aria-pressed", String(sound));
+  }
 }
 function clearInput() {
   pressedKeys.clear();
@@ -98,21 +100,23 @@ function clearInput() {
   for (const key of Object.keys(input)) input[key] = false;
   document.querySelectorAll(".held").forEach((b) => b.classList.remove("held"));
 }
-function setMode(next) {
+function setMode(next, focusId) {
   mode = next;
   g.stepRemainder = 0;
   clearInput();
   $("overlay").hidden = next === "drive";
-  $("hud").hidden = next === "title";
+  document.querySelector('[data-playpile-notices]').hidden = next !== 'title' && next !== 'pause';
+  $("hud").hidden = next !== "drive";
   $("hud").inert = next !== "drive";
   $("city").inert = next !== "drive";
   $("overlay").inert = next === "drive";
+  $("overlay").scrollTop = 0;
   $("overlay").setAttribute("aria-label", {
     title: "Harbor Rush", pause: "Shift paused", jobs: "Harbor dispatch", garage: "Fleet workshop",
   }[next] || "Harbor Rush");
   queueMicrotask(() => {
     if (mode !== next) return;
-    const target = next === "drive" ? $("city") : $("menu").querySelector("button:not(:disabled)");
+    const target = next === "drive" ? $("city") : $(focusId) || $("menu").querySelector("button:not(:disabled)");
     target?.focus({ preventScroll: true });
   });
 }
@@ -136,30 +140,86 @@ function beginShift(withDelivery) {
   g.mission = null;
   g.rival = null;
   g.toast = null;
-  $("toast").classList.remove("show");
+  $("toast").hidden = true;
+  toastUntil = 0;
   if (withDelivery) makeContract(g);
   startDrive();
 }
 function startDrive() {
   setMode("drive");
+  updateHud();
   cam.x = g.car.x;
   cam.y = g.car.y;
   last = performance.now();
   beep(520);
 }
-function showPause() {
-  setMode("pause");
+function drawPauseMap(target) {
+  const map = $("routeMap");
+  const ctx = map.getContext("2d");
+  if (!ctx) return;
+  ctx.setTransform(map.width / WIDTH, 0, 0, map.height / HEIGHT, 0, 0);
+  ctx.fillStyle = "#112630";
+  ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  ctx.fillStyle = "#236276";
+  ctx.fillRect(2130, 0, WIDTH - 2130, HEIGHT);
+  ctx.fillRect(0, 2170, WIDTH, HEIGHT - 2170);
+  ctx.lineWidth = 28;
+  ctx.strokeStyle = "#547079";
+  ctx.beginPath();
+  for (const x of GRID) { ctx.moveTo(x,120); ctx.lineTo(x,2110); }
+  for (const y of YGRID) { ctx.moveTo(155,y); ctx.lineTo(2110,y); }
+  ctx.stroke();
+  function marker(position, radius, color) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(position.x, position.y, radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  if (target) {
+    ctx.strokeStyle = "#f6c475";
+    ctx.lineWidth = 19;
+    ctx.beginPath();
+    for (const point of routeTo(g.car, target)) ctx.lineTo(point.x, point.y);
+    ctx.stroke();
+    marker(target, 47, "#f6c475");
+  }
+  if (g.rival) marker(g.rival, 37, "#ee99b3");
+  marker(g.car, 46, "#75f2d4");
+}
+function showPause(focusId = "resume") {
+  setMode("pause", focusId);
   persist();
-  $("menu").innerHTML =
-    `<div class="eyebrow">TAKE A BREATHER</div><h2>City on hold.</h2><p>Your route will be here when you get back.</p><div class="statline"><div><strong>${g.shiftDeliveries}</strong><small>THIS SHIFT</small></div><div><strong>$${g.shiftEarned}</strong><small>EARNED</small></div><div><strong>${(g.save.distance * METERS_PER_UNIT / 1000).toFixed(1)}</strong><small>KM DRIVEN</small></div></div><div class="buttons"><button class="primary" id="resume">Keep driving</button><button id="resetCar">Return to the road</button><button id="quit">End shift</button></div><p class="keys">WASD / ARROWS accelerate, brake, reverse and steer.<br>SPACE loosens the rear wheels. SHIFT uses rechargeable boost.<br>B opens dispatch, G opens the garage. No timers run while paused.</p>`;
+  const m = g.mission;
+  const target = m && (m.stage === "pickup" ? m.from : m.to);
+  const district = g.car.x > 1770 ? "Waterfront" : g.car.y < 500 ? "North Heights" :
+    g.car.y > 1750 ? "South Docks" : g.car.x < 550 ? "Old Town" : "Midtown";
+  $("menu").innerHTML = `<h2>Shift paused</h2>
+    <div class="pause-actions">
+      <button class="primary" id="resume">Keep driving</button><button id="jobsButton">Jobs</button><button id="garageButton">Garage</button>
+      <button id="soundButton" aria-pressed="${sound}">Sound ${sound ? "on" : "off"}</button><button id="resetCar">Return to road</button><button id="quit">End shift</button>
+    </div>
+    <details id="shiftDetails"><summary>Map and shift details</summary><div class="shift-content">
+      <canvas id="routeMap" width="300" height="285" role="img" aria-label="Harbor map. Your car is in ${district}${target ? ', with a route to ' + target.name : ''}."></canvas>
+      <div><p><strong>${target ? (m.stage === "pickup" ? "Pick up: " : "Deliver: ") + target.name : "Free drive"}</strong></p>
+      <p>${district}${target ? " · " + Math.round(distance(g.car, target) * METERS_PER_UNIT) + " m" : ""}</p>
+      <p id="bank">Shift earnings $${g.shiftEarned} · ${g.shiftDeliveries} ${g.shiftDeliveries === 1 ? "delivery" : "deliveries"}</p>
+      ${m ? `<p>${m.type === "rival" ? "Rival run" : m.type === "fragile" ? "Fragile cargo" : "City delivery"} · Package ${Math.round(m.cargo)}%</p>` : ""}
+      <p>${(g.save.distance * METERS_PER_UNIT / 1000).toFixed(1)} km driven</p></div>
+    </div></details>
+    <details><summary>Controls</summary><p>Use the arrows or WASD to drive. Space drifts, Shift boosts, B opens Jobs and G opens the Garage. On touchscreens, hold Brake to reverse. Slow down in the marked bay to load or unload.</p></details>`;
+  drawPauseMap(target);
   $("resume").onclick = startDrive;
+  $("jobsButton").onclick = () => showJobs(true);
+  $("garageButton").onclick = () => showGarage(true);
+  $("soundButton").onclick = soundToggle;
   $("resetCar").onclick = () => {
     recover(g);
     startDrive();
   };
   $("quit").onclick = showTitle;
 }
-function showJobs() {
+function showJobs(fromPause = false) {
+  submenuFromPause = fromPause;
   setMode("jobs");
   $("menu").innerHTML =
     `<div class="eyebrow">HARBOR DISPATCH</div><h2>Choose your next run.</h2><p>Only the pickup and destination matter. Every street and park shortcut is yours to use.</p><div class="cards">${[
@@ -196,15 +256,17 @@ function showJobs() {
         startDrive();
       }),
   );
-  $("back").onclick = startDrive;
+  if (fromPause) $("back").textContent = "Back to menu";
+  $("back").onclick = () => fromPause ? showPause("jobsButton") : startDrive();
   if ($("abandon"))
     $("abandon").onclick = () => {
       g.mission = null;
       g.rival = null;
-      showJobs();
+      showJobs(fromPause);
     };
 }
-function showGarage() {
+function showGarage(fromPause = false) {
+  submenuFromPause = fromPause;
   setMode("garage");
   persist();
   $("menu").innerHTML =
@@ -238,16 +300,14 @@ function showGarage() {
         if (buyUpgrade(g, b.dataset.upgrade)) {
           persist();
           beep(780, 0.15);
-          showGarage();
+          showGarage(fromPause);
         }
       }),
   );
-  $("back").onclick = startDrive;
+  if (fromPause) $("back").textContent = "Back to menu";
+  $("back").onclick = () => fromPause ? showPause("garageButton") : startDrive();
 }
-$("pauseButton").onclick = showPause;
-$("jobsButton").onclick = showJobs;
-$("garageButton").onclick = showGarage;
-$("soundButton").onclick = soundToggle;
+$("pauseButton").onclick = () => showPause();
 const bindings = {
   ArrowUp: "throttle",
   KeyW: "throttle",
@@ -271,7 +331,7 @@ function syncInput() {
 }
 addEventListener("keydown", (e) => {
   if (e.code === "Tab" && mode !== "drive") {
-    const buttons = Array.from($("menu").querySelectorAll("button:not(:disabled), a[href], input, select, textarea, [tabindex='0']"))
+    const buttons = Array.from($("overlay").querySelectorAll("button:not(:disabled), summary, a[href], input, select, textarea, [tabindex='0']"))
       .filter((element) => element.getClientRects().length > 0);
     const first = buttons[0], last = buttons.at(-1);
     if (first && (e.shiftKey ? document.activeElement === first : document.activeElement === last)) {
@@ -289,7 +349,9 @@ addEventListener("keydown", (e) => {
   if (e.repeat) return;
   if (e.code === "Escape" || e.code === "KeyP") {
     if (mode === "drive") showPause();
-    else if (mode !== "title") startDrive();
+    else if (e.code === "Escape" && submenuFromPause && (mode === "garage" || mode === "jobs")) {
+      showPause(mode === "garage" ? "garageButton" : "jobsButton");
+    } else if (mode !== "title") startDrive();
   }
   if (mode === "drive") {
     if (e.code === "KeyB") showJobs();
@@ -339,65 +401,34 @@ function draw() {
   view.render(g, input, mode);
 }
 function updateHud() {
-  const c = g.car,
-    m = g.mission;
-  $("speedValue").textContent = Math.round(Math.hypot(c.vx, c.vy) * METERS_PER_UNIT * 3.6);
+  const c = g.car, m = g.mission;
+  const target = m && (m.stage === "pickup" ? m.from : m.to);
+  const range = target ? distance(c, target) : 0;
+  const needsStop = target && range < 85;
+  const setText = (id, value) => {
+    const el = $(id);
+    if (el.textContent !== value) el.textContent = value;
+  };
+  setText("speedValue", String(Math.round(Math.hypot(c.vx, c.vy) * METERS_PER_UNIT * 3.6)));
   $("boostFill").style.width = c.boost + "%";
-  $("bank").textContent = "$" + g.shiftEarned;
-  $("district").textContent =
-    c.x > 1770
-      ? "WATERFRONT"
-      : c.y < 500
-        ? "NORTH HEIGHTS"
-        : c.y > 1750
-          ? "SOUTH DOCKS"
-          : c.x < 550
-            ? "OLD TOWN"
-            : "MIDTOWN";
-  if (m) {
-    const t = m.stage === "pickup" ? m.from : m.to;
-    $("phase").textContent =
-      (m.type === "rival"
-        ? "RIVAL RUN"
-        : m.type === "fragile"
-          ? "FRAGILE CARGO"
-          : "CITY DELIVERY") +
-      " / " +
-      (g.shiftDeliveries + 1).toString().padStart(2, "0");
-    $("objective").textContent =
-      (m.stage === "pickup" ? "Pick up: " : "Deliver: ") + t.name;
-    $("instructions").textContent =
-      distance(c, t) < 85
-        ? "Slow down and hold in the circle."
-        : m.stage === "pickup"
-          ? "Cyan route to pickup. Choose any street."
-          : m.type === "rival"
-            ? "Pink rival behind you. Keep your route moving."
-            : "Gold route to delivery. Brake before corners.";
-    $("distance").textContent = Math.round(distance(c, t) * METERS_PER_UNIT) + " m";
-    $("condition").textContent = "PACKAGE " + Math.round(m.cargo) + "%";
-    $("cargo").style.width = m.cargo + "%";
-    $("cargo").style.background = m.cargo < 35 ? "#f68e79" : "#63edcc";
-  } else {
-    $("phase").textContent = "OFF THE CLOCK";
-    $("objective").textContent = "The city is yours.";
-    $("instructions").textContent =
-      "Discover 12 landmarks for $35 each, or open Jobs for a delivery.";
-    $("condition").textContent = g.save.deliveries + " DELIVERIES";
-    $("distance").textContent = "FREE ROAM";
-    $("cargo").style.width = "100%";
-  }
+  setText("objective", target ? (m.stage === "pickup" ? "Pick up: " : "Deliver: ") + target.name : "Free drive");
+  $("distance").hidden = !target;
+  if (target) setText("distance", Math.round(range * METERS_PER_UNIT) + " m");
+  const now = performance.now();
   if (g.toast && g.toast.id !== lastToast) {
     lastToast = g.toast.id;
-    $("toast").textContent = g.toast.text;
-    $("toast").classList.add("show");
-    toastUntil = performance.now() + 4200;
+    setText("toast", g.toast.text);
+    toastUntil = now + 3200;
     if (g.toast.kind === "delivery" || g.toast.kind === "discovery") {
       persist();
       beep(880, 0.25);
     } else beep(440, 0.1);
   }
-  if (performance.now() > toastUntil) $("toast").classList.remove("show");
+  // Feedback shares the dispatch strip with the nearby stop hint. Keep the
+  // actionable hint visible while the car is attempting a pickup or delivery.
+  $("routeNote").hidden = !needsStop;
+  if (needsStop) setText("routeNote", "Slow down in the marked bay");
+  $("toast").hidden = Boolean(needsStop) || now >= toastUntil;
 }
 function frame(now) {
   const dt = Math.min(0.25, Math.max(0, (now - last) / 1000 || 0.016));

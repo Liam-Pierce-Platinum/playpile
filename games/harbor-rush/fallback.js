@@ -14,7 +14,6 @@ export function createCanvasFallback(canvas, g) {
     height = innerHeight,
     dpr = 1,
     zoom = 1,
-    mode = "drive",
     cam = { x: g.car.x, y: g.car.y };
   function rect(x, y, w, h, color) {
     ctx.fillStyle = color;
@@ -303,35 +302,6 @@ export function createCanvasFallback(canvas, g) {
       target.y - 60,
     );
   }
-  function drawMap() {
-    const size = width < 650 ? 100 : 172,
-      x = width - size - 26,
-      y =
-        height -
-        size -
-        (width < 650 || matchMedia("(pointer:coarse)").matches ? 122 : 36),
-      scale = size / 2300;
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.fillStyle = "#071b29e8";
-    ctx.beginPath();
-    ctx.roundRect(-10, -10, size + 20, size + 20, 10);
-    ctx.fill();
-    ctx.strokeStyle = "#45616d";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    ctx.scale(scale, scale);
-    for (const n of GRID) line(n, 130, n, 2110, "#49616c", 21);
-    for (const n of YGRID) line(155, n, 2110, n, "#49616c", 21);
-    rect(2130, 0, 170, 2240, "#23667b");
-    if (g.mission) {
-      const s = g.mission.stage === "pickup" ? g.mission.from : g.mission.to;
-      circle(s.x, s.y, 55, "#f3ba77");
-    }
-    if (g.rival) circle(g.rival.x, g.rival.y, 40, "#e893b2");
-    circle(g.car.x, g.car.y, 52, "#80ffe2");
-    ctx.restore();
-  }
   function draw() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     rect(0, 0, width, height, "#0c2635");
@@ -367,7 +337,6 @@ export function createCanvasFallback(canvas, g) {
     for (const p of g.particles)
       circle(p.x, p.y, Math.max(1, p.life * 6), p.color);
     ctx.restore();
-    if (mode !== "title") drawMap();
     const shade = ctx.createLinearGradient(0, 0, 0, height);
     shade.addColorStop(0, "#07152255");
     shade.addColorStop(0.25, "#07152200");
@@ -385,8 +354,7 @@ export function createCanvasFallback(canvas, g) {
       canvas.height = h * dpr;
       zoom = w < 650 ? 0.64 : Math.min(1.08, w / 1200);
     },
-    render(state, input, nextMode) {
-      mode = nextMode;
+    render() {
       cam.x = g.car.x;
       cam.y = g.car.y;
       draw();

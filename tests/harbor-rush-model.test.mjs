@@ -4,6 +4,7 @@ import {
   createGame,
   makeContract,
   step,
+  advance,
   buyUpgrade,
   sanitizeSave,
   recover,
@@ -122,4 +123,31 @@ test("three mission types stay distinct and jobs do not force route checkpoints"
     assert.notDeepEqual(m.from, m.to);
     assert.equal("checkpoints" in m, false);
   }
+});
+test("15 FPS and 60 FPS advance identical driving and delivery clocks", () => {
+  const states = [15, 60].map((fps) => {
+    const g = createGame();
+    makeContract(g);
+    Object.assign(g.car, g.mission.from, { vx: 0, vy: 0 });
+    for (let i = 0; i < fps; i++) advance(g, {}, 1 / fps);
+    assert.equal(g.mission.stage, "delivery");
+    for (const [seconds, controls] of [
+      [2, { throttle: true }],
+      [1, { brake: true }],
+      [2, { throttle: true, right: true, drift: true }],
+    ]) for (let i = 0; i < fps * seconds; i++) advance(g, controls, 1 / fps);
+    return g;
+  });
+  for (const key of ["x", "y", "a", "vx", "vy", "boost"])
+    assert.ok(Math.abs(states[0].car[key] - states[1].car[key]) < 1e-8, key);
+  assert.equal(states[0].mission.elapsed, states[1].mission.elapsed);
+  assert.equal(states[0].time, states[1].time);
+});
+test("active-frame catch-up is bounded and invalid time cannot corrupt physics", () => {
+  const g = createGame();
+  advance(g, { throttle: true }, 120);
+  assert.ok(Math.abs(g.time - 0.25) < 1e-9);
+  const before = g.time;
+  for (const elapsed of [NaN, Infinity, -1, 0]) advance(g, {}, elapsed);
+  assert.equal(g.time, before);
 });

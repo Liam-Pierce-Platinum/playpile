@@ -343,6 +343,16 @@ header {
   font-size: 9px;
   letter-spacing: 0.08em;
 }
+button.graphics-choice {
+  min-height: 36px;
+  margin-top: 4px;
+  padding: 4px 10px;
+  border: 0;
+  background: transparent;
+  color: #b9d8d6;
+  text-decoration: underline;
+  font: 600 12px/1.25 system-ui, sans-serif;
+}
 .board-footer {
   display: flex;
   gap: 20px;
@@ -601,6 +611,7 @@ header {
   font-size: 10px;
   padding: 11px;
 }
+.pause-panel #unstick,
 .pause-panel #abandon {
   margin: 14px 0 0;
   width: 100%;
@@ -835,6 +846,16 @@ header {
   .pedals {
     gap: 5px;
   }
+}
+@media (max-width: 400px) {
+  #touch {
+    left: max(7px, env(safe-area-inset-left));
+    right: max(7px, env(safe-area-inset-right));
+  }
+  #touch .steering,
+  #touch .pedals { gap: 4px; }
+  #touch button { width: clamp(44px, 12.3vw, 49px); }
+  #touch [data-key="forward"] { height: 68px; }
 }
 @media (max-height: 570px) and (min-width: 650px) {
   .overlay {
@@ -1103,8 +1124,9 @@ header {
     margin-top: 7px;
     padding: 12px;
   }
+  .pause-panel #unstick,
   .pause-panel #abandon {
-    margin-top: 8px;
-    padding: 11px;
+    margin-top: 5px;
+    padding: 7px;
   }
 }

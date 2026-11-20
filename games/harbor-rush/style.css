@@ -570,6 +570,16 @@ kbd {
     display: none;
   }
 }
+button.graphics-choice {
+  min-height: 36px;
+  margin-top: 4px;
+  padding: 4px 10px;
+  border: 0;
+  background: transparent;
+  color: #b9d8d6;
+  text-decoration: underline;
+  font: 600 12px/1.25 system-ui, sans-serif;
+}
 #map3d {
   position: absolute;
   right: 26px;

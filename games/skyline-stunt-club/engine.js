@@ -97,6 +97,7 @@ export function createGame(saved = {}) {
     combo: 0,
     comboTime: 0,
     time: 0,
+    pendingSeconds: 0,
     checkpoint: { x: 9, z: 7, a: 0 },
     cooldown: 0,
     toast: "",
@@ -134,10 +135,12 @@ export function reset(s) {
   toast(s, "BACK ON THE ROOF · KEEP GOING");
 }
 export function startRoute(s, course = 0) {
-  const def = courses[course] || courses[0];
+  if (!Number.isInteger(course) || !courses[course]) course = 0;
+  const def = courses[course];
   s.checkpoint = { x: 9, z: 7, a: 0 };
   reset(s);
   s.boost = 1;
+  s.pendingSeconds = 0;
   s.route = {
     remaining: def.seconds,
     index: 0,
@@ -153,14 +156,30 @@ export function surface(x, z) {
     (r) => Math.abs(x - r.x) < r.w / 2 && Math.abs(z - r.z) < r.d / 2,
   );
 }
+// Keep the simulation on one clock across renderers. Retain the remainder, including
+// time from unusually long foreground frames, without monopolizing the next frame.
+export function advanceFrame(s, keys, seconds) {
+  if (!Number.isFinite(seconds) || seconds < 0) return;
+  s.pendingSeconds += seconds;
+  const steps = Math.min(60, Math.floor(s.pendingSeconds * 60 + 1e-9));
+  s.pendingSeconds = Math.max(0, s.pendingSeconds - steps / 60);
+  for (let step = 0; step < steps; step++) tick(s, keys, 1 / 60);
+}
 export function tick(s, keys, dt) {
   dt = Math.min(dt, 0.04);
+  // Evaluate the car at the deadline before letting free roam finish the frame.
+  if (s.route && !s.route.done && s.route.remaining > 0 && s.route.remaining < dt) {
+    const untilDeadline = s.route.remaining;
+    tick(s, keys, untilDeadline);
+    return tick(s, keys, dt - untilDeadline);
+  }
   s.time += dt;
   s.cooldown = Math.max(0, s.cooldown - dt);
   s.toastTime = Math.max(0, s.toastTime - dt);
   s.comboTime = Math.max(0, s.comboTime - dt);
   if (!s.comboTime) s.combo = 0;
   const c = s.car;
+  const previousHeight = c.h;
   const up = keys.has("w") || keys.has("arrowup"),
     down = keys.has("s") || keys.has("arrowdown"),
     left = keys.has("a") || keys.has("arrowleft"),
@@ -170,9 +189,12 @@ export function tick(s, keys, dt) {
     boost = keys.has("shift") && s.boost > 0.02 && up && !c.air;
   s.boost = clamp(s.boost + (boost ? -0.3 : 0.12) * dt, 0, 1);
   if (!c.air) {
-    c.speed += ((up ? (boost ? 20 : 12) : 0) - (down ? 14 : 0)) * dt;
+    const speedLimit = boost ? 25 : 18;
+    const previousSpeed = c.speed;
+    const throttle = up && previousSpeed <= speedLimit ? (boost ? 20 : 12) : 0;
+    c.speed += (throttle - (down ? 14 : 0)) * dt;
     c.speed *= Math.pow(brake ? 0.08 : 0.7, dt);
-    c.speed = clamp(c.speed, -7, boost ? 25 : 18);
+    c.speed = clamp(c.speed, -7, Math.max(previousSpeed, speedLimit));
     c.a +=
       turn *
       dt *
@@ -213,7 +235,7 @@ export function tick(s, keys, dt) {
     }
   }
   if (c.air && c.h <= 0) {
-    if (surface(c.x, c.z)) {
+    if (previousHeight >= 0 && surface(c.x, c.z)) {
       c.h = 0;
       c.air = false;
       c.vy = 0;
@@ -262,6 +284,10 @@ export function tick(s, keys, dt) {
     c.spin = 0;
     c.launchA = c.a;
   }
+  if (s.route && !s.route.done) {
+    s.route.remaining = Math.max(0, s.route.remaining - dt);
+    s.route.elapsed += dt;
+  }
   for (let i = 0; i < beacons.length; i++) {
     const b = beacons[i];
     if (Math.hypot(c.x - b.x, c.z - b.z) < 3 && c.h < 3 && c.h >= 0) {
@@ -291,7 +317,7 @@ export function tick(s, keys, dt) {
             150 + def.path.length * 30 + s.route.remaining * 3,
           );
           s.rep += bonus;
-          const time = Math.max(0.01, def.seconds - s.route.remaining);
+          const time = Math.max(0.01, s.route.elapsed);
           s.records[s.route.course] = Math.min(
             s.records[s.route.course] || Infinity,
             time,
@@ -310,14 +336,9 @@ export function tick(s, keys, dt) {
       }
     }
   }
-  if (s.route && !s.route.done) {
-    s.route.remaining -= dt;
-    s.route.elapsed += dt;
-    if (s.route.remaining <= 0) {
-      s.route.remaining = 0;
-      s.route.done = true;
-      toast(s, "TIME UP · TRY A FASTER LINE");
-    }
+  if (s.route && !s.route.done && !s.route.remaining) {
+    s.route.done = true;
+    toast(s, "TIME UP · TRY A FASTER LINE");
   }
   return s;
 }

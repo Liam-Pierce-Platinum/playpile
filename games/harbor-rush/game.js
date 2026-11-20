@@ -1,6 +1,8 @@
-import { createHarborRenderer } from "./render3d.js";
+import { graphicsChoice, mountDrivingView } from "../_shared/city-art/driving-view.js";
+import { createCanvasFallback } from "./fallback.js";
 import {
   GRID,
+  METERS_PER_UNIT,
   YGRID,
   WIDTH,
   HEIGHT,
@@ -14,7 +16,7 @@ import {
   upgradeCost,
   recover,
   spawnTraffic,
-  step,
+  advance,
   routeTo,
 } from "./model.js";
 const $ = (id) => document.getElementById(id),
@@ -27,7 +29,19 @@ try {
 } catch {}
 const g = createGame(saved);
 spawnTraffic(g);
-const view = createHarborRenderer(canvas, g);
+let view;
+await mountDrivingView(
+  canvas,
+  async () => {
+    const { createHarborRenderer } = await import("./render3d.js");
+    return (surface) => createHarborRenderer(surface, g);
+  },
+  (surface) => createCanvasFallback(surface, g),
+  (next, surface) => {
+    view = next;
+    document.querySelector("#menu .graphics-choice")?.replaceWith(graphicsChoice(surface));
+  },
+);
 let mode = "title",
   width = innerWidth,
   height = innerHeight,
@@ -79,27 +93,52 @@ function soundToggle() {
   $("soundButton").textContent = sound ? "FX on" : "FX off";
 }
 function clearInput() {
+  pressedKeys.clear();
+  activePointers.clear();
   for (const key of Object.keys(input)) input[key] = false;
   document.querySelectorAll(".held").forEach((b) => b.classList.remove("held"));
 }
 function setMode(next) {
   mode = next;
+  g.stepRemainder = 0;
   clearInput();
   $("overlay").hidden = next === "drive";
   $("hud").hidden = next === "title";
+  $("hud").inert = next !== "drive";
+  $("city").inert = next !== "drive";
+  $("overlay").inert = next === "drive";
+  $("overlay").setAttribute("aria-label", {
+    title: "Harbor Rush", pause: "Shift paused", jobs: "Harbor dispatch", garage: "Fleet workshop",
+  }[next] || "Harbor Rush");
+  queueMicrotask(() => {
+    if (mode !== next) return;
+    const target = next === "drive" ? $("city") : $("menu").querySelector("button:not(:disabled)");
+    target?.focus({ preventScroll: true });
+  });
 }
 function showTitle() {
   setMode("title");
+  g.mission = null;
+  g.rival = null;
   $("menu").innerHTML =
     `<div class="tag">OPEN CITY / ARCADE COURIER</div><h1>HARBOR<span>RUSH.</span></h1><p>One city. Your route.<br>Run packages along coastal streets, cut through the parks, and turn a little courier car into a harbor legend.</p><div class="buttons"><button class="primary" id="start">Start a shift</button><button id="roam">Just drive</button></div><p class="keys">WASD / ARROWS drive · SPACE handbrake · SHIFT boost<br>Brake into corners. Slow inside a delivery circle to load or unload.<br>Touch controls appear on phones and tablets.</p><div class="statline"><div><strong>${g.save.deliveries}</strong><small>LIFETIME DELIVERIES</small></div><div><strong>$${g.save.credits}</strong><small>GARAGE BALANCE</small></div></div>`;
+  $("menu").append(graphicsChoice($("city")));
   $("start").onclick = () => {
-    makeContract(g);
-    startDrive();
+    beginShift(true);
   };
   $("roam").onclick = () => {
-    g.mission = null;
-    startDrive();
+    beginShift(false);
   };
+}
+function beginShift(withDelivery) {
+  g.shiftEarned = 0;
+  g.shiftDeliveries = 0;
+  g.mission = null;
+  g.rival = null;
+  g.toast = null;
+  $("toast").classList.remove("show");
+  if (withDelivery) makeContract(g);
+  startDrive();
 }
 function startDrive() {
   setMode("drive");
@@ -112,7 +151,7 @@ function showPause() {
   setMode("pause");
   persist();
   $("menu").innerHTML =
-    `<div class="eyebrow">TAKE A BREATHER</div><h2>City on hold.</h2><p>Your route will be here when you get back.</p><div class="statline"><div><strong>${g.shiftDeliveries}</strong><small>THIS SHIFT</small></div><div><strong>$${g.shiftEarned}</strong><small>EARNED</small></div><div><strong>${(g.save.distance / 1000).toFixed(1)}</strong><small>KM DRIVEN</small></div></div><div class="buttons"><button class="primary" id="resume">Keep driving</button><button id="resetCar">Return to the road</button><button id="quit">End shift</button></div><p class="keys">WASD / ARROWS accelerate, brake, reverse and steer.<br>SPACE loosens the rear wheels. SHIFT uses rechargeable boost.<br>B opens dispatch, G opens the garage. No timers run while paused.</p>`;
+    `<div class="eyebrow">TAKE A BREATHER</div><h2>City on hold.</h2><p>Your route will be here when you get back.</p><div class="statline"><div><strong>${g.shiftDeliveries}</strong><small>THIS SHIFT</small></div><div><strong>$${g.shiftEarned}</strong><small>EARNED</small></div><div><strong>${(g.save.distance * METERS_PER_UNIT / 1000).toFixed(1)}</strong><small>KM DRIVEN</small></div></div><div class="buttons"><button class="primary" id="resume">Keep driving</button><button id="resetCar">Return to the road</button><button id="quit">End shift</button></div><p class="keys">WASD / ARROWS accelerate, brake, reverse and steer.<br>SPACE loosens the rear wheels. SHIFT uses rechargeable boost.<br>B opens dispatch, G opens the garage. No timers run while paused.</p>`;
   $("resume").onclick = startDrive;
   $("resetCar").onclick = () => {
     recover(g);
@@ -222,10 +261,30 @@ const bindings = {
   ShiftLeft: "boost",
   ShiftRight: "boost",
 };
+const pressedKeys = new Set(), activePointers = new Map();
+function syncInput() {
+  for (const key of Object.values(bindings)) input[key] = false;
+  for (const code of pressedKeys) input[bindings[code]] = true;
+  for (const key of activePointers.values()) input[key] = true;
+  for (const button of document.querySelectorAll("[data-input]"))
+    button.classList.toggle("held", Array.from(activePointers.values()).includes(button.dataset.input));
+}
 addEventListener("keydown", (e) => {
-  if (bindings[e.code]) {
+  if (e.code === "Tab" && mode !== "drive") {
+    const buttons = Array.from($("menu").querySelectorAll("button:not(:disabled), a[href], input, select, textarea, [tabindex='0']"))
+      .filter((element) => element.getClientRects().length > 0);
+    const first = buttons[0], last = buttons.at(-1);
+    if (first && (e.shiftKey ? document.activeElement === first : document.activeElement === last)) {
+      e.preventDefault();
+      (e.shiftKey ? last : first).focus();
+    }
+  }
+  const interactive = e.target instanceof Element &&
+    (e.target.closest("button, a, input, select, textarea") || e.target.isContentEditable);
+  if (bindings[e.code] && mode === "drive" && !(interactive && e.code === "Space")) {
     e.preventDefault();
-    if (mode === "drive") input[bindings[e.code]] = true;
+    pressedKeys.add(e.code);
+    syncInput();
   }
   if (e.repeat) return;
   if (e.code === "Escape" || e.code === "KeyP") {
@@ -241,13 +300,15 @@ addEventListener("keydown", (e) => {
     }
     if (e.code === "KeyM") soundToggle();
     if (e.code === "KeyE") beep(220, 0.18);
-  } else if (mode === "title" && e.code === "Enter") {
-    makeContract(g);
-    startDrive();
+  } else if (mode === "title" && e.code === "Enter" && !interactive) {
+    beginShift(true);
   }
 });
 addEventListener("keyup", (e) => {
-  if (bindings[e.code]) input[bindings[e.code]] = false;
+  if (bindings[e.code]) {
+    pressedKeys.delete(e.code);
+    syncInput();
+  }
 });
 addEventListener("blur", () => {
   clearInput();
@@ -259,14 +320,15 @@ document.addEventListener("visibilitychange", () => {
 for (const b of document.querySelectorAll("[data-input]")) {
   const key = b.dataset.input;
   b.onpointerdown = (e) => {
+    if (mode !== "drive" || (e.pointerType === "mouse" && e.button !== 0)) return;
     e.preventDefault();
     b.setPointerCapture(e.pointerId);
-    input[key] = true;
-    b.classList.add("held");
+    activePointers.set(e.pointerId, key);
+    syncInput();
   };
-  const release = () => {
-    input[key] = false;
-    b.classList.remove("held");
+  const release = (e) => {
+    activePointers.delete(e.pointerId);
+    syncInput();
   };
   b.onpointerup = release;
   b.onpointercancel = release;
@@ -279,7 +341,7 @@ function draw() {
 function updateHud() {
   const c = g.car,
     m = g.mission;
-  $("speedValue").textContent = Math.round(Math.hypot(c.vx, c.vy) * 0.42);
+  $("speedValue").textContent = Math.round(Math.hypot(c.vx, c.vy) * METERS_PER_UNIT * 3.6);
   $("boostFill").style.width = c.boost + "%";
   $("bank").textContent = "$" + g.shiftEarned;
   $("district").textContent =
@@ -312,7 +374,7 @@ function updateHud() {
           : m.type === "rival"
             ? "Pink rival behind you. Keep your route moving."
             : "Gold route to delivery. Brake before corners.";
-    $("distance").textContent = Math.round(distance(c, t)) + " m";
+    $("distance").textContent = Math.round(distance(c, t) * METERS_PER_UNIT) + " m";
     $("condition").textContent = "PACKAGE " + Math.round(m.cargo) + "%";
     $("cargo").style.width = m.cargo + "%";
     $("cargo").style.background = m.cargo < 35 ? "#f68e79" : "#63edcc";
@@ -338,10 +400,10 @@ function updateHud() {
   if (performance.now() > toastUntil) $("toast").classList.remove("show");
 }
 function frame(now) {
-  const dt = Math.min(0.04, (now - last) / 1000 || 0.016);
+  const dt = Math.min(0.25, Math.max(0, (now - last) / 1000 || 0.016));
   last = now;
   if (mode === "drive") {
-    step(g, input, dt);
+    advance(g, input, dt);
     const ahead = width < 650 ? 0.25 : 0.5;
     const tx = g.car.x + g.car.vx * ahead,
       ty = g.car.y + g.car.vy * ahead;

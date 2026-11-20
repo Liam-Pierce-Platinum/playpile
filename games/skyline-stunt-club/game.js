@@ -6,13 +6,13 @@ import {
   liveries,
   courses,
   createGame,
-  tick,
+  advanceFrame,
   reset,
   startRoute,
   surface,
   toast,
 } from "./engine.js";
-import { createRenderer } from "./renderer.js";
+import { graphicsChoice, mountDrivingView } from "../_shared/city-art/driving-view.js";
 import { createFallback } from "./fallback.js";
 const $ = (id) => document.getElementById(id),
   keys = new Set();
@@ -31,19 +31,18 @@ let running = false,
   engine,
   volume;
 let view;
-try {
-  if (new URLSearchParams(location.search).get("graphics") === "canvas")
-    throw new Error("Low-power view selected");
-  view = createRenderer(canvas);
-  canvas.setAttribute("aria-label", "3D rooftop driving playground");
-} catch (error) {
-  console.info("Using compatibility renderer:", error.message);
-  const replacement = canvas.cloneNode(false);
-  canvas.replaceWith(replacement);
-  canvas = replacement;
-  view = createFallback(canvas);
-  canvas.setAttribute("aria-label", "Compatibility rooftop driving playground");
-}
+await mountDrivingView(
+  canvas,
+  async () => (await import("./renderer.js")).createRenderer,
+  createFallback,
+  (next, surface) => {
+    view = next;
+    canvas = surface;
+    $("graphicsChoice").replaceChildren(graphicsChoice(canvas));
+    canvas.setAttribute("aria-label", canvas.dataset.engine
+      ? "3D rooftop driving playground" : "Compatibility rooftop driving playground");
+  },
+);
 function render(dt) {
   view.render(s, dt, keys, running, paused);
 }
@@ -90,12 +89,13 @@ function ui() {
   $("rep").textContent = s.rep.toLocaleString();
   $("best").textContent = s.best.toLocaleString();
   $("landings").textContent = s.landings;
-  $("speed").textContent = Math.round(Math.abs(s.car.speed) * 5);
+  $("speed").textContent = Math.round(Math.abs(s.car.speed) * 3.6);
   $("boostFill").style.width = s.boost * 100 + "%";
   $("location").textContent = s.car.air
     ? "AIR TIME / " + s.car.airTime.toFixed(1) + "s"
     : surface(s.car.x, s.car.z)?.name || "OVER THE EDGE";
-  $("toast").textContent = s.toastTime > 0 ? s.toast : "";
+  const message = s.toastTime > 0 ? s.toast : "";
+  if ($("toast").textContent !== message) $("toast").textContent = message;
   $("combo").textContent =
     s.combo > 1
       ? "×" + Math.min(s.combo, 5) + " COMBO · " + s.comboTime.toFixed(1) + "s"
@@ -125,16 +125,10 @@ function ui() {
   }
 }
 function frame(now) {
-  const elapsed = Math.min((now - last) / 1000, 1),
-    dt = Math.min(elapsed, 0.04);
-  last = now;
+  const elapsed = Math.max(0, (now - last) / 1000);
+  last = Math.max(last, now);
   if (running && !paused) {
-    let remaining = elapsed;
-    while (remaining > 0) {
-      const step = Math.min(remaining, 1 / 60);
-      tick(s, keys, step);
-      remaining -= step;
-    }
+    advanceFrame(s, keys, elapsed);
     events();
   }
   if (engine && volume) {
@@ -149,8 +143,8 @@ function frame(now) {
       0.1,
     );
   }
-  render(elapsed);
-  uiTime += dt;
+  render(Math.min(elapsed, 1));
+  uiTime += elapsed;
   if (uiTime > 0.1) {
     ui();
     uiTime = 0;
@@ -158,19 +152,36 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+const keyboardHeld = new Set();
+const touchPointers = new Map();
+function releaseControls() {
+  keyboardHeld.clear();
+  touchPointers.clear();
+  keys.clear();
+  document.querySelectorAll(".mobile .held").forEach((b) => b.classList.remove("held"));
+}
 function setPause(value) {
   paused = value;
-  keys.clear();
+  last = performance.now();
+  s.pendingSeconds = 0;
+  releaseControls();
   $("pause").textContent = paused ? "RESUME" : "PAUSE";
   if (paused) toast(s, "PAUSED · PRESS P OR RESUME");
-  else toast(s, "BACK IN THE DRIVER’S SEAT");
+  else {
+    canvas.focus({ preventScroll: true });
+    toast(s, "BACK IN THE DRIVER’S SEAT");
+  }
   ui();
 }
 $("start").onclick = () => {
   running = true;
+  last = performance.now();
   $("menu").hidden = true;
-  canvas.focus();
-  toast(s, "HOLD W / ↑ · FOLLOW THE MINT ARROWS");
+  $("cockpit").inert = false;
+  canvas.focus({ preventScroll: true });
+  toast(s, matchMedia("(pointer: coarse)").matches
+    ? "HOLD GO · FOLLOW THE MINT ARROWS"
+    : "HOLD W / ↑ · FOLLOW THE MINT ARROWS");
 };
 $("start").disabled = false;
 $("pause").onclick = () => {
@@ -179,14 +190,14 @@ $("pause").onclick = () => {
 $("challenge").onclick = () => {
   running = true;
   paused = false;
+  last = performance.now();
+  releaseControls();
   $("pause").textContent = "PAUSE";
   $("menu").hidden = true;
   startRoute(s, +$("course").value);
-  canvas.focus();
+  canvas.focus({ preventScroll: true });
 };
-function garage() {
-  setPause(true);
-  $("garagePanel").hidden = false;
+function showLiveries() {
   $("cars").replaceChildren(
     ...liveries.map((v, i) => {
       const b = document.createElement("button");
@@ -206,62 +217,61 @@ function garage() {
       b.onclick = () => {
         s.livery = i;
         save();
-        garage();
+        showLiveries();
+        $("cars").querySelector(".selected")?.focus();
       };
       return b;
     }),
   );
 }
+let pausedBeforeGarage = false;
+function garage() {
+  pausedBeforeGarage = paused;
+  setPause(true);
+  showLiveries();
+  $("garagePanel").showModal();
+  $("cars").querySelector(".selected")?.focus();
+}
 $("garage").onclick = garage;
 $("mobileGarage").onclick = garage;
 $("recover").onclick = () => {
   if (running && !paused) reset(s);
-  canvas.focus();
+  canvas.focus({ preventScroll: true });
 };
 $("course").onchange = ui;
-$("garageClose").onclick = () => {
-  $("garagePanel").hidden = true;
-  setPause(false);
-  canvas.focus();
+$("garageClose").onclick = () => $("garagePanel").close();
+$("garagePanel").onclose = () => {
+  setPause(pausedBeforeGarage || document.hidden);
 };
 $("sound").onclick = () => {
-  sound = !sound;
-  if (sound && !audio) {
-    audio = new AudioContext();
-    engine = audio.createOscillator();
-    volume = audio.createGain();
-    engine.type = "triangle";
-    volume.gain.value = 0;
-    engine.connect(volume);
-    volume.connect(audio.destination);
-    engine.start();
+  try {
+    if (!sound && !audio) {
+      const Context = window.AudioContext || window.webkitAudioContext;
+      audio = new Context();
+      engine = audio.createOscillator();
+      volume = audio.createGain();
+      engine.type = "triangle";
+      volume.gain.value = 0;
+      engine.connect(volume);
+      volume.connect(audio.destination);
+      engine.start();
+    }
+    sound = !sound;
+    if (sound) audio.resume().catch(() => {
+      sound = false;
+      $("sound").textContent = "FX OFF";
+    });
+    $("sound").textContent = sound ? "FX ON" : "FX OFF";
+  } catch {
+    sound = false;
+    $("sound").disabled = true;
+    $("sound").textContent = "FX UNAVAILABLE";
   }
-  if (audio) audio.resume();
-  $("sound").textContent = sound ? "FX ON" : "FX OFF";
 };
 addEventListener("keydown", (e) => {
   const k = e.key.toLowerCase();
-  if (!$("garagePanel").hidden) {
-    if (k === "escape") $("garageClose").click();
-    if (
-      [
-        "p",
-        "r",
-        "w",
-        "a",
-        "s",
-        "d",
-        "arrowup",
-        "arrowdown",
-        "arrowleft",
-        "arrowright",
-        " ",
-        "shift",
-      ].includes(k)
-    )
-      e.preventDefault();
-    return;
-  }
+  if (!running || $("garagePanel").open || e.target instanceof HTMLSelectElement ||
+      e.ctrlKey || e.metaKey || e.altKey) return;
   if (
     [
       "w",
@@ -283,29 +293,40 @@ addEventListener("keydown", (e) => {
     e.preventDefault();
     if (k === "p" && !e.repeat && running) setPause(!paused);
     if (k === "r" && !e.repeat && running && !paused) reset(s);
-    if (!paused && running) keys.add(k);
+    if (!paused && !["p","r"].includes(k)) {
+      keyboardHeld.add(k);
+      keys.add(k);
+    }
   }
 });
-addEventListener("keyup", (e) => keys.delete(e.key.toLowerCase()));
-addEventListener("blur", () => {
-  keys.clear();
-  document.querySelectorAll(".held").forEach((b) => b.classList.remove("held"));
+addEventListener("keyup", (e) => {
+  const key = e.key.toLowerCase();
+  keyboardHeld.delete(key);
+  if (![...touchPointers.values()].includes(key)) keys.delete(key);
 });
+function pauseInactiveGame() {
+  if ($("garagePanel").open) pausedBeforeGarage = true;
+  if (running && !paused) setPause(true);
+  else releaseControls();
+}
+addEventListener("blur", pauseInactiveGame);
 document.addEventListener("visibilitychange", () => {
-  keys.clear();
-  if (document.hidden && running) setPause(true);
+  if (document.hidden) pauseInactiveGame();
 });
 for (const b of document.querySelectorAll("[data-key]")) {
   b.onpointerdown = (e) => {
     e.preventDefault();
     b.setPointerCapture(e.pointerId);
     if (running && !paused) {
+      touchPointers.set(e.pointerId, b.dataset.key);
       keys.add(b.dataset.key);
       b.classList.add("held");
     }
   };
-  const release = () => {
-    keys.delete(b.dataset.key);
+  const release = (e) => {
+    touchPointers.delete(e.pointerId);
+    if ([...touchPointers.values()].includes(b.dataset.key)) return;
+    if (!keyboardHeld.has(b.dataset.key)) keys.delete(b.dataset.key);
     b.classList.remove("held");
   };
   b.onpointerup = release;

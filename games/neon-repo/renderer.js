@@ -1,9 +1,11 @@
 import * as THREE from "../_deck/three.module.js";
+import { drivingFrameBudget } from "../_shared/city-art/driving-view.js";
 import { upgradeVehicle } from "../_shared/city-art/vehicle.js";
 import {
   GRID_X,
   GRID_Y,
   WORLD,
+  METRES_PER_UNIT,
   BLOCKS,
   VEHICLES,
   target,
@@ -12,7 +14,7 @@ import {
 
 // Original authored city and vehicle geometry. The simulation remains in engine.js;
 // rendering converts its decimetres into metres without changing collision bounds.
-const SCALE = 0.1,
+const SCALE = METRES_PER_UNIT,
   Y = new THREE.Vector3(0, 1, 0);
 const palettes = [
   "#a99788",
@@ -164,6 +166,7 @@ export function createCityRenderer(canvas) {
     powerPreference: "high-performance",
   });
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
+  const adjustFrameBudget = drivingFrameBudget(renderer);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -882,7 +885,7 @@ export function createCityRenderer(canvas) {
       }
       parked.visible = true;
       parked.position.set(s.job.x * SCALE, 0, s.job.y * SCALE);
-      parked.rotation.y = -Math.PI / 2;
+      parked.rotation.y = -s.job.parkedHeading;
     } else if (parked) parked.visible = false;
     const t = target(s);
     ring.visible = marker.visible = !!s.job;
@@ -1003,6 +1006,7 @@ export function createCityRenderer(canvas) {
     initialized = true;
     lastPos.set(px, 0, pz);
     lastMode = s.mode;
+    adjustFrameBudget();
     renderer.render(scene, camera);
     minimap.hidden = !active;
     mapctx.fillStyle = "#101f2be8";
@@ -1047,5 +1051,9 @@ export function createCityRenderer(canvas) {
     mapctx.fill();
     mapctx.restore();
   }
-  return { resize, render };
+  function dispose() {
+    minimap.remove();
+    renderer.dispose();
+  }
+  return { resize, render, dispose };
 }

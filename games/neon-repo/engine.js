@@ -1,6 +1,8 @@
 export const GRID_X = [220, 760, 1300, 1840, 2380, 2920],
   GRID_Y = [220, 760, 1300, 1840, 2380];
 export const WORLD = { w: 3180, h: 2640, road: 154 };
+export const METRES_PER_UNIT = 0.1;
+export const HANDOVER_RADIUS = 91;
 export const DEPOT = { x: 760, y: 760 };
 export const HANDOVERS = [
   { ...DEPOT, name: "Neon Repo depot" },
@@ -129,6 +131,12 @@ export const JOBS = [
 ];
 export const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 export const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+function departureHeading(origin, destination) {
+  const dx = destination.x - origin.x;
+  const dy = destination.y - origin.y;
+  if (Math.abs(dx) >= Math.abs(dy)) return dx >= 0 ? 0 : Math.PI;
+  return dy >= 0 ? Math.PI / 2 : -Math.PI / 2;
+}
 export function initialCareer(raw = {}) {
   if (!raw || typeof raw !== "object") raw = {};
   const records = {};
@@ -251,17 +259,21 @@ export function acceptJob(s, index) {
     s.job.index +
     ":" +
     (s.career.jobs < 3 ? 0 : Math.floor(s.career.jobs / 3) % HANDOVERS.length);
+  s.job.parkedHeading = departureHeading(s.job, s.job.drop);
   s.mode = "play";
   s.stage = "pickup";
   s.clock = template.time;
   s.elapsed = 0;
   s.collisions = 0;
   s.clean = 0;
+  s.cooldown = 0;
+  s.shake = 0;
+  s.skids.length = 0;
   s.car = {
     ...s.car,
     x: DEPOT.x,
     y: DEPOT.y,
-    angle: 0,
+    angle: departureHeading(DEPOT, s.job),
     speed: 0,
     vx: 0,
     vy: 0,
@@ -279,8 +291,8 @@ export function target(s) {
 export function canInteract(s) {
   return (
     s.mode === "play" &&
-    dist(s.car, target(s)) < 91 &&
-    Math.abs(s.car.speed) < 80
+    dist(s.car, target(s)) < HANDOVER_RADIUS &&
+    Math.max(Math.abs(s.car.speed), Math.hypot(s.car.vx, s.car.vy)) < 80
   );
 }
 export function interact(s) {
@@ -290,7 +302,7 @@ export function interact(s) {
     s.car.kind = s.job.vehicle;
     s.car.x = s.job.x;
     s.car.y = s.job.y;
-    s.car.angle = Math.PI / 2;
+    s.car.angle = s.job.parkedHeading;
     s.car.speed = 0;
     s.car.vx = 0;
     s.car.vy = 0;
@@ -468,7 +480,8 @@ export function step(s, input, dt) {
 export function route(s) {
   const to = target(s),
     p = nearestRoad(s.car),
-    vertical = GRID_X.includes(p.x);
+    vertical = GRID_X.includes(p.x) &&
+      (!GRID_Y.includes(p.y) || Math.abs(Math.sin(s.car.angle)) > Math.abs(Math.cos(s.car.angle)));
   const points = [
     { x: s.car.x, y: s.car.y },
     p,

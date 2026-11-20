@@ -255,7 +255,7 @@ export function createFallback(canvas) {
     ctx.restore();
     if (pickup)
       car(
-        { x: t.x, y: t.y, kind: s.job.vehicle, angle: Math.PI / 2 },
+        { x: t.x, y: t.y, kind: s.job.vehicle, angle: s.job.parkedHeading },
         false,
         true,
       );

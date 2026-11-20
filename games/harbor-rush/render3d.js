@@ -1,8 +1,9 @@
 import * as THREE from "../_deck/three.module.js";
-import { createCanvasFallback } from "./fallback.js";
+import { drivingFrameBudget } from "../_shared/city-art/driving-view.js";
 import { upgradeVehicle } from "../_shared/city-art/vehicle.js";
 import {
   GRID,
+  METERS_PER_UNIT,
   YGRID,
   WIDTH,
   HEIGHT,
@@ -11,31 +12,14 @@ import {
   routeTo,
 } from "./model.js";
 
-const S = 0.1,
+const S = METERS_PER_UNIT,
   V = THREE.Vector3;
 export function createHarborRenderer(canvas, game) {
-  if (new URLSearchParams(location.search).get("graphics") === "canvas")
-    return createCanvasFallback(canvas, game);
-  let renderer;
-  try {
-    const context = canvas.getContext("webgl2", {
-      antialias: true,
-      alpha: false,
-      powerPreference: "high-performance",
-    });
-    if (!context) return createCanvasFallback(canvas, game);
-    renderer = new THREE.WebGLRenderer({
-      canvas,
-      context,
-      antialias: true,
-      alpha: false,
-    });
-  } catch {
-    const replacement = canvas.cloneNode(false);
-    canvas.replaceWith(replacement);
-    return createCanvasFallback(replacement, game);
-  }
+  const renderer = new THREE.WebGLRenderer({
+    canvas, antialias: true, alpha: false, powerPreference: "high-performance",
+  });
   renderer.setPixelRatio(Math.min(1.5, devicePixelRatio || 1));
+  const adjustFrameBudget = drivingFrameBudget(renderer);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.08;
@@ -804,7 +788,12 @@ export function createHarborRenderer(canvas, game) {
       routeDistances.needsUpdate = true;
     }
     drawMini(g, mode);
+    adjustFrameBudget();
     renderer.render(scene, camera);
   }
-  return { resize, render };
+  function dispose() {
+    mini.remove();
+    renderer.dispose();
+  }
+  return { resize, render, dispose };
 }

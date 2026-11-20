@@ -40,6 +40,12 @@ canvas {
   height: 100dvh;
   outline: none;
 }
+#world {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
 header {
   position: fixed;
   inset: 22px 28px auto;
@@ -242,8 +248,31 @@ kbd {
   align-items: center;
   padding: 8vw;
 }
-.veil[hidden] {
+.veil[hidden],
+dialog.veil:not([open]) {
   display: none;
+}
+.veil {
+  z-index: 3;
+}
+dialog.veil {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  color: inherit;
+}
+button.graphics-choice {
+  min-height: 36px;
+  margin-top: 4px;
+  padding: 4px 10px;
+  border: 0;
+  background: transparent;
+  color: #b9d8d6;
+  text-decoration: underline;
+  font: 600 12px/1.25 system-ui, sans-serif;
 }
 .welcome {
   max-width: 560px;
@@ -334,6 +363,7 @@ h1 em {
 .mobile {
   display: none;
   position: fixed;
+  z-index: 2;
   bottom: 22px;
   left: 14px;
   right: 14px;

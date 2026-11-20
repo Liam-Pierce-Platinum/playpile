@@ -1,4 +1,5 @@
 import * as THREE from "../_deck/three.module.js";
+import { drivingFrameBudget } from "../_shared/city-art/driving-view.js";
 import { upgradeVehicle } from "../_shared/city-art/vehicle.js";
 import { roofs, bridges, ramps, beacons, courses, liveries } from "./engine.js";
 
@@ -11,6 +12,7 @@ export function createRenderer(canvas) {
     powerPreference: "high-performance",
   });
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.6));
+  const adjustFrameBudget = drivingFrameBudget(renderer);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -840,10 +842,10 @@ export function createRenderer(canvas) {
     lastLivery = -1,
     frameCount = 0;
   function resize() {
-    renderer.setSize(innerWidth, innerHeight, false);
-    canvas.style.width = innerWidth + "px";
-    canvas.style.height = innerHeight + "px";
-    camera.aspect = innerWidth / innerHeight;
+    const width = Math.max(1, canvas.clientWidth);
+    const height = Math.max(1, canvas.clientHeight);
+    renderer.setSize(width, height, false);
+    camera.aspect = width / height;
     camera.updateProjectionMatrix();
   }
   addEventListener("resize", resize);
@@ -858,9 +860,9 @@ export function createRenderer(canvas) {
     car.rotation.y = -c.a;
     car.rotation.z = THREE.MathUtils.lerp(
       car.rotation.z,
-      ((!c.air && keys.has("d")
+      ((!c.air && (keys.has("d") || keys.has("arrowright"))
         ? -0.035
-        : !c.air && keys.has("a")
+        : !c.air && (keys.has("a") || keys.has("arrowleft"))
           ? 0.035
           : 0) *
         Math.abs(c.speed)) /
@@ -916,7 +918,13 @@ export function createRenderer(canvas) {
       v.diamond.material = active ? amber : mint;
     });
     if (++frameCount % 5 === 0) map(s);
+    adjustFrameBudget();
     renderer.render(scene, camera);
   }
-  return { render, renderer, scene, camera };
+  function dispose() {
+    removeEventListener("resize", resize);
+    mapCanvas.remove();
+    renderer.dispose();
+  }
+  return { render, renderer, scene, camera, dispose };
 }

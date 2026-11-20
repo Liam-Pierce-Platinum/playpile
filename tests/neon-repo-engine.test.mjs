@@ -11,6 +11,8 @@ import {
   BLOCKS,
   DEPOT,
   upgrade,
+  route,
+  HANDOVER_RADIUS,
 } from "../games/neon-repo/engine.js";
 const run = (s, input, secs) => {
   for (let i = 0; i < secs * 60; i++) step(s, input, 1 / 60);
@@ -142,4 +144,56 @@ test("malformed or absent career storage safely becomes a new career", () => {
   assert.equal(a.career.cash, 0);
   assert.equal(a.career.jobs, 0);
   assert.deepEqual(a.career.records, {});
+});
+
+test("dispatch and recovered vehicles face the first GPS leg for each contract and destination", () => {
+  function facesRoute(s) {
+    const next = route(s)[1];
+    const dx = next.x - s.car.x, dy = next.y - s.car.y;
+    const forward = Math.cos(s.car.angle) * dx + Math.sin(s.car.angle) * dy;
+    assert.ok(Math.abs(forward - Math.hypot(dx, dy)) < 0.001);
+  }
+  for (const jobs of [0, 3, 6]) for (let i = 0; i < JOBS.length; i++) {
+    const s = makeState({ jobs });
+    acceptJob(s, i);
+    facesRoute(s);
+    Object.assign(s.car, { x: s.job.x, y: s.job.y });
+    assert.equal(interact(s), "collected");
+    facesRoute(s);
+  }
+});
+
+test("the handover zone rejects a car still sliding after braking", () => {
+  const s = makeState();
+  acceptJob(s, 0);
+  Object.assign(s.car, { x: s.job.x, y: s.job.y, speed: 10, vx: 95 });
+  assert.equal(interact(s), null);
+  s.car.vx = 0;
+  s.car.x = s.job.x + HANDOVER_RADIUS;
+  assert.equal(interact(s), null);
+  s.car.x -= 1;
+  assert.equal(interact(s), "collected");
+});
+
+test("overtime pays once without a time bonus and the next contract starts clean", () => {
+  const s = makeState();
+  acceptJob(s, 0);
+  run(s, {}, JOBS[0].time + 1);
+  assert.equal(s.mode, "play");
+  assert.ok(s.clock < 0);
+  Object.assign(s.car, { x: s.job.x, y: s.job.y });
+  assert.equal(interact(s), "collected");
+  Object.assign(s.car, { x: s.job.drop.x, y: s.job.drop.y });
+  assert.equal(interact(s), "delivered");
+  assert.equal(s.completed.timeBonus, 0);
+  assert.ok(s.completed.pay >= JOBS[0].pay);
+  assert.equal(interact(s), null);
+  Object.assign(s, { shake: 8, cooldown: 0.6, skids: [{ ttl: 7 }] });
+  assert.ok(acceptJob(s, 1));
+  assert.equal(s.clock, JOBS[1].time);
+  assert.equal(s.car.health, 100);
+  assert.equal(s.skids.length + s.shake + s.cooldown, 0);
+  const reloaded = makeState(JSON.parse(JSON.stringify(s.career)));
+  assert.equal(reloaded.career.jobs, 1);
+  assert.equal(reloaded.career.records["0:0"].count, 1);
 });

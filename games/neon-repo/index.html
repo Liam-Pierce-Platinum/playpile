@@ -11,12 +11,19 @@
       name="description"
       content="Drive the midnight city, recover stranded cars and build your own vehicle recovery business."
     />
-    <link rel="stylesheet" href="style.css" />
-    <script type="importmap">{"imports":{"../apex/vendor/three.module.js":"../_deck/three.module.js"}}</script>
+    <link rel="stylesheet" href="style.css?v=20261120-controls" />
+    <script type="importmap">
+      {"imports":{
+        "../apex/vendor/three.module.js":"../_deck/three.module.js",
+        "./engine.js":"./engine.js?v=20261120-controls",
+        "./renderer.js":"./renderer.js?v=20261120-controls",
+        "./fallback.js":"./fallback.js?v=20261120-controls"
+      }}
+    </script>
     <script src="../_shared/mobile.js"></script>
   </head>
   <body>
-    <canvas id="city" aria-label="Neon Repo driving game"></canvas>
+    <canvas id="city" tabindex="-1" aria-label="Neon Repo driving game"></canvas>
     <div class="grain" aria-hidden="true"></div>
     <header>
       <a class="brand" href="#" id="brand"
@@ -79,13 +86,14 @@
         <div id="jobs" class="job-grid"></div>
         <div class="board-footer">
           <span
-            ><b>HOW IT WORKS</b> Follow the amber GPS. Slow down and press E to
-            switch cars. Return to the mint handover bay.</span
+            ><b>HOW IT WORKS</b> Follow the amber GPS to the car, slow down and
+            collect it. Bring it to the mint handover bay.</span
           ><button id="garage">GARAGE / UPGRADES ↗</button>
         </div>
         <p class="save-note" id="savenote">
           Your career saves on this device. No account needed.
         </p>
+        <div id="graphicsChoice"></div>
       </section>
     </main>
     <section id="result" class="overlay" hidden>
@@ -110,8 +118,9 @@
         <span class="eyebrow">TAKE A BREATHER</span>
         <h2>SHIFT PAUSED</h2>
         <p>Your contract clock is paused too.</p>
-        <button class="primary" id="resume">KEEP DRIVING →</button
-        ><button id="abandon">ABANDON THIS CONTRACT</button>
+        <button class="primary" id="resume">KEEP DRIVING →</button>
+        <button id="unstick">RETURN TO ROAD · −5% BODYWORK</button>
+        <button id="abandon">ABANDON THIS CONTRACT</button>
       </div>
     </section>
     <div id="touch" hidden>
@@ -126,6 +135,6 @@
         ><button data-key="boost" aria-label="Boost">⚡</button>
       </div>
     </div>
-    <script type="module" src="app.js?v=20261120-3d"></script>
+    <script type="module" src="app.js?v=20261120-controls"></script>
   </body>
 </html>

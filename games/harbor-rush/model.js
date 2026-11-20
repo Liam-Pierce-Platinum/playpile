@@ -1,5 +1,6 @@
 export const GRID = [260, 700, 1140, 1580, 2020],
   YGRID = [240, 680, 1120, 1560, 2000];
+export const METERS_PER_UNIT = 0.1;
 export const WIDTH = 2360,
   HEIGHT = 2240,
   ROAD = 144;
@@ -72,6 +73,7 @@ export function createGame(save = initialSave()) {
     traffic: [],
     rival: null,
     time: 0,
+    stepRemainder: 0,
     shiftEarned: 0,
     shiftDeliveries: 0,
     toast: null,
@@ -382,6 +384,17 @@ export function step(g, input, dt) {
         "delivery",
       );
     }
+  }
+}
+// Render cadence must not change acceleration, package loading or delivery time.
+// The app pauses on blur/visibility changes and resets its clock on resume.
+export function advance(g, input, elapsed) {
+  if (!Number.isFinite(elapsed) || elapsed <= 0) return;
+  const tick = 1 / 60;
+  g.stepRemainder += Math.min(elapsed, 0.25);
+  while (g.stepRemainder + 1e-9 >= tick) {
+    step(g, input, tick);
+    g.stepRemainder = Math.max(0, g.stepRemainder - tick);
   }
 }
 export function routeTo(car, target) {

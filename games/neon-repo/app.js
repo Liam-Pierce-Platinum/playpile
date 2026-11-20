@@ -18,22 +18,27 @@ import {
   route,
   clamp,
   dist,
+  METRES_PER_UNIT,
+  HANDOVER_RADIUS,
 } from "./engine.js";
-import { createCityRenderer } from "./renderer.js";
+import { graphicsChoice, mountDrivingView } from "../_shared/city-art/driving-view.js";
 import { createFallback } from "./fallback.js";
 const $ = (id) => document.getElementById(id),
   canvas = $("city"),
   keys = new Set(),
+  touchPointers = new Map(),
   held = new Set();
 let view;
-try {
-  view = createCityRenderer(canvas);
-} catch (error) {
-  console.warn("3D is unavailable; using the compatible city renderer.", error);
-  const replacement = canvas.cloneNode(false);
-  canvas.replaceWith(replacement);
-  view = createFallback(replacement);
-}
+await mountDrivingView(
+  canvas,
+  async () => (await import("./renderer.js")).createCityRenderer,
+  createFallback,
+  (next, surface) => {
+    view = next;
+    const slot = $("graphicsChoice");
+    slot.replaceChildren(graphicsChoice(surface));
+  },
+);
 const SAVE = "playpile.neon-repo.career.v1";
 let saved = {},
   saveOK = true;
@@ -59,6 +64,7 @@ let w = innerWidth,
   idleFor = 0;
 const coarse = matchMedia("(pointer:coarse)").matches,
   reduced = matchMedia("(prefers-reduced-motion:reduce)").matches;
+let padButtons = [], usingPad = false;
 function resize() {
   w = innerWidth;
   h = innerHeight;
@@ -121,8 +127,8 @@ function renderBoard() {
   ][Math.min(4, Math.floor(s.career.jobs / 5))];
   $("rank").textContent = rank;
   $("cash").textContent = "$" + s.career.cash.toLocaleString();
-  $("careerline").textContent =
-    `${s.career.jobs} RECOVERIES · ${s.career.rep} REP`;
+  const recoveries = s.career.jobs === 1 ? "RECOVERY" : "RECOVERIES";
+  $("careerline").textContent = `${s.career.jobs} ${recoveries} · ${s.career.rep} REP`;
   const start = s.career.jobs % JOBS.length;
   $("jobs").innerHTML = [0, 1, 2]
     .map((n) => {
@@ -155,6 +161,7 @@ function begin(index) {
 function showMode() {
   $("board").hidden = s.mode !== "board";
   $("hud").hidden = !["play", "pause"].includes(s.mode);
+  $("hud").inert = s.mode !== "play";
   $("result").hidden = s.mode !== "result";
   $("pausepanel").hidden = s.mode !== "pause";
   $("garagepanel").hidden = s.mode !== "garage";
@@ -168,7 +175,13 @@ function showMode() {
     save();
   }
   if (s.mode === "garage") renderGarage();
+  const focusTarget = {
+    play: $("city"), pause: $("resume"), result: $("next"),
+    board: $("jobs").querySelector("button"), garage: $("closegarage"),
+  }[s.mode];
+  focusTarget?.focus({ preventScroll: true });
   keys.clear();
+  touchPointers.clear();
   held.clear();
   document
     .querySelectorAll("#touch .held")
@@ -225,6 +238,12 @@ function pause() {
 }
 $("pause").onclick = pause;
 $("resume").onclick = pause;
+function returnToRoad() {
+  if (s.mode === "pause") pause();
+  recover(s);
+  notify("Back on the street. Bodywork −5%", 2);
+}
+$("unstick").onclick = returnToRoad;
 $("next").onclick = () => {
   s.mode = "board";
   showMode();
@@ -253,16 +272,15 @@ $("sound").onclick = () => {
   if (engineGain) engineGain.gain.value = 0;
 };
 addEventListener("keydown", (e) => {
-  if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key))
+  usingPad = false;
+  if (e.code === "Space" && e.target instanceof HTMLButtonElement) return;
+  if (s.mode === "play" && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key))
     e.preventDefault();
   if (e.repeat) return;
   keys.add(e.code);
   if (e.code === "KeyE") action();
   if (e.code === "Escape" || e.code === "KeyP") pause();
-  if (e.code === "KeyR" && s.mode === "play") {
-    recover(s);
-    notify("Back on the street. Bodywork −5%", 2);
-  }
+  if (e.code === "KeyR" && s.mode === "play") returnToRoad();
   if (e.code === "KeyM") $("sound").click();
   if (
     e.code === "Enter" &&
@@ -272,8 +290,10 @@ addEventListener("keydown", (e) => {
     begin(s.career.jobs % JOBS.length);
 });
 addEventListener("keyup", (e) => keys.delete(e.code));
+addEventListener("pointerdown", () => { usingPad = false; }, true);
 addEventListener("blur", () => {
   keys.clear();
+  touchPointers.clear();
   held.clear();
   if (s.mode === "play") pause();
 });
@@ -284,15 +304,45 @@ for (const b of document.querySelectorAll("[data-key]")) {
   b.addEventListener("pointerdown", (e) => {
     e.preventDefault();
     b.setPointerCapture(e.pointerId);
+    touchPointers.set(e.pointerId, b.dataset.key);
     held.add(b.dataset.key);
     b.classList.add("held");
     audio();
   });
   for (const name of ["pointerup", "pointercancel", "lostpointercapture"])
-    b.addEventListener(name, () => {
+    b.addEventListener(name, (e) => {
+      touchPointers.delete(e.pointerId);
+      if ([...touchPointers.values()].includes(b.dataset.key)) return;
       held.delete(b.dataset.key);
       b.classList.remove("held");
     });
+}
+function padActions(pad) {
+  const buttons = pad.buttons.map(b => b.pressed);
+  const previous = padButtons;
+  padButtons = buttons;
+  const pressed = i => buttons[i] && !previous[i];
+  if (buttons.some(Boolean) || Math.abs(pad.axes[0] || 0) > 0.15) usingPad = true;
+  if (!buttons.some((down, i) => down && !previous[i])) return;
+  if (pressed(9) && (s.mode === "play" || s.mode === "pause")) pause();
+  else if (s.mode === "play") {
+    if (pressed(2)) action();
+  } else {
+    const panel = { board: "board", result: "result", pause: "pausepanel", garage: "garagepanel" }[s.mode];
+    const choices = panel ? Array.from($(panel).querySelectorAll("button:enabled")) : [];
+    const index = choices.indexOf(document.activeElement);
+    const direction = pressed(12) || pressed(14) ? -1 : pressed(13) || pressed(15) ? 1 : 0;
+    if (direction && choices.length) {
+      const next = index < 0 ? (direction < 0 ? choices.length - 1 : 0) :
+        (index + direction + choices.length) % choices.length;
+      choices[next].focus();
+    } else if (pressed(0)) choices[Math.max(0, index)]?.click();
+    else if (pressed(1)) {
+      if (s.mode === "pause") pause();
+      if (s.mode === "garage") $("closegarage").click();
+      if (s.mode === "result") $("next").click();
+    }
+  }
 }
 function input() {
   let throttle =
@@ -313,11 +363,15 @@ function input() {
       (p) => p?.connected,
     );
     if (p) {
+      padActions(p);
       steer = steer || (Math.abs(p.axes[0]) > 0.15 ? p.axes[0] : 0);
       throttle =
         throttle || (p.buttons[7]?.value || 0) - (p.buttons[6]?.value || 0);
       brake ||= p.buttons[0]?.pressed;
       boost ||= p.buttons[1]?.pressed;
+    } else if (padButtons.length) {
+      padButtons = [];
+      usingPad = false;
     }
   } catch {}
   return { throttle, steer, brake, boost };
@@ -332,11 +386,12 @@ function updateHUD() {
   $("stage").textContent =
     s.stage === "pickup" ? "01 / FIND THE VEHICLE" : "02 / BRING IT HOME";
   $("mission").textContent = s.job.name;
+  const actionHint = usingPad ? "press X" : coarse ? "tap the prompt" : "press E";
   $("objective").textContent =
     s.stage === "pickup"
-      ? `Collect the ${VEHICLES[s.job.vehicle].name}. Stop nearby and press E.`
-      : "Return to " + s.job.drop.name + ". Slow down, then press E.";
-  $("distance").textContent = `${Math.round(d / 10) * 10}m VIA GPS`;
+      ? `Collect the ${VEHICLES[s.job.vehicle].name}. Slow down and ${actionHint}.`
+      : `Return to ${s.job.drop.name}. Slow down and ${actionHint}.`;
+  $("distance").textContent = `${Math.round(d * METRES_PER_UNIT)}m VIA GPS`;
   $("clock").textContent =
     s.clock > 0
       ? `${Math.ceil(s.clock)}s BONUS WINDOW`
@@ -346,18 +401,20 @@ function updateHUD() {
   $("healthbar").style.width = s.car.health + "%";
   $("boostbar").style.width = s.car.boost + "%";
   $("speed").textContent = String(
-    Math.round(Math.abs(s.car.speed) * 0.35),
+    Math.round(Math.abs(s.car.speed) * METRES_PER_UNIT * 3.6),
   ).padStart(3, "0");
   $("carname").textContent = VEHICLES[s.car.kind].name;
-  const near = dist(s.car, t) < 110;
+  const near = dist(s.car, t) < HANDOVER_RADIUS;
   $("interaction").hidden = !(s.mode === "play" && near);
+  const ready = canInteract(s);
+  const prefix = usingPad ? "X / " : coarse ? "" : "E / ";
   $("interaction").textContent =
-    Math.abs(s.car.speed) > 80
-      ? "SLOW DOWN TO HAND OVER"
+    !ready
+      ? "SLOW DOWN"
       : s.stage === "pickup"
-        ? "E / COLLECT VEHICLE"
-        : "E / COMPLETE RECOVERY";
-  $("interaction").disabled = !canInteract(s);
+        ? prefix + "COLLECT VEHICLE"
+        : prefix + "COMPLETE RECOVERY";
+  $("interaction").disabled = !ready;
 }
 function frame(ts) {
   const dt = Math.min((ts - last) / 1000 || 0.016, 0.5);

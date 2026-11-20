@@ -16,13 +16,11 @@ export function createFallback(canvas) {
     y: H * 0.56 + (x - cam.x + z - cam.z) * scale * 0.43 - h * scale,
   });
   function resize() {
-    W = innerWidth;
-    H = innerHeight;
+    W = Math.max(1, canvas.clientWidth);
+    H = Math.max(1, canvas.clientHeight);
     const d = Math.min(devicePixelRatio || 1, 2);
     canvas.width = Math.round(W * d);
     canvas.height = Math.round(H * d);
-    canvas.style.width = W + "px";
-    canvas.style.height = H + "px";
     ctx.setTransform(d, 0, 0, d, 0, 0);
     scale = Math.max(6.3, Math.min(14, W / 82, H / 47));
   }
@@ -350,7 +348,7 @@ export function createFallback(canvas) {
         3,
       );
     }
-    if (keys.has("shift") && keys.has("w") && s.boost > 0.02 && !c.air) {
+    if (keys.has("shift") && (keys.has("w") || keys.has("arrowup")) && s.boost > 0.02 && !c.air) {
       const a = trans(0, 1.8, 0.3);
       ctx.fillStyle = "#ffe39c";
       ctx.beginPath();

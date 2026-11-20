@@ -1,0 +1,28 @@
+Environment photography and asphalt by Poly Haven contributors, licensed CC0.
+https://polyhaven.com/license
+
+coast.webp - Kloofendal 48d Partly Cloudy (Pure Sky)
+https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky
+
+sunset.webp - Kloppenheim 06 (Pure Sky)
+https://polyhaven.com/a/kloppenheim_06_puresky
+
+dusk.webp - Venice Sunset
+https://polyhaven.com/a/venice_sunset
+
+asphalt.webp - Aerial Asphalt 01
+https://polyhaven.com/a/aerial_asphalt_01
+
+Matching asphalt normal and roughness maps from the same scan.
+
+reflections.webp - Modern Buildings 2 by Alexander Scholten
+https://polyhaven.com/a/modern_buildings_2
+
+Panoramas tone-mapped and color-graded for PlayPile.
+
+The sports coupe and four-door sedan were modeled by Quaternius (CC0).
+https://poly.pizza/m/1mkmFkAz5v
+https://poly.pizza/m/unqqkULtRU
+Paint, glazing, running lights, number plates and wheel animation adapted for PlayPile.
+
+The six street facade textures were generated for PlayPile with OpenAI ImageGen.

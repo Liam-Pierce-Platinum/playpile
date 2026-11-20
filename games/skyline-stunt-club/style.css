@@ -645,3 +645,150 @@ h1 em {
     display: none;
   }
 }
+
+/* Chase-camera presentation: compact instrument panels keep the road clear. */
+#miniMap {
+  position: fixed;
+  right: 23px;
+  bottom: 65px;
+  width: 136px;
+  height: 136px;
+  border: 1px solid #e1eceb44;
+  border-radius: 7px;
+  box-shadow: 0 7px 30px #0005;
+  pointer-events: none;
+  z-index: 2;
+}
+.scoreboard {
+  padding: 13px 17px;
+  background: linear-gradient(110deg, #0b1824c9, #0b18246b);
+  border-left: 2px solid #d4e6a3;
+  border-radius: 3px;
+  top: 105px;
+  left: 25px;
+  gap: 24px;
+}
+.scoreboard small {
+  color: #e1dfd4;
+}
+.challenge {
+  background: linear-gradient(110deg, #0b1824bb, #0b182488);
+  padding: 15px 17px;
+  width: 255px;
+  border-right: 2px solid #d4e6a3;
+  border-radius: 3px;
+  top: 105px;
+}
+.challenge p {
+  color: #d3d8dc;
+}
+.dashboard {
+  background: linear-gradient(90deg, #0b1824bd, #0b182400);
+  padding: 13px 17px;
+  left: 16px;
+  width: 210px;
+}
+.dashboard p {
+  color: #d5dee2;
+}
+.controls {
+  background: linear-gradient(90deg, #0b1824bc, #0b182422);
+  padding: 8px 10px;
+  border-radius: 5px;
+  bottom: 10px;
+}
+.top-actions button {
+  background: #10202dcc;
+}
+.brand {
+  text-shadow: 0 2px 12px #07121a;
+}
+.brand small {
+  color: #e0dfd4;
+}
+.club-mark {
+  background: #172d3599;
+  border-color: #d9edb7;
+  color: #d9edb7;
+}
+.welcome p {
+  max-width: 400px;
+}
+.veil {
+  background: linear-gradient(90deg, #061421f2, #061421a1 45%, #06142115);
+}
+@media (max-width: 800px), (pointer: coarse) {
+  #miniMap {
+    width: 94px;
+    height: 94px;
+    right: 15px;
+    bottom: 80px;
+  }
+  .scoreboard {
+    left: 12px;
+    top: 65px;
+    padding: 8px;
+    gap: 12px;
+  }
+  .challenge {
+    right: 12px;
+    top: 65px;
+    width: 157px;
+    padding: 9px;
+  }
+  .dashboard {
+    left: 8px;
+    width: 150px;
+    bottom: 80px;
+    padding: 8px;
+  }
+  .controls {
+    display: none;
+  }
+  .scoreboard strong {
+    font-size: 20px;
+  }
+  .challenge h2 {
+    font-size: 12px;
+  }
+  .mobile button {
+    background: #10202ddd;
+  }
+  .top-actions button {
+    background: #10202de8;
+  }
+}
+@media (max-height: 400px) {
+  #miniMap {
+    width: 70px;
+    height: 70px;
+    bottom: 70px;
+    right: 15px;
+  }
+  .scoreboard {
+    top: 57px;
+    padding: 6px;
+  }
+  .challenge {
+    top: 57px;
+    padding: 6px;
+  }
+  .dashboard {
+    bottom: 65px;
+  }
+  .challenge > span {
+    font-size: 6px;
+  }
+  .challenge select {
+    padding: 4px;
+  }
+  .challenge button {
+    padding: 5px;
+  }
+  .challenge h2 {
+    font-size: 10px;
+  }
+  .scoreboard strong {
+    font-size: 17px;
+  }
+}

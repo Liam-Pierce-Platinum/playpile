@@ -570,3 +570,55 @@ kbd {
     display: none;
   }
 }
+#map3d {
+  position: absolute;
+  right: 26px;
+  bottom: 34px;
+  width: 174px;
+  height: 174px;
+  border: 1px solid #bac9c980;
+  border-radius: 10px;
+  box-shadow: 0 8px 28px #0004;
+  pointer-events: none;
+}
+#city {
+  position: absolute;
+  inset: 0;
+}
+#dispatch {
+  background: #101f2bcd;
+}
+#speed {
+  text-shadow: 0 2px 8px #0008;
+}
+@media (max-width: 650px) {
+  #map3d {
+    width: 100px;
+    height: 100px;
+    right: 16px;
+    bottom: 126px;
+  }
+}
+@media (max-height: 480px) {
+  #map3d {
+    width: 90px;
+    height: 90px;
+    bottom: 90px;
+  }
+  #dispatch {
+    width: 205px;
+    padding: 10px 12px;
+  }
+  #dispatch p {
+    display: none;
+  }
+}
+header .readout,
+header .brand small,
+#speed span,
+#speed small {
+  color: #edf5f7;
+  text-shadow:
+    0 1px 3px #071522,
+    0 0 7px #071522cc;
+}

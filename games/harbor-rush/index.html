@@ -12,7 +12,8 @@
       name="description"
       content="An original open-city arcade courier driving game. Find your route, drift the harbor, and build your fleet."
     />
-    <link rel="stylesheet" href="style.css?v=20261120-hud" />
+    <link rel="stylesheet" href="style.css?v=20261120-touch-size" />
+    <link rel="stylesheet" href="../_shared/city-art/driving-pad.css?v=20261120-touch-size" />
     <script type="importmap">
       {"imports":{
         "../apex/vendor/three.module.js":"../_deck/three.module.js",
@@ -38,7 +39,7 @@
         </div>
         <button id="pauseButton" aria-haspopup="dialog" aria-label="Pause game and open menu">Menu</button>
       </header>
-      <div id="touch">
+      <div id="touch" class="driving-pad">
         <div>
           <button data-input="left" aria-label="Steer left"><span class="arrow" aria-hidden="true"></span></button
           ><button data-input="right" aria-label="Steer right"><span class="arrow right" aria-hidden="true"></span></button>
@@ -46,7 +47,7 @@
         <div>
           <button data-input="drift">DRIFT</button
           ><button data-input="brake">BRAKE<br /><small>REVERSE</small></button
-          ><button data-input="throttle" class="pedal">GO</button
+          ><button data-input="throttle" class="pedal accelerator">GO</button
           ><button data-input="boost" class="nitro">BOOST</button>
         </div>
       </div>

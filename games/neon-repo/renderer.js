@@ -5,6 +5,7 @@ import {
   GRID_X,
   GRID_Y,
   WORLD,
+  DISTRICT_EDGE,
   METRES_PER_UNIT,
   BLOCKS,
   VEHICLES,
@@ -258,6 +259,35 @@ export function createCityRenderer(canvas) {
   ground.position.set(WORLD.w * 0.05, -0.04, WORLD.h * 0.05);
   ground.receiveShadow = true;
   scene.add(ground);
+  // Paint the limit on the road and signpost each exit before the player reaches it.
+  const districtSign = canvasTexture(512, 128, (ctx, w, h) => {
+    ctx.fillStyle = "#284939";
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = ctx.fillStyle = "#fff6d7";
+    ctx.lineWidth = 5;
+    ctx.strokeRect(6, 6, w - 12, h - 12);
+    ctx.font = "bold 57px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("DISTRICT LIMIT", w / 2, 84);
+  });
+  const districtSignMat = new THREE.MeshStandardMaterial({ map: districtSign, side: THREE.DoubleSide });
+  const edge = DISTRICT_EDGE * SCALE, farX = WORLD.w * SCALE - edge, farZ = WORLD.h * SCALE - edge;
+  for (const z of [edge, farZ]) {
+    batch(box, yellow, (edge + farX) / 2, 0.025, z, farX - edge, 0.025, 0.24);
+    for (const roadX of GRID_X) {
+      const x = roadX * SCALE + (z === edge ? 8.6 : -8.6);
+      batch(box, pole, x, 1.15, z, 0.1, 2.3, 0.1);
+      batch(plane, districtSignMat, x, 2.35, z, 3.8, 0.95, 1, z === edge ? 0 : Math.PI);
+    }
+  }
+  for (const x of [edge, farX]) {
+    batch(box, yellow, x, 0.025, (edge + farZ) / 2, 0.24, 0.025, farZ - edge);
+    for (const roadY of GRID_Y) {
+      const z = roadY * SCALE + (x === edge ? -8.6 : 8.6);
+      batch(box, pole, x, 1.15, z, 0.1, 2.3, 0.1);
+      batch(plane, districtSignMat, x, 2.35, z, 3.8, 0.95, 1, x === edge ? Math.PI / 2 : -Math.PI / 2);
+    }
+  }
   loader.load("../_shared/city-art/asphalt.webp", (t) => {
     t.colorSpace = THREE.SRGBColorSpace;
     t.wrapS = t.wrapT = THREE.RepeatWrapping;
@@ -665,8 +695,8 @@ export function createCityRenderer(canvas) {
     const g = new THREE.Group(),
       v = VEHICLES[kind] || VEHICLES.scout;
     const paint = material(color || v.color, 0.2, 0.65),
-      long = kind === "atlas" ? 1.18 : kind === "wren" ? 0.86 : 1,
-      width = kind === "atlas" ? 1.05 : 1;
+      long = v.length / VEHICLES.scout.length,
+      width = v.width / VEHICLES.scout.width;
     const body = loft(
       [
         [-2.18, 0.44, 0.85, 0.74, 0.72],
@@ -787,7 +817,7 @@ export function createCityRenderer(canvas) {
     if (kind !== "atlas" && kind !== "wren")
       upgradeVehicle(g, {
         model: kind === "scout" || kind === "comet" ? "coupe" : "saloon",
-        length: 4.4,
+        length: VEHICLES.scout.length * SCALE,
         forward: "+x",
         paint,
         keep: [shadow, beam],
@@ -857,16 +887,12 @@ export function createCityRenderer(canvas) {
     player.rotation.z = Math.max(-0.04, Math.min(0.04, c.speed * 0.0001));
     player.userData.wheels?.spin((c.speed * SCALE * dt) / 0.34);
     s.traffic.forEach((t, i) => {
-      if (!cars.has(i))
-        cars.set(
-          i,
-          createCar(["scout", "wren", "thunder", "atlas"][i % 4], t.color),
-        );
+      if (!cars.has(i)) cars.set(i, createCar(t.kind || "scout", t.color));
       const mesh = cars.get(i);
       mesh.position.set(t.x * SCALE, 0, t.y * SCALE);
       mesh.rotation.y = -t.angle;
       mesh.visible = Math.hypot(t.x - c.x, t.y - c.y) < 1400;
-      mesh.userData.wheels?.spin((t.speed * SCALE * dt) / 0.34);
+      if (!t.waiting) mesh.userData.wheels?.spin((t.speed * SCALE * dt) / 0.34);
     });
     if (s.job && s.stage === "pickup") {
       if (parkedKind !== s.job.vehicle) {

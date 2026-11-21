@@ -1,0 +1,70 @@
+.driving-pad {
+  --touch-gap: clamp(5px, 1vmin, 10px);
+  --secondary-width: clamp(44px, calc(32px + 2.6vmin), 66px);
+  --secondary-height: clamp(44px, calc(28px + 4.75vmin), 66px);
+  --turn-width: clamp(64px, calc(34px + 7vw + 2.75vmin), 124px);
+  --go-width: calc(var(--turn-width) + clamp(6px, 1vmin, 12px));
+  --primary-height: clamp(58px, calc(36px + 8vmin), 98px);
+  container: driving-pad / inline-size;
+  justify-content: space-between;
+  align-items: end;
+  gap: var(--touch-gap);
+  pointer-events: none;
+}
+
+.driving-pad > div {
+  display: flex;
+  flex: none;
+  align-items: end;
+  gap: var(--touch-gap);
+}
+
+.driving-pad button {
+  flex: none;
+  width: var(--secondary-width);
+  height: var(--secondary-height);
+  pointer-events: auto;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.driving-pad > div:first-child button, .driving-pad .accelerator {
+  width: var(--turn-width);
+  height: var(--primary-height);
+  font-size: clamp(17px, 3vmin, 25px);
+}
+
+.driving-pad .accelerator {
+  width: var(--go-width);
+  font-size: clamp(15px, 2.8vmin, 22px);
+}
+
+/* Measure the usable width after the game's safe-area insets. */
+@container driving-pad (max-width: 430px) {
+  .driving-pad > div:last-child {
+    display: grid;
+    grid-template-columns: repeat(3, var(--secondary-width));
+  }
+  .driving-pad .accelerator {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: end;
+  }
+}
+
+/* On short screens only the outermost pedal sits above the bottom row. */
+@media (max-height: 380px) {
+  @container driving-pad (max-width: 430px) {
+    .driving-pad .accelerator { grid-row: 1; }
+  }
+}
+
+@container driving-pad (max-width: 281px) {
+  .driving-pad > div {
+    --turn-width: clamp(54px, 20cqw, 60px);
+    --go-width: clamp(58px, 23cqw, 66px);
+  }
+  .driving-pad > div:last-child { grid-template-columns: var(--go-width) var(--secondary-width); }
+  .driving-pad .accelerator { grid-column: 1; grid-row: 2; }
+}

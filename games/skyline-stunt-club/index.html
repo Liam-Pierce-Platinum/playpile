@@ -4,7 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
     <title>Skyline Stunt Club</title>
-    <link rel="stylesheet" href="style.css?v=20261120-drive-menu" />
+    <link rel="stylesheet" href="style.css?v=20261120-touch-size" />
+    <link rel="stylesheet" href="../_shared/city-art/driving-pad.css?v=20261120-touch-size" />
     <script type="importmap">
       {"imports":{
         "../apex/vendor/three.module.js":"../_deck/three.module.js",
@@ -31,7 +32,7 @@
         </div>
         <button id="pause" aria-haspopup="dialog" aria-controls="pausePanel">Menu</button>
       </header>
-      <div class="mobile" aria-label="Driving controls">
+      <div class="mobile driving-pad" aria-label="Driving controls">
         <div>
           <button data-key="a" aria-label="Steer left">◀</button>
           <button data-key="d" aria-label="Steer right">▶</button>
@@ -39,7 +40,7 @@
         <div>
           <button data-key=" " aria-label="Brake">BRAKE</button>
           <button data-key="s" aria-label="Reverse">REV</button>
-          <button data-key="w" aria-label="Accelerate">GO</button>
+          <button data-key="w" class="accelerator" aria-label="Accelerate">GO</button>
           <button data-key="shift" aria-label="Boost">BOOST</button>
         </div>
       </div>

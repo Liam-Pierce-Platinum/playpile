@@ -60,30 +60,15 @@ button:disabled { opacity: .52; cursor: default; }
   position: fixed;
   inset: auto var(--right) var(--bottom) var(--left);
   display: none;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-  gap: clamp(6px, 2.5vw, 24px);
-  pointer-events: none;
 }
-.mobile > div {
-  width: min(100%, 122px);
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px;
-}
-.mobile > div:last-child { width: min(100%, 248px); grid-template-columns: repeat(4, minmax(0, 1fr)); justify-self: end; }
-.mobile button {
+.driving-pad button {
   padding: 4px 1px;
-  height: clamp(44px, 8.5dvh, 58px);
   background: #10202de3;
   font: 800 11px Arial;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: none;
-  pointer-events: auto;
 }
 .mobile button.held { background: var(--mint); color: var(--ink); }
 @media (pointer: coarse), (any-pointer: coarse), (max-width: 800px) {
-  .mobile { display: grid; }
+  .mobile { display: flex; }
 }
 .welcome-screen {
   position: fixed; inset: 0; overflow: auto; display: grid;
@@ -136,8 +121,4 @@ summary:hover { background: none; }
 @media (max-width: 370px) {
   .menu-actions button, .course-actions button { padding-inline: 7px; }
   .notice { font-size: 10px; }
-}
-@media (max-width: 309px) {
-  .mobile { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; }
-  .mobile > div:last-child { width: min(100%, 122px); grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

@@ -667,27 +667,15 @@ button.graphics-choice {
 #touch {
   bottom: max(12px, env(safe-area-inset-bottom));
   display: flex;
-  justify-content: space-between;
-  align-items: end;
-  gap: 8px;
-  --pedal-width: clamp(44px, 6vw, 60px);
 }
-.steering, .pedals { display: flex; gap: clamp(4px, .9vw, 9px); }
-#touch button {
-  width: var(--pedal-width);
-  height: clamp(46px, 9vh, 58px);
+.driving-pad button {
   border-radius: 9px;
   padding: 0;
   background: #102731ed;
   border-color: #7b999b;
   font-size: 12px;
   letter-spacing: .03em;
-  pointer-events: auto;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
 }
-#touch .steering button { font-size: 18px; }
 #touch [data-key="forward"] { background: #255b4f; border-color: var(--mint); }
 #touch [data-key="boost"] { color: var(--amber); font-size: 19px; }
 #touch button.held { color: #08251d; background: var(--mint); }

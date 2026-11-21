@@ -1,5 +1,6 @@
 import {
   WORLD,
+  DISTRICT_EDGE,
   GRID_X,
   GRID_Y,
   BLOCKS,
@@ -51,6 +52,25 @@ export function createFallback(canvas) {
       ctx.stroke();
     }
     ctx.setLineDash([]);
+    ctx.strokeStyle = "#e0ba71";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(DISTRICT_EDGE, DISTRICT_EDGE, WORLD.w - 2 * DISTRICT_EDGE, WORLD.h - 2 * DISTRICT_EDGE);
+    ctx.fillStyle = "#ffe5b0";
+    ctx.font = "bold 12px monospace";
+    ctx.textAlign = "center";
+    for (const x of GRID_X) {
+      ctx.fillText("DISTRICT LIMIT", x, DISTRICT_EDGE - 7);
+      ctx.fillText("DISTRICT LIMIT", x, WORLD.h - DISTRICT_EDGE + 15);
+    }
+    for (const y of GRID_Y) {
+      for (const x of [DISTRICT_EDGE, WORLD.w - DISTRICT_EDGE]) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(x === DISTRICT_EDGE ? -Math.PI / 2 : Math.PI / 2);
+        ctx.fillText("DISTRICT LIMIT", 0, -7);
+        ctx.restore();
+      }
+    }
     for (const x of GRID_X) {
       if (Math.abs(x - cam.x) > halfWidth) continue;
       for (const y of GRID_Y) {
@@ -177,8 +197,8 @@ export function createFallback(canvas) {
   function car(c, player = false, parked = false) {
     const kind = c.kind || "scout",
       v = VEHICLES[kind],
-      len = kind === "atlas" ? 56 : 43,
-      width = kind === "atlas" ? 27 : 23;
+      len = v.length,
+      width = v.width;
     ctx.save();
     ctx.translate(c.x, c.y);
     ctx.rotate(c.angle || 0);

@@ -3,6 +3,8 @@ export const GRID_X = [220, 760, 1300, 1840, 2380, 2920],
 export const WORLD = { w: 3180, h: 2640, road: 154 };
 export const METRES_PER_UNIT = 0.1;
 export const HANDOVER_RADIUS = 91;
+// The painted district limit is a game boundary. Crossing it is not a crash.
+export const DISTRICT_EDGE = 65;
 export const DEPOT = { x: 760, y: 760 };
 export const HANDOVERS = [
   { ...DEPOT, name: "Neon Repo depot" },
@@ -12,6 +14,7 @@ export const HANDOVERS = [
 export const VEHICLES = {
   scout: {
     name: "Dispatch coupe",
+    length: 44, width: 19,
     color: "#5df3cd",
     max: 290,
     accel: 200,
@@ -21,6 +24,7 @@ export const VEHICLES = {
   },
   comet: {
     name: "Comet GT",
+    length: 44, width: 19,
     color: "#ffbf69",
     max: 370,
     accel: 248,
@@ -30,6 +34,7 @@ export const VEHICLES = {
   },
   atlas: {
     name: "Atlas delivery van",
+    length: 52, width: 20,
     color: "#c5adff",
     max: 235,
     accel: 145,
@@ -39,6 +44,7 @@ export const VEHICLES = {
   },
   wren: {
     name: "Wren microcar",
+    length: 38, width: 19,
     color: "#fb769f",
     max: 270,
     accel: 190,
@@ -48,6 +54,7 @@ export const VEHICLES = {
   },
   thunder: {
     name: "Thunder V8",
+    length: 44, width: 19,
     color: "#8cb9ff",
     max: 340,
     accel: 225,
@@ -185,6 +192,39 @@ export function buildings() {
   return out;
 }
 export const BLOCKS = buildings();
+const walls = BLOCKS.map(b => ({
+  x: b.x + b.w / 2, y: b.y + b.h / 2, halfLength: b.w / 2, halfWidth: b.h / 2,
+  forward: { x: 1, y: 0 }, side: { x: 0, y: 1 },
+}));
+
+function vehicleBody(car) {
+  const model = VEHICLES[car.kind] || VEHICLES.scout;
+  const x = Math.cos(car.angle), y = Math.sin(car.angle);
+  return { x: car.x, y: car.y, halfLength: model.length / 2, halfWidth: model.width / 2,
+    forward: { x, y }, side: { x: -y, y: x } };
+}
+const dot = (a, b) => a.x * b.x + a.y * b.y;
+function projectedRadius(body, axis) {
+  return body.halfLength * Math.abs(dot(body.forward, axis)) +
+    body.halfWidth * Math.abs(dot(body.side, axis));
+}
+// Oriented rectangles meet only if their extents overlap along all four axes.
+function contact(a, b) {
+  const dx = a.x - b.x, dy = a.y - b.y;
+  let depth = Infinity, nx = 0, ny = 0;
+  for (const axis of [a.forward, a.side, b.forward, b.side]) {
+    const separation = dx * axis.x + dy * axis.y;
+    const overlap = projectedRadius(a, axis) + projectedRadius(b, axis) - Math.abs(separation);
+    if (overlap <= 0) return null;
+    if (overlap < depth) {
+      const sign = separation < 0 ? -1 : 1;
+      depth = overlap;
+      nx = sign * axis.x;
+      ny = sign * axis.y;
+    }
+  }
+  return { nx, ny, depth };
+}
 export function makeState(career = {}) {
   return {
     career: initialCareer(career),
@@ -236,6 +276,7 @@ function makeTraffic() {
           ? Math.PI / 2
           : -Math.PI / 2,
       speed: 65 + (i % 5) * 11,
+      kind: ["scout", "wren", "thunder", "atlas"][i % 4],
       color: ["#487b8f", "#ab708a", "#b39b63", "#4c9091"][i % 4],
       horizontal,
       dir,
@@ -419,52 +460,70 @@ export function step(s, input, dt) {
   c.vy += (Math.sin(c.angle) * c.speed - c.vy) * mix;
   c.x += c.vx * dt;
   c.y += c.vy * dt;
-  let hit = false;
-  const r = c.kind === "atlas" ? 24 : 19;
-  for (const b of BLOCKS) {
-    if (
-      c.x + r > b.x &&
-      c.x - r < b.x + b.w &&
-      c.y + r > b.y &&
-      c.y - r < b.y + b.h
-    ) {
-      c.x = old.x;
-      c.y = old.y;
-      hit = true;
-      break;
+  const body = vehicleBody(c);
+  let impact = 0, source = "";
+  function resolve(hit, vx, vy, traffic) {
+    const { nx, ny, depth } = hit;
+    body.x += nx * depth;
+    body.y += ny * depth;
+    // Only speed into this surface counts. Sliding alongside it keeps momentum.
+    const closing = -((c.vx - vx) * nx + (c.vy - vy) * ny);
+    if (closing <= 0) return;
+    c.vx += nx * closing * 1.18;
+    c.vy += ny * closing * 1.18;
+    c.speed = c.vx * body.forward.x + c.vy * body.forward.y;
+    if (closing > impact) {
+      impact = closing;
+      const longitudinal = nx * body.forward.x + ny * body.forward.y;
+      source = !traffic ? "Wall" : longitudinal > 0.65 ? "Rear hit" :
+        longitudinal < -0.65 ? "Front hit" : "Side hit";
     }
-  }
-  if (c.x < 65 || c.x > WORLD.w - 65 || c.y < 65 || c.y > WORLD.h - 65) {
-    c.x = clamp(c.x, 65, WORLD.w - 65);
-    c.y = clamp(c.y, 65, WORLD.h - 65);
-    hit = true;
   }
   for (const t of s.traffic) {
-    t.x += Math.cos(t.angle) * t.speed * dt;
-    t.y += Math.sin(t.angle) * t.speed * dt;
-    if (t.x < 40) t.x = WORLD.w - 40;
-    if (t.x > WORLD.w - 40) t.x = 40;
-    if (t.y < 40) t.y = WORLD.h - 40;
-    if (t.y > WORLD.h - 40) t.y = 40;
-    if (dist(c, t) < 39 && s.cooldown <= 0) {
-      hit = true;
-      c.x = old.x;
-      c.y = old.y;
+    const vx = Math.cos(t.angle) * t.speed, vy = Math.sin(t.angle) * t.speed;
+    const previousX = t.x, previousY = t.y;
+    t.waiting = false;
+    t.x += vx * dt;
+    t.y += vy * dt;
+    if (t.x < 0) t.x = WORLD.w;
+    if (t.x > WORLD.w) t.x = 0;
+    if (t.y < 0) t.y = WORLD.h;
+    if (t.y > WORLD.h) t.y = 0;
+    if (Math.abs(t.x - body.x) >= 60 || Math.abs(t.y - body.y) >= 60) continue;
+    const hit = contact(body, vehicleBody(t));
+    if (!hit) continue;
+    // Traffic yields to a stopped driver, including at the dispatch spawn and handover.
+    if (Math.hypot(c.vx, c.vy) < 5 && vx * hit.nx + vy * hit.ny > 0) {
+      t.x = previousX;
+      t.y = previousY;
+      t.waiting = true;
+    } else {
+      resolve(hit, vx, vy, true);
     }
   }
-  if (hit) {
-    const impact = Math.abs(c.speed);
-    c.speed *= -0.28;
-    c.vx *= -0.3;
-    c.vy *= -0.3;
-    if (s.cooldown <= 0 && impact > 45) {
-      const damage = clamp(impact / 25, 2, 15) / (1 + up.armor * 0.3);
-      c.health = Math.max(5, c.health - damage);
-      s.collisions++;
-      s.shake = clamp(impact / 25, 2, 12);
-      s.cooldown = 0.65;
-      s.toast = { text: "Bodywork −" + Math.round(damage) + "%", ttl: 1.5 };
-    }
+  const extentX = Math.abs(body.forward.x) * body.halfLength + Math.abs(body.side.x) * body.halfWidth;
+  const extentY = Math.abs(body.forward.y) * body.halfLength + Math.abs(body.side.y) * body.halfWidth;
+  for (const wall of walls) {
+    if (Math.abs(body.x - wall.x) >= wall.halfLength + extentX ||
+        Math.abs(body.y - wall.y) >= wall.halfWidth + extentY) continue;
+    const hit = contact(body, wall);
+    if (hit) resolve(hit, 0, 0, false);
+  }
+  c.x = clamp(body.x, DISTRICT_EDGE + extentX, WORLD.w - DISTRICT_EDGE - extentX);
+  c.y = clamp(body.y, DISTRICT_EDGE + extentY, WORLD.h - DISTRICT_EDGE - extentY);
+  if (c.x !== body.x || c.y !== body.y) {
+    if (c.x !== body.x && (body.x - c.x) * c.vx > 0) c.vx = 0;
+    if (c.y !== body.y && (body.y - c.y) * c.vy > 0) c.vy = 0;
+    c.speed = c.vx * body.forward.x + c.vy * body.forward.y;
+    if (!s.toast || s.toast.ttl <= 0) s.toast = { text: "District limit · turn back", ttl: 1.5 };
+  }
+  if (s.cooldown <= 0 && impact > 45) {
+    const damage = clamp(impact / 25, 2, 15) / (1 + up.armor * 0.3);
+    c.health = Math.max(5, c.health - damage);
+    s.collisions++;
+    s.shake = clamp(impact / 25, 2, 12);
+    s.cooldown = 0.65;
+    s.toast = { text: source + " · Bodywork −" + Math.round(damage) + "%", ttl: 1.5 };
   }
   s.totalDistance += dist(c, old);
   if (input.brake && Math.abs(c.speed) > 75) {

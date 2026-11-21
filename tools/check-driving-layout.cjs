@@ -44,12 +44,28 @@ function auditDriving(touch) {
   }
   const nodes = [...document.querySelectorAll('[data-drive-readout],button,select,#map3d,#miniMap,#radar,#routeMap')].filter(occupied);
   const controls = nodes.filter(el => el.matches('[data-input],[data-key]'));
+  const primary = controls.filter(el => el.matches('[aria-label="Steer left"],[aria-label="Steer right"],[aria-label="Accelerate"],[data-input="throttle"]'));
   const label = el => el.getAttribute('aria-label') || el.id || el.textContent.trim().slice(0,40) || el.tagName;
   const road = { left: innerWidth * .29, right: innerWidth * .71, top: innerHeight * .35, bottom: innerHeight * .66 };
   const overlaps = (a,b) => Math.min(a.right,b.right)-Math.max(a.left,b.left)>1 && Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>1;
   const issues = [];
   if (!nodes.some(el => el.hasAttribute('data-drive-readout'))) issues.push('Missing visible HUD readout');
   if (touch && controls.length !== 6) issues.push('Expected six visible driving controls, found ' + controls.length);
+  const primarySizes = primary.map(el => {
+    const {width, height} = el.getBoundingClientRect();
+    return [width, height];
+  });
+  if (touch) {
+    if (primary.length !== 3) issues.push('Missing steering or accelerator');
+    const secondaryAreas = controls.filter(el => !primary.includes(el)).map(el => {
+      const r = el.getBoundingClientRect();
+      return r.width * r.height;
+    });
+    for (const [i, [width, height]] of primarySizes.entries()) {
+      if (width < 54 || height < 50 || width * height < Math.max(...secondaryAreas) * 1.1)
+        issues.push(label(primary[i])+' primary touch target too small at '+width+'×'+height);
+    }
+  }
   for (const [i, el] of nodes.entries()) {
     const rect = el.getBoundingClientRect();
     if (rect.left < -1 || rect.top < -1 || rect.right > innerWidth+1 || rect.bottom > innerHeight+1) issues.push(label(el)+' outside viewport');
@@ -66,7 +82,32 @@ function auditDriving(touch) {
   const centers = nodes.filter(el => el.matches('button,select')).map(el => {
     const r=el.getBoundingClientRect();return { x:r.x+r.width/2, y:r.y+r.height/2, label:label(el) };
   });
-  return { frame: [innerWidth,innerHeight], issues, centers };
+  return { frame: [innerWidth,innerHeight], issues, centers, primarySizes };
+}
+
+async function checkTwoThumbDriving(context, page, frame, game) {
+  const session = await context.newCDPSession(page);
+  const pedal = frame.locator('[aria-label="Accelerate"],[data-input="throttle"]');
+  async function point(button, id) {
+    const r = await button.boundingBox();
+    assert(r, 'Missing touch target');
+    return {id, x:r.x+r.width/2, y:r.y+r.height/2};
+  }
+  try {
+    const go = await point(pedal, 1);
+    for (const direction of ['left','right']) {
+      const steer = await point(frame.getByRole('button',{name:'Steer '+direction,exact:true}), 2);
+      await session.send('Input.dispatchTouchEvent', {type:'touchStart',touchPoints:[go]});
+      await session.send('Input.dispatchTouchEvent', {type:'touchStart',touchPoints:[go,steer]});
+      await frame.waitForFunction(({direction,speed}) =>
+        document.querySelector('[aria-label="Steer '+direction+'"]').classList.contains('held') &&
+        document.querySelector('[aria-label="Accelerate"],[data-input="throttle"]').classList.contains('held') &&
+        parseInt(document.querySelector(speed).textContent,10) >= 5, {direction,speed:game.speed});
+      const type = direction === 'left' ? 'touchEnd' : 'touchCancel';
+      await session.send('Input.dispatchTouchEvent', {type,touchPoints:[]});
+      await frame.waitForFunction(() => !document.querySelector('[data-key].held,[data-input].held'));
+    }
+  } finally { await session.detach(); }
 }
 
 async function check(browser, base, game) {
@@ -98,11 +139,13 @@ async function check(browser, base, game) {
     const inner = page.frames().find(f => new URL(f.url()).pathname.startsWith('/games/'+game.slug+'/'));
     const is3D = await inner.locator('canvas').first().evaluate(el => Boolean(el.dataset.engine));
     assert.equal(is3D, !flags.has('--2d'), 'Unexpected renderer in '+game.slug);
+    const measurements = [];
     for (const [i, [width,height]] of sizes.entries()) {
       await page.setViewportSize({width,height});
       await inner.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
       const audit = await inner.evaluate(auditDriving, !desktop);
       assert.deepEqual(audit.issues, [], game.slug+' at '+audit.frame.join('×')+': '+audit.issues.join(', '));
+      if (!desktop) measurements.push({frame:audit.frame, primarySizes:audit.primarySizes});
       if (!standalone) {
         const blocked=await slot.evaluate((el,points) => {
           const frame=el.getBoundingClientRect();
@@ -117,6 +160,7 @@ async function check(browser, base, game) {
         await fs.mkdir(process.env.HUD_CAPTURES,{recursive:true});
         await slot.screenshot({path:path.join(process.env.HUD_CAPTURES,game.slug+'.jpg'),type:'jpeg',quality:87});
       }
+      if (i===0 && !desktop && !flags.has('--webkit')) await checkTwoThumbDriving(context,page,inner,game);
       await inner.locator(game.menu).click();
       const panel = inner.locator(game.panel);
       await panel.waitFor({state:'visible'});
@@ -139,6 +183,17 @@ async function check(browser, base, game) {
       }
       await inner.locator('#resume').click();
       await panel.waitFor({state:'hidden'});
+    }
+    if (!desktop) {
+      for (const [index,name] of ['left','right','Go'].entries()) {
+        const widths = measurements.map(m => m.primarySizes[index][0]);
+        const heights = measurements.map(m => m.primarySizes[index][1]);
+        assert(Math.max(...widths)-Math.min(...widths) >= 12, game.slug+' '+name+' width did not adapt');
+        assert(Math.max(...heights)-Math.min(...heights) >= 8, game.slug+' '+name+' height did not adapt');
+      }
+      const report = [0,3,5].map(i => measurements[i].frame.join('×')+' viewport: '+
+        measurements[i].primarySizes.map(pair => pair.map(Math.round).join('×')).join('/'));
+      console.log(game.slug+' left/right/Go, CSS pixels: '+report.join('; '));
     }
     await inner.locator('canvas').first().focus();
     await page.keyboard.down('ArrowUp');

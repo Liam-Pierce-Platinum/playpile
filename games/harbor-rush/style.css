@@ -243,27 +243,18 @@ small,
   left: var(--left);
   right: var(--right);
   bottom: max(var(--edge), env(safe-area-inset-bottom));
-  justify-content: space-between;
-  gap: 6px;
-  pointer-events: none;
 }
-#touch > div { display: flex; align-items: end; gap: clamp(4px, 1vmin, 9px); }
-#touch button {
-  pointer-events: auto;
+.driving-pad button {
   background: #102b3de6;
   border-color: #9ac6d180;
   padding: 0 2px;
-  width: clamp(44px, 9vmin, 62px);
-  height: clamp(46px, 10vmin, 62px);
   font-size: clamp(10px, 1.9vmin, 12px);
-  user-select: none;
-  -webkit-user-select: none;
 }
 #touch button small { font-size: 7px; letter-spacing: 0; color: #cdd9df; }
 #touch .pedal { background: #69dfc6eb; color: #09232a; }
 #touch .nitro { border-color: #daa25d; }
 #touch .held { background: #b0fff0; color: #082327; }
-.arrow { display:inline-block; width:11px; height:11px; border:solid currentColor; border-width:0 0 3px 3px; transform:rotate(45deg); }
+.arrow { display:inline-block; width:clamp(15px, 2.6vmin, 21px); aspect-ratio:1; border:solid currentColor; border-width:0 0 3px 3px; transform:rotate(45deg); }
 .arrow.right { transform:rotate(225deg); }
 [hidden] { display: none !important; }
 @media (pointer: coarse), (max-width: 650px) { #touch { display: flex; } }
@@ -272,9 +263,6 @@ small,
   #dispatch { padding: 6px 9px; }
   #pauseButton { padding: 0 8px; }
   #speed { min-width: 44px; padding-inline: 5px; }
-}
-@media (max-width: 305px) {
-  #touch > div:last-child { display: grid; grid-template-columns: repeat(2, 44px); }
 }
 #overlay { align-items: safe center; padding: max(16px, 4vmin, env(safe-area-inset-top)) max(16px, 4vmin, env(safe-area-inset-right)) max(16px, 4vmin, env(safe-area-inset-bottom)) max(16px, 4vmin, env(safe-area-inset-left)); }
 #overlay button { touch-action: manipulation; }

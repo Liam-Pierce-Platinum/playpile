@@ -13,6 +13,7 @@ import {
   upgrade,
   route,
   HANDOVER_RADIUS,
+  DISTRICT_EDGE,
 } from "../games/neon-repo/engine.js";
 const run = (s, input, secs) => {
   for (let i = 0; i < secs * 60; i++) step(s, input, 1 / 60);
@@ -138,6 +139,101 @@ test("live traffic collision damages bodywork with a cooldown", () => {
   const health = s.car.health;
   step(s, { throttle: 1 }, 1 / 60);
   assert.equal(s.car.health, health);
+});
+
+function drivingAt(x, y, angle, speed, kind = "scout") {
+  const s = makeState();
+  acceptJob(s, 0);
+  Object.assign(s.car, { x, y, kind, angle, speed,
+    vx: speed * Math.cos(angle), vy: speed * Math.sin(angle) });
+  s.traffic = [];
+  return s;
+}
+
+test("all car bodies can overtake or pass oncoming traffic with a visible side gap", () => {
+  for (const kind of Object.keys(VEHICLES)) {
+    for (const angle of [0, Math.PI / 4, Math.PI / 2, -Math.PI / 3]) {
+      for (const oncoming of [false, true]) {
+        const dx = Math.cos(angle), dy = Math.sin(angle);
+        const s = drivingAt(760 - dx * 50, 760 - dy * 50, angle, 200, kind);
+        s.traffic = [{ x: 760 - dy * 31, y: 760 + dx * 31, speed: 50,
+          angle: oncoming ? angle + Math.PI : angle, kind: "atlas" }];
+        run(s, { throttle: 1 }, 0.5);
+        assert.equal(s.collisions, 0);
+        assert.equal(s.car.health, 100);
+        assert.ok(s.car.speed >= 200);
+      }
+    }
+  }
+});
+
+test("a car can pass beside a wall or slide along it without damaging its bodywork", () => {
+  for (const angle of [0, 0.035]) {
+    const s = drivingAt(900, 848, angle, 200, "atlas");
+    run(s, { throttle: 1 }, 0.65);
+    assert.equal(s.collisions, 0);
+    assert.equal(s.car.health, 100);
+    assert.ok(s.car.x > 1025);
+    assert.ok(s.car.y + VEHICLES.atlas.width / 2 <= 860);
+  }
+});
+
+test("true vehicle and wall impacts stop the car at the visible surface", () => {
+  const wall = drivingAt(1000, 810, Math.PI / 2, 200);
+  run(wall, { throttle: 1 }, 0.2);
+  assert.equal(wall.collisions, 1);
+  assert.match(wall.toast.text, /Wall/);
+  assert.ok(wall.car.y <= 860 - VEHICLES.scout.length / 2);
+
+  for (const angle of [0, Math.PI / 2, Math.PI]) {
+    const s = drivingAt(700, 760, 0, 210);
+    s.traffic = [{ x: 760, y: 760, angle, speed: 0, kind: "atlas" }];
+    run(s, { throttle: 1 }, 0.25);
+    assert.equal(s.collisions, 1);
+    assert.match(s.toast.text, /Front hit/);
+    assert.ok(s.car.health < 100);
+    assert.ok(s.car.x < s.traffic[0].x);
+  }
+});
+
+test("a driver at the district limit can reverse away without damage", () => {
+  const s = drivingAt(115, 760, Math.PI, 180);
+  run(s, { throttle: 1 }, 0.5);
+  const limit = DISTRICT_EDGE + VEHICLES.scout.length / 2;
+  assert.equal(s.car.x, limit);
+  assert.equal(s.collisions, 0);
+  assert.equal(s.car.health, 100);
+  assert.match(s.toast.text, /District limit/);
+  run(s, { throttle: -1 }, 0.5);
+  assert.ok(s.car.x > limit + 10);
+});
+
+test("a moving driver can identify a real rear or side impact with a clear road ahead", () => {
+  const rear = drivingAt(740, 760, 0, 60);
+  rear.traffic = [{ x: 680, y: 760, angle: 0, speed: 160, kind: "scout" }];
+  run(rear, {}, 0.3);
+  assert.equal(rear.collisions, 1);
+  assert.match(rear.toast.text, /Rear hit/);
+
+  const side = drivingAt(740, 760, 0, 60);
+  side.traffic = [{ x: 751, y: 710, angle: Math.PI / 2, speed: 160, kind: "scout" }];
+  run(side, {}, 0.25);
+  assert.equal(side.collisions, 1);
+  assert.match(side.toast.text, /Side hit/);
+});
+
+test("traffic yields to a stopped driver and resumes once the lane clears", () => {
+  const s = drivingAt(760, 760, 0, 0);
+  const t = { x: 690, y: 760, angle: 0, speed: 80, kind: "scout" };
+  s.traffic = [t];
+  run(s, {}, 1.5);
+  assert.equal(t.waiting, true);
+  assert.ok(s.car.x - t.x >= VEHICLES.scout.length);
+  assert.equal(s.car.health, 100);
+  s.car.y += 40;
+  run(s, {}, 1);
+  assert.equal(t.waiting, false);
+  assert.ok(t.x > 760);
 });
 test("malformed or absent career storage safely becomes a new career", () => {
   const a = makeState(null);

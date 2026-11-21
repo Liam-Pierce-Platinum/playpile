@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>NIGHT SHIFT</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>&#128663;</text></svg>">
-<link rel="stylesheet" href="css/style.css?v=drive-audit-1">
+<link rel="stylesheet" href="css/style.css?v=drive-audit-2">
 <script type="importmap">
   {"imports": {
     "./src/physics.js":"./src/physics.js?v=drive-audit-1",
@@ -145,10 +145,10 @@
   <div class="title-inner">
     <h1 class="logo"><span class="logo-en">NIGHT<em>SHIFT</em></span></h1>
     <p class="tagline">Do the job &middot; Leave nothing they can describe &middot; Do not get caught</p>
-    <div class="title-btns">
-      <button class="big" id="btn-play">DRIVE</button>
-      <button class="ghost" id="btn-title-garage">GARAGE</button>
-      <button class="ghost small" id="btn-wipe">Reset save</button>
+    <div class="title-btns" aria-busy="true">
+      <button class="big" id="btn-play" disabled>LOADING…</button>
+      <button class="ghost" id="btn-title-garage" disabled>GARAGE</button>
+      <button class="ghost small" id="btn-wipe" disabled>Reset save</button>
     </div>
     <p class="hint" id="title-hint"></p>
   </div>
@@ -205,6 +205,6 @@
   </div>
 </div>
 
-<script type="module" src="src/main.js?v=drive-audit-1"></script>
+<script type="module" src="src/main.js?v=drive-audit-2"></script>
 </body>
 </html>

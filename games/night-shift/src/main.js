@@ -151,6 +151,10 @@ class Game {
       : '<b>W A S D</b> drive &middot; <b>SHIFT</b> sprint &middot; <b>F</b> get out / go in / take a car<br><b>MOUSE</b> aim &middot; <b>CLICK</b> shoot &middot; <b>R</b> reload<br>They have to KILL you. Break line of sight and stay alive.';
     document.getElementById('title-hint').textContent = this.input.isTouch
       ? 'Wheel and pedals to drive · stick to walk · tap the scene to aim' : 'W A S D  ·  F';
+    document.getElementById('btn-play').textContent = 'DRIVE';
+    const actions = document.querySelector('.title-btns');
+    for (const button of actions.querySelectorAll('button[disabled]')) button.disabled = false;
+    actions.setAttribute('aria-busy', 'false');
   }
 
   // ---------------- before the job ----------------

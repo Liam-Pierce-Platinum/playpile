@@ -1,4 +1,7 @@
 // Optional first-party repeat-visit measurement. Never reads saves or profiles.
+import { drivingPrivacyMenu, mountDrivingPrivacy } from './driving-privacy.js';
+
+let removeDrivingPrivacy;
 const CHOICE = 'pp.analytics.choice';
 const VISITOR = 'pp.analytics.visitor';
 const LIFETIME = 90 * 24 * 60 * 60_000;
@@ -50,6 +53,10 @@ export function setAnalyticsChoice(allowed) {
 }
 
 export function showAnalyticsChoice() {
+  if (removeDrivingPrivacy && !document.getElementById('pp-analytics-choice')) {
+    removeDrivingPrivacy();
+    removeDrivingPrivacy = null;
+  }
   if (!document.body || document.getElementById('pp-analytics-choice')) return;
   const settings = ['/settings/', '/settings', '/site/settings.html'].includes(location.pathname);
   const choice = analyticsChoice();
@@ -58,7 +65,8 @@ export function showAnalyticsChoice() {
   panel.id = 'pp-analytics-choice';
   panel.setAttribute('aria-label', 'Repeat-visit analytics choice');
   const slot = document.querySelector('[data-playpile-notices]');
-  const layout = settings || slot ? 'position:relative;margin:16px auto;' : 'position:fixed;bottom:12px;left:12px;right:12px;margin:auto;z-index:10000;';
+  const drivingMenu = !slot && window.self === window.top && drivingPrivacyMenu(location.pathname);
+  const layout = drivingMenu ? 'position:relative;margin:0;' : settings || slot ? 'position:relative;margin:16px auto;' : 'position:fixed;bottom:12px;left:12px;right:12px;margin:auto;z-index:10000;';
   panel.style.cssText = layout + 'box-sizing:border-box;max-width:640px;background:#152b2c;color:#fff;border:2px solid #dfbe75;border-radius:12px;padding:14px;box-shadow:0 8px 32px #0005;font:16px/1.4 system-ui';
   panel.innerHTML = '<strong>Help improve PlayPile?</strong><p style="margin:8px 0">Allow a random browser code to measure return visits and time spent across visits? No names or game saves. The code expires after 90 days. Games work either way.</p><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button type="button" data-choice="no">No thanks</button><button type="button" data-choice="yes">Allow</button><a href="/site/privacy.html#analytics" style="color:#f5d99b">Privacy details</a></div><small style="display:block;margin-top:8px;font-size:14px">Change your choice in Settings &amp; info.</small>';
   const updateStatus = () => {
@@ -73,10 +81,18 @@ export function showAnalyticsChoice() {
     button.addEventListener('click', () => {
       setAnalyticsChoice(button.dataset.choice === 'yes');
       if (settings) updateStatus();
+      else if (removeDrivingPrivacy) {
+        removeDrivingPrivacy();
+        removeDrivingPrivacy = null;
+      }
       else panel.remove();
     });
   }
   if (settings) updateStatus();
+  if (drivingMenu) {
+    removeDrivingPrivacy = mountDrivingPrivacy(panel, drivingMenu);
+    return;
+  }
   const host = slot || (settings && document.querySelector('main')) || document.body;
   host.appendChild(panel);
 }

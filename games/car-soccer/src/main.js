@@ -552,4 +552,7 @@ Object.defineProperty(G, 'phase', { get: () => G.match && G.match.phase });
 // ---------- boot ----------
 if (Q.get('play')) { startMatch({ mode: Q.get('mode') || 'bot', diff: Q.get('diff') || save.diff }); }
 else goTitle();
+$('play').textContent = 'PLAY';
+for (const button of $('title').querySelectorAll('button')) button.disabled = false;
+$('title').setAttribute('aria-busy', 'false');
 requestAnimationFrame(frame);

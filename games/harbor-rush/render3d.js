@@ -8,6 +8,7 @@ import {
   WIDTH,
   HEIGHT,
   buildings,
+  harborEdge,
   stops,
   routeTo,
 } from "./model.js";
@@ -156,6 +157,9 @@ export function createHarborRenderer(canvas, game) {
   box(100, -1.6, -57, 430, 2, 91, mat("#637d79"));
   // Road planes, raised sidewalks, and physically spaced painted lane dashes.
   const paint = [];
+  const { left, right, top, bottom } = harborEdge;
+  for (const x of [left, right]) box(x * S, 0.14, (top + bottom) * S / 2, 0.25, 0.02, (bottom - top) * S, yellow);
+  for (const z of [top, bottom]) box((left + right) * S / 2, 0.14, z * S, (right - left) * S, 0.02, 0.25, yellow);
   for (const x of GRID) {
     box(x * S, -0.12, 112, 15.8, 0.35, 198.5, curb);
     box(x * S, 0.075, 112, 14, 0.06, 198.5, road);

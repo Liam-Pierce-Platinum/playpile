@@ -284,7 +284,7 @@ function step(dt) {
   if (m >= run.milestone) { run.milestone = m + 1; banner(m * 100 + ' m'); audio.milestone(); }
   const b = Math.floor((car.x - 4) / BLEN);
   if (b > run.biome) { run.biome = b; banner(BIOMES[b % BIOMES.length].name); }
-  if (car.x > run.lastX + 1) { run.lastX = car.x; run.stuckT = 0; } else run.stuckT += dt;
+  if (thr <= 0 || car.x > run.lastX + 1) { run.lastX = car.x; run.stuckT = 0; } else run.stuckT += dt;
   if (Math.cos(car.a) < -0.3) run.flipT += dt; else run.flipT = 0;
   if (crack) die('The egg cracked!');
   else if (run.flipT > 2.5) die('Flipped over!');
@@ -340,27 +340,27 @@ $('mGarage').onclick = garage; $('oGarage').onclick = garage;
 $('muteBtn').onclick = () => { audio.setMuted(!audio.muted); $('muteBtn').classList.toggle('off', audio.muted); };
 
 // input
-const keys = new Set();
-const recalc = () => { const g = keys.has('g'), b = keys.has('b'); thrIn = g && !b ? 1 : b ? -1 : 0; $('pGas').classList.toggle('on', g); $('pBrake').classList.toggle('on', b); if (thrIn && run) { run.hint = false; $('hint').classList.add('hidden'); } };
+const keys = new Set(), touches = new Map();
+const gasKeys = ['ArrowRight', 'KeyD', 'ArrowUp', 'KeyW'];
+const brakeKeys = ['ArrowLeft', 'KeyA', 'ArrowDown', 'KeyS'];
+const recalc = () => { const held = [...touches.values()];
+  const g = gasKeys.some(key => keys.has(key)) || held.includes('g');
+  const b = brakeKeys.some(key => keys.has(key)) || held.includes('b'); thrIn = g && !b ? 1 : b ? -1 : 0; $('pGas').classList.toggle('on', g); $('pBrake').classList.toggle('on', b); if (thrIn && run) { run.hint = false; $('hint').classList.add('hidden'); } };
 addEventListener('keydown', (e) => {
   audio.init();
-  if (['ArrowRight', 'KeyD', 'ArrowUp', 'KeyW'].includes(e.code)) keys.add('g');
-  if (['ArrowLeft', 'KeyA', 'ArrowDown', 'KeyS'].includes(e.code)) keys.add('b');
+  if (gasKeys.includes(e.code) || brakeKeys.includes(e.code)) { keys.add(e.code); e.preventDefault(); }
   if ((e.code === 'Space' || e.code === 'Enter') && (state === 'over' || state === 'menu')) start();
   if (e.code === 'KeyR' && state === 'play') start();
   recalc();
 });
 addEventListener('keyup', (e) => {
-  if (['ArrowRight', 'KeyD', 'ArrowUp', 'KeyW'].includes(e.code)) keys.delete('g');
-  if (['ArrowLeft', 'KeyA', 'ArrowDown', 'KeyS'].includes(e.code)) keys.delete('b');
+  keys.delete(e.code);
   recalc();
 });
-const touches = new Map();
-const tRecalc = () => { keys.delete('g'); keys.delete('b'); for (const v of touches.values()) keys.add(v); recalc(); };
-canvas.addEventListener('pointerdown', (e) => { audio.init(); canvas.setPointerCapture(e.pointerId); touches.set(e.pointerId, e.clientX > innerWidth / 2 ? 'g' : 'b'); tRecalc(); });
-addEventListener('pointerup', (e) => { touches.delete(e.pointerId); tRecalc(); });
-for (const event of ['pointercancel','lostpointercapture']) addEventListener(event, e => { touches.delete(e.pointerId); tRecalc(); });
-addEventListener('blur', () => { keys.clear(); touches.clear(); tRecalc(); recalc(); });
+canvas.addEventListener('pointerdown', (e) => { audio.init(); canvas.setPointerCapture(e.pointerId); touches.set(e.pointerId, e.clientX > innerWidth / 2 ? 'g' : 'b'); recalc(); });
+addEventListener('pointerup', (e) => { touches.delete(e.pointerId); recalc(); });
+for (const event of ['pointercancel','lostpointercapture']) addEventListener(event, e => { touches.delete(e.pointerId); recalc(); });
+addEventListener('blur', () => { keys.clear(); touches.clear(); recalc(); });
 
 // ---------- render ----------
 const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(), cA = new THREE.Color(), cB = new THREE.Color();

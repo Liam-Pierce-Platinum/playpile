@@ -145,7 +145,7 @@ function reset() {
   for (const s of road) { s.grp.position.y = s.y0; s.rise = 0; }
   for (let i = 0; i < 18; i++) makeCloud((Math.random() - 0.75) * 60, -6 - Math.random() * 12, (Math.random() - 0.75) * 60);
   pos.set(0, 0, 1.5); face = vel = 0; speed = 5.2; body.rotation.set(0, 0, 0);
-  state = 'run'; $('hint').classList.remove('off');
+  hold = false; state = 'run'; $('hint').classList.remove('off');
   updHud(); $('over').classList.add('hide');
 }
 function setZone(z, instant) {
@@ -258,7 +258,7 @@ function releaseDrift(e) {
 for (const event of ['pointerup','pointercancel','lostpointercapture']) addEventListener(event, releaseDrift);
 addEventListener('blur', () => releaseDrift());
 const KEYS = ['Space', 'ArrowLeft', 'ArrowUp', 'KeyA', 'Enter'];
-addEventListener('keydown', (e) => { if (e.repeat || !KEYS.includes(e.code)) return; e.preventDefault(); if (state === 'menu') { sfx.unlock(); startPlay(); return; } down(); });
+addEventListener('keydown', (e) => { if (e.repeat || !KEYS.includes(e.code) || e.target.closest?.('button,.panel')) return; e.preventDefault(); if (state === 'menu') { sfx.unlock(); startPlay(); return; } down(); });
 addEventListener('keyup', (e) => { if (KEYS.includes(e.code)) up(); });
 $('retry').onclick = () => { sfx.unlock(); reset(); };
 $('toGarage').onclick = () => { $('over').classList.add('hide'); openMenu(); };
@@ -268,9 +268,10 @@ $('muteBtn').style.opacity = sfx.muted ? 0.4 : 1;
 
 function openMenu() {
   state = 'menu'; $('menu').classList.remove('hide'); const gEl = $('garage'); gEl.innerHTML = '';
-  SKINS.forEach((s, i) => { const d = document.createElement('div'), own = owned.includes(i);
+  SKINS.forEach((s, i) => { const d = document.createElement('button'), own = owned.includes(i);
     d.className = 'skin' + (i === skin ? ' sel' : '') + (own ? '' : ' lock');
     d.innerHTML = `<i style="background:#${s.body.toString(16).padStart(6, '0')}"></i>${s.name}<br>${own ? (i === skin ? 'DRIVING' : 'OWNED') : s.cost + ' gems'}`;
+    d.setAttribute('aria-pressed', String(skin === i));
     d.onclick = () => { if (!own) { if (bank < s.cost) { sfx.unlock(); sfx.nope(); return; } bank -= s.cost; owned.push(i); store.set('owned', owned); store.set('gems', bank); sfx.unlock(); sfx.gem(); }
       skin = i; store.set('skin', skin); applySkin(); updHud(); openMenu(); };
     gEl.appendChild(d); });

@@ -1,3 +1,4 @@
+import { contact, orientedBody, projectedRadius } from '../../_shared/vehicle-contact.js';
 // ===================== HIGHWAY :: THE CAR =====================
 // Deliberately simple. There is no slip, no drift, nothing that slides. The
 // car points down the road and steering moves it ACROSS the road - which is
@@ -229,34 +230,20 @@ export class Car {
 // through things you had visually hit. Cars are long and thin; only a box
 // works. Separating axis theorem, four axes, two per box.
 // ------------------------------------------------------------------
+function bodyOf(car) {
+  return orientedBody(car.x, car.y, car.h, car.spec.len / 2, car.spec.wid / 2);
+}
+
+function carContact(a, b) {
+  const reach = (a.spec.len + a.spec.wid + b.spec.len + b.spec.wid) / 2;
+  if (Math.abs(a.x - b.x) > reach || Math.abs(a.y - b.y) > reach) return null;
+  return contact(bodyOf(a), bodyOf(b));
+}
+
 export function carCollide(a, b) {
-  const dx = b.x - a.x, dy = b.y - a.y;
-  const ahx = a.spec.len * 0.5, ahy = a.spec.wid * 0.5;
-  const bhx = b.spec.len * 0.5, bhy = b.spec.wid * 0.5;
-  // cheap reject on bounding circles first
-  const reach = Math.hypot(ahx, ahy) + Math.hypot(bhx, bhy);
-  if (dx * dx + dy * dy > reach * reach) return 0;
-
-  const ca = Math.cos(a.h), sa = Math.sin(a.h);
-  const cb = Math.cos(b.h), sb = Math.sin(b.h);
-  const aX = [ca, sa], aY = [-sa, ca];
-  const bX = [cb, sb], bY = [-sb, cb];
-
-  let minOv = Infinity, nx = 0, ny = 0;
-  for (const ax of [aX, aY, bX, bY]) {
-    const ra = Math.abs(ahx * (aX[0] * ax[0] + aX[1] * ax[1]))
-             + Math.abs(ahy * (aY[0] * ax[0] + aY[1] * ax[1]));
-    const rb = Math.abs(bhx * (bX[0] * ax[0] + bX[1] * ax[1]))
-             + Math.abs(bhy * (bY[0] * ax[0] + bY[1] * ax[1]));
-    const dist = dx * ax[0] + dy * ax[1];
-    const ov = ra + rb - Math.abs(dist);
-    if (ov <= 0) return 0;                       // a gap on this axis: no hit
-    if (ov < minOv) {
-      minOv = ov;
-      const sgn = dist < 0 ? -1 : 1;
-      nx = ax[0] * sgn; ny = ax[1] * sgn;        // points from a toward b
-    }
-  }
+  const hit = carContact(a, b);
+  if (!hit) return 0;
+  const nx = -hit.nx, ny = -hit.ny, minOv = hit.depth;
 
   // A patrol sitting on your bumper touches you constantly. If every one of
   // those taps scrubbed speed the way a real impact does, the pack simply
@@ -280,8 +267,8 @@ export function carCollide(a, b) {
   b.speed = Math.max(0, b.speed - force * share * scrub);
   a.steerAngle += (Math.random() - 0.5) * Math.min(0.5, force / 22);
   b.steerAngle += (Math.random() - 0.5) * Math.min(0.5, force / 22);
-  a.vx -= nx * into * (1 - share) * bounce; a.vy -= ny * into * (1 - share) * bounce;
-  b.vx += nx * into * share * bounce;       b.vy += ny * into * share * bounce;
+  a.vx += nx * into * share * bounce; a.vy += ny * into * share * bounce;
+  b.vx -= nx * into * (1 - share) * bounce; b.vy -= ny * into * (1 - share) * bounce;
   if (force > 2 && !soft) { a.crashT = Math.min(1, force / 20); b.crashT = a.crashT; }
   return force;
 }
@@ -289,29 +276,18 @@ export function carCollide(a, b) {
 // Same separating-axis test, without the response - so the game can ask
 // "are these two actually touching?" using the real body, not a bubble.
 export function carsTouching(a, b) {
-  const dx = b.x - a.x, dy = b.y - a.y;
-  const ahx = a.spec.len * 0.5, ahy = a.spec.wid * 0.5;
-  const bhx = b.spec.len * 0.5, bhy = b.spec.wid * 0.5;
-  const reach = Math.hypot(ahx, ahy) + Math.hypot(bhx, bhy);
-  if (dx * dx + dy * dy > reach * reach) return false;
-  const ca = Math.cos(a.h), sa = Math.sin(a.h);
-  const cb = Math.cos(b.h), sb = Math.sin(b.h);
-  const aX = [ca, sa], aY = [-sa, ca], bX = [cb, sb], bY = [-sb, cb];
-  for (const ax of [aX, aY, bX, bY]) {
-    const ra = Math.abs(ahx * (aX[0] * ax[0] + aX[1] * ax[1]))
-             + Math.abs(ahy * (aY[0] * ax[0] + aY[1] * ax[1]));
-    const rb = Math.abs(bhx * (bX[0] * ax[0] + bX[1] * ax[1]))
-             + Math.abs(bhy * (bY[0] * ax[0] + bY[1] * ax[1]));
-    if (ra + rb - Math.abs(dx * ax[0] + dy * ax[1]) <= 0) return false;
-  }
-  return true;
+  return Boolean(carContact(a, b));
 }
 
-export function resolveCarCollisions(cars) {
+export function resolveCarCollisions(cars, onImpact) {
   let worst = 0;
-  for (let i = 0; i < cars.length; i++)
-    for (let j = i + 1; j < cars.length; j++)
-      worst = Math.max(worst, carCollide(cars[i], cars[j]));
+  for (let i = 0; i < cars.length; i++) {
+    for (let j = i + 1; j < cars.length; j++) {
+      const force = carCollide(cars[i], cars[j]);
+      if (force > 0 && onImpact) onImpact(cars[i], cars[j], force);
+      worst = Math.max(worst, force);
+    }
+  }
   return worst;
 }
 
@@ -327,25 +303,23 @@ export function angleDiff(a, b) {
 // the wall. Shared by the player, the traffic and the police - anything
 // that is not allowed to be inside a building.
 export function boxOut(b, p, mouthOk) {
-  const cs = Math.cos(-b.ang), sn = Math.sin(-b.ang);
   const dx = p.x - b.x, dy = p.y - b.y;
-  const u = cs * dx - sn * dy, v = sn * dx + cs * dy;
-  const rad = p.spec.len * 0.40;
-  const hu = b.w / 2 + rad, hv = b.d / 2 + rad;
-  if (Math.abs(u) > hu || Math.abs(v) > hv) return 0;
+  const reach = (b.w + b.d + p.spec.len + p.spec.wid) / 2;
+  if (Math.abs(dx) > reach || Math.abs(dy) > reach) return 0;
+  const wall = orientedBody(b.x, b.y, b.ang, b.w / 2, b.d / 2);
+  const car = bodyOf(p);
+  const hit = contact(car, wall);
+  if (!hit) return 0;
   if (mouthOk && b.garage) {
-    const onFace = (b.doorSide === 'v-' && v < 0) || (b.doorSide === 'v+' && v > 0);
-    if (onFace && Math.abs(u) < b.mouth / 2) return 0;
+    const u = dx * wall.forward.x + dy * wall.forward.y;
+    const v = dx * wall.side.x + dy * wall.side.y;
+    const onFace = b.doorSide === 'v-' ? v < 0 : v > 0;
+    if (onFace && Math.abs(u) + projectedRadius(car, wall.forward) <= b.mouth / 2) return 0;
   }
-  const ou = hu - Math.abs(u), ov = hv - Math.abs(v);
-  let nu = u, nv = v, nx = 0, ny = 0;
-  if (ou < ov) { nu = Math.sign(u) * hu; nx = Math.sign(u); }
-  else { nv = Math.sign(v) * hv; ny = Math.sign(v); }
-  const c2 = Math.cos(b.ang), s2 = Math.sin(b.ang);
-  p.x = b.x + c2 * nu - s2 * nv;
-  p.y = b.y + s2 * nu + c2 * nv;
-  const wx = c2 * nx - s2 * ny, wy = s2 * nx + c2 * ny;
-  const into = -(p.vx * wx + p.vy * wy);
-  p.speed *= 0.30; p.vx = 0; p.vy = 0;
-  return into > 4 ? into : 0;
+  p.x += hit.nx * hit.depth; p.y += hit.ny * hit.depth;
+  const closing = -(p.vx * hit.nx + p.vy * hit.ny);
+  if (closing <= 0) return 0;
+  p.vx += closing * hit.nx; p.vy += closing * hit.ny;
+  p.speed = p.vx * car.forward.x + p.vy * car.forward.y;
+  return closing > 4 ? closing : 0;
 }

@@ -42,32 +42,35 @@ html,body{width:100%;height:100%;overflow:hidden;background:#12031f;color:#fff;f
 .sw.on{box-shadow:0 0 0 2px #fff36b}
 .sw:focus-visible{outline:2px solid #7ff6ff;outline-offset:2px}
 .sw:disabled{opacity:.45;cursor:not-allowed}
-#touch{display:none}
-body.touch #touch{display:block}
-body.touch #hint{display:none}
-.tb{position:fixed;width:74px;height:74px;border-radius:50%;border:2px solid #ff9ee0aa;background:#ff3fa433;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;color:#fff;touch-action:none}
-.tb.on{background:#ff3fa499}
-#tL{left:16px;bottom:24px}#tR{left:104px;bottom:24px}
-#tB{right:104px;bottom:110px}#tG{right:16px;bottom:110px}#tN{right:16px;bottom:196px;width:60px;height:60px;font-size:14px;border-color:#7ff6ff}
-body.touch #spd{bottom:auto;top:56px;right:16px}
-body.touch #spd b{font-size:30px}
-
-@media (pointer: coarse) {
-  html,body { touch-action: manipulation; }
-  .tb { touch-action: none; }
-  #garage,#card { max-height: calc(100dvh - 24px); overflow: auto; overscroll-behavior: contain; touch-action: pan-y; }
-  #garage { padding-inline: 16px; }
-  #garBtn,#garage button,#card button { min-height: 44px; }
-  #garage .sw { width: 44px; height: 44px; }
-  #hint { display: none; }
-  .tb { width: clamp(46px,16vmin,66px); height: clamp(46px,16vmin,66px); padding: 0; font-size: 14px; }
-  #tL { left: max(10px,env(safe-area-inset-left)); bottom: 12px; }
-  #tR { left: calc(max(10px,env(safe-area-inset-left)) + clamp(54px,18vmin,76px)); bottom: 12px; }
-  #tG,#tB { bottom: 12px; }
-  #tG { right: max(10px,env(safe-area-inset-right)); }
-  #tB { right: calc(max(10px,env(safe-area-inset-right)) + clamp(54px,18vmin,76px)); }
-  #tD,#tN { bottom: clamp(65px,22vmin,90px); }
-  #tD { right: calc(max(10px,env(safe-area-inset-right)) + clamp(54px,18vmin,76px)); }
-  #tN { right: max(10px,env(safe-area-inset-right)); width: clamp(46px,16vmin,66px); height: clamp(46px,16vmin,66px); }
-  #tReset { left: max(10px,env(safe-area-inset-left)); bottom: clamp(65px,22vmin,90px); }
+#touch { display:none; position:fixed; left:max(10px,env(safe-area-inset-left)); right:max(10px,env(safe-area-inset-right)); bottom:max(12px,env(safe-area-inset-bottom)); }
+body.touch #touch { display:flex; }
+body.touch #hint { display:none; }
+.tb { border:2px solid #ff9ee0aa; border-radius:18px; padding:0; background:#54234bdc; font-weight:bold; color:#fff; }
+.tb.on { background:#ab428e; }
+#tN { border-color:#7ff6ff; }
+body.touch #spd { bottom:auto; top:56px; right:12px; }
+body.touch #kmh { font-size:24px; }
+body.touch #nos { width:54px; }
+body:has(#card:not(.hide),#garage:not(.hide),#title:not(.hide)) #touch,
+body:has(#card:not(.hide),#garage:not(.hide),#title:not(.hide)) #hud { visibility:hidden; }
+body:has(#chal:not(.hide)) #garBtn {left:auto;right:10px;top:8px;}
+/* The close chase camera puts the bumper low in short landscape frames. */
+@media (max-height:380px) {
+  @container driving-pad (min-width:431px) and (max-width:650px) {
+    #touch > div:last-child {display:grid;grid-template-columns:repeat(3,var(--secondary-width));}
+    #touch .accelerator {grid-column:1 / -1;grid-row:2;justify-self:end;}
+  }
+}
+@media (pointer:coarse) {
+  html,body { touch-action:manipulation; }
+  #garage,#card,#title { max-height:calc(100dvh - 24px); overflow:auto; overscroll-behavior:contain; touch-action:pan-y; }
+  #garage { padding-inline:16px; }
+  #garBtn,#garage button,#card button { min-height:44px; }
+  #garage .sw { width:44px; height:44px; }
+  #next { font-size:12px; }
+}
+@media (max-width:520px) {
+  body.touch:has(#chal:not(.hide)) #topl {display:none}
+  #chal { left:10px; right:82px; transform:none; text-align:left; padding:4px 8px; }
+  #chal #chName,#chal #chTime { font-size:16px; }
 }

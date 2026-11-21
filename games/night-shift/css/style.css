@@ -490,3 +490,60 @@ button.ghost.small{font-size:11px;padding:8px 18px;opacity:.55}
    list it ran down over CARRYING */
 .board-id{ position:absolute; right:.5rem; top:-.62rem; margin:0; font-size:.56rem; padding:.2rem .45rem; }
 .board{ min-width:210px; }
+
+@media (pointer:coarse) {
+  #touch {
+    --edge: max(8px, env(safe-area-inset-bottom));
+    --wheel: clamp(92px, 29vmin, 166px);
+    --pedal-height: clamp(62px, 18vmin, 100px);
+  }
+  #touch[data-mode="drive"] .wheel-zone { width:var(--wheel); bottom:var(--edge); }
+  .pedals { gap:6px; bottom:var(--edge); }
+  .pedal { height:var(--pedal-height); }
+  .pedal.gas { width:clamp(71px, calc(44px + 8vmin), 118px); }
+  .touch-tools {
+    position:absolute; right:max(10px,env(safe-area-inset-right));
+    bottom:calc(var(--edge) + var(--pedal-height) + 6px);
+    display:flex; align-items:end; gap:5px;
+  }
+  #touch .touch-tools button {
+    position:static; width:auto; height:44px; min-width:44px; min-height:44px;
+    padding:0 7px; border-radius:7px; font:700 11px/1.1 system-ui,sans-serif;
+    letter-spacing:.02em; pointer-events:auto; touch-action:none;
+  }
+  #touch:is([data-mode="foot"],[data-mode="inside"]) .touch-tools { bottom:calc(var(--edge) + 51px); }
+  #hud .pause-btn { top:max(8px,env(safe-area-inset-top)); left:auto; right:max(8px,env(safe-area-inset-right)); transform:none; }
+  #hud .hud-top { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:6px; padding-right:98px; }
+  #hud .score-stack { display:none; }
+  body:has(#touch:not([hidden])) > button[aria-pressed] {
+    top:max(8px,env(safe-area-inset-top)) !important;
+    left:auto !important; right:calc(max(8px,env(safe-area-inset-right)) + 50px) !important;
+  }
+  #hud .clock { position:static; transform:none; min-width:0; }
+  #hud .clock i { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .clock b { font-size:clamp(17px,4vmin,29px); }
+  #hud .speedo { width:clamp(50px,12vmin,72px); height:clamp(50px,12vmin,72px); }
+  #hud .prompt {
+    position:static; width:fit-content; margin:5px 0 0; max-width:65%;
+    transform:none; font-size:11px; letter-spacing:.08em; padding:5px 8px;
+  }
+  .speed-num span { font-size:clamp(18px,4.8vmin,27px); }
+  .gear { right:0; bottom:2px; }
+  #hud .right-stack { min-width:0; }
+  .dmg-bar,.bust-bar { width:clamp(44px,13vw,100px); }
+  body:has(#touch[data-mode="drive"]) #hud :is(.inv,.board,.needs,.vitals) { display:none; }
+  #pause,#title { overflow:auto; padding:8px; touch-action:pan-y; }
+  #pause > .panel,#title > .title-inner { flex:none; margin-block:auto; }
+  #pause > .panel { width:min(380px,100%); min-width:0; padding:16px; }
+  #pause-status { width:100%; text-align:left; }
+  #pause-status summary { display:list-item; padding:12px 2px; cursor:pointer; }
+  #pause-status > div { display:grid; gap:8px; }
+  #pause-status :is(.board,.inv,.vitals,.needs) { position:relative; inset:auto; transform:none; min-width:0; }
+  #pause-status :is(.hp-bar,.needs i) { max-width:100%; }
+}
+@media (pointer:coarse) and (max-width:450px) {
+  #hud .dmg { flex-direction:column; align-items:end; gap:3px; }
+  #hud .heat { gap:2px; flex-wrap:wrap; max-width:76px; }
+  .heat-pip { width:6px; }
+  #touch[data-mode="drive"] .touch-tools { bottom:calc(var(--edge) + max(var(--wheel),var(--pedal-height)) + 5px); }
+}

@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="en"><head>
 <script src="../_shared/mobile.js"></script><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>STUNT CITY</title>
-<link rel="stylesheet" href="style.css?v=garage-controls-1">
+<link rel="stylesheet" href="style.css?v=driving-qa-2">
+<link rel="stylesheet" href="../_shared/city-art/driving-pad.css?v=20261120-touch-size">
 <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
 </head><body>
 <canvas id="c"></canvas>
@@ -16,13 +17,15 @@
   <div id="hint">WASD / arrows drive &middot; SHIFT nitro &middot; SPACE drift &middot; in air: W/S flip, A/D spin, Q/E roll &middot; ENTER next challenge &middot; G garage &middot; R reset &middot; M mute</div>
   <button id="garBtn" class="btn sm">GARAGE</button>
 </div>
-<div id="touch">
+<div id="touch" class="driving-pad">
+  <div>
   <button class="tb" id="tL" data-k="left" aria-label="Steer left">&#9664;</button><button class="tb" id="tR" data-k="right" aria-label="Steer right">&#9654;</button>
-  <button class="tb" id="tB" data-k="down" aria-label="Brake">BRK</button><button class="tb" id="tG" data-k="up" aria-label="Accelerate">GAS</button><button class="tb" id="tN" data-k="nitro" aria-label="Nitro">NOS</button>
-  <button class="tb" id="tD" data-k="hand">Drift</button><button class="tb" id="tReset" aria-label="Reset car">Reset</button>
+  </div>
+  <div><button class="tb" id="tB" data-k="down" aria-label="Brake">BRK</button><button class="tb accelerator" id="tG" data-k="up" aria-label="Accelerate">GAS</button><button class="tb" id="tN" data-k="nitro" aria-label="Nitro">NOS</button>
+  <button class="tb" id="tD" data-k="hand">Drift</button></div>
 </div>
 <div id="card" class="hide"><h2 id="cardH"></h2><p id="cardP"></p><div><button id="cardA" class="btn"></button> <button id="cardB" class="btn ghost"></button></div></div>
-<div id="garage" class="hide"><h2>GARAGE</h2><div id="garList"></div><button id="garClose" class="btn">DRIVE</button></div>
+<div id="garage" class="hide"><h2>GARAGE</h2><button id="tReset" class="btn sm" aria-label="Reset car">Reset car</button><div id="garList"></div><button id="garClose" class="btn">DRIVE</button></div>
 <div id="title" class="hide"><h1>STUNT<br>CITY</h1><p>a chrome stunt park at the end of the world</p><button id="playBtn" class="btn">DRIVE</button></div>
-<script type="module" src="src/main.js?v=garage-controls-1"></script>
+<script type="module" src="src/main.js?v=driving-qa-2"></script>
 </body></html>

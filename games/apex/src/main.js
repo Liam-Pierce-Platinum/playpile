@@ -36,7 +36,7 @@ import * as League from './league.js';
 import { Crew, boxMarking } from './crew.js';
 import { WIND, envProbe } from './scenery.js';
 import { setAnisotropy } from './textures.js';
-import { Runner, collide } from './world.js';
+import { Runner, collide } from './world.js?v=20261120-race-qa';
 import { racingLine, speedPlan, Driver } from './ai.js';
 import { createFeedback } from '../../_shared/feedback-sfx.js';
 

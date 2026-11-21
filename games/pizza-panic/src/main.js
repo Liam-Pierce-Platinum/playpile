@@ -44,7 +44,7 @@ function throwForward() { const p = G.p; let best = null, bd = 1e9; for (const o
 // touch: left half = floating stick, right half = tap to throw, buttons for boost/drift
 const stick = { id: null, ox: 0, oy: 0, x: 0, y: 0 }; let tBoost = false, tDrift = false;
 if (touch) {
-  $('touch').classList.remove('hidden');
+  $('tPause').onclick = togglePause;
   const btn = (el, set) => { el.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); A.wake(); set(true); }, { passive: false }); el.addEventListener('touchend', (e) => { e.preventDefault(); set(false); }); el.addEventListener('touchcancel', () => set(false)); };
   btn($('tBoost'), (v) => (tBoost = v)); btn($('tDrift'), (v) => (tDrift = v));
   cv.addEventListener('touchstart', (e) => {
@@ -70,9 +70,11 @@ function readInput() {
   if (stick.id !== null) {
     const dx = stick.x - stick.ox, dy = stick.y - stick.oy, L = Math.hypot(dx, dy);
     if (L > 12) { I.head = Math.atan2(dy, dx); I.thr = Math.min(1, L / 60); } else I.thr = 0;
-    $('knob').style.transform = `translate(${Math.max(-50, Math.min(50, dx))}px, ${Math.max(-50, Math.min(50, dy))}px)`;
-    $('stick').style.cssText = `left:${stick.ox - 60}px;top:${stick.oy - 60}px;opacity:1`;
-  } else if (touch) { $('stick').style.opacity = '0.35'; $('stick').style.cssText = 'opacity:.35'; $('knob').style.transform = ''; }
+    const base = $('stick'), radius = base.offsetWidth / 2;
+    const travel = Math.min(1, radius * 0.6 / Math.max(1, L));
+    $('knob').style.translate = (dx * travel) + 'px ' + (dy * travel) + 'px';
+    base.style.cssText = 'left:' + (stick.ox - radius) + 'px;top:' + (stick.oy - radius) + 'px;opacity:1';
+  } else if (touch) { $('stick').style.opacity = '0.35'; $('stick').style.cssText = 'opacity:.35'; $('knob').style.translate = ''; }
 }
 
 // ---------- screens ----------
@@ -119,7 +121,9 @@ else begin();
 let last = performance.now(), acc = 0;
 function frame(now) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
-  readInput();
+  if (touch) $('touch').classList.toggle('hidden', G.state !== 'play');
+  if (G.state === 'play') readInput();
+  else { stick.id = null; tBoost = tDrift = mouseDown = false; }
   if (G.state === 'play') {
     if (mouseDown && G.throwCd <= 0 && mouse) { const p = toWorld(mouse.x, mouse.y); throwAt(G, p.x, p.y); }
     acc += dt; while (acc >= 1 / 60) { step(G, 1 / 60); acc -= 1 / 60; }

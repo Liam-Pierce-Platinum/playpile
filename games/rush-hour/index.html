@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>RUSH HOUR</title>
 <meta name="description" content="Blocky high-speed traffic weaving. Ten stages on one road, hairpins, drifts, near misses.">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=20261120-race-qa">
 </head>
 <body>
 <canvas id="c"></canvas>
@@ -31,11 +31,9 @@
 </div>
 
 <div id="touch" class="hidden">
-  <div id="tL" class="tz"><span>&#9664;</span></div>
-  <div id="tR" class="tz"><span>&#9654;</span></div>
-  <div id="tBrake" class="tb">BRAKE</div>
-  <div id="tNitro" class="tb">NITRO</div>
-  <div id="tPause" class="tb">II</div>
+  <div class="steering"><button id="tL" aria-label="Steer left">&#9664;</button><button id="tR" aria-label="Steer right">&#9654;</button></div>
+  <div class="pedals"><button id="tBrake">BRAKE</button><button id="tNitro">NITRO</button></div>
+  <button id="tPause" aria-label="Pause">Ⅱ</button>
 </div>
 
 <div id="title" class="screen hidden">
@@ -68,6 +66,6 @@
   </div>
 </div>
 
-<script type="module" src="src/main.js"></script>
+<script type="module" src="src/main.js?v=20261120-race-qa"></script>
 </body>
 </html>

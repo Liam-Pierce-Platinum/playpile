@@ -3,11 +3,12 @@
 import { Track, STEP } from './track.js';
 import { Audio } from './audio.js';
 import { UI } from './ui.js';
-import { drawCar, Rival, STYLES } from './cars.js';
+import { drawCar, Rival, STYLES, carBody, railClearance, RAIL_OFFSET, RAIL_HALF_WIDTH } from './cars.js?v=20261120-race-qa';
+import { contact } from '../../_shared/vehicle-contact.js';
 
 const SAVE_KEY = 'pd.neondrift';
 const CYAN = '#ffffff', PINK = '#ff8a3a', PURPLE = '#9aa0b0', YELLOW = '#ffd060', RED = '#ff4a3a';
-const ACCEL = 980, BRAKE = 1500, MAXSPD = 1000, NITRO_MAX = 1350, CAR_R = 18;
+const ACCEL = 980, BRAKE = 1500, MAXSPD = 1000, NITRO_MAX = 1350;
 const RACE_LEN = 2300;   // track points from the start line to the finish banner
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -184,7 +185,8 @@ class Game {
     T.ensure(c.idx + 260);
     const p = T.pts[c.idx];
     const off = T.offset(c.x, c.y, c.idx);
-    const lim = p.w - CAR_R;
+    const extent = railClearance(c, p);
+    const lim = p.w + RAIL_OFFSET - RAIL_HALF_WIDTH - extent;
     c.hitT = Math.max(0, c.hitT - dt);
     this.wallDist = lim - Math.abs(off);
     if (this.wallDist < 26 && this.wallDist > 0) {
@@ -206,7 +208,7 @@ class Game {
           if (hard) { this.shake = Math.max(this.shake, clamp(into / 40, 4, 16)); this.flash = 0.35; }
           if (hard && this.driftPts > 0) this.loseDrift();
         }
-        for (let k = 0; k < Math.min(18, into / 25); k++) this.parts.push({ x: c.x + nx * CAR_R, y: c.y + ny * CAR_R, vx: -nx * Math.random() * 300 + (Math.random() - 0.5) * 300 + c.vx * 0.3, vy: -ny * Math.random() * 300 + (Math.random() - 0.5) * 300 + c.vy * 0.3, life: 0.5, max: 0.5, col: k % 2 ? '#ffd060' : '#ffffff', s: 2 });
+        for (let k = 0; k < Math.min(18, into / 25); k++) this.parts.push({ x: c.x + nx * extent, y: c.y + ny * extent, vx: -nx * Math.random() * 300 + (Math.random() - 0.5) * 300 + c.vx * 0.3, vy: -ny * Math.random() * 300 + (Math.random() - 0.5) * 300 + c.vy * 0.3, life: 0.5, max: 0.5, col: k % 2 ? '#ffd060' : '#ffffff', s: 2 });
       }
     }
     // checkpoints
@@ -319,17 +321,18 @@ class Game {
       }
     }
     T.ensure(Math.max(...everyone.map((q) => q.idx)) + 260);
-    // bumping: cars are circles; the push is shared, with a little spark
+    // Resolve contact using the same headings and body sizes as the drawn cars.
     for (let a = 0; a < everyone.length; a++) for (let b = a + 1; b < everyone.length; b++) {
       const A = everyone[a], B = everyone[b];
-      const dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy), min = 34;
-      if (d >= min || d < 0.01) continue;
-      const nx = dx / d, ny = dy / d, push = (min - d) / 2;
+      const hit = contact(carBody(A), carBody(B));
+      if (!hit) continue;
+      const nx = -hit.nx, ny = -hit.ny, push = hit.depth / 2;
       A.x -= nx * push; A.y -= ny * push; B.x += nx * push; B.y += ny * push;
       if (A === c || B === c) {
         const r = A === c ? B : A, s = A === c ? 1 : -1;
-        const into = (c.vx * nx + c.vy * ny) * s;
-        if (into > 0) { c.vx -= nx * s * into * 0.6; c.vy -= ny * s * into * 0.6; }
+        const into = ((c.vx - r.vx) * nx + (c.vy - r.vy) * ny) * s;
+        if (into <= 0) continue;
+        c.vx -= nx * s * into * 0.6; c.vy -= ny * s * into * 0.6;
         r.speed = Math.max(0, r.speed * 0.985);
         if ((this.bumpT || 0) <= 0) { this.bumpT = 0.4; this.audio.play('scrape'); this.shake = Math.max(this.shake, 4); for (let k = 0; k < 6; k++) this.parts.push({ x: (A.x + B.x) / 2, y: (A.y + B.y) / 2, vx: (Math.random() - 0.5) * 300, vy: (Math.random() - 0.5) * 300, life: 0.4, max: 0.4, col: '#ffd060', s: 2 }); }
       }
@@ -486,9 +489,9 @@ class Game {
     }
     // guardrails with posts
     for (const s of [-1, 1]) {
-      const rail = side((p) => s * (p.w + 14));
+      const rail = side((p) => s * (p.w + RAIL_OFFSET));
       line(rail, 'rgba(0,0,0,0.35)', 7);
-      line(rail, '#c3c7cf', 4);
+      line(rail, '#c3c7cf', 2 * RAIL_HALF_WIDTH);
       line(rail, '#eef0f4', 1.2);
       x.fillStyle = '#5a5e66';
       for (let k = 0; k < rail.length; k += 3) x.fillRect(rail[k][0] - 2.5, rail[k][1] - 2.5, 5, 5);
@@ -649,10 +652,16 @@ class Game {
 
 Game.prototype.gauge = function () {
   const x = this.x, W = this.W, H = this.H, c = this.car;
-  // rev gauge, bottom right
-  const gx = this.isTouch ? W - 68 : W - 92;
-  const gy = this.isTouch ? H - 102 : H - 86;
-  const gr = this.isTouch ? 48 : 66;
+  // On touch the pedals own the lower right corner. Speed and boost share the left.
+  if (this.isTouch) {
+    this.label(Math.round(c.speed * 0.2) + ' km/h', 16, H - 56, 18, '#ffffff', 'left');
+    const width = Math.min(112, W * .28);
+    x.fillStyle = 'rgba(0,0,0,.65)'; x.fillRect(16, H - 25, width, 7);
+    x.fillStyle = '#4ab8ff'; x.fillRect(16, H - 25, width * c.nitro, 7);
+    this.label('NITRO', 16, H - 34, 10, '#9bd9ff', 'left');
+    return;
+  }
+  const gx = W - 92, gy = H - 86, gr = 66;
   x.fillStyle = 'rgba(10,10,14,0.75)'; x.beginPath(); x.arc(gx, gy, gr + 8, 0, 7); x.fill();
   x.strokeStyle = '#3a3a44'; x.lineWidth = 8; x.beginPath(); x.arc(gx, gy, gr - 6, Math.PI * 0.75, Math.PI * 2.25); x.stroke();
   const sp = clamp(c.speed / 1300, 0, 1);
@@ -664,25 +673,27 @@ Game.prototype.gauge = function () {
   this.label(`${Math.round(c.speed * 0.2)}`, gx, gy + 22, 26);
   this.label('km/h', gx, gy + 44, 11, '#bbbbbb');
   // nitro
-  const nb = this.isTouch ? Math.min(140, W * 0.3) : 140;
-  const nitroX = this.isTouch ? 16 : W - 24 - nb - 150;
-  const nitroY = H - (this.isTouch ? 76 : 30);
+  const nb = 140, nitroX = W - 24 - nb - 150, nitroY = H - 30;
   x.fillStyle = 'rgba(0,0,0,0.5)'; x.fillRect(nitroX, nitroY, nb, 8);
   x.fillStyle = c.nitro > 0.05 ? '#4ab8ff' : '#2a4a66'; x.fillRect(nitroX, nitroY, nb * c.nitro, 8);
-  this.label(this.isTouch ? 'NITRO' : 'SHIFT NITRO', nitroX + nb, nitroY - 14, 12, c.nitro > 0.05 ? '#8fd4ff' : '#7a8899', 'right');
+  this.label('SHIFT NITRO', nitroX + nb, nitroY - 14, 12, c.nitro > 0.05 ? '#8fd4ff' : '#7a8899', 'right');
 };
 
 Game.prototype.raceHud = function () {
   const x = this.x, W = this.W, H = this.H, c = this.car, T = this.track;
   // position, big, top left
   const suf = ['', 'ST', 'ND', 'RD', 'TH'][this.place] || 'TH';
-  this.label(`${this.place}`, 34, 52, 64, this.place === 1 ? '#ffd060' : '#ffffff', 'left');
-  this.label(`${suf} / ${this.rivals.length + 1}`, 34 + (this.place === 1 ? 30 : 40), 66, 20, '#ffffff', 'left');
+  if (this.isTouch) {
+    this.label(`${this.place}${suf} / ${this.rivals.length + 1}`, 16, 32, 19, this.place === 1 ? '#ffd060' : '#ffffff', 'left');
+  } else {
+    this.label(`${this.place}`, 34, 52, 64, this.place === 1 ? '#ffd060' : '#ffffff', 'left');
+    this.label(`${suf} / ${this.rivals.length + 1}`, 34 + (this.place === 1 ? 30 : 40), 66, 20, '#ffffff', 'left');
+  }
   // race clock
   const t = this.finishT ?? this.raceClock;
-  this.label(`${Math.floor(t / 60)}:${(t % 60).toFixed(2).padStart(5, '0')}`, W / 2, 40, 32, '#ffffff');
+  this.label(`${Math.floor(t / 60)}:${(t % 60).toFixed(2).padStart(5, '0')}`, W / 2, this.isTouch ? 32 : 40, this.isTouch ? 22 : 32, '#ffffff');
   // progress strip with everyone's dot
-  const bw = Math.min(460, W * 0.55), bx = W / 2 - bw / 2, by = 72;
+  const bw = Math.min(460, W * 0.55), bx = W / 2 - bw / 2, by = this.isTouch ? 58 : 72;
   x.fillStyle = 'rgba(0,0,0,0.5)'; x.fillRect(bx - 2, by - 2, bw + 4, 10);
   x.fillStyle = '#3a3a44'; x.fillRect(bx, by, bw, 6);
   for (let k = 0; k < 8; k++) { x.fillStyle = k % 2 ? '#111' : '#eee'; x.fillRect(bx + bw - 4, by - 4 + k * 2, 4, 2); }

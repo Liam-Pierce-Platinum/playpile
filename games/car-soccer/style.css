@@ -77,19 +77,31 @@ button.mid { min-width: 130px; }
 #pauseBtn { display: none; }
 body.inmatch #pauseBtn { display: block; }
 
-#touch { position: fixed; inset: 0; z-index: 5; display: none; }
+#touch {
+  position: fixed; inset: 0; z-index: 5; display: none;
+  --stick: clamp(96px, 25vmin, 158px);
+  --jump: clamp(76px, 20vmin, 124px);
+  --boost: clamp(60px, 16vmin, 100px);
+  --gap: clamp(8px, 2vmin, 16px);
+  --right: max(12px, env(safe-area-inset-right));
+  --bottom: max(12px, env(safe-area-inset-bottom));
+}
 body.touchmode.inmatch #touch { display: block; }
 body.inreplay #touch .stick, body.inreplay #touch button { opacity: 0; transition: opacity 0.2s; }
-#touch .stick { position: fixed; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.06); left: 22%; top: 70%; opacity: 0.45; pointer-events: none; }
+#touch .stick { position: fixed; width:var(--stick); height:var(--stick); transform:translate(-50%,-50%); border-radius: 50%; border: 3px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.06); left:max(18%, calc(env(safe-area-inset-left) + var(--stick)/2 + 6px)); top:calc(100% - var(--bottom) - var(--stick)/2); opacity: 0.45; pointer-events: none; }
 #touch .stick.on { opacity: 1; }
-#touch .knob { position: absolute; left: 30px; top: 30px; width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.75); box-shadow: 0 0 18px rgba(120,180,255,0.8); }
+#touch .knob { position: absolute; left:25%; top:25%; width:50%; height:50%; border-radius: 50%; background: rgba(255,255,255,0.75); box-shadow: 0 0 18px rgba(120,180,255,0.8); }
 #touch button { position: fixed; border-radius: 50%; font-size: 15px; padding: 0; background: rgba(20, 30, 80, 0.3); border: 3px solid rgba(255,255,255,0.35); box-shadow: none; }
-#touch .b-jump { width: 104px; height: 104px; right: max(22px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom)); }
-#touch .b-boost { width: 84px; height: 84px; right: calc(max(22px, env(safe-area-inset-right)) + 118px); bottom: max(34px, env(safe-area-inset-bottom)); border-color: rgba(255,170,80,0.6); }
+#touch .b-jump { width:var(--jump); height:var(--jump); right:var(--right); bottom:var(--bottom); }
+#touch .b-boost { width:var(--boost); height:var(--boost); right:calc(var(--right) + var(--jump) + var(--gap)); bottom:var(--bottom); border-color:rgba(255,170,80,0.6); }
 #touch button.on { background: rgba(255, 255, 255, 0.45); transform: scale(0.94); }
 @media (orientation: portrait) {
-  #touch .stick { top: 80%; }
-  #touch .b-boost { right: max(22px, env(safe-area-inset-right)); bottom: calc(max(24px, env(safe-area-inset-bottom)) + 118px); }
+  #touch .b-boost { right:var(--right); bottom:calc(var(--bottom) + var(--jump) + var(--gap)); }
+}
+@media (pointer:coarse) {
+  #topbar button { width:44px; height:44px; }
+  .screen { touch-action:pan-y; padding-top:58px; }
+  .screen button { min-height:44px; }
 }
 #rotate { position: fixed; left: 50%; top: calc(64% + 12px); transform: translateX(-50%); font-family: system-ui, sans-serif; font-weight: 700; font-size: 12px; background: rgba(10,14,40,0.8); padding: 6px 12px; border-radius: 10px; z-index: 30; white-space: nowrap; pointer-events: none; }
 @media (max-height: 520px) {

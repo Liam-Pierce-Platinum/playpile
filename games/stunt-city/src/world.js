@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { Reflector } from '../vendor/Reflector.js';
 
+export const PARK_LIMIT = 335;
 export const SUN = new THREE.Vector3(0, 0.1, -1).normalize();
 export const FOG = new THREE.Color(0.75, 0.22, 0.5);
 const fogGLSL = `uniform vec3 fogC; uniform float fogD;
@@ -199,6 +200,16 @@ export function buildWorld(scene, renderer) {
   scene.environment = null;
   const M = makeMats(env); M.side = M.chrome(0xd8c8ff, 0.18); M.env = env;
   floor(scene, 2400, 2400);
+  // The bright rails follow the playable limit on all four sides of the park.
+  const rail = new THREE.BoxGeometry(PARK_LIMIT * 2 + 0.3, 0.8, 0.3);
+  for (const side of [-1, 1]) {
+    const across = new THREE.Mesh(rail, M.cyan);
+    across.position.set(0, 0.4, side * (PARK_LIMIT + 0.15));
+    const along = new THREE.Mesh(rail, M.cyan);
+    along.rotation.y = PI / 2;
+    along.position.set(side * (PARK_LIMIT + 0.15), 0.4, 0);
+    scene.add(across, along);
+  }
   mountains(scene);
   scene.add(new THREE.HemisphereLight(0xff9ad5, 0x30104a, 1.1));
   const dl = new THREE.DirectionalLight(0xffb070, 2.2); dl.position.copy(SUN).multiplyScalar(100).add(new THREE.Vector3(0, 60, 0)); scene.add(dl);

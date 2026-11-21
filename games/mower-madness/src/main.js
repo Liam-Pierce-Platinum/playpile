@@ -54,6 +54,7 @@ class Game {
   resize() {
     const dpr = Math.min(devicePixelRatio || 1, 2);
     this.dpr = dpr; this.W = innerWidth; this.H = innerHeight;
+    this.stickRadius = clamp(Math.min(this.W, this.H) * 0.1, 32, 58);
     this.canvas.width = Math.round(this.W * dpr); this.canvas.height = Math.round(this.H * dpr);
   }
 
@@ -124,7 +125,7 @@ class Game {
     let boost = k.has('Space') || k.has('ShiftLeft') || k.has('ShiftRight') || this.boostHeld;
     if (x || y) { const l = Math.hypot(x, y); x /= l; y /= l; }
     if (this.stick) {
-      const dx = this.stick.x - this.stick.bx, dy = this.stick.y - this.stick.by, l = Math.hypot(dx, dy), R = 56;
+      const dx = this.stick.x - this.stick.bx, dy = this.stick.y - this.stick.by, l = Math.hypot(dx, dy), R = this.stickRadius;
       if (l > R) { this.stick.bx = this.stick.x - (dx / l) * R; this.stick.by = this.stick.y - (dy / l) * R; }
       if (l > 6) { const s = Math.min(1, l / R); x = (dx / l) * s; y = (dy / l) * s; }
     }
@@ -247,7 +248,7 @@ class Game {
         const before = this.countT;
         this.countT -= dt;
         if (before > 0.8 && this.countT <= 0.8) { this.banner('SET...', 0.7, '#fff8e2', 64); this.audio.play('count', 1); }
-        if (this.countT <= 0) { this.phase = 'go'; this.banner('MOW!', 0.9, '#ffd23f', 92); this.audio.play('count', 2); if (this.lv.tip) this.banner(this.lv.tip, 3.6, '#fff8e2', 22, 0.78); }
+        if (this.countT <= 0) { this.phase = 'go'; this.banner('MOW!', 0.9, '#ffd23f', 92); this.audio.play('count', 2); if (this.lv.tip && !this.touchUI) this.banner(this.lv.tip, 3.6, '#fff8e2', 22, 0.78); }
       } else if (this.phase === 'go') {
         this.clock -= dt;
         if (this.clock < 10 && Math.floor(this.clock) !== Math.floor(this.clock + dt) && this.clock > 0) this.audio.play('tick');
@@ -866,12 +867,14 @@ class Game {
       if (this.stick) {
         const s = this.stick;
         x.fillStyle = 'rgba(255,248,226,0.18)'; x.strokeStyle = 'rgba(255,248,226,0.6)'; x.lineWidth = 3;
-        x.beginPath(); x.arc(s.bx, s.by, 56, 0, TAU); x.fill(); x.stroke();
-        x.fillStyle = 'rgba(255,248,226,0.85)'; x.beginPath(); x.arc(s.x, s.y, 24, 0, TAU); x.fill();
+        x.beginPath(); x.arc(s.bx, s.by, this.stickRadius, 0, TAU); x.fill(); x.stroke();
+        x.fillStyle = 'rgba(255,248,226,0.85)'; x.beginPath(); x.arc(s.x, s.y, this.stickRadius * 0.42, 0, TAU); x.fill();
       } else if (this.touchUI && this.phase !== 'end') {
         x.fillStyle = 'rgba(255,248,226,0.12)'; x.strokeStyle = 'rgba(255,248,226,0.35)'; x.lineWidth = 3;
-        x.beginPath(); x.arc(90, H - 100, 56, 0, TAU); x.fill(); x.stroke();
-        D.drawPop(x, 'DRAG TO DRIVE', 90, H - 100, 13, '#fff8e2', 0.7);
+        const r = this.stickRadius, cx = r + 14, cy = H - r - 14;
+        x.beginPath(); x.arc(cx, cy, r, 0, TAU); x.fill(); x.stroke();
+        D.drawPop(x, 'DRAG', cx, cy - 7, 12, '#fff8e2', 0.7);
+        D.drawPop(x, 'TO DRIVE', cx, cy + 7, 10, '#fff8e2', 0.7);
       }
     }
     for (const b of this.banners) {

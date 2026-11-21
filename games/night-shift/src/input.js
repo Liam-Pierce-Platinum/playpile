@@ -114,12 +114,15 @@ export class Input {
   }
 
   bindPedals() {
+    const releases = [];
+    this.releasePedals = () => releases.forEach(release => release());
     const hook = (elId, set) => {
       const el = document.getElementById(elId);
       if (!el) return;
       let pointer = null;
       const on = e => { if (pointer !== null) return; pointer = e.pointerId; el.setPointerCapture(pointer); set(true); el.classList.add('on'); e.preventDefault(); };
       const off = e => { if (e && e.pointerId !== pointer) return; pointer = null; set(false); el.classList.remove('on'); };
+      releases.push(off);
       el.addEventListener('pointerdown', on);
       for (const event of ['pointerup','pointercancel','lostpointercapture']) el.addEventListener(event, off);
       addEventListener('blur', () => off());

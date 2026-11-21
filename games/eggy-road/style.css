@@ -40,3 +40,10 @@ button:disabled { opacity: .4; cursor: default; }
   #pedals { bottom: max(14px,env(safe-area-inset-bottom)); }
   #hint { padding-inline: 12px; font-size: 14px; box-sizing: border-box; }
 }
+@media (pointer: coarse) {
+  #pedals {left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right)); }
+  #pedals div {width:clamp(70px,20vmin,110px);height:clamp(58px,16vmin,96px);}
+  #hint {bottom:calc(max(14px,env(safe-area-inset-bottom)) + clamp(58px,16vmin,96px) + 8px);font-size:0;}
+  #hint small {font-size:14px;}
+  #muteBtn {width:44px;}
+}

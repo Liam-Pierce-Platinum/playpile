@@ -30,10 +30,15 @@ h2 { font-size: 38px; color: #ffd23f; -webkit-text-stroke: 2px #1b1530; }
 .pips { grid-column: 1 / -1; display: flex; gap: 3px; margin-top: 4px; } .pips i { width: 16px; height: 6px; border-radius: 3px; background: #1b1530; } .pips i.on { background: #5cd6ff; }
 .row { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; }
 #touch { position: fixed; inset: 0; pointer-events: none; z-index: 3; }
-#stick { position: absolute; left: 40px; bottom: 40px; width: 120px; height: 120px; border-radius: 50%; border: 3px solid rgba(255,255,255,.5); background: rgba(27,21,48,.25); opacity: .35; }
-#knob { position: absolute; left: 35px; top: 35px; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,.7); }
-#tBoost, #tDrift { position: absolute; pointer-events: auto; width: 84px; height: 84px; border-radius: 50%; font-size: 16px; color: #1b1530; box-shadow: 0 4px 0 #1b1530; }
-#tBoost { right: 22px; bottom: 30px; background: #5cd6ff; }
-#tDrift { right: 118px; bottom: 18px; background: #ffd23f; width: 70px; height: 70px; font-size: 14px; }
+#stick { position: absolute; left: max(12px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom)); width: clamp(70px, 23vmin, 142px); aspect-ratio: 1; border-radius: 50%; border: 3px solid rgba(255,255,255,.5); background: rgba(27,21,48,.25); opacity: .35; }
+#knob { position: absolute; inset: 29%; border-radius: 50%; background: rgba(255,255,255,.7); }
+#touch { --pedal: clamp(56px, 15vmin, 96px); --edge: max(10px, env(safe-area-inset-right)); }
+#tPause, #tBoost, #tDrift { position: absolute; pointer-events: auto; touch-action: none; color: #1b1530; box-shadow: 0 3px 0 #1b1530; }
+#tPause { top: max(8px, env(safe-area-inset-top)); right: var(--edge); width: 46px; height: 46px; border-radius: 12px; background: #ffe9c7; font: bold 20px system-ui; }
+#tBoost, #tDrift { bottom: max(12px, env(safe-area-inset-bottom)); width: var(--pedal); height: var(--pedal); border-radius: 50%; font-size: clamp(13px, 2.8vmin, 17px); }
+#tBoost { right: var(--edge); background: #5cd6ff; }
+#tDrift { right: calc(var(--edge) + var(--pedal) + 8px); background: #ffd23f; }
+.ov { overflow-y: auto; }
+@media (max-height: 410px) { #title { justify-content: safe center; gap: 8px; } .logo span { font-size: 52px; } }
 @media (max-width: 520px) { #shop { grid-template-columns: 1fr; } h2 { font-size: 30px; } .big { font-size: 42px; } }
 @media (pointer: coarse) { .panel { touch-action: pan-y; } .panel button { min-height: 44px; } }

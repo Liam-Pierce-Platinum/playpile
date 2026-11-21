@@ -15,7 +15,7 @@ import { Combat } from './combat.js';
 import { Manhunt, KIT } from './manhunt.js';
 import { WEAPONS, WEAPON_BY_ID } from './weapons.js';
 import { TrafficStop, STOP } from './stop.js';
-import { Car, resolveCarCollisions, carsTouching, clamp } from './physics.js';
+import { Car, resolveCarCollisions, boxOut, clamp } from './physics.js';
 import { CityTraffic } from './citytraffic.js';
 import { CityPolice } from './citycops.js';
 import { CityRenderer } from './cityrender.js';
@@ -348,6 +348,18 @@ class Game {
   pause(on) {
     if (on && this.state !== 'play') return;
     document.getElementById('pause').hidden = !on;
+    if (this.input.isTouch) {
+      if (on) {
+        this.input.releaseWheel();
+        this.input.releasePedals();
+      }
+      const details = document.getElementById('pause-status');
+      details.hidden = !on;
+      details.open = false;
+      const destination = on ? details.querySelector('div') : document.getElementById('hud');
+      for (const id of ['board', 'inv', 'vitals', 'needs']) destination.append(document.getElementById(id));
+      document.getElementById('touch').hidden = on;
+    }
     this.state = on ? 'pause' : 'play';
     if (!on) this.last = performance.now();
   }
@@ -901,8 +913,8 @@ class Game {
     // are always right there.
     if (!this.garageIn) {
       for (const b of buildings) {
-        const hit = pushCarOut(b, p);
-        if (hit > 0 && !attract) this.damage(hit * 0.9, p, true);
+        const closing = boxOut(b, p, true);
+        if (closing > 4 && !attract) this.damage(clamp((closing - 4) / 34, 0, 1) * 0.9, p, true);
       }
     }
 
@@ -911,23 +923,16 @@ class Game {
       Math.min(46, 26 + Math.floor(this.run.t / 20)), 34,
       { x: p.x, y: p.y, speed: Math.abs(p.speed) }, buildings);
 
-    const contacts = [];
-    for (const c of this.traffic.cars)
-      if (carsTouching(p, c)) contacts.push({ c, rel: Math.hypot(p.vx - c.vx, p.vy - c.vy) });
-    for (const c of this.traffic.parked)
-      if (carsTouching(p, c)) contacts.push({ c, rel: Math.hypot(p.vx - c.vx, p.vy - c.vy) });
-    for (const c of this.police.cars)
-      if (c.wrecked <= 0 && carsTouching(p, c))
-        contacts.push({ c, rel: Math.hypot(p.vx - c.vx, p.vy - c.vy) });
-    resolveCarCollisions([p, ...this.traffic.cars, ...this.traffic.parked, ...this.police.cars]);
-    for (const { c, rel } of contacts) {
-      if (attract || rel <= 3.5) continue;
-      if (this.run.t - (c.lastHitT || -9) < 0.6) continue;
+    const vehicles = [p, ...this.traffic.cars, ...this.traffic.parked, ...this.police.cars];
+    resolveCarCollisions(vehicles, (a, c, closing) => {
+      // The player is first in the pair list. Only closing speed into the
+      // other car damages bodywork; tangential motion and gentle nudges do not.
+      if (a !== p || attract || c.wrecked > 0 || c.gentle || closing <= 4) return;
+      if (this.run.t - (c.lastHitT ?? -9) < 0.6) return;
       c.lastHitT = this.run.t;
-      if (c.gentle) continue;                    // a patrol nudging you is free
-      const sev = clamp((rel - 4) / 46, 0, 1) * (c.copCar ? 0.42 : 1);
-      this.damage(sev, p, false);
-    }
+      const severity = clamp((closing - 4) / 46, 0, 1) * (c.copCar ? 0.42 : 1);
+      this.damage(severity, p, false);
+    });
 
     // running people over. It is a chase sim, not a driving test - but the
     // whole city hears about it.
@@ -1246,34 +1251,6 @@ class Game {
     });
     void here;
   }
-}
-
-// Push a car out of a solid building, returning the severity of the hit.
-function pushCarOut(b, p) {
-  const cs = Math.cos(-b.ang), sn = Math.sin(-b.ang);
-  const dx = p.x - b.x, dy = p.y - b.y;
-  const u = cs * dx - sn * dy, v = sn * dx + cs * dy;
-  const rad = p.spec.len * 0.42;
-  const hu = b.w / 2 + rad, hv = b.d / 2 + rad;
-  if (Math.abs(u) > hu || Math.abs(v) > hv) return 0;
-  // a garage mouth is a hole you can drive through
-  if (b.garage) {
-    const onFace = (b.doorSide === 'v-' && v < 0) || (b.doorSide === 'v+' && v > 0);
-    if (onFace && Math.abs(u) < b.mouth / 2) return 0;
-  }
-  const ou = hu - Math.abs(u), ov = hv - Math.abs(v);
-  let nu = u, nv = v, nrmU = 0, nrmV = 0;
-  if (ou < ov) { nu = Math.sign(u) * hu; nrmU = Math.sign(u); }
-  else { nv = Math.sign(v) * hv; nrmV = Math.sign(v); }
-  const c2 = Math.cos(b.ang), s2 = Math.sin(b.ang);
-  p.x = b.x + c2 * nu - s2 * nv;
-  p.y = b.y + s2 * nu + c2 * nv;
-  // speed into the wall decides how bad it was
-  const wx = c2 * nrmU - s2 * nrmV, wy = s2 * nrmU + c2 * nrmV;
-  const into = -(p.vx * wx + p.vy * wy);
-  p.speed *= 0.30;
-  p.vx = 0; p.vy = 0;
-  return into > 4 ? clamp((into - 4) / 34, 0, 1) : 0;
 }
 
 function fmtTime(s) {

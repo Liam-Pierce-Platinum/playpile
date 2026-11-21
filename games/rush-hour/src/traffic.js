@@ -151,8 +151,7 @@ export class Traffic {
     for (const c of this.cars) {
       const g = c.m.grp, f = T.frame(c.s);
       T.pos(c.s, c.lat, 0, g.position);
-      const steer = c.change ? Math.sign(T.laneLat(c.toLane) - c.lat) * 0.06 : 0;
-      g.rotation.set(0, f.yaw + (c.dir < 0 ? Math.PI : 0) - steer * c.dir + c.spin, Math.atan(f.b) * c.dir, 'YXZ');
+      g.rotation.set(0, f.yaw - trafficAngle(c, T), Math.atan(f.b) * c.dir, 'YXZ');
       const u = g.userData;
       u.tail.material = c.braking ? MAT.tailOn : MAT.tailOff;
       const on = (Math.sin(time * 10) > 0), side = c.blinkSide * c.dir;
@@ -161,4 +160,9 @@ export class Traffic {
     }
   }
   clear() { for (const c of this.cars) this.release(c); this.cars = []; this._front = undefined; }
+}
+
+export function trafficAngle(car, road) {
+  const steer = car.change ? Math.sign(road.laneLat(car.toLane) - car.lat) * .06 : 0;
+  return (car.dir < 0 ? Math.PI : 0) + steer * car.dir - car.spin;
 }

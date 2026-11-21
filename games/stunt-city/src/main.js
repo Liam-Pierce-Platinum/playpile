@@ -1,6 +1,6 @@
 // STUNT CITY - free-roam chrome stunt park. Car physics, stunts, challenges, garage.
 import * as THREE from 'three';
-import { buildWorld, PIECES, L, GAUNT, surface, toLocal, toWorld, loopPoint, lipWorld, U, FOG } from './world.js';
+import { PARK_LIMIT, buildWorld, PIECES, L, GAUNT, surface, toLocal, toWorld, loopPoint, lipWorld, U, FOG } from './world.js?v=driving-qa-2';
 import { initAudio, engine, sfx, music, toggleMute } from './audio.js';
 
 const Q = new URLSearchParams(location.search);
@@ -171,6 +171,7 @@ function respawn() { const s = car.safe; car.pos.copy(s.pos); car.yaw = s.yaw; c
 
 // ---------- physics ----------
 function step(dt) {
+  if (!$('garage').classList.contains('hide') || !$('title').classList.contains('hide')) return;
   U.time.value += dt;
   if (comboT > 0) comboT -= dt;
   if (G.state === 'count') { countdown -= dt; car.vel.set(0, 0, 0); const n = Math.ceil(countdown); if (n !== lastBeep && n > 0) { lastBeep = n; sfx.beep(false); bigText(n + ''); } if (countdown <= 0) { G.state = 'chal'; sfx.beep(true); bigText('GO!'); } updateCar(0); return; }
@@ -208,8 +209,9 @@ function updateCar(dt) {
     const prevY = c.pos.y, ox = c.pos.x, oz = c.pos.z;
     c.vel.copy(nf).multiplyScalar(vf).addScaledVector(nl, vl);
     c.pos.x += c.vel.x * dt; c.pos.z += c.vel.z * dt;
+    constrainToPark(c);
     let gi = groundInfo(c.pos.x, c.pos.z, prevY, c.yaw);
-    if (gi.wall || bounds()) { c.pos.x = ox; c.pos.z = oz; c.vel.multiplyScalar(-0.25); shake = 0.3; sfx.land(1); gi = groundInfo(ox, oz, prevY, c.yaw); }
+    if (gi.wall) { c.pos.x = ox; c.pos.z = oz; c.vel.multiplyScalar(-0.25); shake = 0.3; sfx.land(1); gi = groundInfo(ox, oz, prevY, c.yaw); }
     if (gi.h >= prevY - 0.35) {
       const vy = (gi.h - prevY) / dt; c.pos.y = gi.h; c.vel.y = vy; c.pitch += (gi.pitch - c.pitch) * Math.min(1, dt * 14); c.roll += (gi.roll - c.roll) * Math.min(1, dt * 14);
       c.lastVy = vy; c.lastPitch = gi.pitch;
@@ -224,7 +226,7 @@ function updateCar(dt) {
     c.air += dt; c.vel.y -= G.GRAV * dt;
     const ox = c.pos.x, oz = c.pos.z, oy = c.pos.y;
     c.pos.addScaledVector(c.vel, dt); c.maxY = Math.max(c.maxY, c.pos.y);
-    if (bounds()) { c.pos.x = ox; c.pos.z = oz; c.vel.x *= -0.3; c.vel.z *= -0.3; }
+    constrainToPark(c);
     const pIn = (input.down ? -1 : 0) + (input.up ? 1 : 0), yIn = (input.left ? 1 : 0) - (input.right ? 1 : 0), rIn = (input.rollR ? 1 : 0) - (input.rollL ? 1 : 0);
     c.pr = (c.pr || 0) + (pIn * 5.2 - (c.pr || 0)) * Math.min(1, dt * 6); c.yr = (c.yr || 0) + (yIn * 6 - (c.yr || 0)) * Math.min(1, dt * 6); c.rr = (c.rr || 0) + (rIn * 6 - (c.rr || 0)) * Math.min(1, dt * 6);
     c.pitch += c.pr * dt; c.spinP += c.pr * dt; c.yaw += c.yr * dt; c.spinY += c.yr * dt; c.roll += c.rr * dt; c.spinR += c.rr * dt;
@@ -243,7 +245,17 @@ function updateCar(dt) {
   }
   c.boost = boosting;
 }
-function bounds() { const R = 335; const p = car.pos; return Math.abs(p.x) > R || Math.abs(p.z) > R; }
+function constrainToPark(c) {
+  const sin = Math.abs(Math.sin(c.yaw)), cos = Math.abs(Math.cos(c.yaw));
+  const extents = {x: 2.4 * sin + 1.1 * cos, z: 2.4 * cos + 1.1 * sin};
+  for (const axis of ['x', 'z']) {
+    const limit = PARK_LIMIT - extents[axis];
+    const side = Math.sign(c.pos[axis]);
+    if (Math.abs(c.pos[axis]) <= limit) continue;
+    c.pos[axis] = side * limit;
+    if (c.vel[axis] * side > 0) c.vel[axis] = 0;
+  }
+}
 function loopStep(dt, boosting) {
   const c = car, p = c.loop;
   if (input.up) c.ls += 10 * dt; if (boosting) { c.ls += 22 * dt; c.nitro = Math.max(0, c.nitro - dt * 0.33); }
@@ -312,13 +324,14 @@ function hud(dt) {
     if (n < 0) { $('nextTxt').textContent = 'CITY LEGEND - free roam'; $('arrow').style.display = 'none'; }
     else { const c = CH[n], dx = c.spawn[0] - car.pos.x, dz = c.spawn[1] - car.pos.z, d = Math.hypot(dx, dz);
       const cf = new THREE.Vector3(); camera.getWorldDirection(cf); const rel = Math.atan2(dx, dz) - Math.atan2(cf.x, cf.z);
-      $('arrow').style.transform = `rotate(${-rel}rad)`; $('nextTxt').textContent = `NEXT: ${c.name} ${Math.round(d)}m · ENTER to warp`; }
+      $('arrow').style.transform = `rotate(${-rel}rad)`; $('nextTxt').textContent = `NEXT: ${c.name} ${Math.round(d)}m ${document.body.classList.contains('touch') ? '' : '· ENTER to warp'}`; }
   }
 }
 
 // ---------- garage ----------
 function garage() {
-  if (ch && G.state === 'chal') return; show('garage'); const el = $('garList'); el.innerHTML = '';
+  if (G.state === 'result') return;
+  show('garage'); const el = $('garList'); el.innerHTML = '';
   const row = (label, lvl, cost, fn) => { const d = document.createElement('div'); d.className = 'gi'; d.innerHTML = `<span>${label} <b>${lvl}</b></span>`; const b = document.createElement('button'); b.className = 'btn'; b.textContent = cost == null ? 'MAX' : '$' + cost; b.disabled = cost == null || S.cash < cost; b.style.opacity = b.disabled ? 0.4 : 1; b.onclick = () => { if (S.cash >= cost) { S.cash -= cost; fn(); save(); sfx.buy(); garage(); } }; d.appendChild(b); el.appendChild(d); };
   row('ENGINE', 'LV ' + S.eng + '/5', S.eng < 5 ? 300 * (S.eng + 1) : null, () => S.eng++);
   row('NITRO TANK', 'LV ' + S.nos + '/5', S.nos < 5 ? 250 * (S.nos + 1) : null, () => S.nos++);
@@ -386,7 +399,7 @@ document.querySelectorAll('.tb[data-k]').forEach(b => {
   for (const event of ['pointerup','pointercancel','lostpointercapture']) b.addEventListener(event, release);
   addEventListener('blur', () => release());
 });
-$('tReset').addEventListener('click', () => { if (car.mode !== 'crash') respawn(); });
+$('tReset').addEventListener('click', () => { if (car.mode !== 'crash') { respawn(); hide('garage'); } });
 addEventListener('pointerdown', () => initAudio());
 addEventListener('resize', () => { renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); });
 if (Q.has('title')) { show('title'); $('playBtn').onclick = () => { initAudio(); hide('title'); }; }

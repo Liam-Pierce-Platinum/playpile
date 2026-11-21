@@ -635,7 +635,7 @@ function pill(x, px, py, w, h, fill = 'rgba(255,248,226,0.95)') {
 export function fmtTime(s) { s = Math.max(0, Math.ceil(s)); return `${(s / 60) | 0}:${String(s % 60).padStart(2, '0')}`; }
 
 export function drawHUD(x, G, W, H) {
-  const narrow = W < 600, sc = narrow ? W / 470 : Math.min(1, W / 760, H / 520), touch = G.touchUI;
+  const narrow = W < 600 && H > W, sc = narrow ? W / 470 : Math.min(1, W / 760, H / 520), touch = G.touchUI;
   x.save(); x.scale(sc, sc);
   const w = W / sc, h = H / sc;
   const lv = G.lv;
@@ -710,6 +710,7 @@ function drawMinimap(x, G, W, H, touch, topY, sc) {
   const lv = G.lv, L = G.lawn;
   const mw = touch ? Math.min(120, W * 0.15) : Math.min(150, W * 0.2), mh = mw * (lv.h / lv.w);
   const px = W - mw - 14, py = touch ? topY + 8 : H - mh - 14;
+  if (touch && py + mh + 12 > G.ui.boostBtn.offsetTop) return;
   x.save();
   x.globalAlpha = 0.92;
   x.fillStyle = 'rgba(20,50,15,0.4)'; rr(x, px + 2, py + 3, mw + 8, mh + 8, 8); x.fill();

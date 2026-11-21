@@ -5,11 +5,11 @@ canvas#c { position: fixed; inset: 0; width: 100%; height: 100%; display: block;
 #ui { position: fixed; inset: 0; pointer-events: none; }
 #ui > * { pointer-events: auto; }
 
-.pausebtn { position: absolute; top: 14px; right: 14px; width: 48px; height: 48px; border-radius: 50%; border: 3px solid var(--ink); background: var(--cream); cursor: pointer; box-shadow: 0 4px 0 var(--ink); display: flex; gap: 6px; align-items: center; justify-content: center; padding: 0; }
+.pausebtn { position: absolute; top: max(10px, env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right)); width: 48px; height: 48px; border-radius: 50%; border: 3px solid var(--ink); background: var(--cream); cursor: pointer; box-shadow: 0 4px 0 var(--ink); display: flex; gap: 6px; align-items: center; justify-content: center; padding: 0; }
 .pausebtn span { width: 6px; height: 18px; background: var(--ink); border-radius: 2px; }
 .pausebtn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
-.boostbtn { position: absolute; right: 22px; bottom: 26px; width: 108px; height: 108px; border-radius: 50%; border: 4px solid var(--ink); background: radial-gradient(circle at 40% 35%, #ffb36a, #ff7a1f); color: #fff; font-family: 'Lilita One', sans-serif; cursor: pointer; box-shadow: 0 6px 0 var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; touch-action: none; }
-.boostbtn b { font-weight: 400; font-size: 24px; -webkit-text-stroke: 1px var(--ink); paint-order: stroke fill; text-shadow: 0 2px 0 var(--ink); }
+.boostbtn { position: absolute; right: max(12px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); width: clamp(66px, 18vmin, 110px); height: clamp(66px, 18vmin, 110px); border-radius: 50%; border: 4px solid var(--ink); background: radial-gradient(circle at 40% 35%, #ffb36a, #ff7a1f); color: #fff; font-family: 'Lilita One', sans-serif; cursor: pointer; box-shadow: 0 6px 0 var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; touch-action: none; }
+.boostbtn b { font-weight: 400; font-size: clamp(15px, 3.6vmin, 24px); -webkit-text-stroke: 1px var(--ink); paint-order: stroke fill; text-shadow: 0 2px 0 var(--ink); }
 .boostbtn small { font-family: 'Nunito', sans-serif; font-size: 10px; color: #fff3e0; }
 .boostbtn.down { transform: translateY(4px) scale(0.96); box-shadow: 0 2px 0 var(--ink); background: radial-gradient(circle at 40% 35%, #ffe36a, #ffb020); }
 
@@ -132,5 +132,5 @@ input[type=checkbox] { accent-color: var(--grass); width: 22px; height: 22px; }
   .grid { grid-template-columns: repeat(5, 1fr); }
   .result .starrow { margin-bottom: 6px; }
   .st i.big { font-size: 36px; }
-  .boostbtn { width: 88px; height: 88px; }
+
 }

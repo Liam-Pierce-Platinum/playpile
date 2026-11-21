@@ -1,6 +1,7 @@
 // KART CLASH - glossy toy-plastic arena kart battle. three.js, no build step.
 import * as THREE from '../vendor/three.module.js';
 import * as AU from './audio.js';
+import {orientedBody, contact, capsuleContact} from '../../_shared/vehicle-contact.js';
 
 const Q = new URLSearchParams(location.search);
 const $ = (id) => document.getElementById(id);
@@ -105,7 +106,7 @@ const brickMats = BRICK.map((c) => plastic(c));
 function brick(x, z, w, d, h, ci, collide = true) {
   const m = mesh(slab(w, d, h, 0.18, 0.1), brickMats[ci % BRICK.length], x, 0, z);
   for (let i = 0; i < Math.round(w); i++) for (let j = 0; j < Math.round(d); j++) studs.push([x - w / 2 + 0.5 + i, h, z - d / 2 + 0.5 + j, BRICK[ci % BRICK.length]]);
-  if (collide) boxes.push({ x0: x - w / 2, x1: x + w / 2, z0: z - d / 2, z1: z + d / 2 });
+  if (collide) boxes.push({ x0: x - w / 2, x1: x + w / 2, z0: z - d / 2, z1: z + d / 2, body: orientedBody(x,z,0,w/2,d/2) });
   return m;
 }
 // baseplate floor: per-stud colour map + procedural stud normal map
@@ -175,16 +176,31 @@ function blocked(x, z, pad = 0) {
   for (const c of circles) if ((x - c.x) ** 2 + (z - c.z) ** 2 < (c.r + pad) ** 2) return true;
   return false;
 }
-function collide(o, r) {
-  let hit = false;
-  for (const b of boxes) {
-    const cx = clamp(o.x, b.x0, b.x1), cz = clamp(o.z, b.z0, b.z1); let dx = o.x - cx, dz = o.z - cz; const d2 = dx * dx + dz * dz;
-    if (d2 < r * r) { const d = Math.sqrt(d2) || 1e-4; if (d2 === 0) { dx = 0; dz = o.z > (b.z0 + b.z1) / 2 ? 1 : -1; } hit = push(o, dx / d, dz / d, r - d) || hit; }
+// Wheel exteriors span 2.38 units; the bumper and exhaust span 3.3.
+function kartBody(k) { return orientedBody(k.x, k.z, Math.PI / 2 - k.a, 1.65, 1.19); }
+const boundaryWalls = [
+  orientedBody(H + 1, 0, 0, 1, H + 2), orientedBody(-H - 1, 0, 0, 1, H + 2),
+  orientedBody(0, H + 1, 0, H + 2, 1), orientedBody(0, -H - 1, 0, H + 2, 1)
+];
+const towerBody = orientedBody(0, 0, 0, circles[0].r, circles[0].r);
+function collide(k) {
+  const body = kartBody(k);
+  let hard = false;
+  function resolve(hit) {
+    if (!hit) return;
+    hard = push(k, hit.nx, hit.ny, hit.depth) || hard;
+    body.x = k.x;
+    body.y = k.z;
   }
-  for (const c of circles) { const dx = o.x - c.x, dz = o.z - c.z, d = Math.hypot(dx, dz); if (d < c.r + r) hit = push(o, dx / d, dz / d, c.r + r - d) || hit; }
-  if (o.x > H - r) hit = push(o, -1, 0, o.x - (H - r)) || hit; if (o.x < -H + r) hit = push(o, 1, 0, -H + r - o.x) || hit;
-  if (o.z > H - r) hit = push(o, 0, -1, o.z - (H - r)) || hit; if (o.z < -H + r) hit = push(o, 0, 1, -H + r - o.z) || hit;
-  return hit;
+  for (const box of boxes) {
+    if (k.x < box.x0 - 2.1 || k.x > box.x1 + 2.1 || k.z < box.z0 - 2.1 || k.z > box.z1 + 2.1) continue;
+    resolve(contact(body, box.body));
+  }
+  if (Math.abs(k.x) < 6 && Math.abs(k.z) < 6) resolve(capsuleContact(body, towerBody));
+  if (Math.max(Math.abs(k.x),Math.abs(k.z)) > H - 2.1) {
+    for (const wall of boundaryWalls) resolve(contact(body, wall));
+  }
+  return hard;
 }
 function push(o, nx, nz, pen) {
   o.x += nx * pen; o.z += nz * pen; const vn = o.vx * nx + o.vz * nz;
@@ -477,7 +493,7 @@ function stepKart(k, dt, ctl) {
   const fx = Math.sin(k.a), fz = Math.cos(k.a), grip = Math.min(1, 6.5 * dt);
   k.vx += (fx * k.v - k.vx) * grip; k.vz += (fz * k.v - k.vz) * grip;
   k.x += k.vx * dt; k.z += k.vz * dt;
-  if (collide(k, KR)) { k.v *= 0.6; if (k.isPlayer) { shake = Math.max(shake, 0.25); AU.sfx.bump(); } burst(k.x + fx * 1.2, 0.6, k.z + fz * 1.2, 3, [0xffffff], 3); }
+  if (collide(k)) { k.v *= 0.6; if (k.isPlayer) { shake = Math.max(shake, 0.25); AU.sfx.bump(); } burst(k.x + fx * 1.2, 0.6, k.z + fz * 1.2, 3, [0xffffff], 3); }
   k.v = k.vx * fx + k.vz * fz;
   if (ctl.shoot) fire(k);
   // items
@@ -496,9 +512,10 @@ function stepKart(k, dt, ctl) {
 function kartBumps() {
   for (let i = 0; i < karts.length; i++) for (let j = i + 1; j < karts.length; j++) {
     const a = karts[i], b = karts[j]; if (!a.alive || !b.alive) continue;
-    const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz);
-    if (d < KR * 2 && d > 0) {
-      const nx = dx / d, nz = dz / d, pen = (KR * 2 - d) / 2; a.x -= nx * pen; a.z -= nz * pen; b.x += nx * pen; b.z += nz * pen;
+    if (Math.abs(a.x - b.x) > 3.4 || Math.abs(a.z - b.z) > 3.4) continue;
+    const hit = capsuleContact(kartBody(b), kartBody(a));
+    if (hit) {
+      const nx = hit.nx, nz = hit.ny, pen = hit.depth / 2; a.x -= nx * pen; a.z -= nz * pen; b.x += nx * pen; b.z += nz * pen;
       const rv = (b.vx - a.vx) * nx + (b.vz - a.vz) * nz;
       if (rv < 0) { a.vx += rv * nx * 0.9; a.vz += rv * nz * 0.9; b.vx -= rv * nx * 0.9; b.vz -= rv * nz * 0.9; if (rv < -8 && (a === P || b === P)) { AU.sfx.bump(); shake = Math.max(shake, 0.3); } }
     }

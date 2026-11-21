@@ -251,12 +251,17 @@ export class World {
     for (const o of this.objs) {
       if (Math.abs((o.x || 0) - c.x) > 400) continue;
       if (o instanceof Tnt && o.state === 'live') {
-        for (const p of parts) if (Math.abs(p.x - o.x) < p.r + 15 && p.y + p.r > o.y - 42 && p.y - p.r < o.y) { o.boom(this); return 'tnt'; }
+        // The drawn crate is a 32 × 42 rounded rectangle with a 6-unit corner.
+        for (const p of parts) {
+          const dx = Math.max(0, Math.abs(p.x - o.x) - 10);
+          const dy = Math.max(0, Math.abs(p.y - (o.y - 21)) - 15);
+          if (dx * dx + dy * dy < (p.r + 6) ** 2) { o.boom(this); return 'tnt'; }
+        }
       } else if (o instanceof Crate && (o.state === 'rest' || o.state === 'fall')) {
         const b = o.box();
         for (const p of parts) {
           const qx = Math.max(b.x0, Math.min(p.x, b.x1)), qy = Math.max(b.y0, Math.min(p.y, b.y1));
-          const hit = (p.x - qx) ** 2 + (p.y - qy) ** 2 < (p.r + 3) ** 2;
+          const hit = (p.x - qx) ** 2 + (p.y - qy) ** 2 < p.r ** 2;
           if (!hit) continue;
           if (o.state === 'fall') { if (p.rider) { o.smash(this); return 'crate'; } o.smash(this); break; }
           if (sp > 420 && p.x < b.x0 + 4) { o.smash(this); bike.c.vx *= 0.86; for (const w of bike.wh) w.vx *= 0.86; this.fx.pop('SMASH!', o.x, o.y - o.s - 20, '#ffd23f'); break; }

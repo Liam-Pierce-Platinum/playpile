@@ -3,10 +3,11 @@ import * as THREE from 'three';
 import { ink, makePost } from './ink.js';
 import { buildLevel, COUNT, NAMES } from './levels.js';
 import { unlock, engine, sfx } from './audio.js';
+import {hitsBarrel, hitsHammer} from './contacts.js';
 
 const Q = new URLSearchParams(location.search);
 const G_ = 22, ACC = 17, VMAX = 21, FLIP_BONUS = 1.0;
-const WR = 0.42, OFF = [[-0.78, -0.28], [0.78, -0.28]], HEAD = [-0.12, 1.12], TORSO = [-0.22, 0.5];
+const WR = 0.42, OFF = [[-0.78, -0.28], [0.78, -0.28]], HEAD = [0, 1.12], TORSO = [-0.15, 0.63];
 const MASS = 1, INER = 0.45;
 
 // ---------- renderer ----------
@@ -288,14 +289,14 @@ function physics(dt) {
   // crash tests
   const h = local(HEAD[0], HEAD[1]), t = local(TORSO[0], TORSO[1]);
   if (nearest(h[0], h[1], tmp) < 0.3 || nearest(t[0], t[1], tmp) < 0.22) return crash('head');
-  const pts = [h, t, local(OFF[0][0], OFF[0][1]), local(OFF[1][0], OFF[1][1]), [B.x, B.y]];
+  const parts = [[h, 0.25], [t, 0.24], [local(...OFF[0]), WR], [local(...OFF[1]), WR], [[B.x, B.y], 0.2]];
   for (const o of L.obs) {
     if (o.t === 'barrel') {
       if (o.dead) continue;
-      for (const p of pts) if (Math.abs(p[0] - o.x) < 0.95 && p[1] > o.y - 0.3 && p[1] < o.y + 1.6) { o.dead = true; o.mesh.visible = false; return crash('boom', o.x, o.y + 0.6); }
+      if (parts.some(([p, r]) => hitsBarrel(p, r, o))) { o.dead = true; o.mesh.visible = false; return crash('boom', o.x, o.y + 0.6); }
     } else {
       const hx = o.x + Math.sin(o.ang) * 5.6, hy = o.y + 7.5 - Math.cos(o.ang) * 5.6;
-      for (const p of pts) if ((p[0] - hx) ** 2 + (p[1] - hy) ** 2 < 1.1 ** 2) { B.vx += Math.cos(o.ang) * o.sp * 6; B.vy += 4; return crash('hammer'); }
+      if (parts.some(([p, r]) => hitsHammer(p, r, hx, hy))) { B.vx += Math.cos(o.ang) * o.sp * 6; B.vy += 4; return crash('hammer'); }
     }
   }
   for (const [x0, x1, y] of L.pits) if (B.x > x0 && B.x < x1 && B.y < y - 2.6) return crash('pit');
@@ -426,8 +427,15 @@ addEventListener('blur', () => { for (const k in keys) keys[k] = false; pause(tr
 const touch = { gas: 0, brake: 0, back: 0, fwd: 0 };
 for (const b of document.querySelectorAll('[data-t]')) {
   const k = b.dataset.t;
-  b.addEventListener('pointerdown', (e) => { e.preventDefault(); unlock(); touch[k] = 1; b.classList.add('on'); b.setPointerCapture(e.pointerId); });
-  const up = () => { touch[k] = 0; b.classList.remove('on'); };
+  const held = new Set();
+  b.addEventListener('pointerdown', (e) => {
+    e.preventDefault(); unlock(); held.add(e.pointerId);
+    touch[k] = 1; b.classList.add('on'); b.setPointerCapture(e.pointerId);
+  });
+  const up = e => {
+    if (e.type === 'blur') held.clear(); else held.delete(e.pointerId);
+    touch[k] = Number(held.size > 0); b.classList.toggle('on', Boolean(touch[k]));
+  };
   for (const event of ['pointerup','pointercancel','lostpointercapture']) b.addEventListener(event, up);
   addEventListener('blur', up);
 }

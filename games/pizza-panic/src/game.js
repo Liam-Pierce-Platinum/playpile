@@ -133,10 +133,11 @@ function collideWorld(G, e) {
       if (d < m && d > 0.01) { const nx = dx / d, ny = dy / d; e.x = t.x + nx * m; e.y = t.y + ny * m; const imp = -(e.vx * nx + e.vy * ny); if (imp > 0) { e.vx += nx * imp * 1.4; e.vy += ny * imp * 1.4; hit = Math.max(hit, imp); } }
     }
   }
-  if (e.x < 20) { e.x = 20; hit = Math.max(hit, -e.vx); e.vx = Math.abs(e.vx) * 0.4; }
-  if (e.y < 20) { e.y = 20; hit = Math.max(hit, -e.vy); e.vy = Math.abs(e.vy) * 0.4; }
-  if (e.x > W - 20) { e.x = W - 20; hit = Math.max(hit, e.vx); e.vx = -Math.abs(e.vx) * 0.4; }
-  if (e.y > W - 20) { e.y = W - 20; hit = Math.max(hit, e.vy); e.vy = -Math.abs(e.vy) * 0.4; }
+  // The marked delivery zone ends here; contact with its paint does not spoil an order.
+  const x = clamp(e.x, 20, W - 20), y = clamp(e.y, 20, W - 20);
+  if ((e.x - x) * e.vx > 0) e.vx = 0;
+  if ((e.y - y) * e.vy > 0) e.vy = 0;
+  e.x = x; e.y = y;
   return hit;
 }
 function collideCars(G, e, dt) {

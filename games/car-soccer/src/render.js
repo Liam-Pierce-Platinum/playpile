@@ -1,7 +1,7 @@
 // Canvas drawing: arena (pre-rendered layer), cars, ball, particles, HUD.
 // World space is y-up; the world transform flips it so everything is drawn in world units.
 import { W, H, GH, GD, CR, BALL_R, POLY, FLOOR, GY, GT, LEDGE_Y, BASIN, RAMP_END, floorY } from './arena.js';
-import { L, HH, WHEEL_R } from './physics.js';
+import {traceBody, drawingScale, wheelRadius, wheelHeight, spoilerY} from './car-shape.js';
 import { fx } from './fx.js';
 
 export const TEAM = [
@@ -271,22 +271,6 @@ function drawBall(b, heat, touchTeam) {
 }
 
 // ---------- cars ----------
-function bodyPath(kind) {
-  ctx.beginPath();
-  if (kind === 'dart') {
-    ctx.moveTo(-68, -12); ctx.lineTo(-70, 6); ctx.quadraticCurveTo(-68, 13, -58, 14); ctx.lineTo(-36, 15);
-    ctx.lineTo(-16, 29); ctx.quadraticCurveTo(-10, 32, 0, 32); ctx.lineTo(12, 32); ctx.quadraticCurveTo(20, 31, 26, 26);
-    ctx.lineTo(46, 13); ctx.lineTo(66, 8); ctx.quadraticCurveTo(74, 4, 72, -4); ctx.lineTo(68, -12);
-  } else if (kind === 'brute') {
-    ctx.moveTo(-66, -16); ctx.lineTo(-68, 28); ctx.quadraticCurveTo(-68, 42, -54, 43); ctx.lineTo(8, 44);
-    ctx.quadraticCurveTo(18, 43, 24, 36); ctx.lineTo(38, 20); ctx.lineTo(62, 18); ctx.quadraticCurveTo(70, 16, 70, 6); ctx.lineTo(68, -16);
-  } else {
-    ctx.moveTo(-66, -14); ctx.lineTo(-68, 8); ctx.quadraticCurveTo(-66, 17, -55, 17); ctx.lineTo(-34, 18);
-    ctx.lineTo(-22, 35); ctx.quadraticCurveTo(-18, 40, -9, 40); ctx.lineTo(13, 40); ctx.quadraticCurveTo(22, 39, 26, 33);
-    ctx.lineTo(38, 18); ctx.lineTo(60, 14); ctx.quadraticCurveTo(71, 10, 70, 0); ctx.lineTo(68, -14);
-  }
-  ctx.closePath();
-}
 function windowPath(kind) {
   ctx.beginPath();
   if (kind === 'dart') { ctx.moveTo(-12, 27); ctx.lineTo(14, 27); ctx.lineTo(30, 17); ctx.lineTo(-28, 17); }
@@ -312,12 +296,8 @@ export function drawCar(c, style, t) {
   const col = style.paint || team.main;
   ctx.save();
   ctx.translate(c.x, c.y); ctx.rotate(c.a); ctx.scale(c.dir, 1);
-  // air roll / barrel roll: seen side-on the car squashes through its own long axis
-  if (c.rollT > 0 && c.rollDur > 0) { const k = Math.cos((1 - c.rollT / c.rollDur) * c.rollAng); ctx.scale(1, Math.abs(k) < 0.12 ? (k < 0 ? -0.12 : 0.12) : k); }
-  // turn-around squash
-  if (c.turnT > 0) ctx.scale(Math.max(0.2, Math.abs(Math.cos((c.turnT / 0.22) * Math.PI))), 1);
-  const squash = c.landT > 0 ? 1 - c.landT * 0.6 : 1;
-  ctx.scale(1 + (1 - squash) * 0.4, squash);
+  const [sx,sy] = drawingScale(c);
+  ctx.scale(sx,sy);
   // team under-glow
   ctx.globalCompositeOperation = 'lighter';
   glow(0, -10, 110, team.glow, 0.35);
@@ -332,10 +312,9 @@ export function drawCar(c, style, t) {
     glow(-80, 2, 50, cols[1] || team.main, 0.8);
   }
   ctx.globalCompositeOperation = 'source-over';
-  const big = style.body === 'brute';
   // wheels behind body
-  const wr = big ? WHEEL_R + 3 : WHEEL_R;
-  const wy = -HH + (c.landT > 0 ? 3 : 0);
+  const wr = wheelRadius(style.body);
+  const wy = wheelHeight(style.body) + (c.landT > 0 ? 3 : 0);
   for (const wx of [-42, 42]) {
     ctx.fillStyle = '#0c0d14'; ctx.beginPath(); ctx.arc(wx, wy, wr, 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = '#3a3f55'; ctx.lineWidth = 4; ctx.stroke();
@@ -347,13 +326,13 @@ export function drawCar(c, style, t) {
     }
   }
   // body
-  bodyPath(style.body);
+  traceBody(ctx,style.body);
   const gg = ctx.createLinearGradient(0, 44, 0, -16);
   gg.addColorStop(0, shade(col, 0.45)); gg.addColorStop(0.45, col); gg.addColorStop(1, shade(col, -0.55));
   ctx.fillStyle = gg; ctx.fill();
   ctx.lineWidth = 3.5; ctx.strokeStyle = 'rgba(5,8,25,0.85)'; ctx.stroke();
   // lower skirt
-  ctx.save(); bodyPath(style.body); ctx.clip();
+  ctx.save(); traceBody(ctx,style.body); ctx.clip();
   ctx.fillStyle = 'rgba(10,12,30,0.65)'; ctx.fillRect(-80, -20, 160, 12);
   // team stripe
   ctx.fillStyle = style.paint ? team.main : team.light;
@@ -378,7 +357,7 @@ export function drawCar(c, style, t) {
   glow(72, 6, 26, '#fff3b0', 0.5);
   ctx.globalCompositeOperation = 'source-over';
   // spoiler
-  ctx.fillStyle = shade(col, -0.4); ctx.fillRect(-66, style.body === 'brute' ? 43 : 17, 16, 5);
+  ctx.fillStyle = shade(col, -0.4); ctx.fillRect(-66, spoilerY(style.body), 16, 5);
   ctx.restore();
 }
 
@@ -506,7 +485,12 @@ function drawHud(view) {
   const small = cw / u < 640;
   // scoreboard
   const portrait = ch > cw * 1.2;
-  const bw = (small ? 230 : 300) * u, bh = (small ? 48 : 58) * u, bx = cw / 2 - bw / 2, by = (portrait ? 60 : 10) * u;
+  const stackedScore = portrait || (h.touch && cw < 450 * u);
+  const topControls = h.touch && !stackedScore;
+  const bw = Math.min((small ? 230 : 300) * u, cw - (topControls ? 232 : 18) * u);
+  const bh = (small ? 48 : 58) * u, by = (stackedScore ? 60 : 10) * u;
+  // Leave room for the touch buttons at upper right and the boost gauge at left.
+  const bx = Math.min((cw - bw) / 2, cw - bw - (topControls ? 160 * u : 0));
   ctx.fillStyle = 'rgba(8,10,30,0.82)'; rr(bx, by, bw, bh, 14 * u); ctx.fill();
   const sw = bw * 0.3;
   ctx.fillStyle = TEAM[0].main; rr(bx, by, sw, bh, 14 * u); ctx.fill();
@@ -515,14 +499,14 @@ function drawHud(view) {
   text(String(m.score[0]), bx + sw / 2, by + bh / 2, bh * 0.62 * pulse(0), '#fff');
   text(String(m.score[1]), bx + bw - sw / 2, by + bh / 2, bh * 0.62 * pulse(1), '#fff');
   const tcol = m.overtime ? '#ffd23f' : m.time < 10.5 && m.time > 0 ? (Math.floor(m.time * 2) % 2 ? '#ff5a5a' : '#fff') : '#fff';
-  text(m.overtime ? '+' + fmtTime(m.otTime) : fmtTime(m.time), cw / 2, by + bh * 0.45, bh * 0.46, tcol, 'center', false);
-  if (m.overtime) text('OVERTIME', cw / 2, by + bh * 0.86, bh * 0.17, '#ffd23f', 'center', false, false);
+  text(m.overtime ? '+' + fmtTime(m.otTime) : fmtTime(m.time), bx + bw / 2, by + bh * 0.45, bh * 0.46, tcol, 'center', false);
+  if (m.overtime) text('OVERTIME', bx + bw / 2, by + bh * 0.86, bh * 0.17, '#ffd23f', 'center', false, false);
   // names
   text(h.names[0], bx + sw / 2, by + bh + 12 * u, 11 * u, TEAM[0].light, 'center', true, false);
   text(h.names[1], bx + bw - sw / 2, by + bh + 12 * u, 11 * u, TEAM[1].light, 'center', true, false);
   // boost gauges
   const gr = (small ? 34 : 46) * u;
-  if (h.replay) {} else if (h.touch) boostGauge(gr + 14 * u, (portrait ? 10 * u : by) + gr * 0.85 + 4 * u, gr * 0.85, view.cars[0].boost, 0, 'BOOST');
+  if (h.replay) {} else if (h.touch) boostGauge(gr + 14 * u, 14 * u + gr * 0.85, gr * 0.85, view.cars[0].boost, 0, 'BOOST');
   else boostGauge(gr + 22 * u, ch - gr - 22 * u, gr, view.cars[0].boost, 0, h.twoP ? 'P1 BOOST' : 'BOOST');
   if (h.twoP && !h.replay) boostGauge(cw - gr - 22 * u, ch - gr - 22 * u, gr, view.cars[1].boost, 1, 'P2 BOOST');
   // off-screen ball arrow

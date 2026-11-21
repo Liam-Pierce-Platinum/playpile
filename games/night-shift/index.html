@@ -6,7 +6,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>NIGHT SHIFT</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>&#128663;</text></svg>">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=drive-audit-1">
+<script type="importmap">
+  {"imports": {
+    "./src/physics.js":"./src/physics.js?v=drive-audit-1",
+    "./src/input.js":"./src/input.js?v=drive-audit-1"
+  }}
+</script>
 </head>
 <body>
 <canvas id="game"></canvas>
@@ -57,6 +63,7 @@
       </div>
     </div>
 
+    <div class="clock" id="clock"><span>TIME FREE</span><b id="clock-t">0:00</b><i id="clock-where">MANHATTAN</i></div>
     <div class="right-stack">
       <div class="heat" id="heat-wrap" hidden>
         <span class="heat-label">HEAT</span>
@@ -72,17 +79,15 @@
     </div>
   </div>
 
+  <div class="prompt" id="prompt" hidden></div>
   <div class="event" id="event" hidden></div>
   <div class="banner" id="banner" hidden></div>
   <div class="toasts" id="toasts"></div>
   <div class="offroad" id="offroad" hidden>OFF ROAD</div>
-  <button id="btn-use" class="btn-use" hidden>USE</button>
-  <div class="prompt" id="prompt" hidden></div>
   <div class="vitals" id="vitals">
     <div class="hp"><span>HEALTH</span><div class="hp-bar"><i id="hp-bar"></i></div></div>
     <div class="ammo"><b id="ammo">12</b><small id="mags">/ 48</small><em id="reload" hidden>RELOADING</em></div>
   </div>
-  <button id="btn-fire" class="btn-fire" hidden>FIRE</button>
   <div class="board" id="board">
     <div class="board-h">WHAT THEY HAVE</div>
     <ul id="board-list"></ul>
@@ -98,7 +103,6 @@
     <span>ENERGY<i><b id="n-energy"></b></i></span>
   </div>
   <div class="sweep" id="sweep" hidden><span>THEY ARE SEARCHING THE BUILDING</span><i><b id="sweep-b"></b></i></div>
-  <div class="clock" id="clock"><span>TIME FREE</span><b id="clock-t">0:00</b><i id="clock-where">MANHATTAN</i></div>
   <div class="seen" id="seen" hidden>SEEN</div>
   <div class="stam" id="stam" hidden><i id="stam-bar"></i></div>
   <div class="blockwarn" id="blockwarn" hidden><span>ROADBLOCK</span><b id="blockdist">0</b><small>m</small></div>
@@ -123,12 +127,16 @@
     <button class="pedal brake" id="pedal-brake"><span>BRAKE</span></button>
     <button class="pedal gas" id="pedal-gas"><span>GAS</span></button>
   </div>
-  <button class="hand-brake" id="pedal-hand">HANDBRAKE</button>
+  <div class="touch-tools">
+    <button id="btn-use" class="btn-use" hidden>USE</button>
+    <button id="btn-fire" class="btn-fire" hidden>FIRE</button>
+    <button id="btn-touch-reload">Reload</button>
+    <button class="hand-brake" id="pedal-hand">HANDBRAKE</button>
+  </div>
   <div class="walk-actions">
     <button id="btn-sprint">Sprint</button>
     <button id="btn-down-floor">Downstairs</button>
   </div>
-  <button id="btn-touch-reload">Reload</button>
 </div>
 
 <!-- ==================== TITLE ==================== -->
@@ -181,6 +189,7 @@
     <h2>PAUSED</h2>
     <button class="big" id="btn-resume">RESUME</button>
     <button class="ghost" id="btn-pause-quit">QUIT TO TITLE</button>
+    <details id="pause-status" hidden><summary>City and driver status</summary><div></div></details>
     <div class="help" id="help"></div>
   </div>
 </div>
@@ -196,6 +205,6 @@
   </div>
 </div>
 
-<script type="module" src="src/main.js"></script>
+<script type="module" src="src/main.js?v=drive-audit-1"></script>
 </body>
 </html>

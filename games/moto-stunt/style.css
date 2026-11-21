@@ -34,20 +34,24 @@ button { font: inherit; }
 .lv .n { font-size: 26px; line-height: 1; } .lv .t { font-family: 'Trebuchet MS', Arial, sans-serif; font-weight: bold; font-size: 11px; } .lv .s { color: #ff8a1a; letter-spacing: 1px; }
 .lv.locked { opacity: 0.4; cursor: default; }
 .keys { font-size: 12px !important; opacity: 0.8; }
-#touchui { display: none; position: fixed; left: 0; right: 0; bottom: 0; padding: 16px; justify-content: space-between; pointer-events: none; }
-body.touch #touchui { display: flex; }
-#touchui div { display: flex; gap: 14px; }
-#touchui button { pointer-events: auto; width: 74px; height: 74px; border-radius: 50%; background: rgba(255,248,230,0.85); border: 3px solid #1b1026; box-shadow: 3px 3px 0 #1b1026; font-size: 30px; color: #1b1026; }
-#touchui button.gas { width: 90px; height: 90px; background: #ffd23a; font-size: 26px; }
-#touchui button.on { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #1b1026; background: #52e0ff; }
+#touchui { display:none; position:fixed; bottom:max(10px,env(safe-area-inset-bottom)); left:max(10px,env(safe-area-inset-left)); right:max(10px,env(safe-area-inset-right)); }
+body.touch #touchui { display:flex; }
+.driving-pad button {border-radius:18px;background:#fff8e6ed;border:3px solid #1b1026;box-shadow:3px 3px 0 #1b1026;color:#1b1026;}
+.driving-pad .gas {background:#ffd23a;}
+.driving-pad button.on {transform:translate(2px,2px);box-shadow:1px 1px 0 #1b1026;background:#52e0ff;}
+body:has(.panel:not([hidden])) #touchui,body:has(.panel:not([hidden])) #hud { visibility:hidden; }
 @media (max-width: 520px) { .pop { font-size: 32px; } .pop.big { font-size: 48px; } .panel h1.logo { font-size: 46px; } #grid { grid-template-columns: repeat(3, 1fr); } #hud .lvbox { font-size: 14px; min-width: 120px; } #time { font-size: 26px; } }
 
 @media (pointer: coarse) {
   html,body { touch-action: manipulation; }
   .panel { box-sizing: border-box; max-height: calc(100dvh - 24px); overflow: auto; touch-action: pan-y; }
   .panel button,#bPause { min-height: 44px; }
-  #touchui { padding: 0 max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left)); }
-  #touchui div { gap: 8px; }
-  #touchui button { width: clamp(48px,16vmin,74px); height: clamp(48px,16vmin,74px); }
-  #touchui button.gas { width: clamp(56px,21vmin,90px); height: clamp(56px,21vmin,90px); }
+  #bPause {min-width:44px;}
+}
+@container driving-pad (max-width:430px) {
+  #touchui > .tr {display:flex;}
+}
+@media (max-width:400px) {
+  #hud .lvbox {width:34vw; min-width:0; font-size:12px; padding:5px;}
+  #hud .tm {padding:5px 8px;}
 }

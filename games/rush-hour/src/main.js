@@ -4,7 +4,8 @@ import * as THREE from '../vendor/three.module.js';
 import { STAGES, starsFor } from './stages.js';
 import { makeRoad, buildWorld, buildWorks, makeZones } from './world.js';
 import { makePlayer, MAT } from './cars.js';
-import { Traffic } from './traffic.js';
+import { Traffic, trafficAngle } from './traffic.js?v=20261120-race-qa';
+import { orientedBody, contact, projectedRadius } from '../../_shared/vehicle-contact.js';
 import { FX } from './fx.js';
 import { Sound } from './audio.js';
 
@@ -121,11 +122,13 @@ function bindTouch(id, k) {
     update();
     snd.wake();
   });
-  el.addEventListener('lostpointercapture', (e) => { pointers.delete(e.pointerId); update(); });
+  for (const name of ['pointerup','pointercancel','lostpointercapture']) {
+    el.addEventListener(name, (e) => { pointers.delete(e.pointerId); update(); });
+  }
   addEventListener('blur', () => { pointers.clear(); update(); });
 }
 bindTouch('tL', 'l'); bindTouch('tR', 'r'); bindTouch('tBrake', 'b'); bindTouch('tNitro', 'n');
-$('tPause').addEventListener('pointerdown', (e) => { e.preventDefault(); pause(true); });
+$('tPause').addEventListener('click', () => pause(true));
 
 function onKey(code) {
   if (code === 'KeyM') { snd.setMute(!snd.muted); $('pMute').textContent = 'SOUND: ' + (snd.muted ? 'OFF' : 'ON'); }
@@ -337,14 +340,15 @@ function step(dt) {
   P.s += sDot * dt; P.latV = P.v * Math.sin(P.h); P.lat += P.latV * dt;
   P.top = Math.max(P.top, P.v);
   // walls: outer rails, and the median wall on divided stretches (you can be on either side of it)
-  const side = P.prevLat >= 0 ? 1 : -1, wl = 0.3 + PHW + 0.05;
+  const extent = Math.abs(Math.cos(playerAngle())) * PHW + Math.abs(Math.sin(playerAngle())) * PHL;
+  const side = P.prevLat >= 0 ? 1 : -1, wl = 0.3 + extent + 0.05;
   if (T.wall(P.s) && side * P.lat < wl) {
     if (!T.wall(P.s - PHL - 0.8) && Math.abs(P.prevLat) < wl - 0.4 && playing && P.invuln <= 0) { // nosed into the crash cushion
       crashFx(T.pos(P.s + 2, 0, 0.6), '#e9b41c', P.v); P.lat = side * (wl + 0.15); P.h = side * 0.05; penalize(3, 'BARRIER', 0.3);
     } else railHit(-side, side * wl);
   }
-  const limR = (T.wall(P.s) && side < 0) ? -wl : T.edgeR(P.s) + 1.2 - PHW - 0.06;
-  const limL = (T.wall(P.s) && side > 0) ? wl : T.edgeL(P.s) - 1.2 + PHW + 0.06;
+  const limR = (T.wall(P.s) && side < 0) ? -wl : T.edgeR(P.s) + 1.2 - extent - 0.06;
+  const limL = (T.wall(P.s) && side > 0) ? wl : T.edgeL(P.s) - 1.2 + extent + 0.06;
   if (P.lat > limR && limR > 0) railHit(1, limR);
   else if (P.lat < limL && limL < 0) railHit(-1, limL);
   P.scrapeT -= dt; P.invuln -= dt; P.wobble *= 1 - 4 * dt;
@@ -391,31 +395,42 @@ function checkpoint(ns) {
   fovKick += 4;
 }
 
+function playerAngle() {
+  return P.h + P.slip + Math.sin(G.time * 22) * P.wobble * .12;
+}
+function roadBody(s, lat, angle, halfLength, halfWidth) {
+  const p = T.pos(s, lat);
+  return orientedBody(p.x, p.z, T.frame(s).th + angle - Math.PI / 2, halfLength, halfWidth);
+}
 function collide() {
+  const playerBody = roadBody(P.s, P.lat, playerAngle(), PHL, PHW);
+  const frame = T.frame(P.s), right = {x: frame.rx, y: frame.rz};
+  const playerWidth = projectedRadius(playerBody, right);
   for (const c of traffic.cars) {
     const ds = c.s - P.s, dl = c.lat - P.lat;
-    const hl = c.len / 2 + PHL, hw = c.wid / 2 + PHW;
-    const oz = hl - Math.abs(ds), ox = hw - Math.abs(dl);
+    if (Math.abs(ds) > c.len + 12) { c.passed = Math.sign(ds); continue; }
+    const other = roadBody(c.s, c.lat, trafficAngle(c, T), c.len / 2, c.wid / 2);
+    const hit = contact(playerBody, other);
     const sd = ds > 0 ? 1 : -1;
     if (c.passed === null) c.passed = sd;
     if (c.passed === 1 && sd === -1) {
-      const gap = Math.abs(dl) - hw, walled = T.wall(c.s) && Math.sign(c.lat) !== Math.sign(P.lat);
-      if (!c.touched && !walled && gap < 2.0 && gap > -0.05 && P.v > 26 && G.state !== 'result') nearMiss(c, gap, dl);
+      const gap = Math.abs(dl) - playerWidth - projectedRadius(other, right), walled = T.wall(c.s) && Math.sign(c.lat) !== Math.sign(P.lat);
+      if (!hit && !c.touched && !walled && gap < 2.0 && gap >= 0 && P.v > 26 && G.state !== 'result') nearMiss(c, gap, dl);
     }
     c.passed = sd;
-    if (oz > 0 && ox > 0 && P.invuln <= 0 && c.hitT <= 0.2) {
+    if (hit && P.invuln <= 0 && c.hitT <= 0.2) {
       c.touched = true;
-      if (c.dir > 0 && ox < 0.55 && oz > ox * 1.2) sideswipe(c, dl, ox);
+      if (c.dir > 0 && hit.depth < 0.55 && Math.abs(hit.nx * right.x + hit.ny * right.y) > .7) sideswipe(c, dl, hit.depth);
       else crash(c, ds, dl);
-    } else if (oz > 0 && ox > 0 && c.dir > 0) { c.lat += Math.sign(dl || 1) * ox * 0.5; c.touched = true; }
+    } else if (hit && c.dir > 0) { c.lat -= (hit.nx * right.x + hit.ny * right.y) * hit.depth * .5; c.touched = true; }
   }
   if (P.invuln <= 0) {
     for (const b of works.blocks) {
-      if (Math.abs(b.s - P.s) > PHL + 1.9) continue;
-      if (Math.abs(b.lat - P.lat) < PHW + 0.36) {
+      if (Math.abs(b.s - P.s) > 8) continue;
+      if (contact(playerBody, roadBody(b.s, b.lat, 0, 1.81, .36))) {
         const z = works.zones.find((zz) => b.s >= zz.s0 - 1 && b.s <= zz.s1 + 1), o = z ? z.open : 1;
         crashFx(T.pos(P.s + 2, P.lat, 0.6), '#c9c6bf', P.v);
-        P.lat = b.lat + o * (0.36 + PHW + 0.15); P.h = o * 0.08;
+        P.lat = b.lat + o * (0.36 + playerWidth + 0.15); P.h = o * 0.08;
         penalize(3, 'BARRIER', 0.28);
         break;
       }
@@ -612,7 +627,7 @@ function camTargets(dt) {
 function render(dt) {
   const f = T.frame(P.s);
   T.pos(P.s, P.lat, 0, player.grp.position);
-  const yawVis = P.h + P.slip + Math.sin(G.time * 22) * P.wobble * 0.12;
+  const yawVis = playerAngle();
   player.grp.rotation.set(0, f.yaw - yawVis, Math.atan(f.b), 'YXZ');
   P.roll += (clamp(-P.omega * P.v * 0.0016, -0.08, 0.08) - P.roll) * Math.min(1, 8 * dt);
   const pitchT = input.brake ? 0.035 : P.boosting ? -0.025 : 0;

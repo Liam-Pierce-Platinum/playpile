@@ -15,10 +15,18 @@ export class UI {
     this.pauseBtn.addEventListener('pointerdown', (e) => { e.stopPropagation(); if (this.g.mode === 'play' && !this.open && this.g.phase !== 'end') this.g.pause(); });
     this.root.appendChild(this.pauseBtn);
     this.boostBtn = h('button', 'boostbtn', '<b>BOOST</b><small>uses fuel</small>');
-    const on = (e) => { e.preventDefault(); e.stopPropagation(); this.g.audio.unlock(); this.g.boostHeld = true; this.boostBtn.classList.add('down'); };
-    const off = () => { this.g.boostHeld = false; this.boostBtn.classList.remove('down'); };
+    const pressed = new Set();
+    const on = (e) => {
+      e.preventDefault(); e.stopPropagation(); this.g.audio.unlock();
+      this.boostBtn.setPointerCapture(e.pointerId);
+      pressed.add(e.pointerId); this.g.boostHeld = true; this.boostBtn.classList.add('down');
+    };
+    const off = (e) => {
+      pressed.delete(e.pointerId); this.g.boostHeld = pressed.size > 0;
+      this.boostBtn.classList.toggle('down', this.g.boostHeld);
+    };
     this.boostBtn.addEventListener('pointerdown', on);
-    for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) this.boostBtn.addEventListener(ev, off);
+    for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) this.boostBtn.addEventListener(ev, off);
     this.root.appendChild(this.boostBtn);
     this.hud(false);
   }
@@ -162,6 +170,7 @@ export class UI {
     const a = this.g.audio;
     return `<div class="card small"><header><h2>Paused</h2><span class="sub">${this.g.n}. ${this.g.lv.name}</span></header><div class="body menu">
       <button class="btn go" data-act="resume">Resume</button><button class="btn" data-act="restart">Restart (R)</button>
+      ${this.g.touchUI && this.g.lv.tip ? `<p class="note">${this.g.lv.tip}</p>` : ''}
       <div class="row2"><label class="tog"><input type="checkbox" data-set="musicOn" ${a.musicOn ? 'checked' : ''}> Music</label><label class="tog"><input type="checkbox" data-set="muted" ${a.muted ? 'checked' : ''}> Mute all</label></div>
       <div class="row2"><button class="btn small" data-act="gardens">Gardens</button><button class="btn small" data-act="settings">Settings</button></div>
       <button class="btn small" data-act="howto">How to play</button>

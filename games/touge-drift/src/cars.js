@@ -1,6 +1,18 @@
 // Detailed top-down cars, and the rival drivers you race.
 // Cars face +x; about 52 px long and 26 px wide.
 
+import { orientedBody, projectedRadius } from '../../_shared/vehicle-contact.js';
+
+const HALF_LENGTH = 26, HALF_WIDTH = 13;
+export const RAIL_OFFSET = 14, RAIL_HALF_WIDTH = 2;
+export function carBody(car) {
+  return orientedBody(car.x, car.y, car.drawH ?? car.h, HALF_LENGTH, HALF_WIDTH);
+}
+export function railClearance(car, point) {
+  const normal = {x: -Math.sin(point.a), y: Math.cos(point.a)};
+  return projectedRadius(carBody(car), normal);
+}
+
 export const STYLES = {
   hatch: { name: 'You', top: '#f2f2ee', side: '#141416', glass: '#1a1d26', accent: '#141416', lights: 'popup', shape: 'hatch' },
   red: { name: 'Kenta', top: '#c81e24', side: '#7a0e12', glass: '#14161c', accent: '#1a1a1a', lights: 'popup', shape: 'coupe' },
@@ -12,7 +24,7 @@ const rr = (x, px, py, w, h, r) => { x.beginPath(); x.roundRect(px, py, w, h, r)
 
 export function drawCar(x, car, style, opts = {}) {
   const S = STYLES[style];
-  const L = 26, Wd = 13;           // half length, half width
+  const L = HALF_LENGTH, Wd = HALF_WIDTH;           // half length, half width
   x.save();
   x.translate(car.x, car.y);
   x.rotate(car.h);
@@ -156,7 +168,8 @@ export class Rival {
     this.x += this.vx * dt; this.y += this.vy * dt;
     // stay on the road
     this.idx = T.nearest(this.x, this.y, this.idx);
-    const p = T.pts[this.idx], off = T.offset(this.x, this.y, this.idx), lim = p.w - 18;
+    const p = T.pts[this.idx], off = T.offset(this.x, this.y, this.idx);
+    const lim = p.w + RAIL_OFFSET - RAIL_HALF_WIDTH - railClearance(this, p);
     if (Math.abs(off) > lim) { const s = Math.sign(off), px = -Math.sin(p.a) * s, py = Math.cos(p.a) * s; this.x -= px * (Math.abs(off) - lim); this.y -= py * (Math.abs(off) - lim); this.speed *= 0.97; }
   }
   // body angle to draw (heading plus the slide)

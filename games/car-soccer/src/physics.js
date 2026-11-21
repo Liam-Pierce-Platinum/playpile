@@ -1,6 +1,7 @@
 // Car + ball simulation. Fixed step (240 Hz). Pure data, no drawing, no sound:
 // everything noteworthy is pushed onto world.events for fx/audio/stats to consume.
 import { rand } from './rng.js';
+import {ballContact, carsContact, carPolygons} from './car-shape.js';
 import { W, H, GH, GY, GT, BALL_R, sdf, grad, floorY, floorSlope, floorCurv, above } from './arena.js';
 
 export const L = 68, HH = 21, RIDE = 38, WHEEL_R = 17;
@@ -218,23 +219,26 @@ function updateCar(c, inp, dt, w) {
   carWalls(c, dt, w);
 }
 
-// corner probes against the arena
-const PROBES = [[L, -HH], [-L, -HH], [L, HH], [-L, HH], [0, HH + 4], [L * 0.5, HH + 2], [-L * 0.5, HH + 2]];
+// Probe the same roof, tyres and bumpers that are painted on screen.
 function carWalls(c, dt, w) {
   let roof = false, hard = 0;
+  if (sdf(c.x,c.y) > 84) {c.roofT=0;return;}
+  const ca=Math.cos(c.a), sa=Math.sin(c.a);
+  const originX=c.x, originY=c.y, probes=carPolygons(c).flat();
   for (let it = 0; it < 2; it++) {
-    const ca = Math.cos(c.a), sa = Math.sin(c.a);
-    for (let k = 0; k < PROBES.length; k++) {
-      const lx = PROBES[k][0] * c.dir, ly = PROBES[k][1];
-      const rx = lx * ca - ly * sa, ry = lx * sa + ly * ca;
-      const px = c.x + rx, py = c.y + ry;
+    for (const [x,y] of probes) {
+      const rx=x-originX, ry=y-originY;
+      const px=c.x+rx, py=c.y+ry;
       const d = sdf(px, py);
       if (d >= 0) continue;
       grad(px, py, N2);
+      // The suspension already follows this surface. A second wheel impulse here
+      // would brake a grounded car at every sample on a curved ramp.
+      if (c.grounded && c.nx*N2.x + c.ny*N2.y > 0.9) continue;
       c.x -= N2.x * d; c.y -= N2.y * d;
       const vpx = c.vx - c.av * ry, vpy = c.vy + c.av * rx;
       const vn = vpx * N2.x + vpy * N2.y;
-      if (k >= 2) roof = roof || (ly > 0 && (-sa * N2.x + ca * N2.y) < -0.3);
+      if (-rx * sa + ry * ca > 0 && -sa * N2.x + ca * N2.y < -0.3) roof = true;
       if (vn < 0) {
         const rn = rx * N2.y - ry * N2.x;
         const j = -(1.15) * vn / (1 / M_CAR + rn * rn / I_CAR);
@@ -284,23 +288,14 @@ export function updateBall(b, dt, w) {
 
 function carBall(c, b, w) {
   if (c.demo > 0) return;
-  const ca = Math.cos(c.a), sa = Math.sin(c.a);
-  const dx = b.x - c.x, dy = b.y - c.y;
-  const lx = dx * ca + dy * sa, ly = -dx * sa + dy * ca;
-  const hx = L + 2, hy = HH + 6;
-  const cx = Math.max(-hx, Math.min(hx, lx)), cy = Math.max(-hy, Math.min(hy, ly));
-  let ox = lx - cx, oy = ly - cy;
-  let dist = Math.hypot(ox, oy);
-  if (dist >= BALL_R) return;
-  if (dist < 1e-3) { ox = lx; oy = ly; dist = Math.hypot(ox, oy) || 1; }
-  let nlx = ox / dist, nly = oy / dist;
-  if (lx === cx && ly === cy) { nlx = lx / dist; nly = ly / dist; }
-  const nx = nlx * ca - nly * sa, ny = nlx * sa + nly * ca;
-  const pen = BALL_R - dist;
+  const hit = ballContact(c,b,BALL_R);
+  if (!hit) return;
+  const {nx, ny, depth: pen} = hit;
+  const nly = -nx*Math.sin(c.a)+ny*Math.cos(c.a);
+  const px = hit.x-c.x, py = hit.y-c.y;
   const tm = M_CAR + M_BALL;
   b.x += nx * pen * (M_CAR / tm); b.y += ny * pen * (M_CAR / tm);
   c.x -= nx * pen * (M_BALL / tm); c.y -= ny * pen * (M_BALL / tm);
-  const px = cx * ca - cy * sa, py = cx * sa + cy * ca; // contact rel. to car centre
   const cvx = c.vx - c.av * py, cvy = c.vy + c.av * px;
   const vn = (b.vx - cvx) * nx + (b.vy - cvy) * ny;
   if (vn >= 0) return;
@@ -331,19 +326,9 @@ function carBall(c, b, w) {
 
 function carCar(a, b, w) {
   if (a.demo > 0 || b.demo > 0) return;
-  const ca1 = Math.cos(a.a), sa1 = Math.sin(a.a), ca2 = Math.cos(b.a), sa2 = Math.sin(b.a);
-  const R = 25, offs = [-L * 0.6, 0, L * 0.6];
-  let best = null;
-  for (const o1 of offs) {
-    const x1 = a.x + ca1 * o1, y1 = a.y + sa1 * o1;
-    for (const o2 of offs) {
-      const x2 = b.x + ca2 * o2, y2 = b.y + sa2 * o2;
-      const dx = x2 - x1, dy = y2 - y1, d = Math.hypot(dx, dy);
-      if (d < 2 * R && (!best || d < best.d)) best = { d, dx, dy };
-    }
-  }
-  if (!best) return;
-  const d = best.d || 1, nx = best.dx / d, ny = best.dy / d, pen = 2 * R - d;
+  const hit = carsContact(a,b);
+  if (!hit) return;
+  const {nx, ny, depth: pen} = hit;
   a.x -= nx * pen / 2; a.y -= ny * pen / 2; b.x += nx * pen / 2; b.y += ny * pen / 2;
   const va = a.vx * nx + a.vy * ny, vb = b.vx * nx + b.vy * ny;
   const rel = va - vb;
@@ -379,8 +364,8 @@ export function step(w, inputs, dt = STEP) {
   for (let i = 0; i < w.cars.length; i++) for (let k = i + 1; k < w.cars.length; k++) carCar(w.cars[i], w.cars[k], w);
   const b = w.ball;
   if (b.hidden) return -1;
-  if (b.x - BALL_R * 0.98 > W / 2) { w.lastGoal = 0; return 0; }        // blue (team 0) scores in the right goal
-  if (b.x + BALL_R * 0.98 < -W / 2) { w.lastGoal = 1; return 1; }       // orange scores in the left goal
+  if (b.y >= GY && b.y <= GT && b.x - BALL_R > W / 2) { w.lastGoal = 0; return 0; }        // blue (team 0) scores in the right goal
+  if (b.y >= GY && b.y <= GT && b.x + BALL_R < -W / 2) { w.lastGoal = 1; return 1; }       // orange scores in the left goal
   return -1;
 }
 

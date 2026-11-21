@@ -16,6 +16,7 @@ export function draw(ctx, G, cam, w, h, dpr, aim, touch) {
   const vis = (x0, y0, x1, y1, m = 0) => x1 > vx0 - m && x0 < vx1 + m && y1 > vy0 - m && y0 < vy1 + m;
 
   ground(ctx, G, vis);
+  ctx.strokeStyle = "#edc574"; ctx.lineWidth = 3; ctx.strokeRect(7, 7, W - 14, W - 14);
   // skid marks + splat decals
   ctx.lineCap = 'round'; ctx.lineWidth = 4;
   for (const k of G.skids) { const a = Math.max(0, 0.32 - (G.t - k[4]) * 0.03); if (a <= 0) continue; ctx.strokeStyle = `rgba(20,20,26,${a})`; ctx.beginPath(); ctx.moveTo(k[0], k[1]); ctx.lineTo(k[2], k[3]); ctx.stroke(); }
@@ -92,7 +93,7 @@ export function draw(ctx, G, cam, w, h, dpr, aim, touch) {
 
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   if (G.p.boosting) speedLines(ctx, w, h, G.t);
-  arrows(ctx, G, cam, w, h, pulse, needShop);
+  arrows(ctx, G, cam, w, h, pulse, needShop, touch);
   hud(ctx, G, w, h, touch);
 }
 
@@ -242,20 +243,25 @@ function pin(ctx, x, y, col, label, k = 1) {
   ctx.restore();
 }
 
-function arrows(ctx, G, cam, w, h, pulse, needShop) {
+function arrows(ctx, G, cam, w, h, pulse, needShop, touch) {
   const tg = G.orders.map((o) => ({ x: o.door.x, y: o.door.y, col: heatCol(o.heat), l: '$' }));
   if (needShop && (avail(G) === 0)) tg.push({ x: G.city.pizza.x, y: G.city.pizza.y, col: '#ffd23f', l: 'P' });
-  const m = 46, top = 74;
+  const m = 46, top = touch ? 90 : 74;
+  // Reserve the thumb controls at the bottom and keep one readable direction on touch.
+  const stick = Math.max(70, Math.min(142, Math.min(w, h) * .23));
+  const bottom = touch ? h - stick - 34 : h - m;
+  if (touch) tg.sort((a,b) => Math.hypot(a.x-G.p.x,a.y-G.p.y) - Math.hypot(b.x-G.p.x,b.y-G.p.y));
   for (const t of tg) {
     const sx = (t.x - cam.x) * cam.s + w / 2, sy = (t.y - cam.y) * cam.s + h / 2;
-    if (sx > m && sx < w - m && sy > top && sy < h - m) continue;
+    if (sx > m && sx < w - m && sy > top && sy < bottom) continue;
     const dx = sx - w / 2, dy = sy - h / 2, kx = (w / 2 - m) / Math.abs(dx || 1e-3), ky = (h / 2 - m) / Math.abs(dy || 1e-3), k = Math.min(kx, ky);
-    let ex = w / 2 + dx * k, ey = h / 2 + dy * k; ey = Math.max(top, ey);
+    let ex = w / 2 + dx * k, ey = h / 2 + dy * k; ey = Math.min(bottom, Math.max(top, ey));
     const a = Math.atan2(dy, dx), dist = Math.round(Math.hypot(t.x - G.p.x, t.y - G.p.y) / 10);
     ctx.save(); ctx.translate(ex, ey); ctx.rotate(a); ctx.fillStyle = t.col; ctx.strokeStyle = '#1b1530'; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(20 + pulse * 4, 0); ctx.lineTo(-6, -14); ctx.lineTo(-6, 14); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
     ctx.font = `14px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineWidth = 4; ctx.strokeStyle = '#1b1530';
     const tx = ex - Math.cos(a) * 26, ty = ey - Math.sin(a) * 26; ctx.strokeText(t.l + ' ' + dist + 'm', tx, ty); ctx.fillStyle = '#fff'; ctx.fillText(t.l + ' ' + dist + 'm', tx, ty);
+    if (touch) break;
   }
 }
 
@@ -272,36 +278,47 @@ function txt(ctx, s, x, y, size, col, align = 'left', stroke = 6) {
 
 function hud(ctx, G, w, h, touch) {
   const sm = w < 700;
-  // cash vs target
-  const bw = sm ? 150 : 230, f = Math.min(1, G.cash / G.target);
-  ctx.fillStyle = 'rgba(27,21,48,0.8)'; rr(ctx, 14, 14, bw + 20, 54, 12);
-  txt(ctx, '$' + G.cash, 26, 33, sm ? 22 : 26, G.hitTarget ? '#7dff8a' : '#ffd23f', 'left', 5);
-  txt(ctx, '/ $' + G.target, 26 + (sm ? 62 : 76) + String(G.cash).length * (sm ? 4 : 6), 34, sm ? 13 : 15, '#d8d2ea', 'left', 4);
-  ctx.fillStyle = '#3a3156'; rr(ctx, 24, 52, bw, 8, 4); ctx.fillStyle = G.hitTarget ? '#7dff8a' : '#ffd23f'; rr(ctx, 24, 52, Math.max(8, bw * f), 8, 4);
-  // timer
-  const tl = Math.max(0, G.time), low = tl < 10;
-  const k = low ? 1 + 0.12 * Math.max(0, Math.sin(G.t * 12)) : 1;
-  txt(ctx, Math.ceil(tl) + '', w / 2, 40, (sm ? 38 : 48) * k, low ? '#ff5c5c' : '#ffffff', 'center', 8);
-  txt(ctx, 'SHIFT ' + G.shift, w / 2, sm ? 70 : 78, 13, '#d8d2ea', 'center', 4);
-  // combo
-  if (G.combo > 1) { const pz = 1 + Math.max(0, G.comboT - 4.6) * 0.6; txt(ctx, 'x' + comboMult(G).toFixed(1), w - 20, 36, (sm ? 26 : 34) * pz, '#ff5ca8', 'right', 6); txt(ctx, G.combo + ' COMBO', w - 20, 64, 13, '#ffd0ea', 'right', 4); ctx.fillStyle = '#ff5ca8'; rr(ctx, w - 110, 76, 90 * Math.max(0, G.comboT / 5), 4, 2); }
-  // bag + boost (bottom-left)
-  const by = h - 104;
-  const y0 = touch ? 80 : by;
-  ctx.fillStyle = 'rgba(27,21,48,0.8)'; rr(ctx, 14, y0, 40 + G.cap * 30, 58, 12);
-  const show = G.orders.slice(0, avail(G));
-  for (let i = 0; i < G.cap; i++) {
-    const x = 28 + i * 30, o = show[i];
-    ctx.fillStyle = o ? '#f7ead0' : 'rgba(255,255,255,0.12)'; rr(ctx, x, y0 + 10, 24, 24, 4);
-    if (o) { ctx.fillStyle = '#d8452f'; ctx.beginPath(); ctx.arc(x + 12, y0 + 22, 5, 0, 7); ctx.fill(); ctx.fillStyle = '#3a3156'; rr(ctx, x, y0 + 40, 24, 6, 3); ctx.fillStyle = heatCol(o.heat); rr(ctx, x, y0 + 40, Math.max(3, 24 * o.heat / 100), 6, 3); }
+  if (touch) {
+    const width = Math.min(w - 77, 244), x = 8, y = 8;
+    ctx.fillStyle = 'rgba(27,21,48,.86)'; rr(ctx, x, y, width, 54, 10);
+    txt(ctx, '$' + G.cash + ' / $' + G.target, x + 9, y + 16, 17, '#ffd23f');
+    txt(ctx, Math.ceil(G.time) + 's', x + width - 9, y + 16, 17, G.time < 10 ? '#ff8080' : '#fff', 'right');
+    const orders = G.orders.slice(0, avail(G));
+    txt(ctx, 'BAG ' + orders.length + '/' + G.cap, x + 9, y + 39, 12, orders.length ? heatCol(orders[0].heat) : '#fff');
+    txt(ctx, 'BOOST ' + Math.round(G.p.boost / G.p.tank * 100) + '%', x + width - 9, y + 39, 12, '#5cd6ff', 'right');
+    if (G.combo > 1) txt(ctx, '×' + comboMult(G).toFixed(1), x + width / 2, y + 39, 12, '#ff9bd0', 'center');
+  } else {
+    // cash vs target
+    const bw = sm ? 150 : 230, f = Math.min(1, G.cash / G.target);
+    ctx.fillStyle = 'rgba(27,21,48,0.8)'; rr(ctx, 14, 14, bw + 20, 54, 12);
+    txt(ctx, '$' + G.cash, 26, 33, sm ? 22 : 26, G.hitTarget ? '#7dff8a' : '#ffd23f', 'left', 5);
+    txt(ctx, '/ $' + G.target, 26 + (sm ? 62 : 76) + String(G.cash).length * (sm ? 4 : 6), 34, sm ? 13 : 15, '#d8d2ea', 'left', 4);
+    ctx.fillStyle = '#3a3156'; rr(ctx, 24, 52, bw, 8, 4); ctx.fillStyle = G.hitTarget ? '#7dff8a' : '#ffd23f'; rr(ctx, 24, 52, Math.max(8, bw * f), 8, 4);
+    // timer
+    const tl = Math.max(0, G.time), low = tl < 10;
+    const k = low ? 1 + 0.12 * Math.max(0, Math.sin(G.t * 12)) : 1;
+    txt(ctx, Math.ceil(tl) + '', w / 2, 40, (sm ? 38 : 48) * k, low ? '#ff5c5c' : '#ffffff', 'center', 8);
+    txt(ctx, 'SHIFT ' + G.shift, w / 2, sm ? 70 : 78, 13, '#d8d2ea', 'center', 4);
+    // combo
+    if (G.combo > 1) { const pz = 1 + Math.max(0, G.comboT - 4.6) * 0.6; txt(ctx, 'x' + comboMult(G).toFixed(1), w - 20, 36, (sm ? 26 : 34) * pz, '#ff5ca8', 'right', 6); txt(ctx, G.combo + ' COMBO', w - 20, 64, 13, '#ffd0ea', 'right', 4); ctx.fillStyle = '#ff5ca8'; rr(ctx, w - 110, 76, 90 * Math.max(0, G.comboT / 5), 4, 2); }
+    // bag + boost (bottom-left)
+    const by = h - 104;
+    const y0 = by;
+    ctx.fillStyle = 'rgba(27,21,48,0.8)'; rr(ctx, 14, y0, 40 + G.cap * 30, 58, 12);
+    const show = G.orders.slice(0, avail(G));
+    for (let i = 0; i < G.cap; i++) {
+      const x = 28 + i * 30, o = show[i];
+      ctx.fillStyle = o ? '#f7ead0' : 'rgba(255,255,255,0.12)'; rr(ctx, x, y0 + 10, 24, 24, 4);
+      if (o) { ctx.fillStyle = '#d8452f'; ctx.beginPath(); ctx.arc(x + 12, y0 + 22, 5, 0, 7); ctx.fill(); ctx.fillStyle = '#3a3156'; rr(ctx, x, y0 + 40, 24, 6, 3); ctx.fillStyle = heatCol(o.heat); rr(ctx, x, y0 + 40, Math.max(3, 24 * o.heat / 100), 6, 3); }
+    }
+    const bx = 14, bwid = sm ? 130 : 170, byy = y0 + 66;
+    ctx.fillStyle = 'rgba(27,21,48,0.8)'; rr(ctx, bx, byy, bwid, 20, 10);
+    ctx.fillStyle = G.p.boosting ? '#ffffff' : '#5cd6ff'; rr(ctx, bx + 4, byy + 4, Math.max(6, (bwid - 8) * G.p.boost / G.p.tank), 12, 6);
+    txt(ctx, 'BOOST', bx + bwid / 2, byy + 10, 11, '#ffffff', 'center', 3);
   }
-  const bx = 14, bwid = sm ? 130 : 170, byy = y0 + 66;
-  ctx.fillStyle = 'rgba(27,21,48,0.8)'; rr(ctx, bx, byy, bwid, 20, 10);
-  ctx.fillStyle = G.p.boosting ? '#ffffff' : '#5cd6ff'; rr(ctx, bx + 4, byy + 4, Math.max(6, (bwid - 8) * G.p.boost / G.p.tank), 12, 6);
-  txt(ctx, 'BOOST', bx + bwid / 2, byy + 10, 11, '#ffffff', 'center', 3);
   // first-seconds hint
   if (G.t < 9 && !touch && !G.bot) { ctx.globalAlpha = Math.min(1, (9 - G.t) / 1.5); txt(ctx, 'WASD drive  -  SPACE drift  -  SHIFT boost  -  CLICK throw pizza at the glowing doors', w / 2, h - 30, sm ? 12 : 16, '#ffffff', 'center', 5); ctx.globalAlpha = 1; }
-  if (G.t < 9 && touch) { ctx.globalAlpha = Math.min(1, (9 - G.t) / 1.5); txt(ctx, 'Left thumb: steer  -  tap right side: throw', w / 2, h - 150, 14, '#ffffff', 'center', 5); ctx.globalAlpha = 1; }
+  if (G.t < 4 && touch && h >= 420) { ctx.globalAlpha = Math.min(1, (9 - G.t) / 1.5); txt(ctx, 'Left thumb: steer  -  tap right side: throw', w / 2, h - 118, 13, '#ffffff', 'center', 5); ctx.globalAlpha = 1; }
   // banner
   if (G.banner) {
     const b = G.banner, a = Math.min(1, b.t * 3), sc = 1 + Math.max(0, b.t - (b.t > 1 ? b.t - 0.15 : 0)) * 0;

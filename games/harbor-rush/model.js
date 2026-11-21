@@ -1,3 +1,4 @@
+import { contact, orientedBody, projectedRadius } from "../_shared/vehicle-contact.js";
 export const GRID = [260, 700, 1140, 1580, 2020],
   YGRID = [240, 680, 1120, 1560, 2000];
 export const METERS_PER_UNIT = 0.1;
@@ -35,6 +36,9 @@ for (let i = 0; i < 4; i++)
     if ((i === 1 && j === 1) || (i === 2 && j === 3)) continue;
     buildings.push({ x, y, w, h, kind: (i * 3 + j) % 5, seed: i * 7 + j });
   }
+export const harborEdge = { left: 150, right: 2120, top: 130, bottom: 2120 };
+const walls = buildings.map(b => orientedBody(b.x + b.w / 2, b.y + b.h / 2, 0, b.w / 2, b.h / 2));
+const carBody = c => orientedBody(c.x, c.y, c.a, 22.75, 10.5);
 export function initialSave() {
   return {
     credits: 0,
@@ -133,7 +137,7 @@ export function recover(g) {
 }
 function impact(g, speed) {
   const c = g.car;
-  if (c.hit > 0) return;
+  if (c.hit > 0 || speed < 35) return;
   c.hit = 0.65;
   if (g.mission?.stage === "delivery")
     g.mission.cargo = clamp(
@@ -153,46 +157,35 @@ function impact(g, speed) {
       color: "#f5bd76",
     });
 }
+function resolveContact(g, hit, otherVx, otherVy, damageFactor) {
+  const c = g.car;
+  c.x += hit.nx * hit.depth;
+  c.y += hit.ny * hit.depth;
+  const closing = -((c.vx - otherVx) * hit.nx + (c.vy - otherVy) * hit.ny);
+  if (closing <= 0) return;
+  c.vx += hit.nx * closing * 1.2;
+  c.vy += hit.ny * closing * 1.2;
+  impact(g, closing * damageFactor);
+}
 function collision(g) {
   const c = g.car;
-  for (const b of buildings) {
-    const px = clamp(c.x, b.x, b.x + b.w),
-      py = clamp(c.y, b.y, b.y + b.h),
-      dx = c.x - px,
-      dy = c.y - py,
-      len = Math.hypot(dx, dy);
-    if (len < 17) {
-      const speed = Math.hypot(c.vx, c.vy);
-      if (len > 0.01) {
-        const nx = dx / len,
-          ny = dy / len;
-        c.x = px + nx * 17;
-        c.y = py + ny * 17;
-        const dot = c.vx * nx + c.vy * ny;
-        if (dot < 0) {
-          c.vx -= dot * 1.3 * nx;
-          c.vy -= dot * 1.3 * ny;
-        }
-      } else {
-        c.x = b.x - 18;
-        c.vx = 0;
-        c.vy = 0;
-      }
-      impact(g, speed);
-    }
+  const body = carBody(c);
+  const extentX = projectedRadius(body, { x: 1, y: 0 });
+  const extentY = projectedRadius(body, { x: 0, y: 1 });
+  for (const wall of walls) {
+    if (Math.abs(c.x - wall.x) >= extentX + wall.halfLength || Math.abs(c.y - wall.y) >= extentY + wall.halfWidth) continue;
+    body.x = c.x;
+    body.y = c.y;
+    const hit = contact(body, wall);
+    if (hit) resolveContact(g, hit, 0, 0, 1);
   }
-  const ox = c.x,
-    oy = c.y;
-  c.x = clamp(c.x, 155, 2110);
-  c.y = clamp(c.y, 135, 2110);
-  if (ox !== c.x) {
-    impact(g, Math.abs(c.vx));
-    c.vx *= -0.25;
-  }
-  if (oy !== c.y) {
-    impact(g, Math.abs(c.vy));
-    c.vy *= -0.25;
-  }
+  // The painted port limit stops outward travel without damaging a delivery.
+  const x = clamp(c.x, harborEdge.left + extentX, harborEdge.right - extentX);
+  const y = clamp(c.y, harborEdge.top + extentY, harborEdge.bottom - extentY);
+  if ((c.x - x) * c.vx > 0) c.vx = 0;
+  if ((c.y - y) * c.vy > 0) c.vy = 0;
+  c.x = x;
+  c.y = y;
 }
 export function spawnTraffic(g) {
   g.traffic = [];
@@ -232,15 +225,10 @@ function updateTraffic(g, dt) {
     t.a = Math.atan2(dy, dx);
     t.x += (dx / Math.max(1, d)) * t.speed * dt;
     t.y += (dy / Math.max(1, d)) * t.speed * dt;
-    const c = g.car,
-      cd = distance(c, t);
-    if (cd < 31 && cd > 0.01) {
-      impact(g, Math.hypot(c.vx, c.vy) * 0.5);
-      c.x += ((c.x - t.x) / cd) * (31 - cd);
-      c.y += ((c.y - t.y) / cd) * (31 - cd);
-      c.vx *= 0.65;
-      c.vy *= 0.65;
-    }
+    const c = g.car;
+    if (Math.abs(t.x - c.x) >= 52 || Math.abs(t.y - c.y) >= 52) continue;
+    const hit = contact(carBody(c), carBody(t));
+    if (hit) resolveContact(g, hit, Math.cos(t.a) * t.speed, Math.sin(t.a) * t.speed, 0.5);
   }
 }
 function updateRival(g, dt) {
@@ -266,11 +254,11 @@ function updateRival(g, dt) {
     r.y += (dy / d) * step;
   }
   r.cooldown = Math.max(0, r.cooldown - dt);
-  if (distance(r, g.car) < 60 && r.cooldown <= 0) {
+  if (r.cooldown <= 0 && distance(r, g.car) < 52 && contact(carBody(g.car), carBody(r))) {
     r.cooldown = 5;
     if (g.mission?.stage === "delivery") {
       g.mission.cargo = Math.max(0, g.mission.cargo - 8);
-      emit(g, "Rival pressure! Take another street.");
+      emit(g, "Rival contact · cargo −8%");
     }
   }
 }
@@ -311,8 +299,6 @@ export function step(g, input, dt) {
   c.x += c.vx * dt;
   c.y += c.vy * dt;
   c.hit = Math.max(0, c.hit - dt);
-  collision(g);
-  g.save.distance += distance({ x: oldX, y: oldY }, c);
   if (input.drift && Math.abs(forward) > 80) {
     g.skids.push({ x: c.x, y: c.y, a: c.a, life: 8 });
     if (g.skids.length > 450) g.skids.shift();
@@ -335,6 +321,8 @@ export function step(g, input, dt) {
   for (const s of g.skids) s.life -= dt;
   g.skids = g.skids.filter((s) => s.life > 0);
   updateTraffic(g, dt);
+  collision(g);
+  g.save.distance += distance({ x: oldX, y: oldY }, c);
   updateRival(g, dt);
   for (let i = 0; i < stops.length; i++) {
     if (!(g.save.stamps & (1 << i)) && distance(c, stops[i]) < 58) {

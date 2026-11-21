@@ -4,6 +4,7 @@ import {
   WIDTH,
   HEIGHT,
   buildings,
+  harborEdge,
   stops,
   clamp,
   routeTo,
@@ -209,6 +210,9 @@ export function createCanvasFallback(canvas, g) {
         b.y + 112,
       );
     }
+    const { left, right, top, bottom } = harborEdge;
+    for (const x of [left, right]) line(x, top, x, bottom, "#ecbd75", 3);
+    for (const y of [top, bottom]) line(left, y, right, y, "#ecbd75", 3);
     // Waterfront rails and warehouse-edge lighting make boundaries legible.
     for (let y = 145; y < 2120; y += 44) {
       circle(2118, y, 3, "#b2e5d6");

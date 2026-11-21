@@ -10,15 +10,54 @@
 .pp-touch .screen .opts { gap: 7px 10px; width: 100%; }
 .pp-touch .screen .seg button { padding-inline: 9px; }
 .pp-touch #help { display: none; }
-.pp-touch #map { width: 90px; height: 90px; right: 12px; bottom: 166px; opacity: .88; }
-.pp-touch #dash { left: 50%; right: auto; bottom: 16px; transform: translateX(-50%); }
-.pp-touch #speed,.pp-touch #gear { font-size: 26px; }
-.pp-touch #carbox { width: 135px; left: 10px; bottom: 65px; padding: 5px 7px; font-size: 10px; }
-.pp-touch #tower { max-height: 23vh; overflow: hidden; }
-.pp-touch #timing { right: 12px; top: 58px; }
-@media (max-width: 520px) {
-  .pp-touch #dash { left: 12px; bottom: 76px; transform: none; }
-  .pp-touch #carbox { bottom: 128px; }
-  .pp-touch #timing { max-width: 38vw; }
-  .pp-touch #where { max-width: 50vw; }
+/* Keep the drivetrain controls together, leaving the middle of the track clear. */
+.pp-touch #pp-pad.pad-drive {
+  --primary-w: clamp(62px, calc(35px + 7vw + 2vmin), 124px);
+  --primary-h: clamp(55px, calc(34px + 7vmin), 92px);
+  --minor: clamp(44px, 7vmin, 60px);
+  --gap: clamp(4px, .8vmin, 8px);
+}
+.pp-touch #pp-pad .pad-side { gap: var(--gap); }
+.pp-touch #pp-pad .pad-left button, .pp-touch #pp-pad [data-key="KeyW"] {
+  width: var(--primary-w); min-width: 0; height: var(--primary-h); font-size: clamp(16px, 3vmin, 24px);
+}
+.pp-touch #pp-pad [data-key="KeyW"] { background: #285a4d; color: #fff; grid-column: 2 / 4; justify-self: end; }
+.pp-touch #pp-pad [data-key="KeyW"].on { background: #99e1bf; color: #12271b; }
+.pp-touch #pp-pad .pad-right { grid-template-columns: repeat(3,var(--minor)); }
+.pp-touch #pp-pad .pad-right button:not([data-key="KeyW"]) { min-width: 0; width: 100%; height: var(--minor); padding: 2px; }
+.pp-touch #pp-pad [data-key="KeyW"] { max-width: calc(2 * var(--minor) + var(--gap)); }
+.pp-touch #pp-pad .pad-tools { top: max(8px,env(safe-area-inset-top)); }
+.pp-touch #pp-pad details { top: max(8px,env(safe-area-inset-top)); right: calc(var(--right) + 58px); }
+.pp-touch #pp-pad summary { min-height: 44px; min-width: 76px; }
+.pp-touch #pp-pad details[open] { width: min(235px, 65vw); }
+.pp-touch #pp-pad details[open] div { max-height: calc(100dvh - 202px); min-height: 44px; overscroll-behavior: contain; }
+
+.pp-touch #hud #where, .pp-touch #hud #map, .pp-touch #hud #tower,
+.pp-touch #hud #carbox, .pp-touch #hud #revwrap { display: none !important; }
+.pp-touch #hud #timing { left: max(8px,env(safe-area-inset-left)); top: max(8px,env(safe-area-inset-top)); right: auto; min-width: 0; max-width: calc(100% - 166px); padding: 5px 8px; }
+.pp-touch #timing .row, .pp-touch #timing #delta, .pp-touch #timing #sectors { display: none; }
+.pp-touch #big { gap: 6px; }
+.pp-touch #pos, .pp-touch #laptime { font-size: clamp(14px, 3.2vmin, 20px); }
+.pp-touch #lapcount { font-size: 11px; margin: 2px 0 0; }
+.pp-touch #hud #dash { left: max(10px,env(safe-area-inset-left)); bottom: calc(max(10px,env(safe-area-inset-bottom)) + clamp(55px, calc(34px + 7vmin), 92px) + 4px); transform: none; gap: 8px; align-items: center; }
+.pp-touch #speed, .pp-touch #gear { font-size: clamp(18px,3.1vmin,26px); }
+.pp-touch #radio { bottom: auto; top: 66px; }
+.pp-touch #flags { top: 62px; }
+.pp-touch #flags .flag:not(.on) { display: none; }
+.pp-touch #flags .flag { font-size: 10px; }
+.pp-touch #hud #banner { top: 26%; width: 86%; font-size: clamp(20px,4.5vmin,32px); white-space: normal; }
+.pp-touch #hud #banner small { font-size: clamp(11px,2vmin,14px); }
+.pp-touch body:has(#hud.on) > button[aria-pressed] {
+  top: max(8px,env(safe-area-inset-top)) !important;
+  right: calc(max(10px,env(safe-area-inset-right)) + 158px) !important;
+  left: auto !important;
+}
+.pp-touch body:has(#pp-pad details[open]):not(:has(.screen.on)) > button[aria-pressed] { visibility: hidden; }
+.pp-touch:has(#pp-pad details[open]) #hud #carbox { display: block !important; top: max(62px,env(safe-area-inset-top)); bottom: auto; left: 8px; width: min(150px,26vw); font-size: 10px; padding: 5px; }
+@media (max-width: 480px) {
+  .pp-touch #pp-pad.pad-drive { --primary-w: clamp(56px,17vw,76px); }
+  .pp-touch #hud #timing { max-width: calc(100% - 214px); }
+  .pp-touch #laptime { overflow: hidden; text-overflow: ellipsis; }
+  .pp-touch:has(#pp-pad details[open]) #hud #timing { visibility: hidden; }
+  .pp-touch:has(#pp-pad details[open]) #hud #carbox { display: none !important; }
 }

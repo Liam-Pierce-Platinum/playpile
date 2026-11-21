@@ -17,7 +17,7 @@ import { TUNE, TYRES, WHEEL_SHORT } from './stock.js';
 import { buildOval, TRACKS } from './oval.js';
 import { buildTrack, markPitStall } from './track.js';
 import { buildCar } from './body.js';
-import { Race, PHASE } from './race.js';
+import { Race, PHASE } from './race.js?v=20261120-race-qa';
 import { setAnisotropy } from './textures.js';
 import { Sky } from './sky.js';
 import { Post } from './post.js';

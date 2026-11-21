@@ -758,12 +758,15 @@ class Game {
     this.feed.forEach((f, i) => { x.globalAlpha = Math.min(1, f.t); this.label(f.text, W - 20, 82 + i * 22, 12 * sc, '#ffffff', 'right'); });
     x.globalAlpha = 1;
     // damage diagram
-    if (p) this.diagram(p, this.isTouch ? 20 : 24, this.isTouch ? 150 * sc : H - 190, this.isTouch ? sc * 0.75 : sc);
+    if (p && this.isTouch && H <= 450) {
+      this.label('ENGINE ' + Math.round(100 * p.ef) + '%', 20, 118 * sc, 13 * sc, '#ffffff', 'left');
+      this.label('BOOST ' + Math.round(100 * p.boost) + '%', 20, 137 * sc, 13 * sc, '#82caff', 'left');
+    } else if (p) this.diagram(p, this.isTouch ? 20 : 24, this.isTouch ? 150 * sc : H - 190, this.isTouch ? sc * 0.75 : sc);
     // countdown
     if (this.count > 0) {
       const n = Math.ceil(this.count), k = this.count - Math.floor(this.count);
       if (n <= 3) { x.globalAlpha = Math.min(1, k * 3); this.label(`${n}`, W / 2, H * 0.4, (110 + (1 - k) * 40) * sc, n === 1 ? '#ff6a3a' : '#ffffff'); x.globalAlpha = 1; }
-      this.label(this.isTouch ? 'DRAG LEFT SIDE TO STEER  ·  BOOST / REV ON THE RIGHT' : 'WASD DRIVE  ·  SPACE HANDBRAKE  ·  SHIFT BOOST  ·  LAST CAR RUNNING WINS', W / 2, H * 0.4 + 100 * sc, 13 * sc, '#ffd23a');
+      if (!this.isTouch) this.label('WASD DRIVE  ·  SPACE HANDBRAKE  ·  SHIFT BOOST  ·  LAST CAR RUNNING WINS', W / 2, H * 0.4 + 100 * sc, 13 * sc, '#ffd23a');
     }
     if (this.spectate && !this.over && !this.ui.open) this.label(`SPECTATING  ·  ${this.isTouch ? 'TAP' : 'SPACE'} FOR RESULTS`, W / 2, H - 40, 14 * sc, '#ffd23a');
     if (this.isTouch && p && p.alive) this.touchHud();

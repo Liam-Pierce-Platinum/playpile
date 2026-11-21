@@ -197,20 +197,22 @@
     var tools = document.createElement('div'); tools.className = 'pad-tools';
     if (cfg.drive || cfg.left === 'horizontal') { button(left,'◀','KeyA'); button(left,'▶','KeyD'); }
     else stick(left,cfg.left === 'wasd' ? ['KeyW','KeyA','KeyS','KeyD'] : ['ArrowUp','ArrowLeft','ArrowDown','ArrowRight']);
-    var actions = cfg.drive ? [['Brake','KeyS'],['Gas','KeyW'],['Clutch','KeyC'],['Gear −','KeyQ'],['Gear +','KeyE'],['Pit','KeyP']] : cfg.btns;
-    if (cfg.drs) actions.push(['DRS','Space']);
+    var actions = cfg.drive ? [['Gear −','KeyQ'],['Clutch','KeyC'],['Gear +','KeyE'],['Brake','KeyS'],['Gas','KeyW']] : cfg.btns;
     actions.forEach(function (bt) { button(right,bt[0],bt[1]); });
-    var extras = cfg.drive ? [['Camera','KeyV'],['Reset','KeyR'],['Pause','Escape']] : cfg.tools || [];
+    var extras = cfg.drive ? [['Pause','Escape']] : cfg.tools || [];
     extras.forEach(function(bt) { button(tools,bt[0],bt[1]); });
     pad.append(left,right,tools);
     if (cfg.drive) {
       var more = document.createElement('details');
-      var title = document.createElement('summary'); title.textContent = cfg.drs ? 'Tyres' : 'Race setup';
+      var title = document.createElement('summary'); title.textContent = 'Race tools';
       var options = document.createElement('div');
       var advanced = cfg.drs
         ? [['Soft','Digit1'],['Medium','Digit2'],['Hard','Digit3'],['Inter','Digit4'],['Wet','Digit5']]
         : [['Wedge +','ArrowUp'],['Wedge −','ArrowDown'],['Bar +','ArrowRight'],['Bar −','ArrowLeft'],['Slower','BracketLeft'],['Faster','BracketRight'],['Visor','KeyT']];
+      advanced = [['Camera','KeyV'],['Reset','KeyR'],['Pit','KeyP']].concat(cfg.drs ? [['DRS','Space']] : [], advanced);
       advanced.forEach(function(bt) { button(options,bt[0],bt[1]); });
+      pad.querySelector('[data-key="KeyA"]').setAttribute('aria-label','Steer left');
+      pad.querySelector('[data-key="KeyD"]').setAttribute('aria-label','Steer right');
       more.append(title,options); pad.appendChild(more);
     }
     document.body.appendChild(pad);

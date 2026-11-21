@@ -41,3 +41,8 @@ button.ghost{background:#c9c1ec;box-shadow:0 6px 0 #9a90c8}
   .panel button,#muteBtn { min-height: 44px; }
   #muteBtn { left: max(12px, env(safe-area-inset-left)); top: max(12px, env(safe-area-inset-top)); }
 }
+.skin {margin:0;color:inherit;box-shadow:none;}
+@media (pointer:coarse) {
+  #muteBtn {width:44px;}
+  body:has(.panel:not(.hide)) #hud, body:has(.panel:not(.hide)) #muteBtn {visibility:hidden;}
+}

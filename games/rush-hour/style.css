@@ -80,14 +80,28 @@ button.big:hover { background: #ff6a3a; }
 .card.locked { opacity: 0.4; cursor: default; }
 .card.locked .n::after { content: ' \1F512'; font-size: 16px; }
 
-#touch { position: fixed; inset: 0; }
-.tz { position: absolute; bottom: 0; top: 30%; width: 34%; display: flex; align-items: flex-end; padding: 22px; font-size: 32px; opacity: 0.35; }
-#tL { left: 0; } #tR { right: 0; justify-content: flex-end; }
-.tz.on { opacity: 0.8; }
-.tb { position: absolute; bottom: 22px; font-size: 14px; padding: 16px 14px; border: 2px solid rgba(255,255,255,0.6); background: rgba(0,0,0,0.3); border-radius: 10px; }
-#tBrake { left: 16px; bottom: 96px; } #tNitro { right: 16px; bottom: 96px; border-color: #4ef0ff; color: #4ef0ff; }
-#tPause { top: 110px; bottom: auto; right: 16px; padding: 8px 12px; }
-body.touch #speedo { bottom: 160px; }
+#touch { --drive-h: clamp(58px,calc(34px + 8vmin),94px); --turn-w: clamp(60px,calc(27px + 8vw + 2vmin),120px);
+  position: fixed; inset: max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));
+  display: flex; align-items: end; justify-content: space-between; pointer-events: none; }
+#touch > div { display: flex; gap: clamp(4px,1vmin,10px); }
+#touch button { transform: none; pointer-events: auto; touch-action: none; border-radius: 8px; padding: 2px; background: #111c29df; }
+#touch .steering button { width: var(--turn-w); height: var(--drive-h); font-size: clamp(18px,3vmin,24px); }
+#touch .pedals button { width: clamp(56px,10vmin,80px); height: clamp(48px,8vmin,68px);
+  font: 750 clamp(11px,1.8vmin,14px)/1 'Segoe UI',Arial,sans-serif; letter-spacing: .25px; }
+#touch .on { background: #e6f1f4; color: #102230; }
+#tNitro { border-color: #4ef0ff; color: #4ef0ff; }
+#tPause { position: absolute; right: 0; top: 0; width: 46px; height: 46px; }
+body.touch #speedo { right: max(10px,env(safe-area-inset-right)); bottom: calc(max(8px,env(safe-area-inset-bottom)) + clamp(48px,8vmin,68px) + 4px); }
+body.touch #spd { font-size: clamp(22px,4.2vmin,35px); }
+body.touch #hudTop { left: max(8px,env(safe-area-inset-left)); right: calc(max(8px,env(safe-area-inset-right)) + 56px); gap: 4px; }
+body.touch #title .keys { display: none; }
+body.touch #title .tagline::after { content: ' Auto gas. Steer to weave through traffic.'; }
+body.touch #nitroBar { width: clamp(70px,17vw,126px); height: 12px; margin-top: 2px; }
+body.touch #speedo .lbl { letter-spacing: 1px; }
+body.touch #stageBox { max-width: 35%; }
+body.touch #cornerWarn { top: 25%; }
+body.touch #banner { inset: 26% 6% auto; font-size: clamp(18px,4.5vmin,30px); line-height: 1.1; }
+body.touch #banner small { font: 700 clamp(10px,2vmin,13px)/1.35 'Segoe UI',Arial,sans-serif; letter-spacing: 1px; }
 @media (max-width: 700px) {
   #grid { grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: 62vh; overflow-y: auto; }
   #time { font-size: 34px; } #spd { font-size: 44px; } #stageName { font-size: 13px; } #score { font-size: 20px; }

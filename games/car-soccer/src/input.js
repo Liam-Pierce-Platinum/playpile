@@ -63,15 +63,14 @@ export function initTouch(el, onAnyTouch) {
   const base = el.querySelector('.stick'), knob = el.querySelector('.knob');
   const bJump = el.querySelector('.b-jump'), bBoost = el.querySelector('.b-boost');
   let stickId = null, ox = 0, oy = 0;
-  const R = 60;
+  let radius = 60;
   const setKnob = (dx, dy) => { knob.style.transform = `translate(${dx}px, ${dy}px)`; };
   const btn = (b, id) => b && b.classList.toggle('on', id);
   const state = new Map(); // touch id -> 'jump' | 'boost'
   const hitBtn = (t) => {
     for (const [b, name] of [[bJump, 'jump'], [bBoost, 'boost']]) {
       const r = b.getBoundingClientRect();
-      const pad = 18;
-      if (t.clientX > r.left - pad && t.clientX < r.right + pad && t.clientY > r.top - pad && t.clientY < r.bottom + pad) return name;
+      if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) return name;
     }
     return null;
   };
@@ -89,6 +88,7 @@ export function initTouch(el, onAnyTouch) {
       if (name) { state.set(t.identifier, name); continue; }
       if (stickId === null && t.clientX < window.innerWidth * 0.55) {
         stickId = t.identifier; ox = t.clientX; oy = t.clientY;
+        radius = base.getBoundingClientRect().width / 2;
         base.style.left = ox + 'px'; base.style.top = oy + 'px'; base.classList.add('on'); setKnob(0, 0);
       } else if (t.clientX >= window.innerWidth * 0.55) {
         state.set(t.identifier, 'jump');   // a tap anywhere on the right = jump
@@ -102,13 +102,13 @@ export function initTouch(el, onAnyTouch) {
       if (t.identifier === stickId) {
         let dx = t.clientX - ox, dy = t.clientY - oy;
         const l = Math.hypot(dx, dy);
-        if (l > R) {               // the base follows the thumb so the stick never "runs out"
-          ox += (dx / l) * (l - R); oy += (dy / l) * (l - R);
+        if (l > radius) {          // the base follows the thumb so the stick never "runs out"
+          ox += (dx / l) * (l - radius); oy += (dy / l) * (l - radius);
           base.style.left = ox + 'px'; base.style.top = oy + 'px';
           dx = t.clientX - ox; dy = t.clientY - oy;
         }
         setKnob(dx, dy);
-        const nx = dx / R, ny = -dy / R;
+        const nx = dx / radius, ny = -dy / radius;
         touch.x = Math.abs(nx) < 0.18 ? 0 : Math.max(-1, Math.min(1, nx * 1.25));
         touch.y = Math.abs(ny) < 0.25 ? 0 : Math.max(-1, Math.min(1, ny * 1.25));
       } else if (state.has(t.identifier)) {
@@ -130,7 +130,7 @@ export function initTouch(el, onAnyTouch) {
   el.addEventListener('touchmove', move, { passive: false });
   el.addEventListener('touchend', end);
   el.addEventListener('touchcancel', end);
-  window.addEventListener('blur', () => {
+  function releaseTouches() {
     stickId = null;
     touch.x = touch.y = 0;
     base.classList.remove('on');
@@ -138,5 +138,7 @@ export function initTouch(el, onAnyTouch) {
     setKnob(0, 0);
     state.clear();
     refresh();
-  });
+  }
+  window.addEventListener('blur', releaseTouches);
+  return releaseTouches;
 }

@@ -31,7 +31,7 @@
 //                the pit road.
 //   THE FINISH   white flag, chequered flag, and a results table.
 import { Car, TUNE, TYRES } from './stock.js';
-import { Runner, collide, enforceWalls } from './world.js';
+import { Runner, collide, enforceWalls } from './world.js?v=20261120-race-qa';
 import { Driver, lanePlan } from './ai.js';
 import { airflow } from './draft.js';
 import { Damage } from './damage.js';

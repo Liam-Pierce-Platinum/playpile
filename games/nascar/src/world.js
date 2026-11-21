@@ -1,3 +1,4 @@
+import { orientedBody, capsuleContact } from '../../_shared/vehicle-contact.js';
 // =====================================================================
 // NASCAR :: world.js - WHAT HAPPENS TO A CAR BECAUSE OF WHERE IT IS
 // =====================================================================
@@ -244,20 +245,18 @@ export class Runner {
  * proper bounce, because that is a crash and it should feel like one.
  */
 export function collide(runners) {
-  const R = 1.05;
   for (let a = 0; a < runners.length; a++) {
     if (runners[a].out) continue;
     for (let b = a + 1; b < runners.length; b++) {
       if (runners[b].out) continue;
       const A = runners[a].car, B = runners[b].car;
       if (Math.abs(A.x - B.x) > 8 || Math.abs(A.z - B.z) > 8) continue;
-      const segA = seg(A), segB = seg(B);
-      const [pa, pb] = closest(segA, segB);
-      let nx = pb[0] - pa[0], nz = pb[1] - pa[1];
-      const d = Math.hypot(nx, nz);
-      if (d >= R * 2 || d < 1e-6) continue;
-      nx /= d; nz /= d;
-      const push = (R * 2 - d) / 2;
+      const hit = capsuleContact(
+        orientedBody(A.x, A.z, Math.PI / 2 - A.yaw, HALF_LENGTH, HALF_WIDTH),
+        orientedBody(B.x, B.z, Math.PI / 2 - B.yaw, HALF_LENGTH, HALF_WIDTH)
+      );
+      if (!hit) continue;
+      const nx = -hit.nx, nz = -hit.ny, push = hit.depth / 2;
       A.x -= nx * push; A.z -= nz * push;
       B.x += nx * push; B.z += nz * push;
       const vrel = (B.vx - A.vx) * nx + (B.vz - A.vz) * nz;
@@ -276,7 +275,7 @@ export function collide(runners) {
       const vn = Math.max(0, -vrel);
       const tx = (B.vx - A.vx) - nx * vrel, tz = (B.vz - A.vz) - nz * vrel;
       const vt = Math.hypot(tx, tz);
-      const cx = (pa[0] + pb[0]) / 2, cz = (pa[1] + pb[1]) / 2;
+      const cx = hit.x, cz = hit.y;
       const y = (runners[a].y + runners[b].y) / 2 + 0.5;
       for (const [r, C, sgn] of [[runners[a], A, 1], [runners[b], B, -1]]) {
         const dx = cx - C.x, dz = cz - C.z;
@@ -335,25 +334,4 @@ export function enforceWalls(runners) {
     }
     r.lat = loc.off - (loc.off - r.lat) * 0;      // keep the cached offset honest
   }
-}
-
-function seg(car) {
-  const f = [Math.sin(car.yaw), Math.cos(car.yaw)], h = 1.55;
-  return [[car.x - f[0] * h, car.z - f[1] * h], [car.x + f[0] * h, car.z + f[1] * h]];
-}
-
-/** closest points between two segments, sampled - plenty at car scale */
-function closest(s1, s2) {
-  let best = Infinity, out = null;
-  for (let i = 0; i <= 4; i++) {
-    const t = i / 4;
-    const p = [s1[0][0] + (s1[1][0] - s1[0][0]) * t, s1[0][1] + (s1[1][1] - s1[0][1]) * t];
-    for (let j = 0; j <= 4; j++) {
-      const u = j / 4;
-      const q = [s2[0][0] + (s2[1][0] - s2[0][0]) * u, s2[0][1] + (s2[1][1] - s2[0][1]) * u];
-      const dd = (p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2;
-      if (dd < best) { best = dd; out = [p, q]; }
-    }
-  }
-  return out;
 }

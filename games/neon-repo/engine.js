@@ -1,3 +1,4 @@
+import { contact, orientedBody } from "../_shared/vehicle-contact.js";
 export const GRID_X = [220, 760, 1300, 1840, 2380, 2920],
   GRID_Y = [220, 760, 1300, 1840, 2380];
 export const WORLD = { w: 3180, h: 2640, road: 154 };
@@ -199,31 +200,7 @@ const walls = BLOCKS.map(b => ({
 
 function vehicleBody(car) {
   const model = VEHICLES[car.kind] || VEHICLES.scout;
-  const x = Math.cos(car.angle), y = Math.sin(car.angle);
-  return { x: car.x, y: car.y, halfLength: model.length / 2, halfWidth: model.width / 2,
-    forward: { x, y }, side: { x: -y, y: x } };
-}
-const dot = (a, b) => a.x * b.x + a.y * b.y;
-function projectedRadius(body, axis) {
-  return body.halfLength * Math.abs(dot(body.forward, axis)) +
-    body.halfWidth * Math.abs(dot(body.side, axis));
-}
-// Oriented rectangles meet only if their extents overlap along all four axes.
-function contact(a, b) {
-  const dx = a.x - b.x, dy = a.y - b.y;
-  let depth = Infinity, nx = 0, ny = 0;
-  for (const axis of [a.forward, a.side, b.forward, b.side]) {
-    const separation = dx * axis.x + dy * axis.y;
-    const overlap = projectedRadius(a, axis) + projectedRadius(b, axis) - Math.abs(separation);
-    if (overlap <= 0) return null;
-    if (overlap < depth) {
-      const sign = separation < 0 ? -1 : 1;
-      depth = overlap;
-      nx = sign * axis.x;
-      ny = sign * axis.y;
-    }
-  }
-  return { nx, ny, depth };
+  return orientedBody(car.x, car.y, car.angle, model.length / 2, model.width / 2);
 }
 export function makeState(career = {}) {
   return {

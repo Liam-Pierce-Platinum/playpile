@@ -5,7 +5,7 @@ import { makeBot, botInput } from './bot.js';
 import { initInput, readInput, initTouch, touch, anyPressed, clearPressed } from './input.js';
 import { initAudio, sfxs, engine, crowdLevel, setMuted, setMusic, setMusicMode } from './audio.js';
 import { fx, resetFx, updateFx, sparks, dust, boostPuff, goalExplosion, demoBlast, ring, shake, popup, part } from './fx.js';
-import { initRender, resize, draw, updateCamera, TEAM, drawPreview, cam } from './render.js?v=garage-preview-1';
+import { initRender, resize, draw, updateCamera, TEAM, drawPreview, cam } from './render.js?v=driving-qa-2';
 import { save, persist } from './save.js';
 import { PAINTS, BODIES, TRAILS, GOALFX, UNLOCKS, LISTS, unlockLevel, XP_PER_LEVEL, levelFromXp, itemName } from './unlocks.js';
 
@@ -35,7 +35,7 @@ window.__G = G;
 initRender($('c'));
 window.addEventListener('resize', () => { resize(); orientHint(); });
 initInput(onKey);
-initTouch($('touch'), () => { initAudio(); if (G.state === 'match' && G.match.phase === 'replay') skipReplay(); });
+const releaseTouches = initTouch($('touch'), () => { initAudio(); if (G.state === 'match' && G.match.phase === 'replay') skipReplay(); });
 document.addEventListener('pointerdown', () => initAudio(), { capture: true });
 setMuted(save.muted); setMusic(save.music);
 if (matchMedia('(pointer: coarse)').matches) document.body.classList.add('touchmode'), (touch.used = true);
@@ -48,13 +48,17 @@ function styleFor(player) {
   return { paint: null, body: G.match && G.match.mode === 'bot' ? ['octo', 'dart', 'brute'][['rookie', 'pro', 'allstar'].indexOf(G.match.diff)] : 'octo', trailCols: null };
 }
 
+function syncCarStyles() {
+  G.styles = [styleFor(0), styleFor(1)];
+  G.world.cars.forEach((car,i) => {car.body=G.styles[i].body;});
+}
 // ---------- attract mode behind the title ----------
 function startAttract() {
   G.world = makeWorld(); kickoff(G.world);
   G.bots = [makeBot('allstar', 0), makeBot('pro', 1)];
   G.match = { mode: 'attract', diff: 'pro', score: [0, 0], time: 999, overtime: false, otTime: 0, phase: 'play', phaseT: 0, stats: [blankStats(), blankStats()] };
   G.frames = []; G.trail = []; resetFx();
-  G.styles = [styleFor(0), styleFor(1)];
+  syncCarStyles();
 }
 function blankStats() { return { goals: 0, shots: 0, saves: 0, demos: 0, touches: 0 }; }
 
@@ -68,7 +72,7 @@ function startMatch(opts = {}) {
   G.frames = []; G.trail = []; G.replay = null; G.hitstop = 0; G.slowmo = 0;
   G.scorePulse = [0, 0];
   resetFx();
-  G.styles = [styleFor(0), styleFor(1)];
+  syncCarStyles();
   beginKickoff();
   G.state = 'match';
   showScreen(null);
@@ -397,7 +401,7 @@ function startReplay() {
 function render(dt) {
   const m = G.match, w = G.world;
   if (!m) return;
-  G.styles = [styleFor(0), styleFor(1)];
+  syncCarStyles();
   const rp = G.state === 'match' && m.phase === 'replay';
   if (rp !== G.rpClass) { G.rpClass = rp; document.body.classList.toggle('inreplay', rp); }
   let view;
@@ -485,6 +489,7 @@ document.querySelectorAll('#diffs button').forEach((b) => b.addEventListener('cl
 
 function pause() {
   if (G.state !== 'match') return;
+  releaseTouches();
   G.state = 'paused'; showScreen('pause');
   for (let i = 0; i < 2; i++) engine(i, 0, false, 0, false, true);
 }
